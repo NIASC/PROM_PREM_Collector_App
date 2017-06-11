@@ -304,7 +304,8 @@ $url = CONSENT_URL;
 
 		while($row = DBM::fetchObject($query)) {
 
-			$additional_info = '';
+			//$additional_info = '';
+            $additional_info = array();
 
 			$content = info_by_id ($siteData['language'], $row->id, $count = 1, $sort_by = " `bc_info`.`start_date` DESC ");
 

@@ -1,13 +1,20 @@
 <?php
 
-// Cleanup URI
-function cleanupURI($uri) {
+/**
+ * Cleanup URI
+ *
+ * @param mysqli $database_link The instance of the connection to the database.
+ * @param string $uri The URI to clean up.
+ *
+ * @return string The cleaned-up URI.
+ */
+function cleanupURI($database_link, $uri) {
 	
 	$uri = str_replace('\\', '/', $uri);
 	$uri = preg_replace('!\.+/!', '', $uri);
 	$uri = trim(trim($uri), '\/');
 	$uri = preg_replace('!/+!', '/', $uri);
-	$uri = mysql_escape_string($uri);
+	$uri = mysqli_escape_string($database_link, $uri);
 	
 	return $uri;
 	
@@ -67,7 +74,7 @@ function whereWeAre($config, $database_link) {
 	
 	if (GET_QUERY_STRING == 1) {
 		
-		$currentURI = cleanupURI($_GET['que']);
+		$currentURI = cleanupURI($database_link, $_GET['que']);
 		
 	} else {
 	
@@ -82,7 +89,7 @@ function whereWeAre($config, $database_link) {
 			
 		}
 		
-		$currentURI = cleanupURI($currentURI);
+		$currentURI = cleanupURI($database_link, $currentURI);
 		
 		if (IN_FOLDER != '') {
 			$currentURI = str_replace(IN_FOLDER, '', $currentURI);
@@ -392,7 +399,7 @@ function menu_by_parent($siteData, $parent, $menu_id, $database_link) {
 				";
 		if ($result = DBM::queryData($query, $database_link)) {
 		
-		while ($data = DBM::fetchObject($result)) {
+            while ($data = DBM::fetchObject($result)) {
 			
 			$return_value[] = $data;
 			
@@ -813,7 +820,7 @@ function get_related_gall_album($id, $language, $database_link){
 	
 	if ($result = DBM::queryData($query, $database_link)) {
 		
-	$data = DBM::fetchObject($result);
+        $data = DBM::fetchObject($result);
 	
 	$related_gall = array('thumbnail' => $data->thumbnail,
 						'title' => $data->title,
@@ -843,7 +850,7 @@ $query = "SELECT
 	
 	if ($result = DBM::queryData($query, $database_link)) {
 		
-	while ($data = DBM::fetchObject($result)){
+        while ($data = DBM::fetchObject($result)){
 			
 	$related_news[] = array('id' => $data->id, 
 							'title' => $data->title, 

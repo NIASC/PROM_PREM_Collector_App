@@ -13,7 +13,8 @@ Download the project (as zip or using 'git clone') to you _htdocs_ directory (On
 
 ### Configuration
 * In _sql/research.sql_ change _localhost:80_ to your site address.
-* Create a new database (using XAMPP: In the XAMPP dashboard, go to the _phpMyAdmin_ page and select _Databases_ in the menubar. Then create a new database (the _Collation_ setting does not need to be set)) and import `research.sql`.
+* Create a new database names _research_ and import _research.sql_ (using XAMPP: In the XAMPP dashboard, go to the _phpMyAdmin_ page and select _Databases_ in the menubar. Then create a new database (the _Collation_ setting does not need to be set)).
+* NOTE: The login information is hard-coded to be login:_root_, password:_root_ so you may have to set the password manually to _root_. This maybe break your login to _phpMyAdmin_ so be careful.
 
 # INSTALL.txt
 Below is the information contained in INSTALL.txt. The instructions will be updated later.

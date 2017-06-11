@@ -51,7 +51,7 @@ $get_info_query = "SELECT `section_id`,
 
 if ($get_info_result = DBM::queryData($get_info_query, $database_link)) {
 	
-	$get_info_data = DBM::fetchObject($get_info_result);
+	$get_info_data = DBM::fetchObject($get_info_result, $get_info_result);
 	
 	$smarty->assign('info_title', $get_info_data->title);
 	

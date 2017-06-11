@@ -12,13 +12,13 @@ $config['database']['database'] = 'research';
 // General
 
 $config['languages'] = array('en', 'dk', 'se');
-$config['site_url'] = 'http://localhost:8888/InformedConsent-app/manage/';
-$config['file_path'] = 'http://localhost:8888/InformedConsent-app/html/res/images/';
+$config['site_url'] = 'http://localhost:80/PROM_PREM_Collector/manage/';
+$config['file_path'] = 'http://localhost:80/PROM_PREM_Collector/html/res/images/';
 $config['fpath'] = '../html/res/images/';
 $config['PDFpath'] = '../html/res/docs/';
 
-$config['site_address'] = 'http://localhost:8888/InformedConsent-app/html/';
-$config['base_path'] = '/Applications/MAMP/htdocs/InformedConsent-app/html/';
+$config['site_address'] = 'http://localhost:80/PROM_PREM_Collector/html/';
+$config['base_path'] = '/opt/lampp/htdocs/PROM_PREM_Collector/html/';
 $config['thumb_folder_name'] = 'thumb/';
 $config['slider_folder_name'] = 'slider/';
 $config['docs_folder_name'] = '../docs/';

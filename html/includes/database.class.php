@@ -1,50 +1,59 @@
 <?php
+/*
+--------------------------------------------------------------------------------
+ */
+class DBM
+{
 
-class DBM {
-	
-	// Connect
+	/**
+     * Connect to the mysql database.
+     *
+     * @param array $parameters The list of parameters used to open the
+     *     connection with. It must include the keys 'host', 'username',
+     *     'password', 'database'.
+     *
+     * @return mysqli The instance of the connection.
+     */
 	public static function open($parameters) {
 		
-		$database_link = mysql_connect($parameters['host'], $parameters['username'], $parameters['password']);
-		
-		if (!$database_link) {
+		$database_link = mysqli_connect(
+            $parameters['host'], $parameters['username'],
+            $parameters['password'], $parameters['database']);
+		if (!$database_link)
+        {
 			return false;
 		}
-
-		$db_selected = mysql_select_db($parameters['database'], $database_link);
-		
-		if (!$db_selected) {
-			return false;
-		}
-		
-		mysql_query('SET CHARACTER SET utf8', $database_link);
-		
-		mysql_query("SET NAMES 'utf8'", $database_link);
+		mysqli_query($database_link, 'SET CHARACTER SET utf8');
+		mysqli_query($database_link, "SET NAMES 'utf8'");
 		
 		return $database_link;
-		
 	}
 	
-	// Close
-	public static function close($database_link) {
-		
-		if (!$database_link) {
+	/**
+     * Close the connection to the database.
+     *
+     * @param mysqli The instance of the upen connection.
+     *
+     * @return bool True if the connection was closed. False on error.
+     */
+	public static function close($database_link)
+    {
+		if (!$database_link)
+        {
 			return false;
 		}
-		
-		mysql_close($database_link);
+		mysqli_close($database_link);
 		
 		return true;
-		
 	}
 	
 	// Query
 	public static function query($query, $database_link = '') {
 	
 		if ($database_link) {
-			return mysql_query($query, $database_link);
+			return mysqli_query($database_link, $query);
 		} else {
-			return mysql_query($query);
+			return false;
 		}
 		
 	}
@@ -52,21 +61,21 @@ class DBM {
 	// Num Rows
 	public static function numRows($result) {
 	
-		return mysql_num_rows($result);
+		return mysqli_num_rows($result);
 		
 	}
 	
 	// Fetch Object
 	public static function fetchObject($result) {
 	
-		return mysql_fetch_object($result);
+		return mysqli_fetch_object($result);
 		
 	}
 	
 	// Fetch Array
-	public static function fetchArray($result, $intMode = MYSQL_ASSOC) {
+	public static function fetchArray($result, $intMode = MYSQLI_ASSOC) {
 	
-		return mysql_fetch_array($result, $intMode);
+		return mysqli_fetch_array($result, $intMode);
 		
 	}
 	
@@ -74,14 +83,26 @@ class DBM {
 	public static function queryData($query, $database_link = '') {
 	
 		if ($database_link) {
-			$result = mysql_query($query, $database_link);
-		} else {
-			$result = mysql_query($query);
+			$result = mysqli_query($database_link, $query);
 		}
-		
-		if (mysql_num_rows($result)) {
+        else
+        {
+			return false;
+		}
+
+        if (is_bool($result))
+        {
+            /* sometimes mysqli_query returns a boolean which
+             * mysqli_num_rows can not handle
+             */
+            return $result;
+        }
+		else if (mysqli_num_rows($result))
+        {
 			return $result;
-		} else {
+		}
+        else
+        {
 			return false;
 		}
 		

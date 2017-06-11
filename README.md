@@ -12,7 +12,8 @@ It is based on [InformedConsent-app](https://github.com/NIASC/InformedConsent-ap
 Download the project (as zip or using 'git clone') to you _htdocs_ directory (On a GNU+Linux machine with XAMPP this should be located in _/opt/lampp/_).
 
 ### Configuration
-yet to be done.
+* In _sql/research.sql_ change _localhost:80_ to your site address.
+* Create a new database (using XAMPP: In the XAMPP dashboard, go to the _phpMyAdmin_ page and select _Databases_ in the menubar. Then create a new database (the _Collation_ setting does not need to be set)) and import `research.sql`.
 
 # INSTALL.txt
 Below is the information contained in INSTALL.txt. The instructions will be updated later.

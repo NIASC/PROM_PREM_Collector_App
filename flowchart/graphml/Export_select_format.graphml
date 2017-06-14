@@ -90,7 +90,7 @@
           <y:Geometry height="50.0" width="200.0" x="260.0" y="275.0"/>
           <y:Fill color="#008080" color2="#99CC00" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="45.90625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="170.67578125" x="14.662109375" y="2.046875">Ask for sample count
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="45.90625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="170.67578125" x="14.662109375" y="2.046875">Ask for output format
 
 UserInterface_select_option<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
@@ -159,7 +159,7 @@ request?<y:LabelModel>
           <y:Geometry height="50.0" width="200.0" x="440.0" y="526.0"/>
           <y:Fill color="#008080" color2="#99CC00" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="45.90625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="172.48046875" x="13.759765625" y="2.046875">Present error
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="45.90625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="172.48046875" x="13.759765625" y="2.046875">Invalid format
 
 UserInterface_present_error<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>

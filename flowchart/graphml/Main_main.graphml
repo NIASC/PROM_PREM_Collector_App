@@ -193,13 +193,12 @@ UserHandle_Logout<y:LabelModel>
       </data>
     </node>
     <node id="n10">
-      <data key="d5"/>
       <data key="d6">
         <y:GenericNode configuration="com.yworks.flowchart.predefinedProcess">
           <y:Geometry height="50.0" width="200.0" x="260.0" y="545.0"/>
           <y:Fill color="#008080" color2="#99CC00" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="45.90625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="170.67578125" x="14.662109375" y="2.046875">Select action
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="45.90625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="170.67578125" x="14.662109375" y="2.046875">Main menu/Select action
 
 UserInterface_select_option<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
@@ -271,7 +270,6 @@ UserInterface_select_option<y:LabelModel>
       </data>
     </edge>
     <edge id="e5" source="n3" target="n10">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -282,7 +280,6 @@ UserInterface_select_option<y:LabelModel>
       </data>
     </edge>
     <edge id="e6" source="n10" target="n7">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -293,7 +290,6 @@ UserInterface_select_option<y:LabelModel>
       </data>
     </edge>
     <edge id="e7" source="n10" target="n6">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
@@ -307,7 +303,6 @@ UserInterface_select_option<y:LabelModel>
       </data>
     </edge>
     <edge id="e8" source="n10" target="n5">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
@@ -321,7 +316,6 @@ UserInterface_select_option<y:LabelModel>
       </data>
     </edge>
     <edge id="e9" source="n6" target="n10">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
@@ -337,7 +331,6 @@ UserInterface_select_option<y:LabelModel>
       </data>
     </edge>
     <edge id="e10" source="n5" target="n10">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">

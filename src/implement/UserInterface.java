@@ -38,20 +38,20 @@ public class UserInterface implements UserInterface_Interface
 	{
 		separate();
 		System.out.printf(
-				"What would you like to do?\n\t%s\n\t%s\n\t%s\n",
+				"What would you like to do?\n%s\n%s\n%s\n",
 				"1: Login", "2: Register", "0: Exit");
 		int input = in.nextInt();
 		in.reset();
 		int out = UserInterface_Interface.ERROR;
 		switch (input)
 		{
-		case UserInterface_Interface.EXIT: //exit
+		case 0: //exit
 			out = UserInterface_Interface.EXIT;
 			break;
-		case UserInterface_Interface.LOGIN:
+		case 1:
 			out = UserInterface_Interface.LOGIN;
 			break;
-		case UserInterface_Interface.REGISTER:
+		case 2:
 			out = UserInterface_Interface.REGISTER;
 			break;
 		default:

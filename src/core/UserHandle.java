@@ -13,6 +13,7 @@ public class UserHandle
 	{
 		if (loggedIn)
 			return;
+		System.out.printf("Logging in\n");
 		initLoginVars();
 	}
 	
@@ -20,12 +21,14 @@ public class UserHandle
 	{
 		if (loggedIn)
 			return;
+		System.out.printf("Registering\n");
 	}
 	
 	public void logout()
 	{
 		if (!loggedIn)
 			return;
+		System.out.printf("Logging out\n");
 		resetLoginVars();
 	}
 	

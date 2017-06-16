@@ -7,9 +7,9 @@ import core.containers.OptionContainer;
 public interface UserInterface_Interface
 {
 	public static final int ERROR = -1;
-	public static final int EXIT = 0;
-	public static final int LOGIN = 1;
-	public static final int REGISTER = 2;
+	public static final int EXIT = 0x100;
+	public static final int LOGIN = 0x200;
+	public static final int REGISTER = 0x400;
 	/**
 	 * Presents an error message to the user. The message
 	 * should contain clear information about why the error

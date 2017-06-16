@@ -9,9 +9,10 @@ public class PROM_PREM_Collector
 	private UserHandle userHandle;
 	private Questionaire questionaire;
 	private ViewData viewData;
-	private final int LOGOUT = 0;
-	private final int START_QUESTIONAIRE = 1;
-	private final int VIEW_DATA = 2;
+	private final int ERROR = -1;
+	private final int LOGOUT = 1;
+	private final int START_QUESTIONAIRE = 2;
+	private final int VIEW_DATA = 4;
 	
 	private UserInterface ui;
 
@@ -47,8 +48,8 @@ public class PROM_PREM_Collector
 		}
 
 		OptionContainer options = new OptionContainer();
-		options.fill(new Option[]
-				{
+		options.fill(
+				new Option[] {
 						new Option(START_QUESTIONAIRE, "Start questionaire."),
 						new Option(VIEW_DATA, "View statistics for this clinic."),
 						new Option(LOGOUT, "Log out.")
@@ -56,9 +57,16 @@ public class PROM_PREM_Collector
 		boolean running = true;
 		while (running)
 		{
-			int response = ui.selectOption(options);
+			options.setSelected(ui.selectOption(options));
+			Option selected = options.getSelected();
+			int response = ERROR;
+			if (selected != null)
+				response = selected.getIdentifier();
 			switch (response)
 			{
+			case ERROR:
+				ui.displayError("No option selected");
+				break;
 			case LOGOUT:
 				userHandle.logout();
 				running = false;

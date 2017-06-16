@@ -20,7 +20,7 @@ public class PROM_PREM_Collector
 	{
 		ui = new UserInterface();
 		
-		userHandle = new UserHandle();
+		userHandle = new UserHandle(ui);
 		questionaire = new Questionaire(ui, userHandle);
 		viewData = new ViewData(ui, userHandle);
 	}

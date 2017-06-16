@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
+import core.containers.User;
+
 
 public class Database implements Database_interface
 {
@@ -126,6 +128,38 @@ public class Database implements Database_interface
 			e.printStackTrace();
 		}
 		return ret;
+	}
+
+	public User getUser(String username)
+	{
+		ResultSet rs = query("SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
+		User user = null;
+		try
+		{
+			while (rs.next())
+			{
+				if (rs.getString("name").equals(username))
+				{
+					user = new User(rs.getInt("clinic_id"), rs.getString("name"), rs.getString("password"),
+							rs.getString("email"), rs.getString("salt"), rs.getInt("update_password") != 0);
+					break;
+				}
+			}
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return user;
+	}
+
+	public User setPassword(User user, String oldPass, String newPass, String newSalt)
+	{
+		if (!user.passwordMatch(oldPass))
+			return null;
+		String qInsert = String.format(
+				"UPDATE `users` SET `password`=%s,`salt`=%s,`update_password`=%d WHERE `users`.`name` = '%s'",
+				newPass, newSalt, 0, user.getUsername());
+		return queryUpdate(qInsert) == QUERY_SUCCESS ? getUser(user.getUsername()) : null;
 	}
 
 	private final class DatabaseConfig

@@ -1,11 +1,17 @@
 package implement;
 
+import java.util.HashMap;
+
+import core.containers.User;
+
 public interface Database_interface
 {
 	public static final int ERROR = -1;
 	public static final int CONNECT_SUCCESS = 0x10;
 	public static final int DISCONNECT_SUCCESS = 0x20;
 	public static final int QUERY_SUCCESS = 0x40;
+	public static final int FOUND = 0x80;
+	public static final int NOT_FOUND = 0x100;
 
 	/**
 	 * Opens a connection to the database.
@@ -44,4 +50,33 @@ public interface Database_interface
 	 * @return QUERY_SUCCESS on successful update, ERROR on failure.
 	 */
 	public int addClinic(String clinicName);
+	
+	/**
+	 * Collects the clinic names and id and places them in a HashMap.
+	 * 
+	 * @return A HashMap containing clinic id as keys and clinic names as values.
+	 */
+	public HashMap<Integer, String> getClinics();
+	
+	/**
+	 * Collects the information about the user from the database.
+	 * @param username The name of the user to look for.
+	 * @return If the user was found the instance of the user is returned else null.
+	 */
+	public User getUser(String username);
+	
+	/**
+	 * Updates the user's password and salt to newPass and newSalt if oldPass matches
+	 * the user's current password.
+	 * 
+	 * @param user The user that is updating it's password.
+	 * @param oldPass The old (current) (unhashed) password.
+	 * @param newPass The new password hashed using the new salt.
+	 * @param newSalt The new salt.
+	 * 
+	 * @return The instance of the user with updated password. If the old password does
+	 * 		not match the user's password then the password is not updated and
+	 * 		null is returned.
+	 */
+	public User setPassword(User user, String oldPass, String newPass, String newSalt);
 }

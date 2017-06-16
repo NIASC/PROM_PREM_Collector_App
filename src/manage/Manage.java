@@ -40,7 +40,7 @@ public class Manage
 		System.out.printf("Clinic?\n");
 		HashMap<Integer, String> clinics = db.getClinics();
 		for (Entry<Integer, String> e : clinics.entrySet())
-			System.out.printf("%d: %s", e.getKey(), e.getValue());
+			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
 		int clinic = in.nextInt();
 		in.reset();
 

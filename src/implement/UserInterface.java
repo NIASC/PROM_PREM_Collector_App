@@ -59,6 +59,18 @@ public class UserInterface implements UserInterface_Interface
 		}
 		return out;
 	}
+	
+	public HashMap<String, String> requestLoginDetails(String usernameKey, String passwordKey)
+	{
+		HashMap<String, String> details = new HashMap<String, String>(2);
+		System.out.printf("%s\n", "Enter username");
+		details.put(usernameKey, in.next());
+		in.reset();
+		System.out.printf("%s\n", "Enter password");
+		details.put(passwordKey, in.next());
+		in.reset();
+		return details;
+	}
 
 	@Override
 	public int selectOption(OptionContainer options)

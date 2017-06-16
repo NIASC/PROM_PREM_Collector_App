@@ -31,6 +31,13 @@ public interface UserInterface_Interface
 	public int displayLoginScreen();
 	
 	/**
+	 * Requests login details (i.e. username & password) from the user.
+	 * @return A HashMap where the username is associated with 'usernameKey'
+	 * 		and the password is associated with 'passwordKey'
+	 */
+	public HashMap<String, String> requestLoginDetails(String usernameKey, String passwordKey);
+	
+	/**
 	 * Displays options and require the user to select one of them.
 	 * @param options The options
 	 * @return int The id of the selected option

@@ -44,7 +44,7 @@ public interface Database_interface
 			String password, int clinic, String email);
 
 	/**
-	 * Adds a new clinic to the database
+	 * Adds a new clinic to the database.
 	 * 
 	 * @param clinicName The name of the clinic.
 	 * 

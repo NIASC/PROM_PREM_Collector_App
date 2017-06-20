@@ -29,6 +29,13 @@ public class UserHandle
 		loggedIn = false;
 	}
 	
+	/**
+	 * Prompts the user for login details and attempts to match them
+	 * with data in the database.
+	 * If the user successfully logs in it will be flagged as logged in
+	 * (which can be used to verify that the user has logged in using
+	 * the function isLoggedIn).
+	 */
 	public void login()
 	{
 		if (loggedIn)
@@ -52,13 +59,24 @@ public class UserHandle
 		user_db.disconnect();
 	}
 	
+	/**
+	 * Not implemented yet.
+	 * 
+	 * Presents a registration form that the user must fill in and
+	 * sends the request to an administrator who can add the user if it
+	 * is authorized.
+	 */
 	public void register()
 	{
 		if (loggedIn)
 			return;
-		System.out.printf("Registering\n");
+		System.out.printf("Requesting Registration\n");
 	}
 	
+	/**
+	 * Resets any variables that was initialized during login (in
+	 * particular it resets the 'logged in' flag).
+	 */
 	public void logout()
 	{
 		if (!loggedIn)
@@ -67,11 +85,22 @@ public class UserHandle
 		resetLoginVars();
 	}
 	
+	/**
+	 * Returns the 'logged in' flag.
+	 * @return True if the user is logged in. False if not.
+	 */
 	public boolean isLoggedIn()
 	{
 		return loggedIn;
 	}
 	
+	/**
+	 * Query the user for current password and new password if the user
+	 * is logged in. If the old password is correct and the password
+	 * matches the valid passwords criterion.
+	 * This function will query the user until the old and new password
+	 * fulfill the criterion described above.
+	 */
 	private void setPassword()
 	{
 		if (!loggedIn)
@@ -112,7 +141,23 @@ public class UserHandle
 			ui.displayError(Messages.DATABASE_ERROR);
 	}
 	
-	private boolean newPassError(String oldPass, String newPass1, String newPass2)
+	/**
+	 * Attempts to find any errors in the supplied passwords.
+	 * The errors it looks for are:
+	 * Old/current password must match the user's current password.
+	 * The two new passwords must be the same.
+	 * The new password must fit the length constraint.
+	 * The new password must fit the strength constraint.
+	 * 
+	 * @param oldPass The unhashed old/current password.
+	 * @param newPass1 The first entry of the new unhashed password.
+	 * @param newPass2 The second entry of the new unhashed password.
+	 *  
+	 * @return True if an error occurred (se description above). False
+	 * 		if no errors were found.
+	 */
+	private boolean newPassError(
+			String oldPass, String newPass1, String newPass2)
 	{
 		if (!user.passwordMatch(oldPass))
 		{
@@ -143,11 +188,11 @@ public class UserHandle
 	}
 	
 	/**
-	 * Attempts to match the supplied username and password with users that are
-	 * already in the database.
-	 * Bitwise masking can be use to mask out different return values (i.e.
-	 * USER_FOUND | DETAILS_MATCH) is returns if the user is found and the password
-	 * matches.
+	 * Attempts to match the supplied username and password with users
+	 * that are already in the database.
+	 * Bitwise masking can be use to mask out different return values
+	 * (i.e. USER_FOUND | DETAILS_MATCH) is returns if the user is
+	 * found and the password matches.
 	 * 
 	 * Bitwise masks:
 	 * USER_FOUND		- User was found.
@@ -167,19 +212,35 @@ public class UserHandle
 	}
 	
 	/**
-	 * Query the database to look for the user with the supplied name and
-	 * return the instance of that user.
+	 * Query the database to look for the user with the supplied name
+	 * and return the instance of that user.
 	 * 
-	 * 
-	 * @param username The name of the user to look for in the database.
-	 * @return The instance of the user with the supplied username if it was found.
-	 * 		If the user was not found or an error occurred then null is returned.
+	 * @param username The name of the user to look for in the
+	 * 		database.
+	 * @return The instance of the user with the supplied username if
+	 * 		it was found. If the user was not found or an error
+	 * 		occurred then null is returned.
 	 */
 	private User findDetails(String username)
 	{
 		return user_db.getUser(username);
 	}
 	
+	/**
+	 * Validates the password according to the security criterion.
+	 * This should typically be done when the user wants to set a new
+	 * password.
+	 * The criterion are:
+	 * password length: >5 and < 33 characters.
+	 * password strength: contain characters from at least 2 groups
+	 * 		out of [a-z], [A-Z], [0-9], [^a-zA-Z0-9] (symbols).
+	 * 
+	 * @param password The password to validate.
+	 * @return <0 if the password does not fit the length constraint.
+	 * 		0 if the password does not fit the strength constraint.
+	 * 		>0 if the password fits the length constraint and strength
+	 * 		constraint.
+	 */
 	private int validatePassword(String password)
 	{
 		if (password.length() < 6 || password.length() > 32)
@@ -203,7 +264,8 @@ public class UserHandle
 	}
 	
 	/**
-	 * Initializes variables that are useful during the time the user is logged in.
+	 * Initializes variables that are useful during the time the user
+	 * is logged in.
 	 */
 	private void initLoginVars()
 	{

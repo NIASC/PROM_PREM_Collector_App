@@ -32,9 +32,6 @@ public class Database implements Database_interface
 		}
 	}
 
-	/**
-	 * Open a connection to the database.
-	 */
 	@Override
 	public int connect()
 	{
@@ -72,7 +69,8 @@ public class Database implements Database_interface
 		}
 		return ret;
 	}
-	
+
+	@Override
 	public int addUser(String username,
 			String password, int clinic, String email)
 	{
@@ -82,7 +80,8 @@ public class Database implements Database_interface
 				clinic, username, password, email, sdf.format(new Date()));
 		return queryUpdate(qInsert);
 	}
-	
+
+	@Override
 	public int addClinic(String clinicName)
 	{
 		String qInsert = String.format(
@@ -90,6 +89,15 @@ public class Database implements Database_interface
 		return queryUpdate(qInsert);
 	}
 	
+	/**
+	 * Query the database to update an entry i.e. modify an existing
+	 * database entry.
+	 * 
+	 * @param message The command (specified by the SQL language)
+	 * 		to send to the database.
+	 * 
+	 * @return QUERY_SUCCESS on successful query, ERROR on failure.
+	 */
 	private int queryUpdate(String message)
 	{
 		int ret = ERROR;
@@ -107,6 +115,17 @@ public class Database implements Database_interface
 		return ret;
 	}
 	
+	/**
+	 * Query the database, typically for data (i.e. request data from
+	 * the database).
+	 * 
+	 * @param message The command (specified by the SQL language)
+	 * 		to send to the database.
+	 * 
+	 * @return The the ResultSet from the database. If the statement
+	 * 		is not initialized or a query error occurs then null is
+	 * 		returned.
+	 */
 	private ResultSet query(String message)
 	{
 		if (stmt == null)
@@ -122,6 +141,7 @@ public class Database implements Database_interface
 		return rs;
 	}
 	
+	@Override
 	public HashMap<Integer, String> getClinics()
 	{
 		ResultSet rs = query("SELECT `id`, `name` FROM `clinics`");
@@ -139,6 +159,7 @@ public class Database implements Database_interface
 		return ret;
 	}
 
+	@Override
 	public User getUser(String username)
 	{
 		ResultSet rs = query("SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
@@ -163,6 +184,7 @@ public class Database implements Database_interface
 		return user;
 	}
 
+	@Override
 	public User setPassword(User user, String oldPass, String newPass, String newSalt)
 	{
 		if (!user.passwordMatch(oldPass))
@@ -174,6 +196,7 @@ public class Database implements Database_interface
 		return queryUpdate(qInsert) == QUERY_SUCCESS ? getUser(user.getUsername()) : null;
 	}
 
+	@Override
 	public int getErrorMessages(MessageContainer mc)
 	{
 		ResultSet rs = query("SELECT `code`, `name`, `locale`, `message` FROM `error_messages` WHERE `locale` = 'en'");

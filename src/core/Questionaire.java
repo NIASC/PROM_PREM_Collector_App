@@ -17,8 +17,8 @@ public class Questionaire
 	{
 		if (!userHandle.isLoggedIn())
 		{
-			userInterface.displayError(
-					"You must be logged in to start the questionaire.");
+			userInterface.displayError(Messages.errorMessages.getMessage(
+					"NOT_LOGGED_IN", "en"));
 			return;
 		}
 		System.out.println("Starting Questionaire");

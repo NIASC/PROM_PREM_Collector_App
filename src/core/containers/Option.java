@@ -33,6 +33,8 @@ public class Option
 	
 	public static Option copy(final Option opt)
 	{
+		if (opt == null)
+			return null;
 		return new Option(opt.getIdentifier(), opt.getText());
 	}
 }

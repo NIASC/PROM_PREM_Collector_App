@@ -2,6 +2,7 @@ package implement;
 
 import java.util.HashMap;
 
+import core.containers.FormContainer;
 import core.containers.OptionContainer;
 
 public interface UserInterface_Interface
@@ -32,6 +33,7 @@ public interface UserInterface_Interface
 	
 	/**
 	 * Requests login details (i.e. username & password) from the user.
+	 * 
 	 * @return A HashMap where the username is associated with 'usernameKey'
 	 * 		and the password is associated with 'passwordKey'
 	 */
@@ -39,8 +41,26 @@ public interface UserInterface_Interface
 	
 	/**
 	 * Displays options and require the user to select one of them.
+	 * 
 	 * @param options The options
 	 * @return int The id of the selected option
 	 */
 	public int selectOption(OptionContainer options);
+	
+	/**
+	 * Displays a form that the user has to fill in. The supplied
+	 * FormContainer may contain forms that has already been filled
+	 * or contains default values which should be displayed.
+	 * 
+	 * @param form A container for form entries.
+	 */
+	public void displayForm(FormContainer form);
+	
+	/**
+	 * Displays information to the user. For displaying error messages
+	 * please use displayForm.
+	 * 
+	 * @param message The message to display to the user.
+	 */
+	public void displayMessage(String message);
 }

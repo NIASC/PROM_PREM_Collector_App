@@ -44,9 +44,7 @@ public class OptionContainer
 	 */
 	public HashMap<Integer, Option> get()
 	{
-		HashMap<Integer, Option> opt = new HashMap<Integer, Option>(options.size());
-		opt.putAll(options);
-		return opt;
+		return options;
 	}
 	
 	/**

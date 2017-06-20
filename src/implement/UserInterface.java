@@ -5,6 +5,8 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 
 import core.containers.OptionContainer;
+import core.containers.Form;
+import core.containers.FormContainer;
 import core.containers.Option;
 
 public class UserInterface implements UserInterface_Interface
@@ -78,13 +80,37 @@ public class UserInterface implements UserInterface_Interface
 		separate();
 		System.out.printf("Select option\n");
 		HashMap<Integer, Option> opt = options.get();
+		Option selected = options.getSelected();
 		for (Entry<Integer, Option> e : opt.entrySet())
 		{
-			System.out.printf("%d: %s\n", e.getKey(), e.getValue().getText());
+			Option option = e.getValue();
+			if (option == selected)
+				System.out.printf("[%d]: %s\n",
+						e.getKey(), option.getText());
+			else
+				System.out.printf(" %d : %s\n",
+						e.getKey(), option.getText());
 		}
 		int input = in.nextInt();
 		in.reset();
 		return input;
 	}
 
+	public void displayForm(FormContainer form)
+	{
+		separate();
+		for (Entry<Integer, Form> e : form.get().entrySet())
+		{
+			Form f = e.getValue();
+			System.out.printf("%d) %s: %s", e.getKey(), f.getKey(),
+					(f.getValue() == null ? "" : f.getValue()));
+			f.setValue(in.next());
+			in.reset();
+		}
+	}
+
+	public void displayMessage(String message)
+	{
+		System.out.printf("%s\n", message);
+	}
 }

@@ -2,6 +2,7 @@ package implement;
 
 import java.util.HashMap;
 
+import core.containers.MessageContainer;
 import core.containers.User;
 
 public interface Database_interface
@@ -41,7 +42,7 @@ public interface Database_interface
 	 */
 	public int addUser(String username,
 			String password, int clinic, String email);
-	
+
 	/**
 	 * Adds a new clinic to the database
 	 * 
@@ -54,29 +55,44 @@ public interface Database_interface
 	/**
 	 * Collects the clinic names and id and places them in a HashMap.
 	 * 
-	 * @return A HashMap containing clinic id as keys and clinic names as values.
+	 * @return A HashMap containing clinic id as keys and clinic names
+	 * 		as values.
 	 */
 	public HashMap<Integer, String> getClinics();
 	
 	/**
 	 * Collects the information about the user from the database.
+	 * 
 	 * @param username The name of the user to look for.
-	 * @return If the user was found the instance of the user is returned else null.
+	 * @return If the user was found the instance of the user is
+	 * 		returned else null.
 	 */
 	public User getUser(String username);
-	
+
 	/**
-	 * Updates the user's password and salt to newPass and newSalt if oldPass matches
-	 * the user's current password.
+	 * Updates the user's password and salt to newPass and newSalt if
+	 * oldPass matches the user's current password.
 	 * 
 	 * @param user The user that is updating it's password.
 	 * @param oldPass The old (current) (unhashed) password.
 	 * @param newPass The new password hashed using the new salt.
 	 * @param newSalt The new salt.
 	 * 
-	 * @return The instance of the user with updated password. If the old password does
-	 * 		not match the user's password then the password is not updated and
-	 * 		null is returned.
+	 * @return The instance of the user with updated password. If the
+	 * 		old password does not match the user's password then the
+	 * 		password is not updated and null is returned.
 	 */
-	public User setPassword(User user, String oldPass, String newPass, String newSalt);
+	public User setPassword(User user, String oldPass, String newPass,
+			String newSalt);
+	
+	/**
+	 * Loads error messages from the database and puts them in a
+	 * MessageContainer.
+	 * 
+	 * @param mc The (empty) message container to put error messages in.
+	 * 
+	 * @return QUERY_SUCCESS if the error messages were successfully
+	 * 		loaded. ERROR if there was an error with the database.
+	 */
+	public int getErrorMessages(MessageContainer mc);
 }

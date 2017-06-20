@@ -1,5 +1,6 @@
 package core;
 
+import core.containers.MessageContainer;
 import core.containers.Option;
 import core.containers.OptionContainer;
 import implement.*;
@@ -19,7 +20,6 @@ public class PROM_PREM_Collector
 	public PROM_PREM_Collector()
 	{
 		ui = new UserInterface();
-		
 		userHandle = new UserHandle(ui);
 		questionaire = new Questionaire(ui, userHandle);
 		viewData = new ViewData(ui, userHandle);
@@ -27,6 +27,7 @@ public class PROM_PREM_Collector
 
 	public void start()
 	{
+		Messages.loadMessages();
 		while(!userHandle.isLoggedIn())
 		{
 			int response = ui.displayLoginScreen();
@@ -41,8 +42,8 @@ public class PROM_PREM_Collector
 				userHandle.register();
 				break;
 			default:
-				ui.displayError("Unknown option " + response
-						+ ".");
+				ui.displayError(Messages.errorMessages.getMessage(
+						"UNKNOWN_RESPONSE", "en"));
 				break;
 			}
 		}
@@ -65,7 +66,8 @@ public class PROM_PREM_Collector
 			switch (response)
 			{
 			case ERROR:
-				ui.displayError("No option selected");
+				ui.displayError(Messages.errorMessages.getMessage(
+						"NULL_SELECTED", "en"));
 				break;
 			case LOGOUT:
 				userHandle.logout();
@@ -78,8 +80,8 @@ public class PROM_PREM_Collector
 				viewData.start();
 				break;
 			default:
-				ui.displayError("Unknown option " + response
-						+ ".");
+				ui.displayError(Messages.errorMessages.getMessage(
+						"UNKNOWN_RESPONSE", "en"));
 				break;
 			}
 		}

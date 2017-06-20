@@ -17,8 +17,8 @@ public class ViewData
 	{
 		if (!userHandle.isLoggedIn())
 		{
-			userInterface.displayError(
-					"You must be logged in to view statistics.");
+			userInterface.displayError(Messages.errorMessages.getMessage(
+					"NOT_LOGGED_IN", "en"));
 			return;
 		}
 		System.out.println("Viewing data");

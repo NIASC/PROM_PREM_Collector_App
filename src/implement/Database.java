@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
+import core.containers.Message;
+import core.containers.MessageContainer;
 import core.containers.User;
 
 
@@ -65,7 +67,7 @@ public class Database implements Database_interface
 			ret = DISCONNECT_SUCCESS;
 		}
 		catch(SQLException se)
-		{ // nothing we can do
+		{
 			se.printStackTrace();
 		}
 		return ret;
@@ -91,11 +93,14 @@ public class Database implements Database_interface
 	private int queryUpdate(String message)
 	{
 		int ret = ERROR;
+		if (stmt == null)
+			return ret;
 		try
 		{
 			stmt.executeUpdate(message);
 			ret = QUERY_SUCCESS;
-		} catch (SQLException se)
+		}
+		catch (SQLException se)
 		{
 			se.printStackTrace();
 		}
@@ -104,6 +109,8 @@ public class Database implements Database_interface
 	
 	private ResultSet query(String message)
 	{
+		if (stmt == null)
+			return null;
 		ResultSet rs = null;
 		try
 		{
@@ -118,6 +125,8 @@ public class Database implements Database_interface
 	public HashMap<Integer, String> getClinics()
 	{
 		ResultSet rs = query("SELECT `id`, `name` FROM `clinics`");
+		if (rs == null)
+			return null;
 		HashMap<Integer, String> ret = new HashMap<Integer, String>();
 		try
 		{
@@ -133,6 +142,8 @@ public class Database implements Database_interface
 	public User getUser(String username)
 	{
 		ResultSet rs = query("SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
+		if (rs == null)
+			return null;
 		User user = null;
 		try
 		{
@@ -157,16 +168,42 @@ public class Database implements Database_interface
 		if (!user.passwordMatch(oldPass))
 			return null;
 		String qInsert = String.format(
-				"UPDATE `users` SET `password`=%s,`salt`=%s,`update_password`=%d WHERE `users`.`name` = '%s'",
+				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
 				newPass, newSalt, 0, user.getUsername());
+		System.out.println(qInsert);
 		return queryUpdate(qInsert) == QUERY_SUCCESS ? getUser(user.getUsername()) : null;
+	}
+
+	public int getErrorMessages(MessageContainer mc)
+	{
+		ResultSet rs = query("SELECT `code`, `name`, `locale`, `message` FROM `error_messages` WHERE `locale` = 'en'");
+		if (rs == null)
+			return ERROR;
+		try
+		{
+			while (rs.next())
+			{
+				/* put messages for all locale in msg.
+				 * currently only English(en) is loaded
+				 * so only adding English messages.
+				 */
+				HashMap<String, String> msg = new HashMap<String, String>();
+				msg.put(rs.getString("locale"), rs.getString("message"));
+				
+				mc.addMessage(new Message(rs.getInt("code"),
+						rs.getString("name"), msg));
+			}
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return QUERY_SUCCESS;
 	}
 
 	private final class DatabaseConfig
 	{
 		// JDBC driver name and database URL
 		private String jdbcDriver, dbURL;
-		private int port;
 		//  Database credentials
 		private String username, password;
 		
@@ -176,7 +213,6 @@ public class Database implements Database_interface
 	        props.load(new FileInputStream("src/implement/settings.ini"));
 	        jdbcDriver = props.getProperty("jdbc_driver");
 	        dbURL = props.getProperty("url");
-	        port = Integer.parseInt(props.getProperty("port"));
 	        username = props.getProperty("db_login");
 	        password = props.getProperty("db_password");
 	        props.clear();

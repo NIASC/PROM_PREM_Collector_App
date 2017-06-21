@@ -13,7 +13,7 @@ It is based on [InformedConsent-app](https://github.com/NIASC/InformedConsent-ap
 * `git` is recommended for downloading the source code.
 
 ### Downloading the files (XAMPP)
-Download the project (as zip or using 'git clone') to you _htdocs_ directory (On a GNU+Linux machine with XAMPP this should be located in _/opt/lampp/_).
+Download the project (as zip or using `git clone`) to you _htdocs_ directory (On a GNU+Linux machine with XAMPP this should be located in _/opt/lampp/_).
 
 ### Configuration
 * In _sql/research.sql_ change _localhost:80_ to your site address.

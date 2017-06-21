@@ -5,8 +5,8 @@ It is based on [InformedConsent-app](https://github.com/NIASC/InformedConsent-ap
 ## Getting Started
 
 ### Prerequisits
-* [XAMPP](https://www.apachefriends.org/index.html) version 7.1.4 (or similar). 
-* [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) for MySQL interface to Java (version 5.1.42 included)
+* [XAMPP](https://www.apachefriends.org/index.html) version 7.1.4 (or similar). For Starting MySQL.
+* [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) (version 5.1.42 included). For MySQL interface to Java
 * [GNU JavaMail](https://www.gnu.org/software/classpathx/javamail/javamail.html) (version 1.1.2 included). For email to work.
 * [GNU JAF](https://www.gnu.org/software/classpathx/jaf/jaf.html) (version 1.1.1 included). For email to work.
 * [GNU inetlib](https://www.gnu.org/software/classpathx/inetlib/inetlib.html) (version 1.1.1 included). For email to work.

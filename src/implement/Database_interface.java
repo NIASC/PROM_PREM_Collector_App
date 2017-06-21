@@ -95,4 +95,15 @@ public interface Database_interface
 	 * 		loaded. ERROR if there was an error with the database.
 	 */
 	public int getErrorMessages(MessageContainer mc);
+	
+	/**
+	 * Loads info messages from the database and puts them in a
+	 * MessageContainer.
+	 * 
+	 * @param mc The (empy) message container to put info messages in.
+	 * 
+	 * @return QUERY_SUCCESS if the info messages were successfully
+	 * 		loaded. ERROR if there was an error with the database.
+	 */
+	public int getInfoMessages(MessageContainer mc);
 }

@@ -29,7 +29,11 @@ public class PROM_PREM_Collector
 	 */
 	public void start()
 	{
-		Messages.loadMessages();
+		if (!Messages.loadMessages())
+		{
+			ui.displayError("Database error: unable to load messages.");
+			System.exit(1);
+		}
 		boolean quit = false;
 		do
 		{

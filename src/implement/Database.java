@@ -197,13 +197,42 @@ public class Database implements Database_interface
 	}
 
 	@Override
+	public int getInfoMessages(MessageContainer mc)
+	{
+		if (mc == null)
+			return ERROR;
+		return getMessages("info_messages", "en", mc) ? QUERY_SUCCESS : ERROR;
+	}
+
+	@Override
 	public int getErrorMessages(MessageContainer mc)
 	{
-		ResultSet rs = query("SELECT `code`, `name`, `locale`, `message` FROM `error_messages` WHERE `locale` = 'en'");
-		if (rs == null)
+		if (mc == null)
 			return ERROR;
+		return getMessages("error_messages", "en", mc) ? QUERY_SUCCESS : ERROR;
+	}
+
+	/**
+	 * Retrieves messages from the database and places them in a
+	 * MessageContainer.
+	 * @param tableName
+	 * @param locale
+	 * @param mc
+	 * @return
+	 */
+	private boolean getMessages(String tableName, String locale,
+			MessageContainer mc)
+	{
+		ResultSet rs = query(String.format(
+				("SELECT `code`, `name`, `locale`, `message` "
+						+ "FROM `%s` WHERE `locale` = '%s'"),
+				tableName, locale));
+		if (rs == null)
+			return false;
 		try
 		{
+			if (rs.isClosed())
+				return false;
 			while (rs.next())
 			{
 				/* put messages for all locale in msg.
@@ -220,7 +249,7 @@ public class Database implements Database_interface
 		{
 			e.printStackTrace();
 		}
-		return QUERY_SUCCESS;
+		return true;
 	}
 
 	private final class DatabaseConfig
@@ -232,13 +261,13 @@ public class Database implements Database_interface
 		
 		public DatabaseConfig() throws IOException
 		{
-	        Properties props = new Properties();
-	        props.load(new FileInputStream("src/implement/settings.ini"));
-	        jdbcDriver = props.getProperty("jdbc_driver");
-	        dbURL = props.getProperty("url");
-	        username = props.getProperty("db_login");
-	        password = props.getProperty("db_password");
-	        props.clear();
+			Properties props = new Properties();
+			props.load(new FileInputStream("src/implement/settings.ini"));
+			jdbcDriver = props.getProperty("jdbc_driver");
+			dbURL = props.getProperty("url");
+			username = props.getProperty("db_login");
+			password = props.getProperty("db_password");
+			props.clear();
 			try
 			{ // Register JDBC driver
 				Class.forName(jdbcDriver);

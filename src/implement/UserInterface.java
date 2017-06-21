@@ -102,7 +102,7 @@ public class UserInterface implements UserInterface_Interface
 		for (Entry<Integer, Form> e : form.get().entrySet())
 		{
 			Form f = e.getValue();
-			System.out.printf("%d) %s: %s", e.getKey(), f.getKey(),
+			System.out.printf("%d) %s: %s\n", e.getKey(), f.getKey(),
 					(f.getValue() == null ? "" : f.getValue()));
 			f.setValue(in.next());
 			in.reset();

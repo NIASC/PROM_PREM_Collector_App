@@ -1,10 +1,19 @@
 package core;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.regex.Pattern;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import implement.Database;
 import implement.Encryption;
+import implement.Registration;
 import implement.UserInterface;
 import core.containers.Form;
 import core.containers.FormContainer;
@@ -70,7 +79,8 @@ public class UserHandle
 	{
 		if (loggedIn)
 			return;
-		System.out.printf("Requesting Registration\n");
+		Registration register = new Registration(ui);
+		register.registrationProcess();
 	}
 	
 	/**
@@ -106,6 +116,11 @@ public class UserHandle
 		if (!loggedIn)
 			return; // no user to set password for
 		FormContainer fc = new FormContainer();
+		String[] formKeys = { "Current password",
+				"New password", "New password"};
+		for (String s : formKeys)
+			fc.addForm(new Form(s));
+		
 		fc.fill(new Form[] {
 				new Form("Current password"),
 				new Form("Enter new password"),
@@ -153,7 +168,7 @@ public class UserHandle
 	 * @param newPass1 The first entry of the new unhashed password.
 	 * @param newPass2 The second entry of the new unhashed password.
 	 *  
-	 * @return True if an error occurred (se description above). False
+	 * @return True if an error occurred (see description above). False
 	 * 		if no errors were found.
 	 */
 	private boolean newPassError(

@@ -1,3 +1,5 @@
-/bin/
+local/
+bin/
 .classpath
 .project
+src/implement/mailaccount_settings.ini

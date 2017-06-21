@@ -5,8 +5,12 @@ It is based on [InformedConsent-app](https://github.com/NIASC/InformedConsent-ap
 ## Getting Started
 
 ### Prerequisits
-* [XAMPP](https://www.apachefriends.org/index.html) version 7.1.4 (or similar)
-* `git` is recommended
+* [XAMPP](https://www.apachefriends.org/index.html) version 7.1.4 (or similar). 
+* [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) for MySQL interface to Java (version 5.1.42 included)
+* [GNU JavaMail](https://www.gnu.org/software/classpathx/javamail/javamail.html) (version 1.1.2 included). For email to work.
+* [GNU JAF](https://www.gnu.org/software/classpathx/jaf/jaf.html) (version 1.1.1 included). For email to work.
+* [GNU inetlib](https://www.gnu.org/software/classpathx/inetlib/inetlib.html) (version 1.1.1 included). For email to work.
+* `git` is recommended for downloading the source code.
 
 ### Downloading the files (XAMPP)
 Download the project (as zip or using 'git clone') to you _htdocs_ directory (On a GNU+Linux machine with XAMPP this should be located in _/opt/lampp/_).

@@ -2,7 +2,7 @@
 This is an application designed to collect PROM (patient reported outcome measures) and PREM (patient reported experience measures).
 
 ## Getting Started
-It is recommended to user `git` for downloading the source code, but it is possible to download the source as a zip or to use `wget` or `curl`.
+It is recommended to use `git` for downloading the source code, but it is possible to download the source as a zip.
 ### Prerequisits
 * [Java Development Kit](http://openjdk.java.net/) version 7 or later. For the JVM and compiler. [Core]
 * [Apache Ant](https://ant.apache.org/). For building the program. [Core]
@@ -22,7 +22,7 @@ These configuration steps are needed for the current implementation. You are fre
 * Import the data from _sql/prom_prem_db.sql_ to your new database.
 * In _src/implement/settings.ini_: change `url` to the url of your database; change `db_login` to your database login name; change `db_password` to your database password.
 
-#### If using e-mail-based registration
+#### If using email-based registration
 * In _src/implement/mail_settings.txt modify the settings to match your mail server.
 * In _src/implement/mailaccount_settings.ini: change `admin_email` to the email address that will administer registration requests; change `server_email` and `server_password` to match the credentials of the server's email account that will send registration requests to the administrators.
 
@@ -38,4 +38,5 @@ Navigate to the project folder (it should contain a file called _build.xml_). Th
 ## Writing your own implementation
 __Note: This software is still in early development so it is discouraged to implement your own implementation at this time.__
 Your implementation must implement all of the interfaces located in _src/implement/_ in order to work.
-Currently all of the error and information messages that are presented to the user are stored in the database but are loaded based on the name of the message (which is also stored in the database). If you write your own database implementation you may receive errors when the program tries to load messages from the database.
+### Known implementation-specific issues
+* Error and information messages are called by their name or code as they are defined in the MySQL database.

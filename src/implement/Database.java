@@ -78,13 +78,14 @@ public class Database implements Database_interface
 	}
 
 	@Override
-	public int addUser(String username,
-			String password, int clinic, String email)
+	public int addUser(String username, String password,
+			String salt, int clinic, String email)
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String qInsert = String.format(
-				"INSERT INTO `users` (`clinic_id`, `name`, `password`, `email`, `registered`) VALUES ('%d', '%s', '%s', '%s', '%s')",
-				clinic, username, password, email, sdf.format(new Date()));
+				"INSERT INTO `users` (`clinic_id`, `name`, `password`, `email`, `registered`, `salt`, `update_password`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%d')",
+				clinic, username, password, email,
+				sdf.format(new Date()), salt, 1);
 		return queryUpdate(qInsert);
 	}
 

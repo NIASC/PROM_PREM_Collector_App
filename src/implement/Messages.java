@@ -1,10 +1,20 @@
-package core;
+package implement;
 
 import core.containers.MessageContainer;
-import implement.Database;
-import implement.Database_interface;
 
-public class Messages
+/**
+ * This class should contain error and information messages fomr the
+ * database.
+ * The purpose of this class is to store messages from the database in
+ * a local class so you don't have to query the database every time
+ * you want to display a message to the user.
+ * This implementation allows you do easily choose the language to
+ * display messages for and quick access to messages.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
+public abstract class Messages
 {
 	public static MessageContainer error, info;
 	public static final String LOCALE = "en";

@@ -42,15 +42,16 @@ public interface Database_interface
 	/**
 	 * Adds a new user to the database.
 	 * 
-	 * @param username The username of the new user
-	 * @param password The (hashed) password of the new user
-	 * @param clinic The clinic ID that the new user belongs to
+	 * @param username The username of the new user.
+	 * @param password The (hashed) password of the new user.
+	 * @param salt The salt that was used to hash the password.
+	 * @param clinic The clinic ID that the new user belongs to.
 	 * @param email The email of the new user.
 	 * 
 	 * @return QUERY_SUCCESS on successful update, ERROR on failure.
 	 */
 	public int addUser(String username,
-			String password, int clinic, String email);
+			String password, String salt, int clinic, String email);
 
 	/**
 	 * Adds a new clinic to the database.

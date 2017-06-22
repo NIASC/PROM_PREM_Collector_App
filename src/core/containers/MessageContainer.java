@@ -2,7 +2,7 @@ package core.containers;
 
 import java.util.HashMap;
 
-import core.Messages;
+import implement.Messages;
 
 /**
  * This class is a handles for Message objects. It allows you to group

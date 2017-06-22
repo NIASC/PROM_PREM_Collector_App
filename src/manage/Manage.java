@@ -1,11 +1,20 @@
 package manage;
 
 import implement.Database;
+import implement.Encryption;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+/**
+ * This class is used for managing the database and is only intended
+ * to be used by administrators.
+ * The managing includes adding new clinics and users to the database.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class Manage
 {
 	private Scanner in;
@@ -17,6 +26,11 @@ public class Manage
 		in = new Scanner(System.in);
 	}
 	
+	/**
+	 * Adds a new clinic to the database. The administrator will be
+	 * presented with a form to fill in and the data is formatted
+	 * such that the database can add the clinic.
+	 */
 	private void addClinic()
 	{
 		System.out.printf("Clinic?\n");
@@ -26,6 +40,11 @@ public class Manage
 		db.addClinic(clinic);
 	}
 	
+	/**
+	 * Adds a new user to the database. The administrator will be
+	 * presented with a form to fill in and the data is formatted
+	 * such that the database can add the user.
+	 */
 	private void addUser()
 	{
 		System.out.printf("Username?\n");
@@ -46,10 +65,15 @@ public class Manage
 		System.out.printf("Email?\n");
 		String email = in.next();
 		in.reset();
-		
-		db.addUser(user, password, clinic, email);
+		Encryption crypto = new Encryption();
+		String salt = crypto.getNewSalt();
+		db.addUser(user, crypto.hashString(password, salt), salt, clinic, email);
 	}
 	
+	/**
+	 * Runs the manager main loop. The administrator is presented with
+	 * available management operations and can choose which one to do.
+	 */
 	public void runManager()
 	{
 		// Open a connection
@@ -90,10 +114,11 @@ public class Manage
 		}
 		System.out.printf("%s\n", "Done!");
 	}
+	
 	public static void main(String[] args)
 	{
 		Manage m = new Manage();
 		m.runManager();
 		
-	}//end main
+	}
 }

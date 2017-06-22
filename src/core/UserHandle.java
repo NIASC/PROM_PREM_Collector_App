@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import implement.Database;
 import implement.Encryption;
+import implement.Messages;
 import implement.Registration;
 import implement.UserInterface;
 import core.containers.Form;

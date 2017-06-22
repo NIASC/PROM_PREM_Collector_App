@@ -14,10 +14,13 @@ public class User
 	 * 
 	 * @param clinicID The id of the clinic that the user belongs to.
 	 * @param username The username of the user.
-	 * @param password The (hashed) password of the user, as it appears in the database.
+	 * @param password The (hashed) password of the user, as it appears
+	 * 		in the database.
 	 * @param email The email of the user.
-	 * @param salt The salt that was used to produce the hashed password.
-	 * @param updatePass True if the user is flagged for password update.
+	 * @param salt The salt that was used to produce the hashed
+	 * 		password.
+	 * @param updatePass True if the user is flagged for password
+	 * 		update.
 	 */
 	public User(int clinicID, String username, String password, String email,
 			String salt, boolean updatePass)
@@ -31,17 +34,52 @@ public class User
 		crypto = new Encryption();
 	}
 	
-	public String getUsername() { return username; }
-	public String getEmail() { return email; }
-	public int getClinicID() { return clinicID; }
-	public boolean getUpdatePassword() { return updatePass; }
+	/**
+	 * 
+	 * @return The user's username.
+	 */
+	public String getUsername()
+	{
+		return username;
+	}
+	
+	/**
+	 * 
+	 * @return The user's email address.
+	 */
+	public String getEmail()
+	{
+		return email;
+	}
+	
+	/**
+	 * 
+	 * @return The id of the clinic that the user is registered at.
+	 */
+	public int getClinicID()
+	{
+		return clinicID;
+	}
+	
+	/**
+	 * 
+	 * @return True if the user is flagged to password update.
+	 * 		False if not.
+	 */
+	public boolean getUpdatePassword()
+	{
+		return updatePass;
+	}
 	
 	/**
 	 * Hashes the unhashed password with the user's salt and compares
 	 * the hashed password with the user's password.
-	 * @param unhashedPass The unhashed password to be compared with the user's password.
-	 * @return true if the hashed version of the password matches the user's password.
-	 * 		false if not.
+	 * 
+	 * @param unhashedPass The unhashed password to be compared with
+	 * 		the user's password.
+	 * 
+	 * @return True if the hashed version of the password matches the
+	 * 		user's password. False if not.
 	 */
 	public boolean passwordMatch(String unhashedPass)
 	{

@@ -12,7 +12,14 @@ import core.containers.Message;
 import core.containers.MessageContainer;
 import core.containers.User;
 
-
+/**
+ * This class is an example of an implementation of
+ * Database_Interface. This is done using a MySQL database and a
+ * MySQL Connector/J to provide a MySQL interface to Java.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class Database implements Database_interface
 {
 	
@@ -192,7 +199,6 @@ public class Database implements Database_interface
 		String qInsert = String.format(
 				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
 				newPass, newSalt, 0, user.getUsername());
-		System.out.println(qInsert);
 		return queryUpdate(qInsert) == QUERY_SUCCESS ? getUser(user.getUsername()) : null;
 	}
 
@@ -201,7 +207,7 @@ public class Database implements Database_interface
 	{
 		if (mc == null)
 			return ERROR;
-		return getMessages("info_messages", "en", mc) ? QUERY_SUCCESS : ERROR;
+		return getMessages("info_messages", mc) ? QUERY_SUCCESS : ERROR;
 	}
 
 	@Override
@@ -209,24 +215,23 @@ public class Database implements Database_interface
 	{
 		if (mc == null)
 			return ERROR;
-		return getMessages("error_messages", "en", mc) ? QUERY_SUCCESS : ERROR;
+		return getMessages("error_messages", mc) ? QUERY_SUCCESS : ERROR;
 	}
 
 	/**
 	 * Retrieves messages from the database and places them in a
 	 * MessageContainer.
-	 * @param tableName
-	 * @param locale
+	 * 
+	 * @param tableName The name of the (message) table to retreive
+	 * 		messages from.
 	 * @param mc
 	 * @return
 	 */
-	private boolean getMessages(String tableName, String locale,
-			MessageContainer mc)
+	private boolean getMessages(String tableName, MessageContainer mc)
 	{
 		ResultSet rs = query(String.format(
 				("SELECT `code`, `name`, `locale`, `message` "
-						+ "FROM `%s` WHERE `locale` = '%s'"),
-				tableName, locale));
+						+ "FROM `%s`"), tableName));
 		if (rs == null)
 			return false;
 		try
@@ -235,10 +240,6 @@ public class Database implements Database_interface
 				return false;
 			while (rs.next())
 			{
-				/* put messages for all locale in msg.
-				 * currently only English(en) is loaded
-				 * so only adding English messages.
-				 */
 				HashMap<String, String> msg = new HashMap<String, String>();
 				msg.put(rs.getString("locale"), rs.getString("message"));
 				
@@ -248,21 +249,37 @@ public class Database implements Database_interface
 		} catch (SQLException e)
 		{
 			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
 
+	/**
+	 * Contains the database configuration.
+	 * The configuration provides a link between the Java code and
+	 * the database, and contains necesary information to log in to
+	 * the database and get as well as put data in it.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	private final class DatabaseConfig
 	{
+		private final String cfgFile = "src/implement/settings.ini";
 		// JDBC driver name and database URL
 		private String jdbcDriver, dbURL;
 		//  Database credentials
 		private String username, password;
 		
+		/**
+		 * Loads the settings from src/implement/settings.ini.
+		 * 
+		 * @throws IOException
+		 */
 		public DatabaseConfig() throws IOException
 		{
 			Properties props = new Properties();
-			props.load(new FileInputStream("src/implement/settings.ini"));
+			props.load(new FileInputStream(cfgFile));
 			jdbcDriver = props.getProperty("jdbc_driver");
 			dbURL = props.getProperty("url");
 			username = props.getProperty("db_login");
@@ -277,8 +294,31 @@ public class Database implements Database_interface
 			}
 		}
 		
-		public String getURL() { return dbURL; }
-		public String getUser() { return username; }
-		public String getPassword() { return password; }
+		/**
+		 * 
+		 * @return The URL of the database.
+		 */
+		public String getURL()
+		{
+			return dbURL;
+		}
+		
+		/**
+		 * 
+		 * @return The login name to the database.
+		 */
+		public String getUser()
+		{
+			return username;
+		}
+		
+		/**
+		 * 
+		 * @return The password to the database in plain text.
+		 */
+		public String getPassword()
+		{
+			return password;
+		}
 	}
 }

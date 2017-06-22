@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="PROM_PREM_Collector">
+
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="lib" location="libs"/>
+  <property name="jar" location="${ant.project.name}.jar"/>
+  
+  <!--
+      The project classpath. Any external libraries can be added here.
+  -->
+  <path id="PROM_PREM_Collector.classpath">
+    <pathelement location="${build}"/>
+    <pathelement location="${lib}/mysql-connector-java-5.1.42-bin.jar"/>
+    <pathelement location="${lib}/activation-1.1.1.jar"/>
+    <pathelement location="${lib}/gnumail-1.1.2.jar"/>
+    <pathelement location="${lib}/gnumail-providers-1.1.2.jar"/>
+    <pathelement location="${lib}/inetlib-1.1.2.jar"/>
+  </path>
+
+  <!--
+      Create build directory and copy files that are not source code
+      e.g. .ini and .txt files.
+  -->
+  <target name="init">
+    <mkdir dir="${build}"/>
+    <copy includeemptydirs="false" todir="${build}">
+      <fileset dir="${src}">
+        <exclude name="**/*.launch"/>
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!--
+      Clean up build files.
+  -->
+  <target name="clean">
+    <delete dir="${build}"/>
+  </target>
+
+  <!--
+      Build project
+  -->
+  <target name="build" depends="init">
+    <echo message="${ant.project.name}: ${ant.file}"/>
+    <javac debug="true" destdir="${build}" includeantruntime="false">
+      <src path="${src}"/>
+      <classpath refid="PROM_PREM_Collector.classpath"/>
+    </javac>
+  </target>
+
+  <!--
+      Places the project in an executable jar file.
+  -->
+  <target name="jar" depends="build">
+    <jar basedir="${build}" destfile="${jar}">
+      <zipgroupfileset dir="${lib}" includes="*.jar" />
+      <manifest>
+	<attribute name="Main-Class" value="Testing.Main"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!--
+      Run the Manage program.
+  -->
+  <target name="Manage">
+    <java classname="manage.Manage" failonerror="true" fork="yes">
+      <classpath refid="PROM_PREM_Collector.classpath"/>
+    </java>
+  </target>
+
+  <!--
+      Run the main program.
+  -->
+  <target name="Main">
+    <java classname="Testing.Main" failonerror="true" fork="yes">
+      <classpath refid="PROM_PREM_Collector.classpath"/>
+    </java>
+  </target>
+
+</project>

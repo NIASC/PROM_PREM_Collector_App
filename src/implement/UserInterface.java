@@ -1,5 +1,6 @@
 package implement;
 
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -9,36 +10,82 @@ import core.containers.Form;
 import core.containers.FormContainer;
 import core.containers.Option;
 
+/**
+ * This class is an example of an implementation of
+ * UserInterface_Interface. This implementation is done using
+ * command-line interface (CLI) for simplicity of development.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class UserInterface implements UserInterface_Interface
 {
+	public static final String ANSI_RESET = "\u001B[0m";
+	public static final String ANSI_BLACK = "\u001B[30m";
+	public static final String ANSI_RED = "\u001B[31m";
+	public static final String ANSI_GREEN = "\u001B[32m";
+	public static final String ANSI_YELLOW = "\u001B[33m";
+	public static final String ANSI_BLUE = "\u001B[34m";
+	public static final String ANSI_PURPLE = "\u001B[35m";
+	public static final String ANSI_CYAN = "\u001B[36m";
+	public static final String ANSI_WHITE = "\u001B[37m";
+	
 	private Scanner in;
+	private static final int LINE_LENGTH = 80;
+	private static final String SEPARATION_CHARACTER = "-";
+	private static String separation;
+	
+	static
+	{
+		StringBuilder sb = new StringBuilder(LINE_LENGTH);
+		for (int i = 0 ; i < LINE_LENGTH; ++i)
+			sb.append(SEPARATION_CHARACTER);
+		separation = sb.toString();
+	}
+	
 	public UserInterface()
 	{
 		in = new Scanner(System.in);
 	}
 	
+	@Override
 	public void close()
 	{
 		if (in != null)
 			in.close();
 	}
 	
-	private void separate()
+	/**
+	 * Prints a line of characters to make it simple for the user
+	 * to separate active interface stuff (forms, options, messages
+	 * etc.) from inactive interface stuff. This part may only be
+	 * relevant when using CLI.
+	 * @param ps TODO
+	 */
+	private void separate(PrintStream ps)
 	{
-		System.out.printf("%s%s\n", "----------------------------------------",
-				"----------------------------------------");
+		ps.printf("%s\n", separation);
 	}
 	
 	@Override
-	public void displayError(String s)
+	public void displayError(String message)
 	{
-		System.err.printf("%s\n", s);
+		separate(System.out);
+		System.out.println(ANSI_RED);
+		print(message, System.out);
+		System.out.println(ANSI_RESET);
+	}
+
+	@Override
+	public void displayMessage(String message)
+	{
+		print(message, System.out);
 	}
 
 	@Override
 	public int displayLoginScreen()
 	{
-		separate();
+		separate(System.out);
 		System.out.printf(
 				"What would you like to do?\n%s\n%s\n%s\n",
 				"1: Login", "2: Register", "0: Exit");
@@ -62,8 +109,10 @@ public class UserInterface implements UserInterface_Interface
 		return out;
 	}
 	
+	@Override
 	public HashMap<String, String> requestLoginDetails(String usernameKey, String passwordKey)
 	{
+		separate(System.out);
 		HashMap<String, String> details = new HashMap<String, String>(2);
 		System.out.printf("%s\n", "Enter username");
 		details.put(usernameKey, in.next());
@@ -77,7 +126,7 @@ public class UserInterface implements UserInterface_Interface
 	@Override
 	public int selectOption(OptionContainer options)
 	{
-		separate();
+		separate(System.out);
 		System.out.printf("Select option\n");
 		HashMap<Integer, Option> opt = options.get();
 		Option selected = options.getSelected();
@@ -96,21 +145,37 @@ public class UserInterface implements UserInterface_Interface
 		return input;
 	}
 
+	@Override
 	public void displayForm(FormContainer form)
 	{
-		separate();
+		separate(System.out);
 		for (Entry<Integer, Form> e : form.get().entrySet())
 		{
 			Form f = e.getValue();
 			System.out.printf("%d) %s: %s\n", e.getKey(), f.getKey(),
 					(f.getValue() == null ? "" : f.getValue()));
-			f.setValue(in.next());
+			/* Sometimes the input is empty. not allowed. */
+			String entry;
+			while ((entry = in.nextLine()).equals(""));
+			f.setValue(entry);
 			in.reset();
 		}
 	}
-
-	public void displayMessage(String message)
+	
+	private void print(String message, PrintStream ps)
 	{
-		System.out.printf("%s\n", message);
+		/* If the message is too wide it must be split up */
+		StringBuilder sb = new StringBuilder();
+		final int msgLength = message.length();
+		int beginIndex = 0, step;
+		do
+		{
+			step = (msgLength - beginIndex > LINE_LENGTH)
+					? LINE_LENGTH : msgLength - beginIndex;
+			sb.append(String.format("%s\n", message.substring(
+					beginIndex, beginIndex + step)));
+			beginIndex += step;
+		} while (step == LINE_LENGTH); // while >LINE_LENGTH remains
+		ps.printf("%s\n", sb.toString());
 	}
 }

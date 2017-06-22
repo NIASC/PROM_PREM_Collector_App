@@ -5,6 +5,15 @@ import java.util.HashMap;
 import core.containers.MessageContainer;
 import core.containers.User;
 
+/**
+ * This interface contains the methods required by the core part of
+ * this program to function. The purpose of this interface is to give
+ * the freedom of choosing your own database along with the core part
+ * of this program.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public interface Database_interface
 {
 	public static final int ERROR = -1;

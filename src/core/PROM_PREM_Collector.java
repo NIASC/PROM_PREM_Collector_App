@@ -68,7 +68,7 @@ public class PROM_PREM_Collector
 				userHandle.register();
 				break;
 			default:
-				ui.displayError(Messages.errorMessages.getMessage(
+				ui.displayError(Messages.error.getMessage(
 						"UNKNOWN_RESPONSE", "en"));
 				break;
 			}
@@ -87,11 +87,9 @@ public class PROM_PREM_Collector
 
 		final int ERROR = 0, LOGOUT = 1, START_QUESTIONAIRE = 2, VIEW_DATA = 3;
 		OptionContainer options = new OptionContainer();
-		options.fill(new Option[] {
-				new Option(START_QUESTIONAIRE, "Start questionaire."),
-				new Option(VIEW_DATA, "View statistics (for this clinic)."),
-				new Option(LOGOUT, "Log out.")
-		});
+		options.addOption(new Option(START_QUESTIONAIRE, "Start questionaire."));
+		options.addOption(new Option(VIEW_DATA, "View statistics (for this clinic)."));
+		options.addOption(new Option(LOGOUT, "Log out."));
 
 		// present options and evaluate them
 		while (userHandle.isLoggedIn())
@@ -111,11 +109,11 @@ public class PROM_PREM_Collector
 				userHandle.logout();
 				break;
 			case ERROR:
-				ui.displayError(Messages.errorMessages.getMessage(
+				ui.displayError(Messages.error.getMessage(
 						"NULL_SELECTED", "en"));
 				break;
 			default:
-				ui.displayError(Messages.errorMessages.getMessage(
+				ui.displayError(Messages.error.getMessage(
 						"UNKNOWN_RESPONSE", "en"));
 				break;
 			}

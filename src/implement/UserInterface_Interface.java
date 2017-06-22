@@ -5,6 +5,15 @@ import java.util.HashMap;
 import core.containers.FormContainer;
 import core.containers.OptionContainer;
 
+/**
+ * This interface contains the methods required by the core part of
+ * this program to function. The purpose of this interface is to give
+ * the freedom of choosing how the end user interacts with your
+ * program.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public interface UserInterface_Interface
 {
 	public static final int ERROR = -1;
@@ -63,4 +72,9 @@ public interface UserInterface_Interface
 	 * @param message The message to display to the user.
 	 */
 	public void displayMessage(String message);
+
+	/**
+	 * Closes the user interface (if it is open).
+	 */
+	void close();
 }

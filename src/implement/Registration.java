@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Properties;
-import java.util.Scanner;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -18,6 +16,13 @@ import javax.mail.internet.MimeMessage;
 import core.containers.Form;
 import core.containers.FormContainer;
 
+/**
+ * This class is an example of an implementation of
+ * Registration_Interface.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class Registration implements Registration_Interface
 {
 	private Properties mailConfig;
@@ -38,10 +43,9 @@ public class Registration implements Registration_Interface
 		refreshConfig();
 	}
 
+	@Override
 	public void registrationProcess()
 	{
-		Scanner in = new Scanner(System.in);
-		PrintStream ps = System.out;
 		FormContainer fc = new FormContainer();
 		String[] formKeys = {"Name", "E-mail", "Clinic"};
 		for (String s : formKeys)
@@ -50,19 +54,22 @@ public class Registration implements Registration_Interface
 		
 		String emailSubject = "PROM_PREM:Registration request";
 		String emailBody = String.format(
-				("Registration request from:<br>"
-						+ "<br> Name: %s<br>E-mail: %s<br>Clinic: %s"),
+				("Registration request from:"
+						+ "<br><br> Name: %s<br>E-mail: %s<br>Clinic: %s"
+						+ "<br><br> This message was sent from the PROM/PREM collector"),
 				fc.getValue("Name"), fc.getValue("E-mail"),
 				fc.getValue("Clinic"));
 		send(adminEmail, emailSubject, emailBody, "text/html");
 	}
 	
 	/**
+	 * Sends an email from the program's email account.
 	 * 
-	 * @param recipient
-	 * @param emailSubject
-	 * @param emailBody
-	 * @param bodyFormat
+	 * @param recipient The email address of to send the email to.
+	 * @param emailSubject The subject of the email.
+	 * @param emailBody The body/contents of the email.
+	 * @param bodyFormat The format of the body. This could for
+	 * 		example be 'text', 'html', 'text/html' etc.
 	 */
 	private void send(String recipient, String emailSubject,
 			String emailBody, String bodyFormat)
@@ -83,6 +90,7 @@ public class Registration implements Registration_Interface
 			/* login to server email account and send email. */
 			Transport transport = getMailSession.getTransport();
 			transport.connect(serverEmail, serverPassword);
+			ui.displayMessage("Sending registration request...");
 			transport.sendMessage(generateMailMessage,
 					generateMailMessage.getAllRecipients());
 			transport.close();
@@ -92,18 +100,12 @@ public class Registration implements Registration_Interface
 		}
 		ui.displayMessage("Registration request sent.");
 	}
-
-	/**
-	 * Send a single email.
-	 * 
-	 * @param fromEmailAddr The e-mail address of the sender.
-	 * @param toEmailAddr The e-mail address of the receiver.
-	 * @param subject E-mail subject.
-	 * 
-	 * @param body The contents of the e-mail.
-	 */
 	
-	public void refreshConfig()
+	/**
+	 * reloads the javax.mail config properties as well as
+	 * the email account config.
+	 */
+	private void refreshConfig()
 	{
 		loadConfig(new File(CONFIG_FILE));
 		loadEmailAccounts(new File(ACCOUNT_FILE));
@@ -132,12 +134,20 @@ public class Registration implements Registration_Interface
 		return true;
 	}
 	
+	/**
+	 * Loads the registration program's email account information
+	 * as well as the email address of the administrator who will
+	 * receive registration requests.
+	 * 
+	 * @param configFile The file that contains the email account
+	 * 		information.
+	 */
 	private void loadEmailAccounts(File configFile)
 	{
 		try
 		{
 			Properties props = new Properties();
-			props.load(new FileInputStream("src/implement/mailaccount_settings.ini"));
+			props.load(new FileInputStream(configFile));
 			adminEmail = props.getProperty("admin_email");
 			serverEmail = props.getProperty("server_email");
 			serverPassword = props.getProperty("server_password");

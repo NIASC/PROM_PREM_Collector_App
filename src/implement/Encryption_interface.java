@@ -1,5 +1,13 @@
 package implement;
 
+/**
+ * This interface contains the methods required by the core part of
+ * this program to function. The purpose of this interface is to give
+ * the freedom of choosing your own method of encryption (if any!).
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public interface Encryption_interface
 {
 	/**
@@ -14,6 +22,7 @@ public interface Encryption_interface
 	
 	/**
 	 * Generates a new salt to be used for hashing.
+	 * 
 	 * @return A new salt
 	 */
 	public String getNewSalt();

@@ -1,7 +1,7 @@
 package core.containers;
 
 /*
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------_--------
  */
 public class Option
 {
@@ -10,8 +10,9 @@ public class Option
 	
 	/**
 	 * Initializes the class with an identifier and a text.
-	 * The identifier is useful to make it easier to identify what action should
-	 * be taken if this option is selected.
+	 * The identifier is useful to make it easier to identify what
+	 * action should be taken if this option is selected.
+	 * 
 	 * @param identifier The option identifier.
 	 * @param text The option text.
 	 */
@@ -21,16 +22,30 @@ public class Option
 		this.text = text;
 	}
 	
+	/**
+	 * 
+	 * @return The identifier for this Option.
+	 */
 	public int getIdentifier()
 	{
 		return identifier;
 	}
 	
+	/**
+	 * 
+	 * @return The text for this Option.
+	 */
 	public String getText()
 	{
 		return text;
 	}
 	
+	/**
+	 * Copies the option from the supplied Option.
+	 * 
+	 * @param opt The option to copy from.
+	 * @return A copy of the supplied Option.
+	 */
 	public static Option copy(final Option opt)
 	{
 		if (opt == null)

@@ -5,40 +5,36 @@ import java.util.HashMap;
 public class OptionContainer
 {
 	private HashMap<Integer, Option> options;
+	private HashMap<Integer, Integer> keyToID;
+	private int optionID;
 	private Option selected;
 
 	public OptionContainer()
 	{
 		options = new HashMap<Integer, Option>();
+		keyToID = new HashMap<Integer, Integer>();
+		optionID = 0;
 		selected = null;
 	}
 	
 	/**
-	 * Fills this container with options.
+	 * Adds an Option to this container.
 	 * 
-	 * @param opt The options that should be stored in this container.
-	 * 
-	 * @return boolean True if the container was filled. False if
-	 * 		an error occurred.
+	 * @param option The Option to add.
 	 */
-	public boolean fill(Option[] opt)
+	public void addOption(Option option)
 	{
-		if (opt == null)
-			return false;
-		
-
-		int id = 0;
-		for (int i = 0; i < opt.length; ++i)
-		{
-			if (opt[i] != null)
-				options.put(id++, opt[i]);
-		}
-		return true;
+		if (option == null)
+			return;
+		options.put(optionID, option);
+		keyToID.put(option.getIdentifier(), optionID++);
 	}
 	
 	/**
-	 * Puts the Options data contained in this class in an Integer-Option map.
-	 * The Integer value is not related to the identifier in the Options class.
+	 * Puts the Options data contained in this class in an
+	 * Integer-Option map.
+	 * The Integer value is not related to the identifier in the
+	 * Options class.
 	 * 
 	 * @return A map containing a map id and an Option.
 	 */
@@ -52,8 +48,8 @@ public class OptionContainer
 	 * 
 	 * @param id The id of the selected Option
 	 * 
-	 * @return boolean True if the selected Option was marked. False if the
-	 * 		id is not in this container.
+	 * @return boolean True if the selected Option was marked. False if
+	 * 		the id is not in this container.
 	 */
 	public boolean setSelected(int id)
 	{
@@ -64,10 +60,11 @@ public class OptionContainer
 	}
 	
 	/**
-	 * Returns the selected Option. If no option has been selected this function
-	 * returns null.
+	 * Returns the selected Option. If no option has been selected this
+	 * 		function returns null.
 	 * 
-	 * @return Option The selected option or null if no option has been selected.
+	 * @return Option The selected option or null if no option has been
+	 * 		selected.
 	 */
 	public Option getSelected()
 	{

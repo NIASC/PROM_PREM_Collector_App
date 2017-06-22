@@ -54,7 +54,7 @@ public class UserHandle
 		int ret = validateDetails(details.get("user"), details.get("pass"));
 		if ((ret & (USER_FOUND | DETAILS_MATCH)) != (USER_FOUND | DETAILS_MATCH))
 		{
-			ui.displayError(Messages.errorMessages.getMessage(
+			ui.displayError(Messages.error.getMessage(
 					"UH_INVALID_LOGIN", Messages.LOCALE));
 			// TODO: add functionality for resetting password.
 			return;
@@ -115,40 +115,46 @@ public class UserHandle
 	{
 		if (!loggedIn)
 			return; // no user to set password for
-		FormContainer fc = new FormContainer();
-		String[] formKeys = { "Current password",
-				"New password", "New password"};
-		for (String s : formKeys)
-			fc.addForm(new Form(s));
 		
-		fc.fill(new Form[] {
-				new Form("Current password"),
-				new Form("Enter new password"),
-				new Form("Repeat new password")
-		});
-		final int cp = 0, np1 = 1, np2 = 2;
+		FormContainer fc = new FormContainer();
+		final String CP_MSG = Messages.info.getMessage(
+				"CURRENT_PASSWORD", Messages.LOCALE);
+		final String NP1_MSG = Messages.info.getMessage(
+				"NEW_PASSWORD", Messages.LOCALE);
+		final String NP2_MSG = Messages.info.getMessage(
+				"RE_NEW_PASSWORD", Messages.LOCALE);
+		fc.addForm(new Form(CP_MSG));
+		fc.addForm(new Form(NP1_MSG));
+		fc.addForm(new Form(NP2_MSG));
+		final int CP_ID = fc.getID(CP_MSG), NP1_ID = fc.getID(NP1_MSG),
+				NP2_ID = fc.getID(NP2_MSG);
+		
 		HashMap<Integer, Form> formMap = null;
 		boolean match = false;
 		while (!match)
 		{
+			ui.displayMessage(Messages.info.getMessage(
+					"NEW_PASS_INFO", Messages.LOCALE));
 			ui.displayForm(fc);
 			formMap = fc.get();
 			if (newPassError(
-					formMap.get(cp).getValue(),
-					formMap.get(np1).getValue(),
-					formMap.get(np2).getValue()))
+					formMap.get(CP_ID).getValue(),
+					formMap.get(NP1_ID).getValue(),
+					formMap.get(NP2_ID).getValue()))
 			{
-				formMap.get(cp).setValue(null);
-				formMap.get(np1).setValue(null);
-				formMap.get(np2).setValue(null);
+				formMap.get(CP_ID).setValue(null);
+				formMap.get(NP1_ID).setValue(null);
+				formMap.get(NP2_ID).setValue(null);
 			}
 			else
 				match = true;
 		}
 		Encryption crypto = new Encryption();
 		String newSalt = crypto.getNewSalt();
-		User tmpUser = user_db.setPassword(user, formMap.get(cp).getValue(),
-				crypto.hashString(formMap.get(np1).getValue(), newSalt),
+		User tmpUser = user_db.setPassword(
+				user, formMap.get(CP_ID).getValue(),
+				crypto.hashString(
+						formMap.get(NP1_ID).getValue(), newSalt),
 				newSalt);
 		if (tmpUser != null)
 			user = tmpUser;
@@ -176,26 +182,26 @@ public class UserHandle
 	{
 		if (!user.passwordMatch(oldPass))
 		{
-			ui.displayError(Messages.errorMessages.getMessage(
+			ui.displayError(Messages.error.getMessage(
 					"UH_PR_INVALID_CURRENT", Messages.LOCALE));
 			return true;
 		}
 		if (!newPass1.equals(newPass2))
 		{
-			ui.displayError(Messages.errorMessages.getMessage(
+			ui.displayError(Messages.error.getMessage(
 					"UH_PR_MISMATCH_NEW", Messages.LOCALE));
 			return true;
 		}
 		int ret = validatePassword(newPass1);
 		if (ret < 0)
 		{
-			ui.displayError(Messages.errorMessages.getMessage(
+			ui.displayError(Messages.error.getMessage(
 					"UH_PR_INVALID_LENGTH", Messages.LOCALE));
 			return true;
 		}
 		else if (ret == 0)
 		{
-			ui.displayError(Messages.errorMessages.getMessage(
+			ui.displayError(Messages.error.getMessage(
 					"UH_PR_PASSWORD_SIMPLE", Messages.LOCALE));
 			return true;
 		}

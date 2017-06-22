@@ -17,7 +17,7 @@ public class ViewData
 	{
 		if (!userHandle.isLoggedIn())
 		{
-			userInterface.displayError(Messages.errorMessages.getMessage(
+			userInterface.displayError(Messages.error.getMessage(
 					"NOT_LOGGED_IN", "en"));
 			return;
 		}

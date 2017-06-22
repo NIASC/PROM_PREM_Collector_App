@@ -2,6 +2,8 @@ package core.containers;
 
 import java.util.HashMap;
 
+import core.Messages;
+
 public class MessageContainer
 {
 	private HashMap<Integer, Message> messages;
@@ -17,7 +19,9 @@ public class MessageContainer
 	}
 	
 	/**
-	 * Adds a Message to this container.
+	 * Adds a Message to this container. If a message with the same
+	 * code as the supplied message exists in this container then the
+	 * supplied message will be merged with the existing message.
 	 * 
 	 * @param message The Message to add to this container.
 	 */
@@ -25,12 +29,19 @@ public class MessageContainer
 	{
 		if (message == null)
 			return;
-		messages.put(message.getCode(), message);
-		nameToCode.put(message.getName(), message.getCode());
+		if (messages.get(message.getCode()) == null)
+		{ // new message
+			messages.put(message.getCode(), message);
+			nameToCode.put(message.getName(), message.getCode());
+		}
+		else
+		{ // message exists with a different locale
+			messages.get(message.getCode()).merge(message);
+		}
 	}
 	
 	/**
-	 * Fetches the message associated with the message code for a
+	 * Retrieves the message associated with the message code for a
 	 * 		given locale.
 	 * 
 	 * @param code The code for the message that is sought.
@@ -39,14 +50,27 @@ public class MessageContainer
 	 * 
 	 * @return The message associated with the code and in the
 	 * 		language specified by the locale.
+	 * 		If no messages exists for the supplied locale then the
+	 * 		message will be returned for the default locale.
+	 * 		If no message exists for the supplied code then null is
+	 * 		returned.
 	 */
 	public String getMessage(int code, String locale)
 	{
-		return messages.get(code).getMessage(locale);
+		if (messages.get(code) != null)
+		{
+			Message message = messages.get(code);
+			String ret = message.getMessage(locale);
+			if (ret != null)
+				return ret;
+			// message exists but not in the requested locale
+			return message.getMessage(Messages.FALLBACK_LOCALE);
+		}
+		return null;
 	}
 	
 	/**
-	 * Fetches the message associated with the message name for a
+	 * Retrieves the message associated with the message name for a
 	 * 		given locale.
 	 * 
 	 * @param name The name of the message that is sought.
@@ -55,6 +79,10 @@ public class MessageContainer
 	 * 
 	 * @return The message associated with the name and in the
 	 * 		language specified by the locale.
+	 * 		If no messages exists for the supplied locale then the
+	 * 		message will be returned for the default locale.
+	 * 		If no message exists for the supplied code then null is
+	 * 		returned.
 	 */
 	public String getMessage(String name, String locale)
 	{

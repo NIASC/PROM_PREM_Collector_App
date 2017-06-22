@@ -1,5 +1,8 @@
 local/
 bin/
+build/
 .classpath
 .project
+*~
+PROM_PREM_Collector.jar
 src/implement/mailaccount_settings.ini

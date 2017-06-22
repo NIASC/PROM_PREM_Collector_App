@@ -6,8 +6,9 @@ import implement.Database_interface;
 
 public class Messages
 {
-	public static MessageContainer errorMessages, infoMessages;
+	public static MessageContainer error, info;
 	public static final String LOCALE = "en";
+	public static final String FALLBACK_LOCALE = "en";
 	public static final String DATABASE_ERROR = "Database error.";
 	
 	/**
@@ -18,13 +19,13 @@ public class Messages
 	 */
 	public static boolean loadMessages()
 	{
-		errorMessages = new MessageContainer();
-		infoMessages = new MessageContainer();
+		error = new MessageContainer();
+		info = new MessageContainer();
 		
 		Database db = new Database();
 		db.connect();
-		int errMsgLoadCode = db.getErrorMessages(errorMessages);
-		int infoMsgLoadCode = db.getErrorMessages(infoMessages);
+		int errMsgLoadCode = db.getErrorMessages(error);
+		int infoMsgLoadCode = db.getInfoMessages(info);
 		db.disconnect();
 		return errMsgLoadCode == Database_interface.QUERY_SUCCESS
 				&& infoMsgLoadCode == Database_interface.QUERY_SUCCESS;

@@ -27,6 +27,8 @@ public class Form
 	 */
 	public static Form copy(final Form form)
 	{
+		if (form == null)
+			return null;
 		return new Form(form.getKey());
 	}
 	

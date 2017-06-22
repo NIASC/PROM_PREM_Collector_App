@@ -15,11 +15,15 @@ public class FormContainer
 		formID = 0;
 	}
 	
+	/**
+	 * Adds a Form to this container.
+	 * 
+	 * @param form The Form to add.
+	 */
 	public void addForm(Form form)
 	{
 		if (form == null)
 			return;
-
 		this.form.put(formID, form);
 		keyToID.put(form.getKey(), formID++);
 	}
@@ -52,32 +56,21 @@ public class FormContainer
 	}
 	
 	/**
-	 * Fills this container with form entries.
+	 * Retrieves the ID of the form with the given key.
 	 * 
-	 * @param frm The form that should be stored in this container.
-	 * 
-	 * @return boolean True if the container was filled. False if
-	 * 		an error occurred.
+	 * @param key The form's name.
+	 * @return The ID of the form associated with the key.
 	 */
-	public boolean fill(Form[] frm)
+	public int getID(String key)
 	{
-		if (frm == null)
-			return false;
-
-		int id = 0;
-		for (int i = 0; i < frm.length; ++i)
-		{
-			if (frm[i] != null)
-				form.put(id++, frm[i]);
-		}
-		return true;
+		return keyToID.get(key);
 	}
 	
 	/**
-	 * Puts the Form data contained in this class in an Integer-Form map.
-	 * The Integer value is not related to the identifier in the Options class.
+	 * Puts the Form data contained in this class in an Integer-Form
+	 * map.
 	 * 
-	 * @return A map containing a map id and a Form.
+	 * @return A map containing a map-id and a Form.
 	 */
 	public HashMap<Integer, Form> get()
 	{

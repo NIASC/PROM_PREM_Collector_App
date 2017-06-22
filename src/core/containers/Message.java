@@ -1,12 +1,13 @@
 package core.containers;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class Message
 {
 	private int code;
 	private String name;
-	private HashMap<String, String> message;
+	private HashMap<String, String> messages;
 	
 	/**
 	 * Creates a Message that has a code, name and a list of messages
@@ -22,20 +23,76 @@ public class Message
 	{
 		this.code = code;
 		this.name = name;
-		this.message = new HashMap<String, String>();
-		this.message.putAll(message);
+		messages = new HashMap<String, String>();
+		messages.putAll(message);
 	}
 	
 	/**
-	 * Fetches the message for a given locale.
+	 * Adds a message to this Message.
+	 * This function can be used for adding messages for different
+	 * locales to this Message. It is up to the database maintainers to
+	 * make sure that the message has the same meaning for all locales.
 	 * 
-	 * @param locale The locale e.g. 'en', 'fr', 'de'.
+	 * @param message The message to add.
+	 * @param locale The locale that this message was written for.
+	 * @param replace Previously stored messages for the supplied
+	 * 		locale will be replaced if replace is true and kept if
+	 * 		replace is false.
+	 * 
+	 * @return If this Message already contains a message for the
+	 * 		supplied locale and replace is true then that message will
+	 * 		be returned. Else null will be returned.
+	 */
+	private String addMessage(String message, String locale,
+			boolean replace)
+	{
+		if (replace || getMessage(locale) == null)
+			return messages.put(locale, message);
+		return null;
+	}
+	
+	/**
+	 * Retrieves the message for a given locale.
+	 * 
+	 * @param locale The locale of the message.
 	 * 
 	 * @return The message in the language specified by the locale.
+	 * 		If no message exists for the supplied locale then null is
+	 * 		returned.
 	 */
 	public String getMessage(String locale)
 	{
-		return message.get(locale);
+		return messages.get(locale);
+	}
+	
+	/**
+	 * Puts the locales and their corresponding messages in a map
+	 * where the locale is the key and the messages is the value.
+	 * 
+	 * @return A map that contains the locales and messages.
+	 */
+	public HashMap<String, String> getMessages()
+	{
+		HashMap<String, String> tmp = new HashMap<String, String>();
+		tmp.putAll(messages);
+		return tmp;
+	}
+	
+	/**
+	 * Merges the supplied Message with this Message by copying the
+	 * messages and locales to this Message.
+	 * If there are overlapping locales (and messages) then the
+	 * messages contained in this Message are kept.
+	 * 
+	 * @param message
+	 */
+	public void merge(final Message message)
+	{
+		HashMap<String, String> msgMap = message.getMessages();
+		for (Entry<String, String> e: msgMap.entrySet())
+		{
+			addMessage(e.getValue(), e.getKey(), false);
+		}
 	}
 	
 	/**

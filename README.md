@@ -9,7 +9,7 @@ This is an application designed to collect PROM (patient reported outcome measur
 * [GNU JavaMail](https://www.gnu.org/software/classpathx/javamail/javamail.html) (version 1.1.2 included). For email to work.
 * [GNU JAF](https://www.gnu.org/software/classpathx/jaf/jaf.html) (version 1.1.1 included). For email to work.
 * [GNU inetlib](https://www.gnu.org/software/classpathx/inetlib/inetlib.html) (version 1.1.1 included). For email to work.
-* [Apache Ant] {https://ant.apache.org/} For building the program.
+* [Apache Ant](https://ant.apache.org/). For building the program.
 * `git` is recommended for downloading the source code.
 
 ### Downloading the files (XAMPP)

@@ -2,6 +2,15 @@ package core.containers;
 
 import implement.Encryption;
 
+/**
+ * This class is a data container for User data. A user has a set of
+ * properties which should be defined in the database.
+ * The purpose of this class is to encapsulate this information into a
+ * class so it can be passed as an argument and be easily modifiable.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class User
 {
 	private Encryption crypto;

@@ -3,6 +3,16 @@ package core.containers;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+/**
+ * This class is a data container for Messages. A message is a
+ * structure which has a code/key/name and a set of messages in
+ * different languages associated with different locales.
+ * The purpose of this class is to encapsulate this information into a
+ * class so it can be passed as an argument and be easily modifiable.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class Message
 {
 	private int code;

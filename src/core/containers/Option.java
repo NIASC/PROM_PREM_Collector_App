@@ -1,7 +1,15 @@
 package core.containers;
 
-/*
------------------------------------------------------------------------_--------
+/**
+ * This class is a data container for Options. An option is a
+ * structure which has a key/id associated with information about what
+ * the option is for as well as an action code (in the event that the
+ * option is selected).
+ * The purpose of this class is to encapsulate this information into a
+ * class so it can be passed as an argument and be easily modifiable.
+ * 
+ * @author Marcus Malmquist
+ *
  */
 public class Option
 {

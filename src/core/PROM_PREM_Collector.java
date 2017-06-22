@@ -4,6 +4,16 @@ import core.containers.Option;
 import core.containers.OptionContainer;
 import implement.*;
 
+/**
+ * This is the main program that is the PROM/PREM Collector.
+ * This purpose of this class is the be the central point in this
+ * program. This is in a was the 'main menu', where you end up when
+ * you start the program and where you quit the program and everything
+ * in between.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class PROM_PREM_Collector
 {
 	private UserHandle userHandle;

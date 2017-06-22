@@ -1,15 +1,7 @@
 package core;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.regex.Pattern;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import implement.Database;
 import implement.Encryption;
@@ -19,6 +11,14 @@ import core.containers.Form;
 import core.containers.FormContainer;
 import core.containers.User;
 
+/**
+ * This class handles the user. This mostly means handling the login,
+ * logout and redirecting to the registration form.
+ * The purpose of this class is to handle user-related processes.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class UserHandle
 {
 	public static final int USER_FOUND = 0x10;
@@ -30,6 +30,11 @@ public class UserHandle
 	
 	private boolean loggedIn;
 	
+	/**
+	 * Initialize variables.
+	 * 
+	 * @param ui The active instance of the user interface.
+	 */
 	public UserHandle(UserInterface ui)
 	{
 		this.ui = ui;
@@ -69,11 +74,9 @@ public class UserHandle
 	}
 	
 	/**
-	 * Not implemented yet.
-	 * 
 	 * Presents a registration form that the user must fill in and
-	 * sends the request to an administrator who can add the user if it
-	 * is authorized.
+	 * sends the request to an administrator who can add the user if
+	 * it is authorized.
 	 */
 	public void register()
 	{
@@ -97,6 +100,7 @@ public class UserHandle
 	
 	/**
 	 * Returns the 'logged in' flag.
+	 * 
 	 * @return True if the user is logged in. False if not.
 	 */
 	public boolean isLoggedIn()
@@ -210,9 +214,11 @@ public class UserHandle
 	
 	/**
 	 * Attempts to match the supplied username and password with users
-	 * that are already in the database.
+	 * that are already in the database. If the username and password
+	 * matches the user information will be placed in the local user
+	 * object.
 	 * Bitwise masking can be use to mask out different return values
-	 * (i.e. USER_FOUND | DETAILS_MATCH) is returns if the user is
+	 * (i.e. USER_FOUND | DETAILS_MATCH) is returned if the user is
 	 * found and the password matches.
 	 * 
 	 * Bitwise masks:
@@ -222,14 +228,18 @@ public class UserHandle
 	 * 
 	 * @param username The name of the user to look for.
 	 * @param password The password of the user to look for.
-	 * @return A bitwise masking of
+	 * @return A bitwise masking of USER_FOUND and DETAILS_MATCH
 	 */
 	private int validateDetails(String username, String password)
 	{
-		user = findDetails(username);
-		if (user == null)
+		User tmp = findDetails(username);
+		if (tmp == null)
 			return 0;
-		return USER_FOUND | (user.passwordMatch(password) ? DETAILS_MATCH : 0);
+		if (!tmp.passwordMatch(password))
+			return 0;
+		// username and password matches if we reach this point
+		user = tmp;
+		return USER_FOUND | DETAILS_MATCH;
 	}
 	
 	/**

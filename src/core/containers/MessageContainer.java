@@ -4,6 +4,16 @@ import java.util.HashMap;
 
 import core.Messages;
 
+/**
+ * This class is a handles for Message objects. It allows you to group
+ * several Message objects to make it simple to find the same type of
+ * messages in a single object.
+ * The purpose of this class is to encapsulate this information into a
+ * class so it can be passed as an argument and be easily modifiable.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class MessageContainer
 {
 	private HashMap<Integer, Message> messages;

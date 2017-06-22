@@ -5,6 +5,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 
+/**
+ * This class consists of static functions that can be useful but don't
+ * really fit anywhere.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class Utilities
 {
 	/**
@@ -15,6 +22,7 @@ public class Utilities
 	 * 
 	 * @return The /path/to/class/c.
 	 */
+	@SuppressWarnings("rawtypes")
 	public static String getClassPath(Class c)
 	{
 		URL url = c.getProtectionDomain().getCodeSource().getLocation();

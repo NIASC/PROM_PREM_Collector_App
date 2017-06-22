@@ -2,12 +2,25 @@ package core.containers;
 
 import java.util.HashMap;
 
+/**
+ * This class is a handles for Form objects. It allows you to group
+ * several Form objects to create a complete Form that the user can
+ * fill in.
+ * The purpose of this class is to encapsulate this information into a
+ * class so it can be passed as an argument and be easily modifiable.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class FormContainer
 {
 	private HashMap<Integer, Form> form;
 	private HashMap<String, Integer> keyToID;
 	private int formID;
 	
+	/**
+	 * Initializes variables.
+	 */
 	public FormContainer()
 	{
 		form = new HashMap<Integer, Form>();

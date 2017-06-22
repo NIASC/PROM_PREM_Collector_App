@@ -1,5 +1,14 @@
 package core.containers;
 
+/**
+ * This class is a data container for Forms. A form is a structure
+ * which has a label/key/name and a value/entry/text.
+ * The purpose of this class is to encapsulate this information into a
+ * class so it can be passed as an argument and be easily modifiable.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class Form
 {
 	private String entryKey;

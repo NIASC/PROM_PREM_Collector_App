@@ -2,6 +2,16 @@ package core.containers;
 
 import java.util.HashMap;
 
+/**
+ * This class is a handles for Option objects. It allows you to group
+ * several Options objects to form a complete set of options to choose
+ * from as well as a way of retrieving the selected option.
+ * The purpose of this class is to encapsulate this information into a
+ * class so it can be passed as an argument and be easily modifiable.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class OptionContainer
 {
 	private HashMap<Integer, Option> options;
@@ -9,6 +19,9 @@ public class OptionContainer
 	private int optionID;
 	private Option selected;
 
+	/**
+	 * Initializes variables.
+	 */
 	public OptionContainer()
 	{
 		options = new HashMap<Integer, Option>();

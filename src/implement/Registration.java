@@ -13,8 +13,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import core.containers.Form;
-import core.containers.FormContainer;
+import core.containers.form.Field;
+import core.containers.form.FieldContainer;
 
 /**
  * This class is an example of an implementation of
@@ -46,10 +46,10 @@ public class Registration implements Registration_Interface
 	@Override
 	public void registrationProcess()
 	{
-		FormContainer fc = new FormContainer();
+		FieldContainer fc = new FieldContainer();
 		String[] formKeys = {"Name", "E-mail", "Clinic"};
 		for (String s : formKeys)
-			fc.addForm(new Form(s));
+			fc.addForm(new Field(s));
 		ui.displayForm(fc);
 		
 		String emailSubject = "PROM_PREM:Registration request";

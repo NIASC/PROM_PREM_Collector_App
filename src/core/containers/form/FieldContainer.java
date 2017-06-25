@@ -1,4 +1,4 @@
-package core.containers;
+package core.containers.form;
 
 import java.util.HashMap;
 
@@ -12,18 +12,18 @@ import java.util.HashMap;
  * @author Marcus Malmquist
  *
  */
-public class FormContainer
+public class FieldContainer
 {
-	private HashMap<Integer, Form> form;
+	private HashMap<Integer, Field> form;
 	private HashMap<String, Integer> keyToID;
 	private int formID;
 	
 	/**
 	 * Initializes variables.
 	 */
-	public FormContainer()
+	public FieldContainer()
 	{
-		form = new HashMap<Integer, Form>();
+		form = new HashMap<Integer, Field>();
 		keyToID = new HashMap<String, Integer>();
 		formID = 0;
 	}
@@ -33,7 +33,7 @@ public class FormContainer
 	 * 
 	 * @param form The Form to add.
 	 */
-	public void addForm(Form form)
+	public void addForm(Field form)
 	{
 		if (form == null)
 			return;
@@ -85,7 +85,7 @@ public class FormContainer
 	 * 
 	 * @return A map containing a map-id and a Form.
 	 */
-	public HashMap<Integer, Form> get()
+	public HashMap<Integer, Field> get()
 	{
 		return form;
 	}

@@ -1,4 +1,4 @@
-package core.containers;
+package core.containers.form;
 
 import java.util.HashMap;
 
@@ -12,19 +12,19 @@ import java.util.HashMap;
  * @author Marcus Malmquist
  *
  */
-public class OptionContainer
+public class SingleOptionContainer
 {
-	private HashMap<Integer, Option> options;
+	private HashMap<Integer, SingleOption> options;
 	private HashMap<Integer, Integer> keyToID;
 	private int optionID;
-	private Option selected;
+	private SingleOption selected;
 
 	/**
 	 * Initializes variables.
 	 */
-	public OptionContainer()
+	public SingleOptionContainer()
 	{
-		options = new HashMap<Integer, Option>();
+		options = new HashMap<Integer, SingleOption>();
 		keyToID = new HashMap<Integer, Integer>();
 		optionID = 0;
 		selected = null;
@@ -35,7 +35,7 @@ public class OptionContainer
 	 * 
 	 * @param option The Option to add.
 	 */
-	public void addOption(Option option)
+	public void addOption(SingleOption option)
 	{
 		if (option == null)
 			return;
@@ -51,7 +51,7 @@ public class OptionContainer
 	 * 
 	 * @return A map containing a map id and an Option.
 	 */
-	public HashMap<Integer, Option> get()
+	public HashMap<Integer, SingleOption> get()
 	{
 		return options;
 	}
@@ -79,8 +79,8 @@ public class OptionContainer
 	 * @return Option The selected option or null if no option has been
 	 * 		selected.
 	 */
-	public Option getSelected()
+	public SingleOption getSelected()
 	{
-		return Option.copy(selected);
+		return SingleOption.copy(selected);
 	}
 }

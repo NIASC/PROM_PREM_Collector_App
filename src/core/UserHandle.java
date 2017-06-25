@@ -8,9 +8,9 @@ import implement.Encryption;
 import implement.Messages;
 import implement.Registration;
 import implement.UserInterface;
-import core.containers.Form;
-import core.containers.FormContainer;
 import core.containers.User;
+import core.containers.form.Field;
+import core.containers.form.FieldContainer;
 
 /**
  * This class handles the user. This mostly means handling the login,
@@ -121,20 +121,20 @@ public class UserHandle
 		if (!loggedIn)
 			return; // no user to set password for
 		
-		FormContainer fc = new FormContainer();
+		FieldContainer fc = new FieldContainer();
 		final String CP_MSG = Messages.info.getMessage(
 				"CURRENT_PASSWORD", Messages.LOCALE);
 		final String NP1_MSG = Messages.info.getMessage(
 				"NEW_PASSWORD", Messages.LOCALE);
 		final String NP2_MSG = Messages.info.getMessage(
 				"RE_NEW_PASSWORD", Messages.LOCALE);
-		fc.addForm(new Form(CP_MSG));
-		fc.addForm(new Form(NP1_MSG));
-		fc.addForm(new Form(NP2_MSG));
+		fc.addForm(new Field(CP_MSG));
+		fc.addForm(new Field(NP1_MSG));
+		fc.addForm(new Field(NP2_MSG));
 		final int CP_ID = fc.getID(CP_MSG), NP1_ID = fc.getID(NP1_MSG),
 				NP2_ID = fc.getID(NP2_MSG);
 		
-		HashMap<Integer, Form> formMap = null;
+		HashMap<Integer, Field> formMap = null;
 		boolean match = false;
 		while (!match)
 		{

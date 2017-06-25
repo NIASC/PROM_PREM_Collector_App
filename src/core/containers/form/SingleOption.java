@@ -1,4 +1,4 @@
-package core.containers;
+package core.containers.form;
 
 /**
  * This class is a data container for Options. An option is a
@@ -11,7 +11,7 @@ package core.containers;
  * @author Marcus Malmquist
  *
  */
-public class Option
+public class SingleOption
 {
 	private int identifier;
 	private String text;
@@ -24,7 +24,7 @@ public class Option
 	 * @param identifier The option identifier.
 	 * @param text The option text.
 	 */
-	public Option(int identifier, String text)
+	public SingleOption(int identifier, String text)
 	{
 		this.identifier = identifier;
 		this.text = text;
@@ -54,10 +54,10 @@ public class Option
 	 * @param opt The option to copy from.
 	 * @return A copy of the supplied Option.
 	 */
-	public static Option copy(final Option opt)
+	public static SingleOption copy(final SingleOption opt)
 	{
 		if (opt == null)
 			return null;
-		return new Option(opt.getIdentifier(), opt.getText());
+		return new SingleOption(opt.getIdentifier(), opt.getText());
 	}
 }

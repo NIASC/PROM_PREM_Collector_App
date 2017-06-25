@@ -2,8 +2,8 @@ package implement;
 
 import java.util.HashMap;
 
-import core.containers.FormContainer;
-import core.containers.OptionContainer;
+import core.containers.form.FieldContainer;
+import core.containers.form.SingleOptionContainer;
 
 /**
  * This interface contains the methods required by the core part of
@@ -54,7 +54,7 @@ public interface UserInterface_Interface
 	 * @param options The options
 	 * @return int The id of the selected option
 	 */
-	public int selectOption(OptionContainer options);
+	public int selectOption(SingleOptionContainer options);
 	
 	/**
 	 * Displays a form that the user has to fill in. The supplied
@@ -63,7 +63,7 @@ public interface UserInterface_Interface
 	 * 
 	 * @param form A container for form entries.
 	 */
-	public void displayForm(FormContainer form);
+	public void displayForm(FieldContainer form);
 	
 	/**
 	 * Displays information to the user. For displaying error messages

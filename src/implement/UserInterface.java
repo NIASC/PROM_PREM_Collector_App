@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
-import core.containers.OptionContainer;
-import core.containers.Form;
-import core.containers.FormContainer;
-import core.containers.Option;
+import core.containers.form.Field;
+import core.containers.form.FieldContainer;
+import core.containers.form.SingleOption;
+import core.containers.form.SingleOptionContainer;
 
 /**
  * This class is an example of an implementation of
@@ -124,15 +124,15 @@ public class UserInterface implements UserInterface_Interface
 	}
 
 	@Override
-	public int selectOption(OptionContainer options)
+	public int selectOption(SingleOptionContainer options)
 	{
 		separate(System.out);
 		System.out.printf("Select option\n");
-		HashMap<Integer, Option> opt = options.get();
-		Option selected = options.getSelected();
-		for (Entry<Integer, Option> e : opt.entrySet())
+		HashMap<Integer, SingleOption> opt = options.get();
+		SingleOption selected = options.getSelected();
+		for (Entry<Integer, SingleOption> e : opt.entrySet())
 		{
-			Option option = e.getValue();
+			SingleOption option = e.getValue();
 			if (option == selected)
 				System.out.printf("[%d]: %s\n",
 						e.getKey(), option.getText());
@@ -146,12 +146,12 @@ public class UserInterface implements UserInterface_Interface
 	}
 
 	@Override
-	public void displayForm(FormContainer form)
+	public void displayForm(FieldContainer form)
 	{
 		separate(System.out);
-		for (Entry<Integer, Form> e : form.get().entrySet())
+		for (Entry<Integer, Field> e : form.get().entrySet())
 		{
-			Form f = e.getValue();
+			Field f = e.getValue();
 			System.out.printf("%d) %s: %s\n", e.getKey(), f.getKey(),
 					(f.getValue() == null ? "" : f.getValue()));
 			/* Sometimes the input is empty. not allowed. */

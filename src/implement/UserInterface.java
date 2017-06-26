@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import core.containers.form.Field;
 import core.containers.form.FieldContainer;
+import core.containers.form.SOptionContainer;
 import core.containers.form.SingleOption;
 import core.containers.form.SingleOptionContainer;
 
@@ -124,22 +125,13 @@ public class UserInterface implements UserInterface_Interface
 	}
 
 	@Override
-	public int selectOption(SingleOptionContainer options)
+	public int selectOption(SOptionContainer options)
 	{
 		separate(System.out);
 		System.out.printf("Select option\n");
-		HashMap<Integer, SingleOption> opt = options.get();
-		SingleOption selected = options.getSelected();
-		for (Entry<Integer, SingleOption> e : opt.entrySet())
-		{
-			SingleOption option = e.getValue();
-			if (option == selected)
-				System.out.printf("[%d]: %s\n",
-						e.getKey(), option.getText());
-			else
-				System.out.printf(" %d : %s\n",
-						e.getKey(), option.getText());
-		}
+		HashMap<Integer, String> opt = options.getSOptions();
+		for (Entry<Integer, String> e : opt.entrySet())
+			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
 		int input = in.nextInt();
 		in.reset();
 		return input;
@@ -177,5 +169,24 @@ public class UserInterface implements UserInterface_Interface
 			beginIndex += step;
 		} while (step == LINE_LENGTH); // while >LINE_LENGTH remains
 		ps.printf("%s\n", sb.toString());
+	}
+	
+	public Integer createSingleOption(SOptionContainer soc)
+	{
+		separate(System.out);
+		System.out.printf("Select option\n");
+		HashMap<Integer, String> opt = soc.getSOptions();
+		Integer selected = soc.getSelected();
+		for (Entry<Integer, String> e : opt.entrySet())
+		{
+			Integer id = e.getKey();
+			if (selected != null && id == selected)
+				System.out.printf("[%d]: %s\n", id, e.getValue());
+			else
+				System.out.printf(" %d : %s\n", id, e.getValue());
+		}
+		int input = in.nextInt();
+		in.reset();
+		return input;
 	}
 }

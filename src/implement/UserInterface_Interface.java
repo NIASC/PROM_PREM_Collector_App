@@ -3,6 +3,7 @@ package implement;
 import java.util.HashMap;
 
 import core.containers.form.FieldContainer;
+import core.containers.form.SOptionContainer;
 import core.containers.form.SingleOptionContainer;
 
 /**
@@ -54,7 +55,7 @@ public interface UserInterface_Interface
 	 * @param options The options
 	 * @return int The id of the selected option
 	 */
-	public int selectOption(SingleOptionContainer options);
+	public int selectOption(SOptionContainer options);
 	
 	/**
 	 * Displays a form that the user has to fill in. The supplied
@@ -77,4 +78,18 @@ public interface UserInterface_Interface
 	 * Closes the user interface (if it is open).
 	 */
 	void close();
+	
+	/**
+	 * Creates an object that can store a single-option container.
+	 * The function should return this object, or an Integer containing
+	 * the ID of the selected option if the method itself presents the
+	 * options from the single-option container.
+	 * 
+	 * @param soc The container that stores the options.
+	 * @return The object that stores the container (such as a
+	 * 		JComponent if using Swing or Component if using AWT) or the
+	 * 		ID of the selected option if the method itself presents the
+	 * 		options.
+	 */
+	public Object createSingleOption(SOptionContainer soc);
 }

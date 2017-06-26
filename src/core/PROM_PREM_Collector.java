@@ -1,5 +1,6 @@
 package core;
 
+import core.containers.form.SOptionContainer;
 import core.containers.form.SingleOption;
 import core.containers.form.SingleOptionContainer;
 import implement.*;
@@ -96,17 +97,23 @@ public class PROM_PREM_Collector
 			return;
 
 		final int ERROR = 0, LOGOUT = 1, START_QUESTIONAIRE = 2, VIEW_DATA = 3;
+		/*
 		SingleOptionContainer options = new SingleOptionContainer();
 		options.addOption(new SingleOption(START_QUESTIONAIRE, "Start questionaire."));
 		options.addOption(new SingleOption(VIEW_DATA, "View statistics (for this clinic)."));
 		options.addOption(new SingleOption(LOGOUT, "Log out."));
-
+		*/
+		SOptionContainer options = new SOptionContainer();
+		options.addSOption(START_QUESTIONAIRE, "Start questionaire.");
+		options.addSOption(VIEW_DATA, "View statistics (for this clinic).");
+		options.addSOption(LOGOUT, "Log out.");
+		
 		// present options and evaluate them
 		while (userHandle.isLoggedIn())
 		{
 			options.setSelected(ui.selectOption(options));
-			SingleOption selected = options.getSelected();
-			int response = selected != null ? selected.getIdentifier() : ERROR;
+			Integer identifier = options.getSelected();
+			int response = identifier != null ? identifier : ERROR;
 			switch (response)
 			{
 			case START_QUESTIONAIRE:

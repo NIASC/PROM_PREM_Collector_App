@@ -9,7 +9,7 @@ public class SOptionContainer extends FContainer
 {
 	private HashMap<Integer, SOption> options;
 	private int nextOption;
-	private SOption selected;
+	private Integer selected;
 	
 	public SOptionContainer()
 	{
@@ -60,7 +60,11 @@ public class SOptionContainer extends FContainer
 	 */
 	public boolean setSelected(int id)
 	{
-		return (selected = options.get(id)) != null;
+		SOption sel = options.get(id);
+		if (sel == null)
+			return false;
+		selected = sel.getIdentifier();
+		return true;
 	}
 	
 	/**
@@ -72,11 +76,14 @@ public class SOptionContainer extends FContainer
 	 */
 	public Integer getSelected()
 	{
-		return selected != null ? selected.getIdentifier() : null;
+		return selected;
 	}
 
 	@Override
-	public void draw(UserInterface ui) {}
+	public Object draw(UserInterface ui)
+	{
+		return ui.createSingleOption(this);
+	}
 	
 	private class SOption
 	{

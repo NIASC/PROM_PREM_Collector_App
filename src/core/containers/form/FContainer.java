@@ -6,8 +6,9 @@ public abstract class FContainer
 {
 	protected FContainer nextFC, prevFC;
 	
-	/** Draws the objects contained in this container. */
-	public abstract void draw(UserInterface ui);
+	/** Draws the objects contained in this container. 
+	 * @return TODO*/
+	public abstract Object draw(UserInterface ui);
 	
 	/**
 	 * Retrieves the next FContainer.

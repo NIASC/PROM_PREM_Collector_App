@@ -19,16 +19,20 @@
  */
 package core.containers;
 
-import core.containers.form.FContainer;
+import core.containers.form.FormContainer;
 
 public class Form
 {
 	public static final int AT_FIRST = 0, AT_LAST = 1,
 			AT_BEFORE = 2, AT_AFTER = 3;
 	
-	private FContainer currentFC;
+	private FormContainer currentFC;
 	
-	public Form() {
+	/**
+	 * Initializes an empty form.
+	 */
+	public Form()
+	{
 		currentFC = null;
 	}
 	
@@ -40,25 +44,29 @@ public class Form
 	 * @param location The location to insert. The location is
 	 * 		specified by the AT_* flags.
 	 */
-	public void insert(FContainer fc, int location)
+	public void insert(FormContainer fc, int location)
 	{
 		if (currentFC == null)
 		{
 			currentFC = fc;
 			return;
 		}
-		final FContainer tmp = currentFC;
+		final FormContainer tmp = currentFC;
 		switch(location)
 		{
 		case AT_FIRST:
 			while (currentFC.getPrevFC() != null)
 				currentFC = currentFC.getPrevFC();
+			insertBefore(fc);
+			break;
 		case AT_BEFORE:
 			insertBefore(fc);
 			break;
 		case AT_LAST:
 			while (currentFC.getNextFC() != null)
 				currentFC = currentFC.getNextFC();
+			insertAfter(fc);
+			break;
 		case AT_AFTER:
 			insertAfter(fc);
 			break;
@@ -75,7 +83,7 @@ public class Form
 	 * 
 	 * @param fc The FContainer to insert.
 	 */
-	private void insertAfter(FContainer fc)
+	private void insertAfter(FormContainer fc)
 	{
 		if (fc == null || currentFC == null)
 			return;
@@ -93,7 +101,7 @@ public class Form
 	 * 
 	 * @param fc The FContainer to insert.
 	 */
-	private void insertBefore(FContainer fc)
+	private void insertBefore(FormContainer fc)
 	{
 		if (fc == null || currentFC == null)
 			return;
@@ -113,23 +121,27 @@ public class Form
 	 * 
 	 * @return The deleted FContainer.
 	 */
-	public FContainer delete(int location)
+	public FormContainer delete(int location)
 	{
 		if (currentFC == null)
 			return null;
-		final FContainer tmp = currentFC;
-		FContainer del = null;
+		final FormContainer tmp = currentFC;
+		FormContainer del = null;
 		switch(location)
 		{
 		case AT_FIRST:
 			while (currentFC.getPrevFC() != null)
 				currentFC = currentFC.getPrevFC();
+			del = deleteBefore();
+			break;
 		case AT_BEFORE:
 			del = deleteBefore();
 			break;
 		case AT_LAST:
 			while (currentFC.getNextFC() != null)
 				currentFC = currentFC.getNextFC();
+			del = deleteAfter();
+			break;
 		case AT_AFTER:
 			del = deleteAfter();
 			break;
@@ -147,12 +159,12 @@ public class Form
 	 * 
 	 * @return The FContainer that was deleted.
 	 */
-	private FContainer deleteAfter()
+	private FormContainer deleteAfter()
 	{
 		if (currentFC == null || currentFC.getNextFC() == null)
 			return null;
 		
-		FContainer del = currentFC.getNextFC();
+		FormContainer del = currentFC.getNextFC();
 		currentFC.setNextFC(del.getNextFC());
 		if (del.getNextFC() != null)
 			del.getNextFC().setPrevFC(currentFC);
@@ -170,12 +182,12 @@ public class Form
 	 * 
 	 * @return The FContainer that was deleted.
 	 */
-	private FContainer deleteBefore()
+	private FormContainer deleteBefore()
 	{
 		if (currentFC == null || currentFC.getPrevFC() == null)
 			return null;
 		
-		FContainer del = currentFC.getPrevFC();
+		FormContainer del = currentFC.getPrevFC();
 		currentFC.setPrevFC(del.getPrevFC());
 		if (del.getPrevFC() != null)
 			del.getPrevFC().setNextFC(currentFC);
@@ -193,13 +205,24 @@ public class Form
 	 * @return The new current entry, or null if there are no next
 	 * 		entries.
 	 */
-	public FContainer nextEntry()
+	public FormContainer nextEntry()
 	{
 		if (currentFC.getNextFC() == null)
 			return null;
 		return currentFC = currentFC.getNextFC();
 	}
-	
+
+	/**
+	 * Retrieves the current form entry.
+	 * 
+	 * @return The current entry in this form or null if this form has
+	 * 		no entries.
+	 */
+	public FormContainer currentEntry()
+	{
+		return currentFC;
+	}
+
 	/**
 	 * Moves the current entry to the previous and retrieves it. If
 	 * the previous entry is null then nothing is done and null is
@@ -208,14 +231,19 @@ public class Form
 	 * @return The new current entry, or null if there are no previous
 	 * 		entries.
 	 */
-	public FContainer prevEntry()
+	public FormContainer prevEntry()
 	{
 		if (currentFC.getPrevFC() == null)
 			return null;
 		return currentFC = currentFC.getPrevFC();
 	}
 	
-	/** jumps to entry n */
+	/**
+	 * Jumps to the entry at location. The location should be specified
+	 * by the AT_* flags.
+	 * 
+	 * @param location The location to jump to.
+	 */
 	public void jumpTo(int location)
 	{
 		switch(location)
@@ -288,5 +316,52 @@ public class Form
 			currentFC = currentFC.getPrevFC();
 			jumpBackward(steps - 1);
 		}
+	}
+	
+	/**
+	 * Determines if all entries are filled. if a form is not filled
+	 * the function will jump to to the first unfilled entry in this
+	 * form if specified by jumpToUnfilled.
+	 * 
+	 * @param jumpToUnfilled True if the method should jump to the
+	 * 		first unfilled entry in this form. False if it should not.
+	 * 
+	 * @return True if all entire are filled. False if there are
+	 * 		unfilled entries.
+	 */
+	public boolean allEntriesFilled(boolean jumpToUnfilled)
+	{
+		FormContainer tmp = currentFC;
+		jumpTo(AT_FIRST);
+		boolean entriesFilled;
+		while(currentFC.hasEntry())
+			if (nextEntry() == null)
+				break;
+		entriesFilled = nextEntry() == null;
+		if (!jumpToUnfilled)
+			currentFC = tmp;
+		return entriesFilled;
+	}
+	
+	/**
+	 * Checks if this form has entries after the current entry.
+	 * 
+	 * @return True if current entry is the last one. False if there
+	 * 		are more entries.
+	 */
+	public boolean endOfForm()
+	{
+		return currentFC.getNextFC() == null;
+	}
+	
+	/**
+	 * Checks if this form has entries before the current entry.
+	 * 
+	 * @return True if current entry is the first one. False if there
+	 * 		are previous entries.
+	 */
+	public boolean beginningOfForm()
+	{
+		return currentFC.getPrevFC() == null;
 	}
 }

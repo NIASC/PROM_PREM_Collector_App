@@ -22,11 +22,18 @@ package implement;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
 import java.util.Scanner;
 
+import javax.swing.JComponent;
+
+import core.containers.Form;
+import core.containers.form.Fcontainer;
 import core.containers.form.Field;
 import core.containers.form.FieldContainer;
+import core.containers.form.FormContainer;
 import core.containers.form.SingleOptionContainer;
+import implement.UserInterface_Interface.FormComponentDisplay;
 
 /**
  * This class is an example of an implementation of
@@ -187,23 +194,243 @@ public class UserInterface implements UserInterface_Interface
 		} while (step == LINE_LENGTH); // while >LINE_LENGTH remains
 		ps.printf("%s\n", sb.toString());
 	}
-	
-	public Integer createSingleOption(SingleOptionContainer soc)
+
+	@Override
+	public boolean presentForm(Form form)
 	{
-		separate(System.out);
-		System.out.printf("Select option\n");
-		HashMap<Integer, String> opt = soc.getSOptions();
-		Integer selected = soc.getSelected();
-		for (Entry<Integer, String> e : opt.entrySet())
+		HashMap<Integer, ExtraImplementation> components = fillContents(form);
+		int nComponents = components.size();
+
+		final int ERROR = 0, EXIT = 1, CONTINUE = 2,
+				GOTO_PREV = 3, GOTO_NEXT = 4;
+		SingleOptionContainer options = new SingleOptionContainer();
+		options.addSOption(CONTINUE, "Continue to next unfilled entry");
+		options.addSOption(GOTO_PREV, "Go to previous question");
+		options.addSOption(GOTO_NEXT, "Go to next question");
+		options.addSOption(EXIT, "Exit (answers will be discarded)");
+
+		int component = 0;
+		boolean allFilled = false;
+		while(!allFilled)
 		{
-			Integer id = e.getKey();
-			if (selected != null && id == selected)
-				System.out.printf("[%d]: %s\n", id, e.getValue());
-			else
-				System.out.printf(" %d : %s\n", id, e.getValue());
+			displayMessage(String.format(
+					"Entry: %d/%d (%s)", component, nComponents-1,
+					components.get(component).entryFilled()
+					? "filled" : "unfilled"));
+			options.setSelected(selectOption(options));
+			Integer identifier = options.getSelected();
+			int response = identifier != null ? identifier : ERROR;
+			switch(response)
+			{
+			case CONTINUE:
+				components.get(component).present();
+				components.get(component).fillEntry();
+				int nextComponent = getNextUnfilledEntry(component,
+						components);
+				if (nextComponent == component)
+					allFilled = true;
+				else
+					component = nextComponent;
+				break;
+			case GOTO_PREV:
+				component = getNextEntry(component, nComponents, -1, false);
+				break;
+			case GOTO_NEXT:
+				component = getNextEntry(component, nComponents, 1, false);
+				break;
+			case EXIT:
+				return false;
+			case ERROR:
+				displayError(Messages.error.getMessage(
+						"NULL_SELECTED", "en"));
+				break;
+			default:
+				displayError(Messages.error.getMessage(
+						"UNKNOWN_RESPONSE", "en"));
+				break;
+			}
 		}
-		int input = in.nextInt();
-		in.reset();
-		return input;
+		return true;
+	}
+	
+	private int getNextEntry(int cIndex, int nEntries, int steps, boolean wrap)
+	{
+		if (wrap)
+			return (cIndex + steps + nEntries) % nEntries;
+
+		if (cIndex + steps >= nEntries)
+			return cIndex;
+		else if (cIndex + steps < 0)
+			return 0;
+		else
+			return cIndex + steps;
+	}
+	
+	/**
+	 * Searches for unfilled entries in the supplied form. The search
+	 * starts at the entry after currentIdx and iterates until an
+	 * unfilled entry is found or the search index becomes the same as
+	 * the current index (i.e. all entries are filled). The search
+	 * wraps around at the end so the next empty index can be smaller
+	 * than the current.
+	 * NOTE: This method will not detect if the entry at the current
+	 * index is filled so if the returned index is the same as the
+	 * current it is up to the caller to decide what to do.
+	 * 
+	 * @param currentIdx The index (question id) of the current entry.
+	 * @param form The map of entries, where the keys range from
+	 * 		0<idx<form.size().
+	 * 
+	 * @return The index/id of the next unfilled entry in form. If
+	 * 		the returned id is the same as the (supplied) current id
+	 * 		it means that the search has wrapped around at the end
+	 * 		and not found an unfilled entry.
+	 */
+	private int getNextUnfilledEntry(int currentIdx,
+			HashMap<Integer, ExtraImplementation> form)
+	{
+		int entries = form.size();
+		int i = getNextEntry(currentIdx, entries, 1, true);
+		//int i = (currentIdx + 1) % entries;
+		try {
+		while (form.get(i).entryFilled()
+				&& i != currentIdx)
+			i = getNextEntry(i, entries, 1, true); //(i + 1) % entries;
+		} catch (NullPointerException npe)
+		{
+			this.displayError(String.format("%d, %d", entries, i));
+		}
+		return i;
+	}
+	
+	private HashMap<Integer, ExtraImplementation> fillContents(Form form)
+	{
+		HashMap<Integer, ExtraImplementation> contents =
+				new HashMap<Integer, ExtraImplementation>();
+		int id = 0;
+		form.jumpTo(Form.AT_FIRST);
+		do
+		{
+			contents.put(id++, form.currentEntry().draw(this));
+		} while(!form.endOfForm() && form.nextEntry() != null);
+		return contents;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends FormComponentDisplay> T createSingleOption(SingleOptionContainer soc)
+	{
+		return (T) new SingleOptionDisplay(this, soc);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends FormComponentDisplay> T createField(Fcontainer fc)
+	{
+		return (T) new FieldDisplay(this, fc);
+	}
+	
+	private interface ExtraImplementation extends FormComponentDisplay
+	{
+		/**
+		 * This method presents the container and stores the response
+		 * from the user. It is up to the implementation of this method
+		 * to prevent null/empty entries.
+		 */
+		public void present();
+	}
+	
+	private class SingleOptionDisplay implements ExtraImplementation
+	{
+		private SingleOptionContainer soc;
+		private UserInterface ui;
+		private int responseID;
+		
+		public SingleOptionDisplay(UserInterface ui,
+				SingleOptionContainer soc)
+		{
+			this.ui = ui;
+			this.soc = soc;
+		}
+
+		@Override
+		public void fillEntry()
+		{
+			soc.setSelected(responseID);
+		}
+
+		@Override
+		public boolean entryFilled() 
+		{
+			return soc.hasEntry();
+		}
+
+		@Override
+		public void present()
+		{
+			boolean done = false;
+			while (!done)
+			{
+				separate(System.out);
+				System.out.printf("Select option\n");
+				HashMap<Integer, String> opt = soc.getSOptions();
+				Integer selected = soc.getSelected();
+				for (Entry<Integer, String> e : opt.entrySet())
+				{
+					Integer id = e.getKey();
+					if (selected != null && id == selected)
+						System.out.printf("[%d]: %s\n", id, e.getValue());
+					else
+						System.out.printf(" %d : %s\n", id, e.getValue());
+				}
+				responseID = in.nextInt();
+				in.reset();
+				if (opt.containsKey(responseID))
+					done = true;
+				else
+					ui.displayError(Messages.error.getMessage(
+							"UNKNOWN_RESPONSE", "en"));
+			}
+		}
+	}
+	
+	private class FieldDisplay implements ExtraImplementation
+	{
+		private UserInterface ui;
+		private Fcontainer fc;
+		private String entry;
+		
+		public FieldDisplay(UserInterface ui, Fcontainer fc)
+		{
+			this.ui = ui;
+			this.fc = fc;
+			entry = null;
+		}
+
+		@Override
+		public void fillEntry()
+		{
+			fc.setEntry(entry);
+		}
+
+		@Override
+		public boolean entryFilled()
+		{
+			return fc.hasEntry();
+		}
+
+		@Override
+		public void present()
+		{
+			separate(System.out);
+			String cEntry = fc.getEntry();
+			System.out.printf("%s: %s\n", fc.getStatement(),
+					(cEntry == null ? "" : cEntry));
+			/* Sometimes the input is empty. not allowed. */
+			String entry;
+			while ((entry = in.nextLine()).equals(""));
+			this.entry = entry;
+			in.reset();
+		}
 	}
 }

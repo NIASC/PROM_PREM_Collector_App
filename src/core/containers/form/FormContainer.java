@@ -20,6 +20,7 @@
 package core.containers.form;
 
 import implement.UserInterface;
+import implement.UserInterface_Interface.FormComponentDisplay;
 
 /**
  * This class is the base class of data types that should be included
@@ -36,9 +37,9 @@ import implement.UserInterface;
  * @author Marcus Malmquist
  *
  */
-public abstract class FContainer
+public abstract class FormContainer
 {
-	protected FContainer nextFC, prevFC;
+	protected FormContainer nextFC, prevFC;
 	
 	/**
 	 * Draws the objects contained in this container.
@@ -56,14 +57,22 @@ public abstract class FContainer
 	 * @return The (subclass of) Object that is returned from the
 	 * 		method in the UserInterface class
 	 */
-	public abstract Object draw(UserInterface ui);
+	public abstract <T extends FormComponentDisplay> T draw(UserInterface ui);
+	
+	/**
+	 * Check if this form has been filled (i.e. an option has been
+	 * selected or the field has text in it etc.).
+	 * 
+	 * @return True if this form has entry/entries. False if not.
+	 */
+	public abstract boolean hasEntry();
 	
 	/**
 	 * Retrieves the next FContainer.
 	 * 
 	 * @return The next FContainer.
 	 */
-	public FContainer getNextFC()
+	public FormContainer getNextFC()
 	{
 		return nextFC;
 	}
@@ -73,7 +82,7 @@ public abstract class FContainer
 	 * 
 	 * @return The previous FContainer.
 	 */
-	public FContainer getPrevFC()
+	public FormContainer getPrevFC()
 	{
 		return prevFC;
 	}
@@ -87,17 +96,17 @@ public abstract class FContainer
 	 * @return The FContainer that currently is the FContainer after
 	 * 		this.
 	 */
-	public FContainer setNextFC(FContainer fc)
+	public FormContainer setNextFC(FormContainer fc)
 	{
-		FContainer old = nextFC;
+		FormContainer old = nextFC;
 		nextFC = fc;
 		return old;
 	}
 	
 	/** sets the previous FContainer and returns the previous previous */
-	public FContainer setPrevFC(FContainer fc)
+	public FormContainer setPrevFC(FormContainer fc)
 	{
-		FContainer old = prevFC;
+		FormContainer old = prevFC;
 		prevFC = fc;
 		return old;
 	}

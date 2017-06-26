@@ -21,8 +21,11 @@ package implement;
 
 import java.util.HashMap;
 
+import core.containers.Form;
+import core.containers.form.Fcontainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
+import implement.UserInterface_Interface.FormComponentDisplay;
 
 /**
  * This interface contains the methods required by the core part of
@@ -98,16 +101,58 @@ public interface UserInterface_Interface
 	void close();
 	
 	/**
+	 * Presents a form that the user should fill in. The form has
+	 * entries which follows the specifications of the abstract class
+	 * core.containers.FormContainer. One of those specifications are
+	 * a method to display themselves using the implementation of this
+	 * class.
+	 * 
+	 * @param form The form container that the user should fill in.
+	 * 
+	 * @return True if the form was filled in early. False if the form
+	 * 		was not fully filled in.
+	 */
+	public boolean presentForm(Form form);
+	
+	/**
 	 * Creates an object that can store a single-option container.
-	 * The function should return this object, or an Integer containing
+	 * The function should return that object, or an Integer containing
 	 * the ID of the selected option if the method itself presents the
 	 * options from the single-option container.
 	 * 
 	 * @param soc The container that stores the options.
-	 * @return The object that stores the container (such as a
-	 * 		JComponent if using Swing or Component if using AWT) or the
-	 * 		ID of the selected option if the method itself presents the
-	 * 		options.
+	 * 
+	 * @return The object that stores the container and implements
+	 * 		FormComponentDisplay.
 	 */
-	public Object createSingleOption(SingleOptionContainer soc);
+	public <T extends FormComponentDisplay> T createSingleOption(SingleOptionContainer soc);
+	
+	/**
+	 * Creates an object that can store a field container.
+	 * The function should return that object, or a string containing
+	 * the ID of the selected option if the method itself presents the
+	 * options from the single-option container.
+	 * 
+	 * @param fc
+	 * 
+	 * @return The object that stores the container and implements
+	 * 		FormComponentDisplay.
+	 */
+	public <T extends FormComponentDisplay> T createField(Fcontainer fc);
+
+	public interface FormComponentDisplay
+	{
+		/**
+		 * Retrieves the data from the user and fills the
+		 * implementation's instance of FormContainer with that data.
+		 */
+		public void fillEntry();
+		
+		/**
+		 * Checks if the entry has been filled.
+		 * 
+		 * @return True if the entry has been filled. False it not.
+		 */
+		public boolean entryFilled();
+	}
 }

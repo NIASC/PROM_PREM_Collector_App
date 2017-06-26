@@ -32,6 +32,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import core.containers.Form;
+import core.containers.form.Fcontainer;
 import core.containers.form.Field;
 import core.containers.form.FieldContainer;
 
@@ -65,19 +67,24 @@ public class Registration implements Registration_Interface
 	@Override
 	public void registrationProcess()
 	{
-		FieldContainer fc = new FieldContainer();
-		String[] formKeys = {"Name", "E-mail", "Clinic"};
-		for (String s : formKeys)
-			fc.addForm(new Field(s));
-		ui.displayForm(fc);
+		Form f = new Form();
+		Fcontainer name = new Fcontainer("Name");
+		f.insert(name, Form.AT_LAST);
+		Fcontainer email = new Fcontainer("E-mail");
+		f.insert(email, Form.AT_LAST);
+		Fcontainer clinic = new Fcontainer("Clinic");
+		f.insert(clinic, Form.AT_LAST);
+		f.jumpTo(Form.AT_FIRST);
+		if (!ui.presentForm(f))
+			return;
 		
 		String emailSubject = "PROM_PREM:Registration request";
 		String emailBody = String.format(
 				("Registration request from:"
 						+ "<br><br> Name: %s<br>E-mail: %s<br>Clinic: %s"
 						+ "<br><br> This message was sent from the PROM/PREM collector"),
-				fc.getValue("Name"), fc.getValue("E-mail"),
-				fc.getValue("Clinic"));
+				name.getEntry(), email.getEntry(),
+				clinic.getEntry());
 		send(adminEmail, emailSubject, emailBody, "text/html");
 	}
 	

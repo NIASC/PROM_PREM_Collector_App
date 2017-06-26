@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import implement.UserInterface;
+import implement.UserInterface_Interface.FormComponentDisplay;
 
 /**
  * This class handles single-option objects. It allows you to
@@ -33,7 +34,7 @@ import implement.UserInterface;
  * @author Marcus Malmquist
  *
  */
-public class SingleOptionContainer extends FContainer
+public class SingleOptionContainer extends FormContainer
 {
 	private HashMap<Integer, SOption> options;
 	private int nextOption;
@@ -108,9 +109,15 @@ public class SingleOptionContainer extends FContainer
 	}
 
 	@Override
-	public Object draw(UserInterface ui)
+	public <T extends FormComponentDisplay> T draw(UserInterface ui)
 	{
 		return ui.createSingleOption(this);
+	}
+
+	@Override
+	public boolean hasEntry()
+	{
+		return selected == null;
 	}
 	
 	private class SOption

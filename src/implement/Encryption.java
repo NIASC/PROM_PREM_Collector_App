@@ -39,10 +39,5 @@ public class Encryption implements Encryption_interface
 	{
 		return "";
 	}
-	
-	public Encryption()
-	{
-		
-	}
 
 }

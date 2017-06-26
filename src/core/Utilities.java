@@ -41,8 +41,7 @@ public class Utilities
 	 * 
 	 * @return The /path/to/class/c.
 	 */
-	@SuppressWarnings("rawtypes")
-	public static String getClassPath(Class c)
+	public static <T> String getClassPath(Class<T> c)
 	{
 		URL url = c.getProtectionDomain().getCodeSource().getLocation();
 		String projectPath = null;

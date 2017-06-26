@@ -25,15 +25,9 @@ import java.util.Map.Entry;
 
 import java.util.Scanner;
 
-import javax.swing.JComponent;
-
 import core.containers.Form;
-import core.containers.form.Fcontainer;
-import core.containers.form.Field;
 import core.containers.form.FieldContainer;
-import core.containers.form.FormContainer;
 import core.containers.form.SingleOptionContainer;
-import implement.UserInterface_Interface.FormComponentDisplay;
 
 /**
  * This class is an example of an implementation of
@@ -60,6 +54,7 @@ public class UserInterface implements UserInterface_Interface
 	private static final String SEPARATION_CHARACTER = "-";
 	private static String separation;
 	
+	/* create the ------ line that separates output form the UI. */
 	static
 	{
 		StringBuilder sb = new StringBuilder(LINE_LENGTH);
@@ -68,6 +63,9 @@ public class UserInterface implements UserInterface_Interface
 		separation = sb.toString();
 	}
 	
+	/**
+	 * Initializes variables and opens the scanner stream.
+	 */
 	public UserInterface()
 	{
 		in = new Scanner(System.in);
@@ -104,13 +102,13 @@ public class UserInterface implements UserInterface_Interface
 	@Override
 	public void displayMessage(String message)
 	{
+		separate(System.out);
 		print(message, System.out);
 	}
 
 	@Override
 	public int displayLoginScreen()
 	{
-		separate(System.out);
 		System.out.printf(
 				"What would you like to do?\n%s\n%s\n%s\n",
 				"1: Login", "2: Register", "0: Exit");
@@ -137,6 +135,7 @@ public class UserInterface implements UserInterface_Interface
 	@Override
 	public HashMap<String, String> requestLoginDetails(String usernameKey, String passwordKey)
 	{
+		/* This should be remade into a form. */
 		separate(System.out);
 		HashMap<String, String> details = new HashMap<String, String>(2);
 		System.out.printf("%s\n", "Enter username");
@@ -160,24 +159,15 @@ public class UserInterface implements UserInterface_Interface
 		in.reset();
 		return input;
 	}
-
-	@Override
-	public void displayForm(FieldContainer form)
-	{
-		separate(System.out);
-		for (Entry<Integer, Field> e : form.get().entrySet())
-		{
-			Field f = e.getValue();
-			System.out.printf("%d) %s: %s\n", e.getKey(), f.getKey(),
-					(f.getValue() == null ? "" : f.getValue()));
-			/* Sometimes the input is empty. not allowed. */
-			String entry;
-			while ((entry = in.nextLine()).equals(""));
-			f.setValue(entry);
-			in.reset();
-		}
-	}
 	
+	/**
+	 * Prints a supplied message using the supplied PrintStream. The
+	 * string will be formatted so that it does not take up more space
+	 * than LINE_LENGTH characters wide.
+	 * 
+	 * @param message The message to print.
+	 * @param ps The PrintStream to use to print the message.
+	 */
 	private void print(String message, PrintStream ps)
 	{
 		/* If the message is too wide it must be split up */
@@ -253,6 +243,21 @@ public class UserInterface implements UserInterface_Interface
 		return true;
 	}
 	
+	/**
+	 * Moves cIndex steps positions. If warp is true the function will
+	 * wrap around at the beginning and at the end. If wrap is false
+	 * the method will at most change to 0 <= index < nEntries.
+	 * 
+	 * @param cIndex The (current) to start from.
+	 * @param nEntries The number of entries / length of list etc.
+	 * @param steps The number of steps to move from cIndex. Negative
+	 * 		indices will move backwards.
+	 * @param wrap True if the increment/decrement should wrap (i.e. if
+	 * 		cIndex+steps >= nEntries then the next index will continue
+	 * 		from zero).
+	 * 
+	 * @return The new index after incrementing.
+	 */
 	private int getNextEntry(int cIndex, int nEntries, int steps, boolean wrap)
 	{
 		if (wrap)
@@ -291,24 +296,29 @@ public class UserInterface implements UserInterface_Interface
 	{
 		int entries = form.size();
 		int i = getNextEntry(currentIdx, entries, 1, true);
-		//int i = (currentIdx + 1) % entries;
-		try {
 		while (form.get(i).entryFilled()
 				&& i != currentIdx)
-			i = getNextEntry(i, entries, 1, true); //(i + 1) % entries;
-		} catch (NullPointerException npe)
-		{
-			this.displayError(String.format("%d, %d", entries, i));
-		}
+			i = getNextEntry(i, entries, 1, true);
 		return i;
 	}
 	
+	/**
+	 * Creates a map with ID for keys and objects that are able to
+	 * display the form entries from the supplied form.
+	 * 
+	 * @param form The form that should be 'converted' to a map of
+	 * 		displayable objects.
+	 * 
+	 * @return A map of displayable objects constructed from the
+	 * 		supplied form. The keys are the ID (i.e. order of appearance)
+	 * 		and the values are the displayable objects.
+	 */
 	private HashMap<Integer, ExtraImplementation> fillContents(Form form)
 	{
 		HashMap<Integer, ExtraImplementation> contents =
 				new HashMap<Integer, ExtraImplementation>();
 		int id = 0;
-		form.jumpTo(Form.AT_FIRST);
+		form.jumpTo(Form.AT_BEGIN);
 		do
 		{
 			contents.put(id++, form.currentEntry().draw(this));
@@ -325,11 +335,19 @@ public class UserInterface implements UserInterface_Interface
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends FormComponentDisplay> T createField(Fcontainer fc)
+	public <T extends FormComponentDisplay> T createField(FieldContainer fc)
 	{
 		return (T) new FieldDisplay(this, fc);
 	}
 	
+	/**
+	 * This interface Is a superset of the FormComponentDisplay and
+	 * contains a set of methods that are require for this particular
+	 * implementation of the user interface to work.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	private interface ExtraImplementation extends FormComponentDisplay
 	{
 		/**
@@ -340,12 +358,31 @@ public class UserInterface implements UserInterface_Interface
 		public void present();
 	}
 	
+	/**
+	 * This class is a displayable wrapper the for SingleOption
+	 * container. In this implementation this class displays the
+	 * SingleOption container and stores the response.
+	 * In a GUI implementaion a corresponding class could just extend
+	 * a JComponent that specializes in displaying select-single-option
+	 * content and not necessarily displaying the content itself.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	private class SingleOptionDisplay implements ExtraImplementation
 	{
 		private SingleOptionContainer soc;
 		private UserInterface ui;
 		private int responseID;
 		
+		/**
+		 * Initializes login variables.
+		 * 
+		 * @param ui The instance of the active UserInterface object.
+		 * @param soc The instance of the SingleOptionContainer that
+		 * 		the instance of this SingleOptionDisplay should act as
+		 * 		a wrapper for.
+		 */
 		public SingleOptionDisplay(UserInterface ui,
 				SingleOptionContainer soc)
 		{
@@ -394,13 +431,32 @@ public class UserInterface implements UserInterface_Interface
 		}
 	}
 	
+	/**
+	 * This class is a displayable wrapper the for the Field container. 
+	 * In this implementation this class displays the Field container
+	 * and stores the response.
+	 * In a GUI implementaion a corresponding class could just extend
+	 * a JComponent that specializes in displaying text field content
+	 * and not necessarily displaying the content itself.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	private class FieldDisplay implements ExtraImplementation
 	{
 		private UserInterface ui;
-		private Fcontainer fc;
+		private FieldContainer fc;
 		private String entry;
 		
-		public FieldDisplay(UserInterface ui, Fcontainer fc)
+		/**
+		 * Initializes login variables.
+		 * 
+		 * @param ui The instance of the active UserInterface object.
+		 * @param fc The instance of the FieldContainer that
+		 * 		the instance of this FieldDisplay should act as a
+		 * 		wrapper for.
+		 */
+		public FieldDisplay(UserInterface ui, FieldContainer fc)
 		{
 			this.ui = ui;
 			this.fc = fc;

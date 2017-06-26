@@ -27,8 +27,8 @@ import implement.Encryption;
 import implement.Messages;
 import implement.Registration;
 import implement.UserInterface;
+import core.containers.Form;
 import core.containers.User;
-import core.containers.form.Field;
 import core.containers.form.FieldContainer;
 
 /**
@@ -139,36 +139,37 @@ public class UserHandle
 	{
 		if (!loggedIn)
 			return; // no user to set password for
-		
-		FieldContainer fc = new FieldContainer();
+
 		final String CP_MSG = Messages.info.getMessage(
 				"CURRENT_PASSWORD", Messages.LOCALE);
 		final String NP1_MSG = Messages.info.getMessage(
 				"NEW_PASSWORD", Messages.LOCALE);
 		final String NP2_MSG = Messages.info.getMessage(
 				"RE_NEW_PASSWORD", Messages.LOCALE);
-		fc.addForm(new Field(CP_MSG));
-		fc.addForm(new Field(NP1_MSG));
-		fc.addForm(new Field(NP2_MSG));
-		final int CP_ID = fc.getID(CP_MSG), NP1_ID = fc.getID(NP1_MSG),
-				NP2_ID = fc.getID(NP2_MSG);
 		
-		HashMap<Integer, Field> formMap = null;
+		Form form = new Form();
+		FieldContainer currentPassword = new FieldContainer(CP_MSG);
+		form.insert(currentPassword, Form.AT_END);
+		FieldContainer newPassword1 = new FieldContainer(NP1_MSG);
+		form.insert(newPassword1, Form.AT_END);
+		FieldContainer newPassword2 = new FieldContainer(NP2_MSG);
+		form.insert(newPassword2, Form.AT_END);
+		form.jumpTo(Form.AT_BEGIN);
+		
 		boolean match = false;
 		while (!match)
 		{
 			ui.displayMessage(Messages.info.getMessage(
 					"NEW_PASS_INFO", Messages.LOCALE));
-			ui.displayForm(fc);
-			formMap = fc.get();
+			ui.presentForm(form);
 			if (newPassError(
-					formMap.get(CP_ID).getValue(),
-					formMap.get(NP1_ID).getValue(),
-					formMap.get(NP2_ID).getValue()))
+					currentPassword.getEntry(),
+					newPassword1.getEntry(),
+					newPassword2.getEntry()))
 			{
-				formMap.get(CP_ID).setValue(null);
-				formMap.get(NP1_ID).setValue(null);
-				formMap.get(NP2_ID).setValue(null);
+				currentPassword.setEntry(null);
+				newPassword1.setEntry(null);
+				newPassword2.setEntry(null);
 			}
 			else
 				match = true;
@@ -176,9 +177,9 @@ public class UserHandle
 		Encryption crypto = new Encryption();
 		String newSalt = crypto.getNewSalt();
 		User tmpUser = user_db.setPassword(
-				user, formMap.get(CP_ID).getValue(),
+				user, currentPassword.getEntry(),
 				crypto.hashString(
-						formMap.get(NP1_ID).getValue(), newSalt),
+						newPassword1.getEntry(), newSalt),
 				newSalt);
 		if (tmpUser != null)
 			user = tmpUser;

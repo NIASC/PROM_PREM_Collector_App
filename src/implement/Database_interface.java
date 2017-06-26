@@ -129,7 +129,7 @@ public interface Database_interface
 	 * Loads info messages from the database and puts them in a
 	 * MessageContainer.
 	 * 
-	 * @param mc The (empy) message container to put info messages in.
+	 * @param mc The (empty) message container to put info messages in.
 	 * 
 	 * @return QUERY_SUCCESS if the info messages were successfully
 	 * 		loaded. ERROR if there was an error with the database.

@@ -19,93 +19,169 @@
  */
 package core.containers.form;
 
-import java.util.HashMap;
+import implement.UserInterface;
+import implement.UserInterface_Interface.FormComponentDisplay;
 
 /**
- * This class is a handles for Form objects. It allows you to group
- * several Form objects to create a complete Form that the user can
- * fill in.
+ * This class handles entry field object. It allows you to present a
+ * statement or a question that you want the user to respond to. The
+ * response can then be stored in this container and retrieved later.
  * The purpose of this class is to encapsulate this information into a
  * class so it can be passed as an argument and be easily modifiable.
  * 
  * @author Marcus Malmquist
  *
  */
-public class FieldContainer
+public class FieldContainer extends FormContainer
 {
-	private HashMap<Integer, Field> form;
-	private HashMap<String, Integer> keyToID;
-	private int formID;
+	private FieldEntry field;
 	
 	/**
-	 * Initializes variables.
+	 * Initializes this container as an empty container.
 	 */
 	public FieldContainer()
 	{
-		form = new HashMap<Integer, Field>();
-		keyToID = new HashMap<String, Integer>();
-		formID = 0;
+		field = null;
 	}
 	
 	/**
-	 * Adds a Form to this container.
+	 * Initializes this container with form with the supplied
+	 * statement.
 	 * 
-	 * @param form The Form to add.
+	 * @param statement The statement to initialize this form with.
 	 */
-	public void addForm(Field form)
+	public FieldContainer(String statement)
 	{
-		if (form == null)
+		field = new FieldEntry(statement);
+	}
+	
+	/**
+	 * Sets the content of this container. A field container is only
+	 * allowed to contain one field so if thie container already have
+	 * an entry it will be overwritten
+	 * 
+	 * @param statement The statement that you want the user to respond
+	 * 		to.
+	 */
+	public void setField(String statement)
+	{
+		field = new FieldEntry(statement);
+	}
+	
+	/**
+	 * Retrieves the statement (i.e. the statement that you request the
+	 * user to respond to)
+	 * 
+	 * @return This container's statement.
+	 */
+	public String getStatement()
+	{
+		return field.getKey();
+	}
+	
+	/**
+	 * Retrieves the entry (i.e. the user input in response to the
+	 * field's statement) of this container's field.
+	 * 
+	 * @return This container's user entry.
+	 */
+	public String getEntry()
+	{
+		return field.getValue();
+	}
+	
+	/**
+	 * Sets the entry (i.e. the user input in response to the field's
+	 * statement) of this container's field. Setting the entry to null
+	 * can be used to reset the field.
+	 * 
+	 * @param entry The user entry to set.
+	 */
+	public void setEntry(String entry)
+	{
+		if (entry != null && entry.equals(""))
 			return;
-		this.form.put(formID, form);
-		keyToID.put(form.getKey(), formID++);
-	}
-	
-	/**
-	 * Retrieves the value from the Form associated with the
-	 * supplied id.
-	 * 
-	 * @param id The form's id.
-	 * @return The value contained in the form associated with
-	 * 		the id.
-	 */
-	public String getValue(int id)
-	{
-		return form.get(id).getValue();
+		field.setValue(entry);
 	}
 
-	
-	/**
-	 * Retrieves the value from the Form associated with the
-	 * supplied key.
-	 * 
-	 * @param key The form's name.
-	 * @return The value contained in the form associated with
-	 * 		the key.
-	 */
-	public String getValue(String key)
+	@Override
+	public <T extends FormComponentDisplay> T draw(UserInterface ui)
 	{
-		return getValue(keyToID.get(key));
+		return ui.createField(this);
+	}
+
+	@Override
+	public boolean hasEntry()
+	{
+		return field.getValue() != null;
 	}
 	
 	/**
-	 * Retrieves the ID of the form with the given key.
+	 * This class is a data container for field entries. It is designed
+	 * with extensibility in mind and it should be possible to modify
+	 * FieldContainer to be able to container several field entries
+	 * using this class as a container for the entries.
 	 * 
-	 * @param key The form's name.
-	 * @return The ID of the form associated with the key.
+	 * @author Marcus Malmquist
+	 *
 	 */
-	public int getID(String key)
+	private class FieldEntry
 	{
-		return keyToID.get(key);
-	}
-	
-	/**
-	 * Puts the Form data contained in this class in an Integer-Form
-	 * map.
-	 * 
-	 * @return A map containing a map-id and a Form.
-	 */
-	public HashMap<Integer, Field> get()
-	{
-		return form;
+		private String entryKey;
+		private String entryValue;
+		
+		/**
+		 * Creates a field entry. The field is represented on the form
+		 * of a key and a value. The key is typically the description
+		 * of what you expect the value to be, e.g. in the form
+		 * 'Age: 30' the key is 'Age' and the value is '30'.
+		 * 
+		 * @param key This field's key/description.
+		 */
+		public FieldEntry(String key)
+		{
+			entryKey = key;
+			entryValue = null;
+		}
+		
+		/**
+		 * Copies this FieldEntry.
+		 * 
+		 * @return The copied FieldEntry.
+		 */
+		public FieldEntry copy()
+		{
+			FieldEntry fe = new FieldEntry(entryKey);
+			fe.setValue(entryValue);
+			return fe;
+		}
+		
+		/**
+		 * 
+		 * @return This field's key.
+		 */
+		public String getKey()
+		{
+			return entryKey;
+		}
+		
+		/**
+		 * 
+		 * @return This field's value.
+		 */
+		public String getValue()
+		{
+			return entryValue;
+		}
+		
+		/**
+		 * Sets the value of this field.
+		 * 
+		 * @param value The value to set for this field.
+		 */
+		public void setValue(String value)
+		{
+			entryValue = value;
+		}
 	}
 }

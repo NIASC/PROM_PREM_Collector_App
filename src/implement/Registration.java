@@ -33,8 +33,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import core.containers.Form;
-import core.containers.form.Fcontainer;
-import core.containers.form.Field;
 import core.containers.form.FieldContainer;
 
 /**
@@ -68,13 +66,13 @@ public class Registration implements Registration_Interface
 	public void registrationProcess()
 	{
 		Form f = new Form();
-		Fcontainer name = new Fcontainer("Name");
-		f.insert(name, Form.AT_LAST);
-		Fcontainer email = new Fcontainer("E-mail");
-		f.insert(email, Form.AT_LAST);
-		Fcontainer clinic = new Fcontainer("Clinic");
-		f.insert(clinic, Form.AT_LAST);
-		f.jumpTo(Form.AT_FIRST);
+		FieldContainer name = new FieldContainer("Name");
+		f.insert(name, Form.AT_END);
+		FieldContainer email = new FieldContainer("E-mail");
+		f.insert(email, Form.AT_END);
+		FieldContainer clinic = new FieldContainer("Clinic");
+		f.insert(clinic, Form.AT_END);
+		f.jumpTo(Form.AT_BEGIN);
 		if (!ui.presentForm(f))
 			return;
 		

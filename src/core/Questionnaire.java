@@ -29,7 +29,7 @@ import implement.UserInterface;
  * @author Marcus Malmquist
  *
  */
-public class Questionaire
+public class Questionnaire
 {
 	private UserHandle userHandle;
 	private UserInterface userInterface;
@@ -40,14 +40,14 @@ public class Questionaire
 	 * @param ui The active instance of the user interface.
 	 * @param uh The active instance of the user handle.
 	 */
-	public Questionaire(UserInterface ui, UserHandle uh)
+	public Questionnaire(UserInterface ui, UserHandle uh)
 	{
 		userInterface = ui;
 		userHandle = uh;
 	}
 	
 	/**
-	 * Starts the questionaire.
+	 * Starts the questionnaire.
 	 */
 	public void start()
 	{

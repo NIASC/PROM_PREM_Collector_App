@@ -59,6 +59,6 @@ public class ViewData
 					"NOT_LOGGED_IN", "en"));
 			return;
 		}
-		System.out.println("Viewing data");
+		userInterface.displayMessage("Viewing data");
 	}
 }

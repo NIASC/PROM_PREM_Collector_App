@@ -36,19 +36,21 @@ import implement.UserInterface_Interface.FormComponentDisplay;
  */
 public class SingleOptionContainer extends FormContainer
 {
-	private HashMap<Integer, SOption> options;
+	private HashMap<Integer, SingleOption> options;
 	private int nextOption;
 	private Integer selected;
 	
+	/**
+	 * Initializes variables
+	 */
 	public SingleOptionContainer()
 	{
 		nextFC = prevFC = null;
-		options = new HashMap<Integer, SOption>();
+		options = new HashMap<Integer, SingleOption>();
 		nextOption = 0;
 		selected = null;
 	}
 	
-	/** a */
 	/**
 	 * Adds a new option to the container.
 	 * 
@@ -59,7 +61,7 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public void addSOption(int identifier, String text)
 	{
-		options.put(nextOption++, new SOption(identifier, text));
+		options.put(nextOption++, new SingleOption(identifier, text));
 	}
 	
 	/**
@@ -73,7 +75,7 @@ public class SingleOptionContainer extends FormContainer
 	public HashMap<Integer, String> getSOptions()
 	{
 		HashMap<Integer, String> sopts = new HashMap<Integer, String>();
-		for (Entry<Integer, SOption> e : options.entrySet())
+		for (Entry<Integer, SingleOption> e : options.entrySet())
 			sopts.put(e.getKey(), e.getValue().getText());
 		return sopts;
 	}
@@ -89,7 +91,7 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public boolean setSelected(int id)
 	{
-		SOption sel = options.get(id);
+		SingleOption sel = options.get(id);
 		if (sel == null)
 			return false;
 		selected = sel.getIdentifier();
@@ -120,7 +122,13 @@ public class SingleOptionContainer extends FormContainer
 		return selected == null;
 	}
 	
-	private class SOption
+	/**
+	 * This class is a data container for single-option form entries.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
+	private class SingleOption
 	{
 		private int identifier;
 		private String text;
@@ -133,7 +141,7 @@ public class SingleOptionContainer extends FormContainer
 		 * @param identifier The option identifier.
 		 * @param text The option text.
 		 */
-		public SOption(int identifier, String text)
+		public SingleOption(int identifier, String text)
 		{
 			this.identifier = identifier;
 			this.text = text;
@@ -163,9 +171,9 @@ public class SingleOptionContainer extends FormContainer
 		 * @param opt The option to copy from.
 		 * @return A copy of the supplied Option.
 		 */
-		public SOption makeCopy()
+		public SingleOption makeCopy()
 		{
-			return new SOption(identifier, text);
+			return new SingleOption(identifier, text);
 		}
 	}
 }

@@ -47,6 +47,9 @@ public class Database implements Database_interface
 	private Connection conn;
 	private Statement stmt;
 
+	/**
+	 * Initializes variables and loads the database configuration.
+	 */
 	public Database()
 	{
 		try
@@ -242,7 +245,7 @@ public class Database implements Database_interface
 	 * Retrieves messages from the database and places them in a
 	 * MessageContainer.
 	 * 
-	 * @param tableName The name of the (message) table to retreive
+	 * @param tableName The name of the (message) table to retrieve
 	 * 		messages from.
 	 * @param mc
 	 * @return
@@ -277,8 +280,10 @@ public class Database implements Database_interface
 	/**
 	 * Contains the database configuration.
 	 * The configuration provides a link between the Java code and
-	 * the database, and contains necesary information to log in to
+	 * the database, and contains necessary information to log in to
 	 * the database and get as well as put data in it.
+	 * 
+	 * The path to the configuration file is hard-coded.
 	 * 
 	 * @author Marcus Malmquist
 	 *

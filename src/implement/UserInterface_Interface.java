@@ -22,7 +22,6 @@ package implement;
 import java.util.HashMap;
 
 import core.containers.Form;
-import core.containers.form.Fcontainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
 import implement.UserInterface_Interface.FormComponentDisplay;
@@ -79,15 +78,6 @@ public interface UserInterface_Interface
 	public int selectOption(SingleOptionContainer options);
 	
 	/**
-	 * Displays a form that the user has to fill in. The supplied
-	 * FormContainer may contain forms that has already been filled
-	 * or contains default values which should be displayed.
-	 * 
-	 * @param form A container for form entries.
-	 */
-	public void displayForm(FieldContainer form);
-	
-	/**
 	 * Displays information to the user. For displaying error messages
 	 * please use displayForm.
 	 * 
@@ -138,8 +128,15 @@ public interface UserInterface_Interface
 	 * @return The object that stores the container and implements
 	 * 		FormComponentDisplay.
 	 */
-	public <T extends FormComponentDisplay> T createField(Fcontainer fc);
+	public <T extends FormComponentDisplay> T createField(FieldContainer fc);
 
+	/**
+	 * This interface contains a set of functions that every class that
+	 * presents form entry objects must implement.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	public interface FormComponentDisplay
 	{
 		/**

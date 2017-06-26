@@ -21,10 +21,22 @@ package core.containers;
 
 import core.containers.form.FormContainer;
 
+/**
+ * This class is a container for the FiledContainer class and its
+ * subclasses. It is used to create a form and add entries to it. This
+ * class also provides many useful functions for navigating the form.
+ * 
+ * This class have been written with great flexibility in mind. It
+ * should be easy to add new types of form entries as long as those
+ * types inherit from the FieldContainer class.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class Form
 {
-	public static final int AT_FIRST = 0, AT_LAST = 1,
-			AT_BEFORE = 2, AT_AFTER = 3;
+	public static final int AT_BEGIN = 0, AT_END = 1,
+			AT_PREVIOUS = 2, AT_NEXT = 3;
 	
 	private FormContainer currentFC;
 	
@@ -54,20 +66,20 @@ public class Form
 		final FormContainer tmp = currentFC;
 		switch(location)
 		{
-		case AT_FIRST:
+		case AT_BEGIN:
 			while (currentFC.getPrevFC() != null)
 				currentFC = currentFC.getPrevFC();
 			insertBefore(fc);
 			break;
-		case AT_BEFORE:
+		case AT_PREVIOUS:
 			insertBefore(fc);
 			break;
-		case AT_LAST:
+		case AT_END:
 			while (currentFC.getNextFC() != null)
 				currentFC = currentFC.getNextFC();
 			insertAfter(fc);
 			break;
-		case AT_AFTER:
+		case AT_NEXT:
 			insertAfter(fc);
 			break;
 		default:
@@ -129,20 +141,20 @@ public class Form
 		FormContainer del = null;
 		switch(location)
 		{
-		case AT_FIRST:
+		case AT_BEGIN:
 			while (currentFC.getPrevFC() != null)
 				currentFC = currentFC.getPrevFC();
 			del = deleteBefore();
 			break;
-		case AT_BEFORE:
+		case AT_PREVIOUS:
 			del = deleteBefore();
 			break;
-		case AT_LAST:
+		case AT_END:
 			while (currentFC.getNextFC() != null)
 				currentFC = currentFC.getNextFC();
 			del = deleteAfter();
 			break;
-		case AT_AFTER:
+		case AT_NEXT:
 			del = deleteAfter();
 			break;
 		default:
@@ -248,16 +260,16 @@ public class Form
 	{
 		switch(location)
 		{
-		case AT_FIRST:
+		case AT_BEGIN:
 			while (prevEntry() != null);
 			break;
-		case AT_BEFORE:
+		case AT_PREVIOUS:
 			prevEntry();
 			break;
-		case AT_LAST:
+		case AT_END:
 			while (nextEntry() != null);
 			break;
-		case AT_AFTER:
+		case AT_NEXT:
 			nextEntry();
 			break;
 		default:
@@ -332,7 +344,7 @@ public class Form
 	public boolean allEntriesFilled(boolean jumpToUnfilled)
 	{
 		FormContainer tmp = currentFC;
-		jumpTo(AT_FIRST);
+		jumpTo(AT_BEGIN);
 		boolean entriesFilled;
 		while(currentFC.hasEntry())
 			if (nextEntry() == null)

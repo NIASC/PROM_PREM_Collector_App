@@ -35,7 +35,7 @@ import implement.*;
 public class PROM_PREM_Collector
 {
 	private UserHandle userHandle;
-	private Questionaire questionaire;
+	private Questionnaire questionaire;
 	private ViewData viewData;
 	
 	private UserInterface ui;
@@ -47,7 +47,7 @@ public class PROM_PREM_Collector
 	{
 		ui = new UserInterface();
 		userHandle = new UserHandle(ui);
-		questionaire = new Questionaire(ui, userHandle);
+		questionaire = new Questionnaire(ui, userHandle);
 		viewData = new ViewData(ui, userHandle);
 	}
 

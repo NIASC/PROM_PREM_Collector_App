@@ -39,6 +39,9 @@ public class Manage
 	private Scanner in;
 	private Database db;
 	
+	/**
+	 * Initializes login variables.
+	 */
 	public Manage()
 	{
 		db = new Database();

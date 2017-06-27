@@ -55,10 +55,10 @@ public class ViewData
 	{
 		if (!userHandle.isLoggedIn())
 		{
-			userInterface.displayError(Messages.getError(
+			userInterface.displayError(Messages.getMessages().getError(
 					Messages.ERROR_NOT_LOGGED_IN));
 			return;
 		}
-		userInterface.displayMessage("Viewing data");
+		System.out.printf("%s\n", "Viewing data");
 	}
 }

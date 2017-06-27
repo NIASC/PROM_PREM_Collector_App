@@ -88,7 +88,9 @@ public class UserInterface implements UserInterface_Interface
 			print(message, System.out);
 			System.out.printf("\n");
 		}
-		System.out.printf("Select option\n");
+		System.out.printf(String.format("%s\n",
+				Messages.getMessages().getInfo(
+						Messages.INFO_UI_SELECT_SINGLE)));
 		HashMap<Integer, String> opt = options.getSOptions();
 		for (Entry<Integer, String> e : opt.entrySet())
 			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
@@ -108,20 +110,31 @@ public class UserInterface implements UserInterface_Interface
 
 		final int ERROR = 0, EXIT = 1, CONTINUE = 2,
 				GOTO_PREV = 3, GOTO_NEXT = 4;
+		Messages msg = Messages.getMessages();
 		SingleOptionContainer options = new SingleOptionContainer();
-		options.addSOption(CONTINUE, "Continue to next unfilled entry");
-		options.addSOption(GOTO_PREV, "Go to previous question");
-		options.addSOption(GOTO_NEXT, "Go to next question");
-		options.addSOption(EXIT, "Exit (answers will be discarded)");
+		options.addSOption(CONTINUE, msg.getInfo(
+				Messages.INFO_UI_FORM_CONTINUE));
+		options.addSOption(GOTO_PREV, msg.getInfo(
+				Messages.INFO_UI_FORM_PREVIOUS));
+		options.addSOption(GOTO_NEXT, msg.getInfo(
+				Messages.INFO_UI_FORM_NEXT));
+		options.addSOption(EXIT, msg.getInfo(
+				Messages.INFO_UI_FORM_EXIT));
 
 		int cIdx = 0;
 		boolean allFilled = false;
 		while(!allFilled)
 		{
+			String entryState;
+			if (components.get(cIdx).entryFilled())
+				entryState = msg.getInfo(Messages.INFO_UI_FILLED);
+			else
+				entryState = msg.getInfo(Messages.INFO_UI_UNFILLED);
+			
 			options.setSelected(selectOption(
-					String.format("Entry: %d/%d (%s)", cIdx, nEntries-1,
-							components.get(cIdx).entryFilled()
-							? "filled" : "unfilled"),
+					String.format("%s: %d/%d (%s)",
+							msg.getInfo(Messages.INFO_UI_ENTRY),
+							cIdx, nEntries-1, entryState),
 					options));
 			Integer identifier = options.getSelected();
 			int response = identifier != null ? identifier : ERROR;
@@ -146,11 +159,11 @@ public class UserInterface implements UserInterface_Interface
 			case EXIT:
 				return false;
 			case ERROR:
-				displayError(Messages.getError(
+				displayError(Messages.getMessages().getError(
 						Messages.ERROR_NULL_SELECTED));
 				break;
 			default:
-				displayError(Messages.getError(
+				displayError(Messages.getMessages().getError(
 						Messages.ERROR_UNKNOWN_RESPONSE));
 				break;
 			}
@@ -368,7 +381,9 @@ public class UserInterface implements UserInterface_Interface
 			while (!done)
 			{
 				separate(System.out);
-				System.out.printf("Select option\n");
+				System.out.printf(String.format("%s\n",
+						Messages.getMessages().getInfo(
+								Messages.INFO_UI_SELECT_SINGLE)));
 				HashMap<Integer, String> opt = soc.getSOptions();
 				Integer selected = soc.getSelected();
 				for (Entry<Integer, String> e : opt.entrySet())
@@ -386,7 +401,7 @@ public class UserInterface implements UserInterface_Interface
 				if (opt.containsKey(responseID))
 					done = true;
 				else
-					ui.displayError(Messages.getError(
+					ui.displayError(Messages.getMessages().getError(
 							Messages.ERROR_UNKNOWN_RESPONSE));
 				
 			}

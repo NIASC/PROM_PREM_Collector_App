@@ -35,10 +35,37 @@ import core.containers.MessageContainer;
  */
 public final class Messages
 {
-	private static MessageContainer error, info;
-	private static final String LOCALE = "en";
-	public static final String FALLBACK_LOCALE = "en";
+	private static Messages messages;
+	private MessageContainer error, info;
+	private String locale = "en";
+	public final String fallbackLocale = "en";
 	public static final String DATABASE_ERROR = "Database error.";
+	
+	/**
+	 * This class is a singleton.
+	 */
+	private Messages()
+	{
+		
+	}
+	
+	/**
+	 * 
+	 * @return The active instance of this class.
+	 */
+	public static synchronized Messages getMessages()
+	{
+		if (messages == null)
+			messages = new Messages();
+		return messages;
+	}
+
+	@Override
+	public final Object clone()
+			throws CloneNotSupportedException
+	{
+		throw new CloneNotSupportedException();
+	}
 	
 	/**
 	 * Attempts to load messages from the database.
@@ -46,7 +73,7 @@ public final class Messages
 	 * @return True if messages was successfully loaded. False if an
 	 * 		error occurred while loading messages.
 	 */
-	public static final boolean loadMessages()
+	public final boolean loadMessages()
 	{
 		error = new MessageContainer();
 		info = new MessageContainer();
@@ -60,20 +87,20 @@ public final class Messages
 				&& infoMsgLoadCode == Database_interface.QUERY_SUCCESS;
 	}
 	
-	public static final String getError(String errorName)
+	public final String getError(String errorName)
 	{
-		return getMessage(error, errorName, LOCALE);
+		return getMessage(error, errorName, locale);
 	}
 	
-	public static final String getInfo(String infoName)
+	public final String getInfo(String infoName)
 	{
-		return getMessage(info, infoName, LOCALE);
+		return getMessage(info, infoName, locale);
 	}
 	
-	private static final String getMessage(
+	private final String getMessage(
 			MessageContainer mc, String messageName, String locale)
 	{
-		if (mc == null && !loadMessages())
+		if (mc == null && !Messages.getMessages().loadMessages())
 			return null;
 		return mc.getMessage(messageName, locale);
 	}
@@ -98,6 +125,28 @@ public final class Messages
 	INFO_NEW_PASS_INFO = "NEW_PASS_INFO",
 	INFO_CURRENT_PASSWORD = "CURRENT_PASSWORD",
 	INFO_NEW_PASSWORD = "NEW_PASSWORD",
-	INFO_RE_NEW_PASSWORD = "RE_NEW_PASSWORD"
+	INFO_RE_NEW_PASSWORD = "RE_NEW_PASSWORD",
+	INFO_START_QUESTIONNAIRE = "START_QUESTIONNAIRE",
+	INFO_VIEW_STATISTICS = "VIEW_STATISTICS",
+	INFO_LOGOUT = "LOGOUT",
+	INFO_UH_ENTER_USERNAME = "UH_ENTER_USERNAME",
+	INFO_UH_ENTER_PASSWORD = "UH_ENTER_PASSWORD",
+	INFO_UH_UPDATE_PASSWORD = "UH_UPDATE_PASSWORD",
+	INFO_REG_CLINIC_NAME = "REG_CLINIC_NAME",
+	INFO_REG_USER_NAME = "REG_USER_NAME",
+	INFO_REG_USER_EMAIL = "REG_USER_EMAIL",
+	INFO_REG_EMAIL_SUBJECT = "REG_EMAIL_SUBJECT",
+	INFO_REG_BODY_DESCRIPTION = "REG_BODY_DESCRIPTION",
+	INFO_REG_EMAIL_SIGNATURE = "REG_EMAIL_SIGNATURE",
+	INFO_REG_REQUEST_SENDING = "REG_REQUEST_SENDING",
+	INFO_REG_REQUEST_SENT = "REG_REQUEST_SENT",
+	INFO_UI_UNFILLED = "UI_UNFILLED",
+	INFO_UI_FILLED = "UI_FILLED",
+	INFO_UI_ENTRY = "UI_ENTRY",
+	INFO_UI_FORM_EXIT = "UI_FORM_EXIT",
+	INFO_UI_FORM_NEXT = "UI_FORM_NEXT",
+	INFO_UI_FORM_PREVIOUS = "UI_FORM_PREVIOUS",
+	INFO_UI_FORM_CONTINUE = "UI_FORM_CONTINUE",
+	INFO_UI_SELECT_SINGLE = "UI_SELECT_SINGLE"
 	;
 }

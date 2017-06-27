@@ -76,9 +76,13 @@ public class UserHandle
 			return;
 		user_db.connect();
 		Form f = new Form();
-		FieldContainer usrnam = new FieldContainer("Enter username");
+		FieldContainer usrnam = new FieldContainer(
+				Messages.getMessages().getInfo(
+						Messages.INFO_UH_ENTER_USERNAME));
 		f.insert(usrnam, Form.AT_END);
-		FieldContainer pswrd = new FieldContainer("Enter password");
+		FieldContainer pswrd = new FieldContainer(
+				Messages.getMessages().getInfo(
+						Messages.INFO_UH_ENTER_PASSWORD));
 		f.insert(pswrd, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
 		
@@ -88,7 +92,7 @@ public class UserHandle
 		int ret = validateDetails(usrnam.getEntry(), pswrd.getEntry());
 		if ((ret & (USER_FOUND | DETAILS_MATCH)) != (USER_FOUND | DETAILS_MATCH))
 		{
-			ui.displayError(Messages.getError(
+			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_INVALID_LOGIN));
 			// TODO: add functionality for resetting password.
 			return;
@@ -96,7 +100,8 @@ public class UserHandle
 		initLoginVars();
 		if (user.getUpdatePassword())
 		{
-			ui.displayMessage("Your account have been lagged for password update.");
+			ui.displayMessage(Messages.getMessages().getInfo(
+					Messages.INFO_UH_UPDATE_PASSWORD));
 			setPassword();
 		}
 		user_db.disconnect();
@@ -123,7 +128,6 @@ public class UserHandle
 	{
 		if (!loggedIn)
 			return;
-		System.out.printf("Logging out\n");
 		resetLoginVars();
 	}
 	
@@ -149,11 +153,11 @@ public class UserHandle
 		if (!loggedIn)
 			return; // no user to set password for
 
-		final String CP_MSG = Messages.getInfo(
+		final String CP_MSG = Messages.getMessages().getInfo(
 				Messages.INFO_CURRENT_PASSWORD);
-		final String NP1_MSG = Messages.getInfo(
+		final String NP1_MSG = Messages.getMessages().getInfo(
 				Messages.INFO_NEW_PASSWORD);
-		final String NP2_MSG = Messages.getInfo(
+		final String NP2_MSG = Messages.getMessages().getInfo(
 				Messages.INFO_RE_NEW_PASSWORD);
 		
 		
@@ -169,7 +173,7 @@ public class UserHandle
 		boolean match = false;
 		while (!match)
 		{
-			ui.displayMessage(Messages.getInfo(
+			ui.displayMessage(Messages.getMessages().getInfo(
 					Messages.INFO_NEW_PASS_INFO));
 			if (!ui.presentForm(form))
 				return;
@@ -218,26 +222,26 @@ public class UserHandle
 	{
 		if (!user.passwordMatch(oldPass))
 		{
-			ui.displayError(Messages.getError(
+			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_PR_INVALID_CURRENT));
 			return true;
 		}
 		if (!newPass1.equals(newPass2))
 		{
-			ui.displayError(Messages.getError(
+			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_PR_MISMATCH_NEW));
 			return true;
 		}
 		int ret = validatePassword(newPass1);
 		if (ret < 0)
 		{
-			ui.displayError(Messages.getError(
+			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_PR_INVALID_LENGTH));
 			return true;
 		}
 		else if (ret == 0)
 		{
-			ui.displayError(Messages.getError(
+			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_PR_PASSWORD_SIMPLE));
 			return true;
 		}

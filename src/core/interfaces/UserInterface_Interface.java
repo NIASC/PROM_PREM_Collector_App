@@ -19,12 +19,10 @@
  */
 package core.interfaces;
 
-import java.util.HashMap;
 
 import core.containers.Form;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
-import core.interfaces.UserInterface_Interface.FormComponentDisplay;
 
 /**
  * This interface contains the methods required by the core part of

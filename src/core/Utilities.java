@@ -36,7 +36,8 @@ public class Utilities
 {
 	/**
 	 * Finds the system path to the folder where the supplied class
-	 * is located.
+	 * is located. This function is useful for finding resources that
+	 * are not included in the class path and/or needs write access.
 	 * 
 	 * @param c The class that the path finding will be based on.
 	 * 
@@ -56,7 +57,8 @@ public class Utilities
 	
 	/**
 	 * Retrieves the the supplied file path as an input stream from the
-	 * class path.
+	 * class path. This function is useful for opening files located in
+	 * this project's class path, such ass config files and text files.
 	 * 
 	 * Example:
 	 * If a resource called 'file.txt' is located in the package mypackage,

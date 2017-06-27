@@ -32,6 +32,7 @@ import javax.mail.internet.MimeMessage;
 import core.Utilities;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
+import core.interfaces.Messages;
 import core.interfaces.Registration_Interface;
 import core.interfaces.UserInterface_Interface;
 
@@ -61,24 +62,33 @@ public class Registration implements Registration_Interface
 	@Override
 	public void registrationProcess()
 	{
+		String nameStr = Messages.getMessages().getInfo(
+				Messages.INFO_REG_USER_NAME);
+		String emailStr = Messages.getMessages().getInfo(
+				Messages.INFO_REG_USER_EMAIL);
+		String clinicStr = Messages.getMessages().getInfo(
+				Messages.INFO_REG_CLINIC_NAME);
 		Form f = new Form();
-		FieldContainer name = new FieldContainer("Name");
+		FieldContainer name = new FieldContainer(nameStr);
 		f.insert(name, Form.AT_END);
-		FieldContainer email = new FieldContainer("E-mail");
+		FieldContainer email = new FieldContainer(emailStr);
 		f.insert(email, Form.AT_END);
-		FieldContainer clinic = new FieldContainer("Clinic");
+		FieldContainer clinic = new FieldContainer(clinicStr);
 		f.insert(clinic, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
 		if (!ui.presentForm(f))
 			return;
 		
-		String emailSubject = "PROM_PREM:Registration request";
+		String emailSubject = Messages.getMessages().getInfo(
+				Messages.INFO_REG_EMAIL_SUBJECT);
+		String emailDescription = Messages.getMessages().getInfo(
+				Messages.INFO_REG_BODY_DESCRIPTION);
+		String emailSignature = Messages.getMessages().getInfo(
+				Messages.INFO_REG_EMAIL_SIGNATURE);
 		String emailBody = String.format(
-				("Registration request from:"
-						+ "<br><br> Name: %s<br>E-mail: %s<br>Clinic: %s"
-						+ "<br><br> This message was sent from the PROM/PREM collector"),
-				name.getEntry(), email.getEntry(),
-				clinic.getEntry());
+				("%s:<br><br> %s: %s<br>%s: %s<br>%s: %s<br><br> %s"),
+				emailDescription, nameStr, name.getEntry(), emailStr,
+				email.getEntry(), clinicStr, clinic.getEntry(), emailSignature);
 		send(adminEmail, emailSubject, emailBody, "text/html");
 	}
 	
@@ -112,7 +122,8 @@ public class Registration implements Registration_Interface
 			/* login to server email account and send email. */
 			Transport transport = getMailSession.getTransport();
 			transport.connect(serverEmail, serverPassword);
-			ui.displayMessage("Sending registration request...");
+			ui.displayMessage(Messages.getMessages().getInfo(
+					Messages.INFO_REG_REQUEST_SENDING));
 			transport.sendMessage(generateMailMessage,
 					generateMailMessage.getAllRecipients());
 			transport.close();
@@ -120,7 +131,8 @@ public class Registration implements Registration_Interface
 		{
 			me.printStackTrace();
 		}
-		ui.displayMessage("Registration request sent.");
+		ui.displayMessage(Messages.getMessages().getInfo(
+				Messages.INFO_REG_REQUEST_SENT));
 	}
 	
 	/**

@@ -19,9 +19,12 @@
  */
 package implementation;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,7 +65,7 @@ public class Database implements Database_interface
 	 */
 
 	@Override
-	public int connect()
+	public synchronized int connect()
 	{
 		int ret = ERROR;
 		try
@@ -79,7 +82,7 @@ public class Database implements Database_interface
 	}
 	
 	@Override
-	public int disconnect()
+	public synchronized int disconnect()
 	{
 		int ret = ERROR;
 		try
@@ -203,7 +206,7 @@ public class Database implements Database_interface
 	 * 
 	 * @return QUERY_SUCCESS on successful query, ERROR on failure.
 	 */
-	private int queryUpdate(String message)
+	private synchronized int queryUpdate(String message)
 	{
 		int ret = ERROR;
 		if (stmt == null)
@@ -231,7 +234,7 @@ public class Database implements Database_interface
 	 * 		is not initialized or a query error occurs then null is
 	 * 		returned.
 	 */
-	private ResultSet query(String message)
+	private synchronized ResultSet query(String message)
 	{
 		if (stmt == null)
 			return null;
@@ -306,7 +309,7 @@ public class Database implements Database_interface
 		 * 
 		 * @throws IOException
 		 */
-		public DatabaseConfig() throws IOException
+		private DatabaseConfig() throws IOException
 		{
 			Properties props = new Properties();
 			props.load(Utilities.getResourceStream(getClass(), cfgFile));
@@ -322,6 +325,13 @@ public class Database implements Database_interface
 			{
 				e.printStackTrace();
 			}
+		}
+
+		@Override
+		public Object clone()
+				throws CloneNotSupportedException
+		{
+			throw new CloneNotSupportedException();
 		}
 		
 		/**

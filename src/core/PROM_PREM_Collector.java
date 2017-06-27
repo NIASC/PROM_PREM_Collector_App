@@ -59,9 +59,9 @@ public class PROM_PREM_Collector
 	 */
 	public void start()
 	{
-		if (!Messages.loadMessages())
+		if (!Messages.getMessages().loadMessages())
 		{
-			ui.displayError("Database error: unable to load messages.");
+			ui.displayError(Messages.DATABASE_ERROR);
 			System.exit(1);
 		}
 		boolean quit = false;
@@ -86,9 +86,12 @@ public class PROM_PREM_Collector
 	{
 		final int ERROR = 0, LOGIN = 1, REGISTER = 2, EXIT = 3;
 		SingleOptionContainer options = new SingleOptionContainer();
-		options.addSOption(LOGIN, "Login");
-		options.addSOption(REGISTER, "Register");
-		options.addSOption(EXIT, "Exit");
+		options.addSOption(LOGIN, Messages.getMessages().getInfo(
+				Messages.INFO_LOGIN));
+		options.addSOption(REGISTER, Messages.getMessages().getInfo(
+				Messages.INFO_REGISTER));
+		options.addSOption(EXIT, Messages.getMessages().getInfo(
+				Messages.INFO_EXIT));
 		
 		while(!userHandle.isLoggedIn())
 		{
@@ -106,7 +109,7 @@ public class PROM_PREM_Collector
 				userHandle.register();
 				break;
 			default:
-				ui.displayError(Messages.getError(
+				ui.displayError(Messages.getMessages().getError(
 						Messages.ERROR_UNKNOWN_RESPONSE));
 				break;
 			}
@@ -125,9 +128,12 @@ public class PROM_PREM_Collector
 
 		final int ERROR = 0, LOGOUT = 1, START_QUESTIONAIRE = 2, VIEW_DATA = 3;
 		SingleOptionContainer options = new SingleOptionContainer();
-		options.addSOption(START_QUESTIONAIRE, "Start questionaire.");
-		options.addSOption(VIEW_DATA, "View statistics (for this clinic).");
-		options.addSOption(LOGOUT, "Log out.");
+		options.addSOption(START_QUESTIONAIRE, Messages.getMessages().getInfo(
+						Messages.INFO_START_QUESTIONNAIRE));
+		options.addSOption(VIEW_DATA, Messages.getMessages().getInfo(
+						Messages.INFO_VIEW_STATISTICS));
+		options.addSOption(LOGOUT, Messages.getMessages().getInfo(
+				Messages.INFO_LOGOUT));
 		
 		// present options and evaluate them
 		while (userHandle.isLoggedIn())
@@ -147,11 +153,11 @@ public class PROM_PREM_Collector
 				userHandle.logout();
 				break;
 			case ERROR:
-				ui.displayError(Messages.getError(
+				ui.displayError(Messages.getMessages().getError(
 						Messages.ERROR_NULL_SELECTED));
 				break;
 			default:
-				ui.displayError(Messages.getError(
+				ui.displayError(Messages.getMessages().getError(
 						Messages.ERROR_UNKNOWN_RESPONSE));
 				break;
 			}

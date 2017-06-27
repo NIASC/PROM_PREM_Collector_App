@@ -53,10 +53,10 @@ public class Questionnaire
 	{
 		if (!userHandle.isLoggedIn())
 		{
-			userInterface.displayError(Messages.getError(
+			userInterface.displayError(Messages.getMessages().getError(
 					Messages.ERROR_NOT_LOGGED_IN));
 			return;
 		}
-		System.out.println("Starting Questionaire");
+		System.out.printf("%s\n", "Starting Questionnaire");
 	}
 }

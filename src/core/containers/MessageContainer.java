@@ -94,7 +94,7 @@ public class MessageContainer
 			if (ret != null)
 				return ret;
 			// message exists but not in the requested locale
-			return message.getMessage(Messages.FALLBACK_LOCALE);
+			return message.getMessage(Messages.getMessages().fallbackLocale);
 		}
 		return null;
 	}

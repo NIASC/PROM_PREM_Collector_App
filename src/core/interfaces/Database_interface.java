@@ -17,7 +17,7 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package implement;
+package core.interfaces;
 
 import java.util.HashMap;
 

@@ -19,7 +19,8 @@
  */
 package core.containers;
 
-import implement.Encryption;
+import core.interfaces.Encryption_interface;
+import core.interfaces.Implementations;
 
 /**
  * This class is a data container for User data. A user has a set of
@@ -32,7 +33,7 @@ import implement.Encryption;
  */
 public class User
 {
-	private Encryption crypto;
+	private Encryption_interface crypto;
 	private String username, password, email, salt;
 	private int clinicID;
 	private boolean updatePass;
@@ -59,7 +60,7 @@ public class User
 		this.email = email;
 		this.salt = salt;
 		this.updatePass = updatePass;
-		crypto = new Encryption();
+		crypto = Implementations.Encryption();
 	}
 	
 	/**

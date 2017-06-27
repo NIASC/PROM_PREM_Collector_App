@@ -20,6 +20,7 @@
 package core;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -51,5 +52,25 @@ public class Utilities
 			e.printStackTrace();
 		}
 		return new File(projectPath).getParentFile().getPath();
+	}
+	
+	/**
+	 * Retrieves the the supplied file path as an input stream from the
+	 * class path.
+	 * 
+	 * Example:
+	 * If a resource called 'file.txt' is located in the package mypackage,
+	 * then filePath should be "mypackage/file.txt" and the class should be
+	 * any class which has the same class loader as the resource file.
+	 * 
+	 * @param c The class to get the class path from.
+	 * @param filePath The path to the file to retrieve as an
+	 * 		InpuStream.
+	 * 
+	 * @return The InputStream from the file.
+	 */
+	public static <T> InputStream getResourceStream(Class<T> c, String filePath)
+	{
+		return c.getClassLoader().getResourceAsStream(filePath);
 	}
 }

@@ -19,8 +19,8 @@
  */
 package core.containers.form;
 
-import implement.UserInterface;
-import implement.UserInterface_Interface.FormComponentDisplay;
+import core.interfaces.UserInterface_Interface.FormComponentDisplay;
+import implementation.UserInterface;
 
 /**
  * This class handles entry field object. It allows you to present a

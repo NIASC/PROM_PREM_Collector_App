@@ -17,7 +17,7 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package implement;
+package implementation;
 
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -28,6 +28,9 @@ import java.util.Scanner;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
+import core.interfaces.Messages;
+import core.interfaces.UserInterface_Interface;
+import core.interfaces.UserInterface_Interface.FormComponentDisplay;
 
 /**
  * This class is an example of an implementation of
@@ -143,12 +146,12 @@ public class UserInterface implements UserInterface_Interface
 			case EXIT:
 				return false;
 			case ERROR:
-				displayError(Messages.error.getMessage(
-						"NULL_SELECTED", "en"));
+				displayError(Messages.getError(
+						Messages.ERROR_NULL_SELECTED));
 				break;
 			default:
-				displayError(Messages.error.getMessage(
-						"UNKNOWN_RESPONSE", "en"));
+				displayError(Messages.getError(
+						Messages.ERROR_UNKNOWN_RESPONSE));
 				break;
 			}
 		}
@@ -383,8 +386,9 @@ public class UserInterface implements UserInterface_Interface
 				if (opt.containsKey(responseID))
 					done = true;
 				else
-					ui.displayError(Messages.error.getMessage(
-							"UNKNOWN_RESPONSE", "en"));
+					ui.displayError(Messages.getError(
+							Messages.ERROR_UNKNOWN_RESPONSE));
+				
 			}
 		}
 	}

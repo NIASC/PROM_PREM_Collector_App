@@ -17,7 +17,7 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package implement;
+package implementation;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,9 +27,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
+import core.Utilities;
 import core.containers.Message;
 import core.containers.MessageContainer;
 import core.containers.User;
+import core.interfaces.Database_interface;
 
 /**
  * This class is an example of an implementation of
@@ -293,21 +295,21 @@ public class Database implements Database_interface
 	 */
 	private final class DatabaseConfig
 	{
-		private final String cfgFile = "src/implement/settings.ini";
+		private final String cfgFile = "implementation/settings.ini";
 		// JDBC driver name and database URL
 		private String jdbcDriver, dbURL;
 		//  Database credentials
 		private String username, password;
 		
 		/**
-		 * Loads the settings from src/implement/settings.ini.
+		 * Loads the settings from implementation/settings.ini.
 		 * 
 		 * @throws IOException
 		 */
 		public DatabaseConfig() throws IOException
 		{
 			Properties props = new Properties();
-			props.load(new FileInputStream(cfgFile));
+			props.load(Utilities.getResourceStream(getClass(), cfgFile));
 			jdbcDriver = props.getProperty("jdbc_driver");
 			dbURL = props.getProperty("url");
 			username = props.getProperty("db_login");

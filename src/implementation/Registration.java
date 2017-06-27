@@ -17,11 +17,8 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package implement;
+package implementation;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -32,8 +29,11 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import core.Utilities;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
+import core.interfaces.Registration_Interface;
+import core.interfaces.UserInterface_Interface;
 
 /**
  * This class is an example of an implementation of
@@ -47,7 +47,7 @@ public class Registration implements Registration_Interface
 	/**
 	 * Initializes Mailer class and loads configuration.
 	 */
-	public Registration(UserInterface ui)
+	public Registration(UserInterface_Interface ui)
 	{
 		this.ui = ui;
 		mailConfig = new Properties();
@@ -99,10 +99,8 @@ public class Registration implements Registration_Interface
 			String emailBody, String bodyFormat)
 	{
 		/* generate session and message instances */
-		Session getMailSession = Session.getDefaultInstance(
-				mailConfig, null);
-		MimeMessage generateMailMessage = new MimeMessage(
-				getMailSession);
+		Session getMailSession = Session.getDefaultInstance(mailConfig, null);
+		MimeMessage generateMailMessage = new MimeMessage(getMailSession);
 		try
 		{
 			/* create email */
@@ -131,30 +129,32 @@ public class Registration implements Registration_Interface
 	 */
 	private void refreshConfig()
 	{
-		loadConfig(new File(CONFIG_FILE));
-		loadEmailAccounts(new File(ACCOUNT_FILE));
+		loadConfig(CONFIG_FILE);
+		loadEmailAccounts(ACCOUNT_FILE);
 	}
 	
 	/**
 	 * Loads the javax.mail config properties contained in the
 	 * supplied config file.
 	 * 
-	 * @param configFile The file while the javax.mail config
+	 * @param filePath The file while the javax.mail config
 	 * 		properties are located.
 	 * 
 	 * @return True if the file was loaded. False if an error
 	 * 		occurred.
 	 */
-	private boolean loadConfig(File configFile)
+	private boolean loadConfig(String filePath)
 	{
 		if (!mailConfig.isEmpty())
 			mailConfig.clear();
-		try (FileInputStream in = new FileInputStream(configFile))
+		try
 		{
-			mailConfig.load(in);
+			mailConfig.load(Utilities.getResourceStream(getClass(), filePath));
 		}
-		catch(FileNotFoundException fnf) { return false; }
-		catch(IOException ioe) { return false; }
+		catch(IOException ioe)
+		{
+			return false;
+		}
 		return true;
 	}
 	
@@ -163,29 +163,35 @@ public class Registration implements Registration_Interface
 	 * as well as the email address of the administrator who will
 	 * receive registration requests.
 	 * 
-	 * @param configFile The file that contains the email account
+	 * @param filePath The file that contains the email account
 	 * 		information.
+	 * 
+	 * @return True if the file was loaded. False if an error
+	 * 		occurred.
 	 */
-	private void loadEmailAccounts(File configFile)
+	private boolean loadEmailAccounts(String filePath)
 	{
 		try
 		{
 			Properties props = new Properties();
-			props.load(new FileInputStream(configFile));
+			props.load(Utilities.getResourceStream(getClass(), filePath));
 			adminEmail = props.getProperty("admin_email");
 			serverEmail = props.getProperty("server_email");
 			serverPassword = props.getProperty("server_password");
 			props.clear();
 		} catch (IOException ioe)
 		{
-			
+			return false;
 		}
+		return true;
 	}
 	
 	private Properties mailConfig;
-	private UserInterface ui;
-	private final String CONFIG_FILE = "src/implement/mail_settings.txt";
-	private final String ACCOUNT_FILE = "src/implement/mailaccount_settings.ini";
+	private UserInterface_Interface ui;
+	private final String CONFIG_FILE =
+			"implementation/mail_settings.txt";
+	private final String ACCOUNT_FILE =
+			"implementation/mailaccount_settings.ini";
 	
 	// server mailing account
 	private String serverEmail, serverPassword, adminEmail;

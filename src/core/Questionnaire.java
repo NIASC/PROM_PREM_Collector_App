@@ -19,8 +19,8 @@
  */
 package core;
 
-import implement.Messages;
-import implement.UserInterface;
+import core.interfaces.Messages;
+import core.interfaces.UserInterface_Interface;
 
 /**
  * This class is the central point for the questionaire part of the
@@ -32,7 +32,7 @@ import implement.UserInterface;
 public class Questionnaire
 {
 	private UserHandle userHandle;
-	private UserInterface userInterface;
+	private UserInterface_Interface userInterface;
 
 	/**
 	 * Initialize variables.
@@ -40,7 +40,7 @@ public class Questionnaire
 	 * @param ui The active instance of the user interface.
 	 * @param uh The active instance of the user handle.
 	 */
-	public Questionnaire(UserInterface ui, UserHandle uh)
+	public Questionnaire(UserInterface_Interface ui, UserHandle uh)
 	{
 		userInterface = ui;
 		userHandle = uh;
@@ -53,8 +53,8 @@ public class Questionnaire
 	{
 		if (!userHandle.isLoggedIn())
 		{
-			userInterface.displayError(Messages.error.getMessage(
-					"NOT_LOGGED_IN", "en"));
+			userInterface.displayError(Messages.getError(
+					Messages.ERROR_NOT_LOGGED_IN));
 			return;
 		}
 		System.out.println("Starting Questionaire");

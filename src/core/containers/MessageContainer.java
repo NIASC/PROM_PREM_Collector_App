@@ -22,7 +22,7 @@ package core.containers;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import implement.Messages;
+import core.interfaces.Messages;
 
 /**
  * This class is a handles for Message objects. It allows you to group

@@ -17,7 +17,9 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package implement;
+package implementation;
+
+import core.interfaces.Encryption_interface;
 
 /**
  * This class is an example of an implementation of

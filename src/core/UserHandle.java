@@ -19,17 +19,17 @@
  */
 package core;
 
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import implement.Database;
-import implement.Encryption;
-import implement.Messages;
-import implement.Registration;
-import implement.UserInterface;
 import core.containers.Form;
 import core.containers.User;
 import core.containers.form.FieldContainer;
+import core.interfaces.Database_interface;
+import core.interfaces.Encryption_interface;
+import core.interfaces.Implementations;
+import core.interfaces.Messages;
+import core.interfaces.Registration_Interface;
+import core.interfaces.UserInterface_Interface;
 
 /**
  * This class handles the user. This mostly means handling the login,
@@ -44,8 +44,8 @@ public class UserHandle
 	public static final int USER_FOUND = 0x10;
 	public static final int DETAILS_MATCH = 0x20;
 	
-	private Database user_db;
-	private UserInterface ui;
+	private Database_interface user_db;
+	private UserInterface_Interface ui;
 	private User user;
 	
 	private boolean loggedIn;
@@ -55,10 +55,10 @@ public class UserHandle
 	 * 
 	 * @param ui The active instance of the user interface.
 	 */
-	public UserHandle(UserInterface ui)
+	public UserHandle(UserInterface_Interface ui)
 	{
 		this.ui = ui;
-		user_db = new Database();
+		user_db = Implementations.Database();
 		user = null;
 		loggedIn = false;
 	}
@@ -88,8 +88,8 @@ public class UserHandle
 		int ret = validateDetails(usrnam.getEntry(), pswrd.getEntry());
 		if ((ret & (USER_FOUND | DETAILS_MATCH)) != (USER_FOUND | DETAILS_MATCH))
 		{
-			ui.displayError(Messages.error.getMessage(
-					"UH_INVALID_LOGIN", Messages.LOCALE));
+			ui.displayError(Messages.getError(
+					Messages.ERROR_UH_INVALID_LOGIN));
 			// TODO: add functionality for resetting password.
 			return;
 		}
@@ -111,7 +111,7 @@ public class UserHandle
 	{
 		if (loggedIn)
 			return;
-		Registration register = new Registration(ui);
+		Registration_Interface register = Implementations.Registration(ui);
 		register.registrationProcess();
 	}
 	
@@ -149,12 +149,13 @@ public class UserHandle
 		if (!loggedIn)
 			return; // no user to set password for
 
-		final String CP_MSG = Messages.info.getMessage(
-				"CURRENT_PASSWORD", Messages.LOCALE);
-		final String NP1_MSG = Messages.info.getMessage(
-				"NEW_PASSWORD", Messages.LOCALE);
-		final String NP2_MSG = Messages.info.getMessage(
-				"RE_NEW_PASSWORD", Messages.LOCALE);
+		final String CP_MSG = Messages.getInfo(
+				Messages.INFO_CURRENT_PASSWORD);
+		final String NP1_MSG = Messages.getInfo(
+				Messages.INFO_NEW_PASSWORD);
+		final String NP2_MSG = Messages.getInfo(
+				Messages.INFO_RE_NEW_PASSWORD);
+		
 		
 		Form form = new Form();
 		FieldContainer currentPassword = new FieldContainer(CP_MSG);
@@ -168,8 +169,8 @@ public class UserHandle
 		boolean match = false;
 		while (!match)
 		{
-			ui.displayMessage(Messages.info.getMessage(
-					"NEW_PASS_INFO", Messages.LOCALE));
+			ui.displayMessage(Messages.getInfo(
+					Messages.INFO_NEW_PASS_INFO));
 			if (!ui.presentForm(form))
 				return;
 			if (newPassError(
@@ -184,7 +185,7 @@ public class UserHandle
 			else
 				match = true;
 		}
-		Encryption crypto = new Encryption();
+		Encryption_interface crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
 		User tmpUser = user_db.setPassword(
 				user, currentPassword.getEntry(),
@@ -217,27 +218,27 @@ public class UserHandle
 	{
 		if (!user.passwordMatch(oldPass))
 		{
-			ui.displayError(Messages.error.getMessage(
-					"UH_PR_INVALID_CURRENT", Messages.LOCALE));
+			ui.displayError(Messages.getError(
+					Messages.ERROR_UH_PR_INVALID_CURRENT));
 			return true;
 		}
 		if (!newPass1.equals(newPass2))
 		{
-			ui.displayError(Messages.error.getMessage(
-					"UH_PR_MISMATCH_NEW", Messages.LOCALE));
+			ui.displayError(Messages.getError(
+					Messages.ERROR_UH_PR_MISMATCH_NEW));
 			return true;
 		}
 		int ret = validatePassword(newPass1);
 		if (ret < 0)
 		{
-			ui.displayError(Messages.error.getMessage(
-					"UH_PR_INVALID_LENGTH", Messages.LOCALE));
+			ui.displayError(Messages.getError(
+					Messages.ERROR_UH_PR_INVALID_LENGTH));
 			return true;
 		}
 		else if (ret == 0)
 		{
-			ui.displayError(Messages.error.getMessage(
-					"UH_PR_PASSWORD_SIMPLE", Messages.LOCALE));
+			ui.displayError(Messages.getError(
+					Messages.ERROR_UH_PR_PASSWORD_SIMPLE));
 			return true;
 		}
 		return false;

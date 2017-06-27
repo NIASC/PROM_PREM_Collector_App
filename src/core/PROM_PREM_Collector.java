@@ -20,7 +20,9 @@
 package core;
 
 import core.containers.form.SingleOptionContainer;
-import implement.*;
+import core.interfaces.Implementations;
+import core.interfaces.Messages;
+import core.interfaces.UserInterface_Interface;
 
 /**
  * This is the main program that is the PROM/PREM Collector.
@@ -38,14 +40,14 @@ public class PROM_PREM_Collector
 	private Questionnaire questionaire;
 	private ViewData viewData;
 	
-	private UserInterface ui;
+	private UserInterface_Interface ui;
 
 	/**
 	 * Initializes class variables.
 	 */
 	public PROM_PREM_Collector()
 	{
-		ui = new UserInterface();
+		ui = Implementations.UserInterface();
 		userHandle = new UserHandle(ui);
 		questionaire = new Questionnaire(ui, userHandle);
 		viewData = new ViewData(ui, userHandle);
@@ -104,8 +106,8 @@ public class PROM_PREM_Collector
 				userHandle.register();
 				break;
 			default:
-				ui.displayError(Messages.error.getMessage(
-						"UNKNOWN_RESPONSE", "en"));
+				ui.displayError(Messages.getError(
+						Messages.ERROR_UNKNOWN_RESPONSE));
 				break;
 			}
 		}
@@ -145,12 +147,12 @@ public class PROM_PREM_Collector
 				userHandle.logout();
 				break;
 			case ERROR:
-				ui.displayError(Messages.error.getMessage(
-						"NULL_SELECTED", "en"));
+				ui.displayError(Messages.getError(
+						Messages.ERROR_NULL_SELECTED));
 				break;
 			default:
-				ui.displayError(Messages.error.getMessage(
-						"UNKNOWN_RESPONSE", "en"));
+				ui.displayError(Messages.getError(
+						Messages.ERROR_UNKNOWN_RESPONSE));
 				break;
 			}
 		}

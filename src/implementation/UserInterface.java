@@ -19,7 +19,6 @@
  */
 package implementation;
 
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -30,7 +29,6 @@ import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
 import core.interfaces.Messages;
 import core.interfaces.UserInterface_Interface;
-import core.interfaces.UserInterface_Interface.FormComponentDisplay;
 
 /**
  * This class is an example of an implementation of
@@ -64,28 +62,27 @@ public class UserInterface implements UserInterface_Interface
 	@Override
 	public void displayError(String message)
 	{
-		PrintStream ps = System.out;
-		ps.printf(ANSI_RED);
-		separate(ps);
-		print(message, ps);
-		separate(ps);
-		ps.printf(ANSI_RESET);
+		System.out.printf(ANSI_RED);
+		separate();
+		print(message);
+		separate();
+		System.out.printf(ANSI_RESET);
 	}
 
 	@Override
 	public void displayMessage(String message)
 	{
-		separate(System.out);
-		print(message, System.out);
+		separate();
+		print(message);
 	}
 
 	@Override
 	public int selectOption(String message, SingleOptionContainer options)
 	{
-		separate(System.out);
+		separate();
 		if (message != null)
 		{
-			print(message, System.out);
+			print(message);
 			System.out.printf("\n");
 		}
 		System.out.printf(String.format("%s\n",
@@ -194,22 +191,19 @@ public class UserInterface implements UserInterface_Interface
 	 * to separate active interface stuff (forms, options, messages
 	 * etc.) from inactive interface stuff. This part may only be
 	 * relevant when using CLI.
-	 * @param ps TODO
 	 */
-	private void separate(PrintStream ps)
+	private void separate()
 	{
-		ps.printf("%s\n", separation);
+		System.out.printf("%s\n", separation);
 	}
 	
 	/**
-	 * Prints a supplied message using the supplied PrintStream. The
-	 * string will be formatted so that it does not take up more space
-	 * than LINE_LENGTH characters wide.
+	 * Prints a supplied message. The string will be formatted so that
+	 * it does not take up more space than LINE_LENGTH characters wide.
 	 * 
 	 * @param message The message to print.
-	 * @param ps The PrintStream to use to print the message.
 	 */
-	private void print(String message, PrintStream ps)
+	private void print(String message)
 	{
 		/* If the message is too wide it must be split up */
 		StringBuilder msgFormatted = new StringBuilder();
@@ -226,7 +220,7 @@ public class UserInterface implements UserInterface_Interface
 					message.substring(beginIndex, beginIndex + step)));
 			beginIndex += step;
 		} while (step == LINE_LENGTH); // while >LINE_LENGTH remains
-		ps.printf("%s", msgFormatted.toString());
+		System.out.printf("%s", msgFormatted.toString());
 	}
 	
 	/**
@@ -380,7 +374,7 @@ public class UserInterface implements UserInterface_Interface
 			boolean done = false;
 			while (!done)
 			{
-				separate(System.out);
+				separate();
 				System.out.printf(String.format("%s\n",
 						Messages.getMessages().getInfo(
 								Messages.INFO_UI_SELECT_SINGLE)));
@@ -455,7 +449,7 @@ public class UserInterface implements UserInterface_Interface
 		@Override
 		public void present()
 		{
-			separate(System.out);
+			separate();
 			String cEntry = fc.getEntry();
 			System.out.printf("%s: %s\n", fc.getStatement(),
 					(cEntry == null ? "" : cEntry));

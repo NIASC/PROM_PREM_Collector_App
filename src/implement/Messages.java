@@ -59,4 +59,6 @@ public abstract class Messages
 		return errMsgLoadCode == Database_interface.QUERY_SUCCESS
 				&& infoMsgLoadCode == Database_interface.QUERY_SUCCESS;
 	}
+	
+	public static String ERROR_ = ""; 
 }

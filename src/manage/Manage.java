@@ -81,15 +81,35 @@ public class Manage
 		HashMap<Integer, String> clinics = db.getClinics();
 		for (Entry<Integer, String> e : clinics.entrySet())
 			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
-		int clinic = in.nextInt();
-		in.reset();
+		Integer clinic = null;
+		if (in.hasNextInt())
+			clinic = in.nextInt();
+		else
+		{
+			in.next();
+			System.out.printf("No such clinic. Exting\n");
+			System.exit(1);
+		}
 
 		System.out.printf("Email?\n");
 		String email = in.next();
-		in.reset();
 		Encryption crypto = new Encryption();
 		String salt = crypto.getNewSalt();
 		db.addUser(user, crypto.hashString(password, salt), salt, clinic, email);
+	}
+
+	/** Open a connection */
+	public boolean dbConnect()
+	{
+		System.out.printf("%s\n", "Connecting to database.");
+		return db.connect() != Database.ERROR;
+	}
+
+	/** Close connection */
+	public boolean dbDisconnect()
+	{
+		System.out.println("Disconnecting from database.");
+		return db.disconnect() != Database.ERROR;
 	}
 	
 	/**
@@ -98,43 +118,40 @@ public class Manage
 	 */
 	public void runManager()
 	{
-		// Open a connection
-		System.out.printf("%s", "Connecting to database... ");
-		if (db.connect() == Database.ERROR)
-		{
-			System.out.printf("%s\n", "Failed!");
+		if (!dbConnect())
 			System.exit(1);
-		}
-		System.out.printf("%s\n", "Success!");
 		
 		// Execute a query
+		final int EXIT = 0, ADD_CLINIC = 1, ADD_USER = 2;
 		System.out.printf(
-				"What would you like to do?\n%s\n%s\n%s\n",
-				"1: Add Clinic", "2: Add user", "0: Exit");
-		int input = in.nextInt();
-		in.reset();
+				"What would you like to do?\n%d: %s\n%d: %s\n%d: %s\n",
+				ADD_CLINIC, "Add Clinic",
+				ADD_USER, "Add user",
+				EXIT, "Exit");
+		int input = EXIT;
+		if (in.hasNextInt())
+			input = in.nextInt();
+		else
+		{
+			in.next();
+			System.out.printf("Unknown option. Exting\n");
+			System.exit(1);
+		}
 		switch (input)
 		{
-		case 0: //exit
+		case EXIT:
 			break;
-		case 1:
+		case ADD_CLINIC:
 			addClinic();
 			break;
-		case 2:
+		case ADD_USER:
 			addUser();
 			break;
 		default:
 			break;
 		}
-		
-		// Close connection
-		System.out.println("Disconnecting from database... ");
-		if (db.disconnect() == Database.ERROR)
-		{
-			System.out.printf("%s\n", "Failed!");
+		if (!dbDisconnect())
 			System.exit(1);
-		}
-		System.out.printf("%s\n", "Done!");
 	}
 	
 	public static void main(String[] args)

@@ -39,30 +39,6 @@ import core.containers.form.SingleOptionContainer;
  */
 public class UserInterface implements UserInterface_Interface
 {
-	public static final String ANSI_RESET = "\u001B[0m";
-	public static final String ANSI_BLACK = "\u001B[30m";
-	public static final String ANSI_RED = "\u001B[31m";
-	public static final String ANSI_GREEN = "\u001B[32m";
-	public static final String ANSI_YELLOW = "\u001B[33m";
-	public static final String ANSI_BLUE = "\u001B[34m";
-	public static final String ANSI_PURPLE = "\u001B[35m";
-	public static final String ANSI_CYAN = "\u001B[36m";
-	public static final String ANSI_WHITE = "\u001B[37m";
-	
-	private Scanner in;
-	private static final int LINE_LENGTH = 80;
-	private static final String SEPARATION_CHARACTER = "-";
-	private static String separation;
-	
-	/* create the ------ line that separates output form the UI. */
-	static
-	{
-		StringBuilder sb = new StringBuilder(LINE_LENGTH);
-		for (int i = 0 ; i < LINE_LENGTH; ++i)
-			sb.append(SEPARATION_CHARACTER);
-		separation = sb.toString();
-	}
-	
 	/**
 	 * Initializes variables and opens the scanner stream.
 	 */
@@ -71,6 +47,10 @@ public class UserInterface implements UserInterface_Interface
 		in = new Scanner(System.in);
 	}
 	
+	/* 
+	 * Public methods required by the interface.
+	 */
+	
 	@Override
 	public void close()
 	{
@@ -78,25 +58,15 @@ public class UserInterface implements UserInterface_Interface
 			in.close();
 	}
 	
-	/**
-	 * Prints a line of characters to make it simple for the user
-	 * to separate active interface stuff (forms, options, messages
-	 * etc.) from inactive interface stuff. This part may only be
-	 * relevant when using CLI.
-	 * @param ps TODO
-	 */
-	private void separate(PrintStream ps)
-	{
-		ps.printf("%s\n", separation);
-	}
-	
 	@Override
 	public void displayError(String message)
 	{
-		separate(System.out);
-		System.out.println(ANSI_RED);
-		print(message, System.out);
-		System.out.println(ANSI_RESET);
+		PrintStream ps = System.out;
+		ps.printf(ANSI_RED);
+		separate(ps);
+		print(message, ps);
+		separate(ps);
+		ps.printf(ANSI_RESET);
 	}
 
 	@Override
@@ -107,89 +77,31 @@ public class UserInterface implements UserInterface_Interface
 	}
 
 	@Override
-	public int displayLoginScreen()
+	public int selectOption(String message, SingleOptionContainer options)
 	{
-		System.out.printf(
-				"What would you like to do?\n%s\n%s\n%s\n",
-				"1: Login", "2: Register", "0: Exit");
-		int input = in.nextInt();
-		in.reset();
-		int out = UserInterface_Interface.ERROR;
-		switch (input)
+		separate(System.out);
+		if (message != null)
 		{
-		case 0: //exit
-			out = UserInterface_Interface.EXIT;
-			break;
-		case 1:
-			out = UserInterface_Interface.LOGIN;
-			break;
-		case 2:
-			out = UserInterface_Interface.REGISTER;
-			break;
-		default:
-			break;
+			print(message, System.out);
+			System.out.printf("\n");
 		}
-		return out;
-	}
-	
-	@Override
-	public HashMap<String, String> requestLoginDetails(String usernameKey, String passwordKey)
-	{
-		/* This should be remade into a form. */
-		separate(System.out);
-		HashMap<String, String> details = new HashMap<String, String>(2);
-		System.out.printf("%s\n", "Enter username");
-		details.put(usernameKey, in.next());
-		in.reset();
-		System.out.printf("%s\n", "Enter password");
-		details.put(passwordKey, in.next());
-		in.reset();
-		return details;
-	}
-
-	@Override
-	public int selectOption(SingleOptionContainer options)
-	{
-		separate(System.out);
 		System.out.printf("Select option\n");
 		HashMap<Integer, String> opt = options.getSOptions();
 		for (Entry<Integer, String> e : opt.entrySet())
 			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
-		int input = in.nextInt();
-		in.reset();
+		int input = ERROR;
+		if (in.hasNextInt())
+			input = in.nextInt();
+		else
+			in.next();
 		return input;
-	}
-	
-	/**
-	 * Prints a supplied message using the supplied PrintStream. The
-	 * string will be formatted so that it does not take up more space
-	 * than LINE_LENGTH characters wide.
-	 * 
-	 * @param message The message to print.
-	 * @param ps The PrintStream to use to print the message.
-	 */
-	private void print(String message, PrintStream ps)
-	{
-		/* If the message is too wide it must be split up */
-		StringBuilder sb = new StringBuilder();
-		final int msgLength = message.length();
-		int beginIndex = 0, step;
-		do
-		{
-			step = (msgLength - beginIndex > LINE_LENGTH)
-					? LINE_LENGTH : msgLength - beginIndex;
-			sb.append(String.format("%s\n", message.substring(
-					beginIndex, beginIndex + step)));
-			beginIndex += step;
-		} while (step == LINE_LENGTH); // while >LINE_LENGTH remains
-		ps.printf("%s\n", sb.toString());
 	}
 
 	@Override
 	public boolean presentForm(Form form)
 	{
 		HashMap<Integer, ExtraImplementation> components = fillContents(form);
-		int nComponents = components.size();
+		int nEntries = components.size();
 
 		final int ERROR = 0, EXIT = 1, CONTINUE = 2,
 				GOTO_PREV = 3, GOTO_NEXT = 4;
@@ -199,34 +111,34 @@ public class UserInterface implements UserInterface_Interface
 		options.addSOption(GOTO_NEXT, "Go to next question");
 		options.addSOption(EXIT, "Exit (answers will be discarded)");
 
-		int component = 0;
+		int cIdx = 0;
 		boolean allFilled = false;
 		while(!allFilled)
 		{
-			displayMessage(String.format(
-					"Entry: %d/%d (%s)", component, nComponents-1,
-					components.get(component).entryFilled()
-					? "filled" : "unfilled"));
-			options.setSelected(selectOption(options));
+			options.setSelected(selectOption(
+					String.format("Entry: %d/%d (%s)", cIdx, nEntries-1,
+							components.get(cIdx).entryFilled()
+							? "filled" : "unfilled"),
+					options));
 			Integer identifier = options.getSelected();
 			int response = identifier != null ? identifier : ERROR;
 			switch(response)
 			{
 			case CONTINUE:
-				components.get(component).present();
-				components.get(component).fillEntry();
-				int nextComponent = getNextUnfilledEntry(component,
+				components.get(cIdx).present();
+				components.get(cIdx).fillEntry();
+				int nextComponent = getNextUnfilledEntry(cIdx,
 						components);
-				if (nextComponent == component)
+				if (nextComponent == cIdx)
 					allFilled = true;
 				else
-					component = nextComponent;
+					cIdx = nextComponent;
 				break;
 			case GOTO_PREV:
-				component = getNextEntry(component, nComponents, -1, false);
+				cIdx = getNextEntry(cIdx, nEntries, -1, false);
 				break;
 			case GOTO_NEXT:
-				component = getNextEntry(component, nComponents, 1, false);
+				cIdx = getNextEntry(cIdx, nEntries, 1, false);
 				break;
 			case EXIT:
 				return false;
@@ -241,6 +153,64 @@ public class UserInterface implements UserInterface_Interface
 			}
 		}
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends FormComponentDisplay> T createSingleOption(SingleOptionContainer soc)
+	{
+		return (T) new SingleOptionDisplay(this, soc);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends FormComponentDisplay> T createField(FieldContainer fc)
+	{
+		return (T) new FieldDisplay(this, fc);
+	}
+	
+	/* 
+	 * Private methods not required by the interface.
+	 */
+	
+	/**
+	 * Prints a line of characters to make it simple for the user
+	 * to separate active interface stuff (forms, options, messages
+	 * etc.) from inactive interface stuff. This part may only be
+	 * relevant when using CLI.
+	 * @param ps TODO
+	 */
+	private void separate(PrintStream ps)
+	{
+		ps.printf("%s\n", separation);
+	}
+	
+	/**
+	 * Prints a supplied message using the supplied PrintStream. The
+	 * string will be formatted so that it does not take up more space
+	 * than LINE_LENGTH characters wide.
+	 * 
+	 * @param message The message to print.
+	 * @param ps The PrintStream to use to print the message.
+	 */
+	private void print(String message, PrintStream ps)
+	{
+		/* If the message is too wide it must be split up */
+		StringBuilder msgFormatted = new StringBuilder();
+		final int msgLength = message.length();
+		int beginIndex = 0, step;
+		do
+		{
+			if (msgLength - beginIndex > LINE_LENGTH)
+				step = LINE_LENGTH;
+			else
+				step = msgLength - beginIndex;
+			
+			msgFormatted.append(String.format("%s\n",
+					message.substring(beginIndex, beginIndex + step)));
+			beginIndex += step;
+		} while (step == LINE_LENGTH); // while >LINE_LENGTH remains
+		ps.printf("%s", msgFormatted.toString());
 	}
 	
 	/**
@@ -325,20 +295,6 @@ public class UserInterface implements UserInterface_Interface
 		} while(!form.endOfForm() && form.nextEntry() != null);
 		return contents;
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends FormComponentDisplay> T createSingleOption(SingleOptionContainer soc)
-	{
-		return (T) new SingleOptionDisplay(this, soc);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends FormComponentDisplay> T createField(FieldContainer fc)
-	{
-		return (T) new FieldDisplay(this, fc);
-	}
 	
 	/**
 	 * This interface Is a superset of the FormComponentDisplay and
@@ -420,8 +376,10 @@ public class UserInterface implements UserInterface_Interface
 					else
 						System.out.printf(" %d : %s\n", id, e.getValue());
 				}
-				responseID = in.nextInt();
-				in.reset();
+				if (in.hasNextInt())
+					responseID = in.nextInt();
+				else
+					in.next();
 				if (opt.containsKey(responseID))
 					done = true;
 				else
@@ -488,5 +446,29 @@ public class UserInterface implements UserInterface_Interface
 			this.entry = entry;
 			in.reset();
 		}
+	}
+	
+	private static final String ANSI_RESET = "\u001B[0m";
+	private static final String ANSI_BLACK = "\u001B[30m";
+	private static final String ANSI_RED = "\u001B[31m";
+	private static final String ANSI_GREEN = "\u001B[32m";
+	private static final String ANSI_YELLOW = "\u001B[33m";
+	private static final String ANSI_BLUE = "\u001B[34m";
+	private static final String ANSI_PURPLE = "\u001B[35m";
+	private static final String ANSI_CYAN = "\u001B[36m";
+	private static final String ANSI_WHITE = "\u001B[37m";
+	
+	private Scanner in;
+	private static final int LINE_LENGTH = 80;
+	private static final String SEPARATION_CHARACTER = "-";
+	private static String separation;
+	
+	/* create the ------ line that separates output form the UI. */
+	static
+	{
+		StringBuilder sb = new StringBuilder(LINE_LENGTH);
+		for (int i = 0 ; i < LINE_LENGTH; ++i)
+			sb.append(SEPARATION_CHARACTER);
+		separation = sb.toString();
 	}
 }

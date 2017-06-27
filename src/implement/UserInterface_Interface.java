@@ -38,9 +38,12 @@ import implement.UserInterface_Interface.FormComponentDisplay;
 public interface UserInterface_Interface
 {
 	public static final int ERROR = -1;
-	public static final int EXIT = 0x100;
-	public static final int LOGIN = 0x200;
-	public static final int REGISTER = 0x400;
+
+	/**
+	 * Closes the user interface (if it is open).
+	 */
+	void close();
+	
 	/**
 	 * Presents an error message to the user. The message
 	 * should contain clear information about why the error
@@ -51,44 +54,21 @@ public interface UserInterface_Interface
 	public void displayError(String s);
 	
 	/**
-	 * Displays the login screen. It should contain an input
-	 * field for entering login id & password as well as
-	 * functionality to login or request registration
-	 * 
-	 * @return int LOGIN if the user wants to log in,
-	 * 		REGISTER if the user wants to register,
-	 * 		EXIT if the user wants to exit.
-	 */
-	public int displayLoginScreen();
-	
-	/**
-	 * Requests login details (i.e. username & password) from the user.
-	 * 
-	 * @return A HashMap where the username is associated with 'usernameKey'
-	 * 		and the password is associated with 'passwordKey'
-	 */
-	public HashMap<String, String> requestLoginDetails(String usernameKey, String passwordKey);
-	
-	/**
-	 * Displays options and require the user to select one of them.
-	 * 
-	 * @param options The options
-	 * @return int The id of the selected option
-	 */
-	public int selectOption(SingleOptionContainer options);
-	
-	/**
 	 * Displays information to the user. For displaying error messages
 	 * please use displayForm.
 	 * 
 	 * @param message The message to display to the user.
 	 */
 	public void displayMessage(String message);
-
+	
 	/**
-	 * Closes the user interface (if it is open).
+	 * Displays options and require the user to select one of them.
+	 * @param message A message to display along with the options.
+	 * @param options The options to display.
+	 * 
+	 * @return The id of the selected option
 	 */
-	void close();
+	public int selectOption(String message, SingleOptionContainer options);
 	
 	/**
 	 * Presents a form that the user should fill in. The form has

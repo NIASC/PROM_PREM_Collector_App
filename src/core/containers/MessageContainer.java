@@ -20,6 +20,7 @@
 package core.containers;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import implement.Messages;
 
@@ -116,5 +117,15 @@ public class MessageContainer
 	public String getMessage(String name, String locale)
 	{
 		return getMessage(nameToCode.get(name), locale);
+	}
+	
+	public HashMap<String, Message> getMessages()
+	{
+		HashMap<String, Message> ret = new HashMap<String, Message>();
+		for (Entry<String, Integer> e: nameToCode.entrySet())
+		{
+			ret.put(e.getKey(), messages.get(e.getValue()));
+		}
+		return ret;
 	}
 }

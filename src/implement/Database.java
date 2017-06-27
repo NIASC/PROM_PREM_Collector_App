@@ -41,12 +41,6 @@ import core.containers.User;
  */
 public class Database implements Database_interface
 {
-	
-	private DatabaseConfig dbConfig;
-
-	private Connection conn;
-	private Statement stmt;
-
 	/**
 	 * Initializes variables and loads the database configuration.
 	 */
@@ -60,6 +54,10 @@ public class Database implements Database_interface
 			e.printStackTrace();
 		}
 	}
+	
+	/* 
+	 * Public methods required by the interface.
+	 */
 
 	@Override
 	public int connect()
@@ -119,6 +117,81 @@ public class Database implements Database_interface
 		return queryUpdate(qInsert);
 	}
 	
+	@Override
+	public HashMap<Integer, String> getClinics()
+	{
+		ResultSet rs = query("SELECT `id`, `name` FROM `clinics`");
+		if (rs == null)
+			return null;
+		HashMap<Integer, String> ret = new HashMap<Integer, String>();
+		try
+		{
+			while (rs.next())
+				ret.put(rs.getInt("id"), rs.getString("name"));
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	@Override
+	public User getUser(String username)
+	{
+		ResultSet rs = query("SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
+		if (rs == null)
+			return null;
+		User user = null;
+		try
+		{
+			while (rs.next())
+			{
+				if (rs.getString("name").equals(username))
+				{
+					user = new User(rs.getInt("clinic_id"), rs.getString("name"), rs.getString("password"),
+							rs.getString("email"), rs.getString("salt"), rs.getInt("update_password") != 0);
+					break;
+				}
+			}
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return user;
+	}
+
+	@Override
+	public User setPassword(User user, String oldPass, String newPass,
+			String newSalt)
+	{
+		if (!user.passwordMatch(oldPass))
+			return null;
+		String qInsert = String.format(
+				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
+				newPass, newSalt, 0, user.getUsername());
+		return queryUpdate(qInsert) == QUERY_SUCCESS ? getUser(user.getUsername()) : null;
+	}
+
+	@Override
+	public int getErrorMessages(MessageContainer mc)
+	{
+		if (mc == null)
+			return ERROR;
+		return getMessages("error_messages", mc) ? QUERY_SUCCESS : ERROR;
+	}
+
+	@Override
+	public int getInfoMessages(MessageContainer mc)
+	{
+		if (mc == null)
+			return ERROR;
+		return getMessages("info_messages", mc) ? QUERY_SUCCESS : ERROR;
+	}
+	
+	/* 
+	 * Private methods not required by the interface.
+	 */
+	
 	/**
 	 * Query the database to update an entry i.e. modify an existing
 	 * database entry.
@@ -169,76 +242,6 @@ public class Database implements Database_interface
 			se.printStackTrace();
 		}
 		return rs;
-	}
-	
-	@Override
-	public HashMap<Integer, String> getClinics()
-	{
-		ResultSet rs = query("SELECT `id`, `name` FROM `clinics`");
-		if (rs == null)
-			return null;
-		HashMap<Integer, String> ret = new HashMap<Integer, String>();
-		try
-		{
-			while (rs.next())
-				ret.put(rs.getInt("id"), rs.getString("name"));
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		return ret;
-	}
-
-	@Override
-	public User getUser(String username)
-	{
-		ResultSet rs = query("SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
-		if (rs == null)
-			return null;
-		User user = null;
-		try
-		{
-			while (rs.next())
-			{
-				if (rs.getString("name").equals(username))
-				{
-					user = new User(rs.getInt("clinic_id"), rs.getString("name"), rs.getString("password"),
-							rs.getString("email"), rs.getString("salt"), rs.getInt("update_password") != 0);
-					break;
-				}
-			}
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		return user;
-	}
-
-	@Override
-	public User setPassword(User user, String oldPass, String newPass, String newSalt)
-	{
-		if (!user.passwordMatch(oldPass))
-			return null;
-		String qInsert = String.format(
-				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
-				newPass, newSalt, 0, user.getUsername());
-		return queryUpdate(qInsert) == QUERY_SUCCESS ? getUser(user.getUsername()) : null;
-	}
-
-	@Override
-	public int getInfoMessages(MessageContainer mc)
-	{
-		if (mc == null)
-			return ERROR;
-		return getMessages("info_messages", mc) ? QUERY_SUCCESS : ERROR;
-	}
-
-	@Override
-	public int getErrorMessages(MessageContainer mc)
-	{
-		if (mc == null)
-			return ERROR;
-		return getMessages("error_messages", mc) ? QUERY_SUCCESS : ERROR;
 	}
 
 	/**
@@ -346,4 +349,8 @@ public class Database implements Database_interface
 			return password;
 		}
 	}
+	
+	private DatabaseConfig dbConfig;
+	private Connection conn;
+	private Statement stmt;
 }

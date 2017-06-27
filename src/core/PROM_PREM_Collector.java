@@ -82,17 +82,25 @@ public class PROM_PREM_Collector
 	 */
 	private boolean loginOptions()
 	{
+		final int ERROR = 0, LOGIN = 1, REGISTER = 2, EXIT = 3;
+		SingleOptionContainer options = new SingleOptionContainer();
+		options.addSOption(LOGIN, "Login");
+		options.addSOption(REGISTER, "Register");
+		options.addSOption(EXIT, "Exit");
+		
 		while(!userHandle.isLoggedIn())
 		{
-			int response = ui.displayLoginScreen();
+			options.setSelected(ui.selectOption(null, options));
+			Integer identifier = options.getSelected();
+			int response = identifier != null ? identifier : ERROR;
 			switch (response)
 			{
-			case UserInterface_Interface.EXIT:
+			case EXIT:
 				return true;
-			case UserInterface_Interface.LOGIN:
+			case LOGIN:
 				userHandle.login();
 				break;
-			case UserInterface_Interface.REGISTER:
+			case REGISTER:
 				userHandle.register();
 				break;
 			default:
@@ -122,7 +130,7 @@ public class PROM_PREM_Collector
 		// present options and evaluate them
 		while (userHandle.isLoggedIn())
 		{
-			options.setSelected(ui.selectOption(options));
+			options.setSelected(ui.selectOption(null, options));
 			Integer identifier = options.getSelected();
 			int response = identifier != null ? identifier : ERROR;
 			switch (response)

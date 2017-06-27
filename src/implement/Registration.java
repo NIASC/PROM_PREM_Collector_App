@@ -44,14 +44,6 @@ import core.containers.form.FieldContainer;
  */
 public class Registration implements Registration_Interface
 {
-	private Properties mailConfig;
-	private UserInterface ui;
-	private final String CONFIG_FILE = "src/implement/mail_settings.txt";
-	private final String ACCOUNT_FILE = "src/implement/mailaccount_settings.ini";
-	
-	// server mailing account
-	private String serverEmail, serverPassword, adminEmail;
-	
 	/**
 	 * Initializes Mailer class and loads configuration.
 	 */
@@ -61,6 +53,10 @@ public class Registration implements Registration_Interface
 		mailConfig = new Properties();
 		refreshConfig();
 	}
+	
+	/* 
+	 * Public methods required by the interface.
+	 */
 
 	@Override
 	public void registrationProcess()
@@ -85,6 +81,10 @@ public class Registration implements Registration_Interface
 				clinic.getEntry());
 		send(adminEmail, emailSubject, emailBody, "text/html");
 	}
+	
+	/* 
+	 * Private methods not required by the interface.
+	 */
 	
 	/**
 	 * Sends an email from the program's email account.
@@ -181,4 +181,12 @@ public class Registration implements Registration_Interface
 			
 		}
 	}
+	
+	private Properties mailConfig;
+	private UserInterface ui;
+	private final String CONFIG_FILE = "src/implement/mail_settings.txt";
+	private final String ACCOUNT_FILE = "src/implement/mailaccount_settings.ini";
+	
+	// server mailing account
+	private String serverEmail, serverPassword, adminEmail;
 }

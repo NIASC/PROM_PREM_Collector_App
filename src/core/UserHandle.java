@@ -75,8 +75,17 @@ public class UserHandle
 		if (loggedIn)
 			return;
 		user_db.connect();
-		HashMap<String, String> details = ui.requestLoginDetails("user", "pass");
-		int ret = validateDetails(details.get("user"), details.get("pass"));
+		Form f = new Form();
+		FieldContainer usrnam = new FieldContainer("Enter username");
+		f.insert(usrnam, Form.AT_END);
+		FieldContainer pswrd = new FieldContainer("Enter password");
+		f.insert(pswrd, Form.AT_END);
+		f.jumpTo(Form.AT_BEGIN);
+		
+		if (!ui.presentForm(f))
+			return;
+		
+		int ret = validateDetails(usrnam.getEntry(), pswrd.getEntry());
 		if ((ret & (USER_FOUND | DETAILS_MATCH)) != (USER_FOUND | DETAILS_MATCH))
 		{
 			ui.displayError(Messages.error.getMessage(
@@ -161,7 +170,8 @@ public class UserHandle
 		{
 			ui.displayMessage(Messages.info.getMessage(
 					"NEW_PASS_INFO", Messages.LOCALE));
-			ui.presentForm(form);
+			if (!ui.presentForm(form))
+				return;
 			if (newPassError(
 					currentPassword.getEntry(),
 					newPassword1.getEntry(),

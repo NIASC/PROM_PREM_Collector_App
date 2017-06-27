@@ -28,6 +28,17 @@ package implement;
  */
 public class Encryption implements Encryption_interface
 {
+	/**
+	 * Initializes variables.
+	 */
+	public Encryption()
+	{
+		
+	}
+	
+	/* 
+	 * Public methods required by the interface.
+	 */
 
 	@Override
 	public String hashString(String s, String salt)
@@ -35,6 +46,7 @@ public class Encryption implements Encryption_interface
 		return s + salt;
 	}
 
+	@Override
 	public String getNewSalt()
 	{
 		return "";

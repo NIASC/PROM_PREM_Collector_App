@@ -5,4 +5,4 @@ build/
 .project
 *~
 PROM_PREM_Collector.jar
-src/implement/mailaccount_settings.ini
+src/implementation/mailaccount_settings.ini

@@ -31,9 +31,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import core.Utilities;
-import core.containers.Message;
 import core.containers.MessageContainer;
-import core.containers.Msg;
 import core.containers.User;
 import core.interfaces.Database_interface;
 
@@ -179,7 +177,7 @@ public class Database implements Database_interface
 	}
 
 	@Override
-	public int getErrorMessages(Msg mc)
+	public int getErrorMessages(MessageContainer mc)
 	{
 		if (mc == null)
 			return ERROR;
@@ -187,7 +185,7 @@ public class Database implements Database_interface
 	}
 
 	@Override
-	public int getInfoMessages(Msg mc)
+	public int getInfoMessages(MessageContainer mc)
 	{
 		if (mc == null)
 			return ERROR;
@@ -259,7 +257,7 @@ public class Database implements Database_interface
 	 * @param mc
 	 * @return
 	 */
-	private boolean getMessages(String tableName, Msg mc)
+	private boolean getMessages(String tableName, MessageContainer mc)
 	{
 		ResultSet rs = query(String.format(
 				("SELECT `code`, `name`, `locale`, `message` "

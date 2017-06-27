@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import core.interfaces.Messages;
 
 /**
- * This class is a handles for Message objects. It allows you to group
+ * This class is a handle for Message objects. It allows you to group
  * several Message objects to make it simple to find the same type of
  * messages in a single object.
  * The purpose of this class is to encapsulate this information into a
@@ -36,37 +36,40 @@ import core.interfaces.Messages;
  */
 public class MessageContainer
 {
-	private HashMap<Integer, Message> messages;
-	private HashMap<String, Integer> nameToCode;
+	private HashMap<String, Message> messages;
+	private HashMap<Integer, String> codeToName;
 
 	/**
 	 * Creates a container for Messages.
 	 */
 	public MessageContainer()
 	{
-		messages = new HashMap<Integer, Message>();
-		nameToCode = new HashMap<String, Integer>();
+		messages = new HashMap<String, Message>();
+		codeToName = new HashMap<Integer, String>();
 	}
 	
 	/**
 	 * Adds a Message to this container. If a message with the same
-	 * code as the supplied message exists in this container then the
+	 * name as the supplied message exists in this container then the
 	 * supplied message will be merged with the existing message.
 	 * 
-	 * @param message The Message to add to this container.
+	 * @param code The message code/id.
+	 * @param name The message name/identifier.
+	 * @param message The list of messages for different locales. The
+	 * 		format should be <locale, message> e.g <"en", "Hello">,
+	 * 		<"fr", "Bonjour"> etc.
 	 */
-	public void addMessage(Message message)
+	public void addMessage(int code, String name, HashMap<String, String> text)
 	{
-		if (message == null)
-			return;
-		if (messages.get(message.getCode()) == null)
+		Message message = new Message(code, name, text);
+		if (messages.get(name) == null)
 		{ // new message
-			messages.put(message.getCode(), message);
-			nameToCode.put(message.getName(), message.getCode());
+			messages.put(name, message);
+			codeToName.put(code, name);
 		}
 		else
 		{ // message exists with a different locale
-			messages.get(message.getCode()).merge(message);
+			messages.get(name).merge(message);
 		}
 	}
 	
@@ -87,16 +90,7 @@ public class MessageContainer
 	 */
 	public String getMessage(int code, String locale)
 	{
-		if (messages.get(code) != null)
-		{
-			Message message = messages.get(code);
-			String ret = message.getMessage(locale);
-			if (ret != null)
-				return ret;
-			// message exists but not in the requested locale
-			return message.getMessage(Messages.getMessages().fallbackLocale);
-		}
-		return null;
+		return getMessage(codeToName.get(code), locale);
 	}
 	
 	/**
@@ -116,16 +110,139 @@ public class MessageContainer
 	 */
 	public String getMessage(String name, String locale)
 	{
-		return getMessage(nameToCode.get(name), locale);
+		if (messages.get(name) != null)
+		{
+			Message message = messages.get(name);
+			String ret = message.getMessage(locale);
+			if (ret != null)
+				return ret;
+			// message exists but not in the requested locale
+			return message.getMessage(Messages.getMessages().fallbackLocale);
+		}
+		return null;
 	}
 	
-	public HashMap<String, Message> getMessages()
+	/**
+	 * This class is a data container for Messages. A message is a
+	 * structure which has a code/key/name and a set of messages in
+	 * different languages associated with different locales.
+	 * The purpose of this class is to encapsulate this information
+	 * into a class so it can be passed as an argument and be easily
+	 * modifiable.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
+	private class Message
 	{
-		HashMap<String, Message> ret = new HashMap<String, Message>();
-		for (Entry<String, Integer> e: nameToCode.entrySet())
+		private int code;
+		private String name;
+		private HashMap<String, String> messages;
+		
+		/**
+		 * Creates a Message that has a code, name and a list of
+		 * messages for different locales (for multiple language
+		 * support).
+		 * 
+		 * @param code The message code/id.
+		 * @param name The message name/identifier.
+		 * @param message The list of messages for different locales.
+		 * 		The format should be <locale, message> e.g
+		 * 		<"en", "Hello"> or <"fr", "Bonjour">.
+		 */
+		public Message(int code, String name, HashMap<String, String> message)
 		{
-			ret.put(e.getKey(), messages.get(e.getValue()));
+			this.code = code;
+			this.name = name;
+			messages = new HashMap<String, String>();
+			messages.putAll(message);
 		}
-		return ret;
+		
+		/**
+		 * Adds a message to this Message.
+		 * This function can be used for adding messages for different
+		 * locales to this Message. It is up to the database
+		 * maintainers to make sure that the message has the same
+		 * meaning for all locales.
+		 * 
+		 * @param message The message to add.
+		 * @param locale The locale that this message was written for.
+		 * @param replace Previously stored messages for the supplied
+		 * 		locale will be replaced if replace is true and kept if
+		 * 		replace is false.
+		 * 
+		 * @return If this Message already contains a message for the
+		 * 		supplied locale and replace is true then that message
+		 * 		will be returned. Else null will be returned.
+		 */
+		private String addMessage(String message, String locale,
+				boolean replace)
+		{
+			if (replace || getMessage(locale) == null)
+				return messages.put(locale, message);
+			return null;
+		}
+		
+		/**
+		 * Retrieves the message for a given locale.
+		 * 
+		 * @param locale The locale of the message.
+		 * 
+		 * @return The message in the language specified by the locale.
+		 * 		If no message exists for the supplied locale then null
+		 * 		is returned.
+		 */
+		public String getMessage(String locale)
+		{
+			return messages.get(locale);
+		}
+		
+		/**
+		 * Puts the locales and their corresponding messages in a map
+		 * where the locale is the key and the messages is the value.
+		 * 
+		 * @return A map that contains the locales and messages.
+		 */
+		public HashMap<String, String> getMessages()
+		{
+			HashMap<String, String> tmp = new HashMap<String, String>();
+			tmp.putAll(messages);
+			return tmp;
+		}
+		
+		/**
+		 * Merges the supplied Message with this Message by copying the
+		 * messages and locales to this Message.
+		 * If there are overlapping locales (and messages) then the
+		 * messages contained in this Message are kept.
+		 * 
+		 * @param message
+		 */
+		public void merge(final Message message)
+		{
+			HashMap<String, String> msgMap = message.getMessages();
+			for (Entry<String, String> e: msgMap.entrySet())
+			{
+				addMessage(e.getValue(), e.getKey(), false);
+			}
+		}
+		
+		/**
+		 * 
+		 * @return The message's name.
+		 */
+		public String getName()
+		{
+			return name;
+		}
+		
+		/**
+		 * 
+		 * @return The message's code.
+		 */
+		public int getCode()
+		{
+			return code;
+		}
 	}
 }

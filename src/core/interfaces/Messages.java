@@ -20,7 +20,6 @@
 package core.interfaces;
 
 import core.containers.MessageContainer;
-import core.containers.Msg;
 
 /**
  * This class should contain error and information messages fomr the
@@ -37,7 +36,7 @@ import core.containers.Msg;
 public final class Messages
 {
 	private static Messages messages;
-	private Msg error, info;
+	private MessageContainer error, info;
 	private String locale = "en";
 	public final String fallbackLocale = "en";
 	public static final String DATABASE_ERROR = "Database error.";
@@ -76,8 +75,8 @@ public final class Messages
 	 */
 	public final boolean loadMessages()
 	{
-		error = new Msg();
-		info = new Msg();
+		error = new MessageContainer();
+		info = new MessageContainer();
 		
 		Database_interface db = Implementations.Database();
 		db.connect();
@@ -99,7 +98,7 @@ public final class Messages
 	}
 	
 	private final String getMessage(
-			Msg mc, String messageName, String locale)
+			MessageContainer mc, String messageName, String locale)
 	{
 		if (mc == null && !Messages.getMessages().loadMessages())
 			return null;

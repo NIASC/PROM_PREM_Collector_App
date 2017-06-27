@@ -21,7 +21,7 @@ package core.interfaces;
 
 import java.util.HashMap;
 
-import core.containers.Msg;
+import core.containers.MessageContainer;
 import core.containers.User;
 
 /**
@@ -123,7 +123,7 @@ public interface Database_interface
 	 * @return QUERY_SUCCESS if the error messages were successfully
 	 * 		loaded. ERROR if there was an error with the database.
 	 */
-	public int getErrorMessages(Msg mc);
+	public int getErrorMessages(MessageContainer mc);
 	
 	/**
 	 * Loads info messages from the database and puts them in a
@@ -134,5 +134,5 @@ public interface Database_interface
 	 * @return QUERY_SUCCESS if the info messages were successfully
 	 * 		loaded. ERROR if there was an error with the database.
 	 */
-	public int getInfoMessages(Msg mc);
+	public int getInfoMessages(MessageContainer mc);
 }

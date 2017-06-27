@@ -42,5 +42,9 @@ Navigate to the project folder (it should contain a file called _build.xml_). Th
 ## Writing your own implementation
 __Note: This software is still in early development so it is discouraged to implement your own implementation at this time.__
 Your implementation must implement all of the interfaces located in _src/implement/_ in order to work.
-### Known implementation-specific issues
-* Error and information messages are called by their name or code as they are defined in the MySQL database.
+### Adding new types of form entries
+See the example implementation for an example of how you can add more data types. You can add data types by following these steps:
+* Create a class that contains the data and acts as an interface to this data. This class must extend FormContainer.
+* In your user interface implementation, create a Class that will be able to store and display your new data type. This class must implement the interface _FormComponentDisplay_ located in _UserInterface\_Interface.java_ Then create a method that takes your new data type as an argument, creates a new instance of your displayable container and returns that instance.
+* Inside your data container class' drawing function, call the function in your user interface implementation that creates a displayable container for your data type. Your drawing function should return this object.
+* Use your new data type by creating an instance, add entries to it and finally add it to an instance of a Form.

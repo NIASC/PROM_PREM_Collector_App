@@ -3,14 +3,18 @@ This is an application designed to collect PROM (patient reported outcome measur
 
 ## Getting Started
 It is recommended to use `git` for downloading the source code, but it is possible to download the source as a zip.
+The prerequisits are labled as
+* __[Core]__: Required to run/build the software.
+* __[Impl]__: Required for the default implementation.
+* __[incl]__: Dependency is included in the software.
 ### Prerequisits
-* [Java Development Kit](http://openjdk.java.net/) version 7 or later. For the JVM and compiler. [Core]
-* [Apache Ant](https://ant.apache.org/). For building the program. [Core]
-* [XAMPP](https://www.apachefriends.org/index.html) version 7.1.4 (or similar). For Starting MySQL. [Implementation-specific]
-* [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) (version 5.1.42 included). For MySQL interface to Java. [Implementation-specific, included]
-* [GNU JavaMail](https://www.gnu.org/software/classpathx/javamail/javamail.html) (version 1.1.2 included). For email to work. [Implementation-specific, included]
-* [GNU JAF](https://www.gnu.org/software/classpathx/jaf/jaf.html) (version 1.1.1 included). For email to work. [Implementation-specific, included]
-* [GNU inetlib](https://www.gnu.org/software/classpathx/inetlib/inetlib.html) (version 1.1.1 included). For email to work. [Implementation-specific, included]
+* __[Core]__ [Java Development Kit](http://openjdk.java.net/) version 7 or later. For the JVM and compiler.
+* __[Core]__ [Apache Ant](https://ant.apache.org/). For building the program.
+* __[Impl]__ [XAMPP](https://www.apachefriends.org/index.html) version 7.1.4 (or similar). For Starting MySQL.
+* __[Impl, incl]__ [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) (version 5.1.42 included). For MySQL interface to Java.
+* __[Impl, incl]__ [GNU JavaMail](https://www.gnu.org/software/classpathx/javamail/javamail.html) (version 1.1.2 included). For email to work.
+* __[Impl, incl]__ [GNU JAF](https://www.gnu.org/software/classpathx/jaf/jaf.html) (version 1.1.1 included). For email to work.
+* __[Impl, incl]__ [GNU inetlib](https://www.gnu.org/software/classpathx/inetlib/inetlib.html) (version 1.1.1 included). For email to work.
 
 ### Downloading the files (XAMPP)
 Download the project (as zip or using `git clone`) to you _htdocs_ directory (On a GNU+Linux machine with XAMPP this should be located in _/opt/lampp/_).

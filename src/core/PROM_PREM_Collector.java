@@ -22,7 +22,7 @@ package core;
 import core.containers.form.SingleOptionContainer;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
-import core.interfaces.UserInterface_Interface;
+import core.interfaces.UserInterface;
 
 /**
  * This is the main program that is the PROM/PREM Collector.
@@ -40,38 +40,26 @@ public class PROM_PREM_Collector
 	private Questionnaire questionaire;
 	private ViewData viewData;
 	
-	private UserInterface_Interface ui;
+	private UserInterface ui;
 
 	/**
 	 * Initializes class variables.
 	 */
-	public PROM_PREM_Collector()
+	public PROM_PREM_Collector(UserInterface ui)
 	{
-		ui = Implementations.UserInterface();
+		this.ui = ui;
 		userHandle = new UserHandle(ui);
 		questionaire = new Questionnaire(ui, userHandle);
 		viewData = new ViewData(ui, userHandle);
 	}
-
-	/**
-	 * The program loop. When this function returns the program
-	 * has exited.
-	 */
-	public void start()
+	
+	public boolean start()
 	{
-		if (!Messages.getMessages().loadMessages())
-		{
-			ui.displayError(Messages.DATABASE_ERROR);
-			System.exit(1);
-		}
 		boolean quit = false;
-		do
-		{
-			quit = loginOptions();
-			if (userHandle.isLoggedIn())
-				loginActions();
-		} while (!quit);
-		ui.close();
+		quit = loginOptions();
+		if (userHandle.isLoggedIn())
+			loginActions();
+		return quit;
 	}
 	
 	/**

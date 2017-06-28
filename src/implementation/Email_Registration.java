@@ -33,8 +33,8 @@ import core.Utilities;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
 import core.interfaces.Messages;
-import core.interfaces.Registration_Interface;
-import core.interfaces.UserInterface_Interface;
+import core.interfaces.Registration;
+import core.interfaces.UserInterface;
 
 /**
  * This class is an example of an implementation of
@@ -43,12 +43,12 @@ import core.interfaces.UserInterface_Interface;
  * @author Marcus Malmquist
  *
  */
-public class Registration implements Registration_Interface
+public class Email_Registration implements Registration
 {
 	/**
 	 * Initializes Mailer class and loads configuration.
 	 */
-	public Registration(UserInterface_Interface ui)
+	public Email_Registration(UserInterface ui)
 	{
 		this.ui = ui;
 		mailConfig = new Properties();
@@ -199,7 +199,7 @@ public class Registration implements Registration_Interface
 	}
 	
 	private Properties mailConfig;
-	private UserInterface_Interface ui;
+	private UserInterface ui;
 	private final String CONFIG_FILE =
 			"implementation/mail_settings.txt";
 	private final String ACCOUNT_FILE =

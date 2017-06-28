@@ -33,7 +33,7 @@ import core.containers.User;
  * @author Marcus Malmquist
  *
  */
-public interface Database_interface
+public interface Database
 {
 	public static final int ERROR = -1;
 	public static final int CONNECT_SUCCESS = 0x10;

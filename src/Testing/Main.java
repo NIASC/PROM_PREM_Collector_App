@@ -19,13 +19,23 @@
  */
 package Testing;
 
-import core.PROM_PREM_Collector;
+import core.interfaces.Messages;
+import implementation.CLI_UserInterface;
 
 public class Main
 {
 	public static void main(String[] args)
 	{
-		PROM_PREM_Collector ppc = new PROM_PREM_Collector();
-		ppc.start();
+		if (!Messages.getMessages().loadMessages())
+		{
+			System.out.printf("%s\n", Messages.DATABASE_ERROR);
+			System.exit(1);
+		}
+		SwingUserInterface qf = new SwingUserInterface();
+		qf.open();
+		/*
+		CLI_UserInterface ui = new CLI_UserInterface();
+		ui.open();
+		 */
 	}
 }

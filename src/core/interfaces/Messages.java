@@ -78,13 +78,13 @@ public final class Messages
 		error = new MessageContainer();
 		info = new MessageContainer();
 		
-		Database_interface db = Implementations.Database();
+		Database db = Implementations.Database();
 		db.connect();
 		int errMsgLoadCode = db.getErrorMessages(error);
 		int infoMsgLoadCode = db.getInfoMessages(info);
 		db.disconnect();
-		return errMsgLoadCode == Database_interface.QUERY_SUCCESS
-				&& infoMsgLoadCode == Database_interface.QUERY_SUCCESS;
+		return errMsgLoadCode == Database.QUERY_SUCCESS
+				&& infoMsgLoadCode == Database.QUERY_SUCCESS;
 	}
 	
 	public final String getError(String errorName)

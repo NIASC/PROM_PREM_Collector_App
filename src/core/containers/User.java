@@ -19,7 +19,7 @@
  */
 package core.containers;
 
-import core.interfaces.Encryption_interface;
+import core.interfaces.Encryption;
 import core.interfaces.Implementations;
 
 /**
@@ -33,7 +33,7 @@ import core.interfaces.Implementations;
  */
 public class User
 {
-	private Encryption_interface crypto;
+	private Encryption crypto;
 	private String username, password, email, salt;
 	private int clinicID;
 	private boolean updatePass;

@@ -20,7 +20,7 @@
 package core;
 
 import core.interfaces.Messages;
-import core.interfaces.UserInterface_Interface;
+import core.interfaces.UserInterface;
 
 /**
  * This class is the central point for the questionaire part of the
@@ -32,7 +32,7 @@ import core.interfaces.UserInterface_Interface;
 public class Questionnaire
 {
 	private UserHandle userHandle;
-	private UserInterface_Interface userInterface;
+	private UserInterface userInterface;
 
 	/**
 	 * Initialize variables.
@@ -40,7 +40,7 @@ public class Questionnaire
 	 * @param ui The active instance of the user interface.
 	 * @param uh The active instance of the user handle.
 	 */
-	public Questionnaire(UserInterface_Interface ui, UserHandle uh)
+	public Questionnaire(UserInterface ui, UserHandle uh)
 	{
 		userInterface = ui;
 		userHandle = uh;

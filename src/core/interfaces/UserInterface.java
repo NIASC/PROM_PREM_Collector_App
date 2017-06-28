@@ -33,14 +33,9 @@ import core.containers.form.SingleOptionContainer;
  * @author Marcus Malmquist
  *
  */
-public interface UserInterface_Interface
+public interface UserInterface extends Runnable
 {
 	public static final int ERROR = -1;
-
-	/**
-	 * Closes the user interface (if it is open).
-	 */
-	void close();
 	
 	/**
 	 * Presents an error message to the user. The message

@@ -19,8 +19,8 @@
  */
 package core.containers.form;
 
-import core.interfaces.UserInterface_Interface.FormComponentDisplay;
-import implementation.UserInterface;
+import core.interfaces.UserInterface;
+import core.interfaces.UserInterface.FormComponentDisplay;
 
 /**
  * This class is the base class of data types that should be included

@@ -22,8 +22,8 @@ package manage;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import core.interfaces.Database_interface;
-import core.interfaces.Encryption_interface;
+import core.interfaces.Database;
+import core.interfaces.Encryption;
 import core.interfaces.Implementations;
 
 import java.util.Scanner;
@@ -39,7 +39,7 @@ import java.util.Scanner;
 public class Manage
 {
 	private Scanner in;
-	private Database_interface db;
+	private Database db;
 	
 	/**
 	 * Initializes login variables.
@@ -95,7 +95,7 @@ public class Manage
 
 		System.out.printf("Email?\n");
 		String email = in.next();
-		Encryption_interface crypto = Implementations.Encryption();
+		Encryption crypto = Implementations.Encryption();
 		String salt = crypto.getNewSalt();
 		db.addUser(user, crypto.hashString(password, salt), salt, clinic, email);
 	}
@@ -104,14 +104,14 @@ public class Manage
 	public boolean dbConnect()
 	{
 		System.out.printf("%s\n", "Connecting to database.");
-		return db.connect() != Database_interface.ERROR;
+		return db.connect() != Database.ERROR;
 	}
 
 	/** Close connection */
 	public boolean dbDisconnect()
 	{
 		System.out.println("Disconnecting from database.");
-		return db.disconnect() != Database_interface.ERROR;
+		return db.disconnect() != Database.ERROR;
 	}
 	
 	/**

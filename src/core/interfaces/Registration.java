@@ -17,41 +17,28 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package implementation;
-
-import core.interfaces.Encryption_interface;
+package core.interfaces;
 
 /**
- * This class is an example of an implementation of
- * Entryption_Interface.
+ * This interface contains the methods required by the core part of
+ * this program to function. The purpose of this interface is to give
+ * the freedom of choosing your own registration process and what
+ * it should contain. Since the database implementation can also be
+ * chosen freely you are not limited to a pre-defined user structure
+ * defined by the database.
  * 
  * @author Marcus Malmquist
  *
  */
-public class Encryption implements Encryption_interface
+public interface Registration
 {
 	/**
-	 * Initializes variables.
+	 * Presets a registration form to the user. The form should
+	 * contain necessary information to be able to register the user.
+	 * 
+	 * Necessary information should at least include the clinic and
+	 * an email (since these are requires to initialize an instance of
+	 * a user).
 	 */
-	public Encryption()
-	{
-		
-	}
-	
-	/* 
-	 * Public methods required by the interface.
-	 */
-
-	@Override
-	public String hashString(String s, String salt)
-	{
-		return s + salt;
-	}
-
-	@Override
-	public String getNewSalt()
-	{
-		return "";
-	}
-
+	public void registrationProcess();
 }

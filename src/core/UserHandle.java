@@ -24,12 +24,12 @@ import java.util.regex.Pattern;
 import core.containers.Form;
 import core.containers.User;
 import core.containers.form.FieldContainer;
-import core.interfaces.Database_interface;
-import core.interfaces.Encryption_interface;
+import core.interfaces.Database;
+import core.interfaces.Encryption;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
-import core.interfaces.Registration_Interface;
-import core.interfaces.UserInterface_Interface;
+import core.interfaces.Registration;
+import core.interfaces.UserInterface;
 
 /**
  * This class handles the user. This mostly means handling the login,
@@ -44,8 +44,8 @@ public class UserHandle
 	public static final int USER_FOUND = 0x10;
 	public static final int DETAILS_MATCH = 0x20;
 	
-	private Database_interface user_db;
-	private UserInterface_Interface ui;
+	private Database user_db;
+	private UserInterface ui;
 	private User user;
 	
 	private boolean loggedIn;
@@ -55,7 +55,7 @@ public class UserHandle
 	 * 
 	 * @param ui The active instance of the user interface.
 	 */
-	public UserHandle(UserInterface_Interface ui)
+	public UserHandle(UserInterface ui)
 	{
 		this.ui = ui;
 		user_db = Implementations.Database();
@@ -116,7 +116,7 @@ public class UserHandle
 	{
 		if (loggedIn)
 			return;
-		Registration_Interface register = Implementations.Registration(ui);
+		Registration register = Implementations.Registration(ui);
 		register.registrationProcess();
 	}
 	
@@ -189,7 +189,7 @@ public class UserHandle
 			else
 				match = true;
 		}
-		Encryption_interface crypto = Implementations.Encryption();
+		Encryption crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
 		User tmpUser = user_db.setPassword(
 				user, currentPassword.getEntry(),

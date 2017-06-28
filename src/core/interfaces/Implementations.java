@@ -19,15 +19,18 @@
  */
 package core.interfaces;
 
-import implementation.Database;
-import implementation.Encryption;
-import implementation.Registration;
-import implementation.UserInterface;
+import implementation.MySQL_Database;
+import implementation.No_Encryption;
+import implementation.Email_Registration;
+import implementation.CLI_UserInterface;
 
 /**
  * This class acts as an interface between the implementation of the
  * interfaces and the core program itself. It contains constructor calls
  * to the classes that implements the interfaces.
+ * There is no method for calling the constructor for the UserInterface
+ * implementation because the program is started by the UserInterface
+ * and should only use that instance.
  * 
  * @author Marcus Malmquist
  *
@@ -40,9 +43,9 @@ public abstract class Implementations
 	 * @return A new/running instance of the current implementation of
 	 * 		Database_interface.
 	 */
-	public static Database_interface Database()
+	public static Database Database()
 	{
-		return Database.getDatabase();
+		return MySQL_Database.getDatabase();
 	}
 	
 	/**
@@ -51,9 +54,9 @@ public abstract class Implementations
 	 * @return A new instance of the current implementation of
 	 * 		Encryption_interface.
 	 */
-	public static Encryption_interface Encryption()
+	public static Encryption Encryption()
 	{
-		return new Encryption();
+		return new No_Encryption();
 	}
 	
 	/**
@@ -64,20 +67,8 @@ public abstract class Implementations
 	 * @return A new instance of the current implementation of
 	 * 		Registration_Interface.
 	 */
-	public static Registration_Interface Registration(
-			UserInterface_Interface ui)
+	public static Registration Registration(UserInterface ui)
 	{
-		return new Registration(ui);
-	}
-	
-	/**
-	 * Constructor for the implementation of Registration_Interface.
-	 * 
-	 * @return A new instance of the current implementation of
-	 * 		UserInterface_Interface.
-	 */
-	public static UserInterface_Interface UserInterface()
-	{
-		return new UserInterface();
+		return new Email_Registration(ui);
 	}
 }

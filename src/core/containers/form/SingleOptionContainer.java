@@ -22,8 +22,8 @@ package core.containers.form;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import core.interfaces.UserInterface_Interface.FormComponentDisplay;
-import implementation.UserInterface;
+import core.interfaces.UserInterface;
+import core.interfaces.UserInterface.FormComponentDisplay;
 
 /**
  * This class handles single-option objects. It allows you to

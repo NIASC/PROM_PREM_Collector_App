@@ -27,7 +27,7 @@ package core.interfaces;
  * @author Marcus Malmquist
  *
  */
-public interface Encryption_interface
+public interface Encryption
 {
 	/**
 	 * Creates a hashed version of the input string.

@@ -1,101 +1,162 @@
-/**
- * Copyright 2017 Marcus Malmquist
- * 
- * This file is part of PROM_PREM_Collector.
- * 
- * PROM_PREM_Collector is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * PROM_PREM_Collector is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with PROM_PREM_Collector.  If not, see
- * <http://www.gnu.org/licenses/>.
- */
-package implementation;
+package Testing;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import java.util.Scanner;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
 
+import core.PROM_PREM_Collector;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
 import core.interfaces.Messages;
-import core.interfaces.UserInterface_Interface;
+import core.interfaces.UserInterface;
 
-/**
- * This class is an example of an implementation of
- * UserInterface_Interface. This implementation is done using
- * command-line interface (CLI) for simplicity of development.
- * 
- * @author Marcus Malmquist
- *
- */
-public class UserInterface implements UserInterface_Interface
+public class SwingUserInterface extends JFrame implements ActionListener, UserInterface
 {
-	/**
-	 * Initializes variables and opens the scanner stream.
-	 */
-	public UserInterface()
+	public SwingUserInterface()
 	{
-		in = new Scanner(System.in);
+		super("PROM/PREM Collector GUI");
+		ppc = new PROM_PREM_Collector(this);
+		initGUI();
 	}
 	
-	/* 
-	 * Public methods required by the interface.
-	 */
-	
-	@Override
-	public void close()
+	private void initGUI()
 	{
-		if (in != null)
-			in.close();
+		setLayout(new BorderLayout());
+		
+		// panel for displaying and questions and answers
+		add(console = new SwingConsole(), BorderLayout.CENTER);
+		
+		// panel with buttons
+		add(makeMenuPanel(), BorderLayout.SOUTH);
+
+		// set focus to answer field
+		addWindowListener( new WindowAdapter() {
+			public void windowOpened( WindowEvent e ){
+				console.requestFocus();
+			}
+		});
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setVisible(true);
+		pack();
 	}
 	
-	@Override
-	public void displayError(String message)
+	private JPanel makeMenuPanel()
 	{
-		System.out.printf(ANSI_RED);
-		separate();
-		print(message);
-		separate();
-		System.out.printf(ANSI_RESET);
+		Dimension dim = new Dimension(130, 25);
+		JPanel bPanel = new JPanel(new GridLayout(1, 4));
+		restartButton = AddButton("(Re)start", "restart",
+				"Click here to (re)start the round.", true, true,
+				Color.LIGHT_GRAY, Color.BLACK, dim);
+		resultsButton = AddButton("Show results", "results",
+				String.format("%s %s", "Click here to show the results.",
+						"Doing so will end the round."), true, true,
+				Color.LIGHT_GRAY, Color.BLACK, dim);
+		settingsButton = AddButton("Settings", "settings",
+				"Click here to modify the settings.", true, true,
+				Color.LIGHT_GRAY, Color.BLACK, dim);
+		databaseButton = AddButton("Database", "database",
+				"Click here to modify the database.", true, true,
+				Color.LIGHT_GRAY, Color.BLACK, dim);
+		bPanel.add(restartButton);
+		bPanel.add(resultsButton);
+		bPanel.add(settingsButton);
+		bPanel.add(databaseButton);
+		return bPanel;
+	}
+	
+	private JButton AddButton(String buttonText, String nameSet, String tooltip,
+			boolean actionListen, boolean opaque, Color background,
+			Color border, Dimension d)
+	{
+		JButton button = new JButton(buttonText);
+		button.setName(nameSet);
+		button.setToolTipText(tooltip);
+		if(actionListen)
+			button.addActionListener(this);
+		button.setOpaque(opaque);
+		button.setBackground(background);
+		button.setBorder(new LineBorder(border));
+		if (d != null)
+			button.setPreferredSize(d);
+		return button;
+	}
+	
+	public void actionPerformed(ActionEvent e)
+	{
+		if(e.getSource() instanceof JButton)
+		{
+			JButton b = (JButton) e.getSource();
+			if (b.getName() != null)
+			{
+				// unimplemented
+			}
+		}
+		else if (e.getSource() instanceof JTextField)
+		{
+			JTextField t = (JTextField) e.getSource();
+			if (t.getName() != null)
+			{
+				// unimplemented
+			}
+		}
+	}
+
+	@Override
+	public void displayError(String s)
+	{
+		JOptionPane.showMessageDialog(
+				null, "Error", s,
+				JOptionPane.ERROR_MESSAGE);
 	}
 
 	@Override
 	public void displayMessage(String message)
 	{
-		separate();
-		print(message);
+		JOptionPane.showMessageDialog(
+				null, "Message", message,
+				JOptionPane.PLAIN_MESSAGE);
 	}
 
 	@Override
 	public int selectOption(String message, SingleOptionContainer options)
 	{
 		separate();
+		StringBuilder sb = new StringBuilder();
 		if (message != null)
 		{
-			print(message);
-			System.out.printf("\n");
+			sb.append(String.format("%s\n", message));
 		}
-		System.out.printf(String.format("%s\n",
+		sb.append(String.format("%s\n",
 				Messages.getMessages().getInfo(
 						Messages.INFO_UI_SELECT_SINGLE)));
 		HashMap<Integer, String> opt = options.getSOptions();
 		for (Entry<Integer, String> e : opt.entrySet())
-			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
-		int input = ERROR;
-		if (in.hasNextInt())
-			input = in.nextInt();
-		else
-			in.next();
+			sb.append(String.format("%d: %s\n", e.getKey(), e.getValue()));
+		
+		console.displayNewQuestion(sb.toString());
+		String rawInput = console.getUserInput();
+		int input = UserInterface.ERROR;
+		try
+		{
+			input = Integer.parseInt(rawInput);
+		} catch (NumberFormatException nfe) {}
 		return input;
 	}
 
@@ -177,10 +238,30 @@ public class UserInterface implements UserInterface_Interface
 	{
 		return (T) new FieldDisplay(this, fc);
 	}
-	
-	/* 
-	 * Private methods not required by the interface.
+
+	@Override
+	public void run()
+	{
+		while (!ppc.start());
+		close();
+	}
+
+	/**
+	 * Opens the PROM/PREM Collector program.
 	 */
+	public void open()
+	{
+		ppc = new PROM_PREM_Collector(this);
+		(new Thread(this)).start();
+	}
+
+	/**
+	 * Closes the user interface (if it is open).
+	 */
+	public void close()
+	{
+		dispose();
+	}
 	
 	/**
 	 * Prints a line of characters to make it simple for the user
@@ -190,33 +271,7 @@ public class UserInterface implements UserInterface_Interface
 	 */
 	private void separate()
 	{
-		System.out.printf("%s\n", separation);
-	}
-	
-	/**
-	 * Prints a supplied message. The string will be formatted so that
-	 * it does not take up more space than LINE_LENGTH characters wide.
-	 * 
-	 * @param message The message to print.
-	 */
-	private void print(String message)
-	{
-		/* If the message is too wide it must be split up */
-		StringBuilder msgFormatted = new StringBuilder();
-		final int msgLength = message.length();
-		int beginIndex = 0, step;
-		do
-		{
-			if (msgLength - beginIndex > LINE_LENGTH)
-				step = LINE_LENGTH;
-			else
-				step = msgLength - beginIndex;
-			
-			msgFormatted.append(String.format("%s\n",
-					message.substring(beginIndex, beginIndex + step)));
-			beginIndex += step;
-		} while (step == LINE_LENGTH); // while >LINE_LENGTH remains
-		System.out.printf("%s", msgFormatted.toString());
+		console.clearDisplayQuestion();
 	}
 	
 	/**
@@ -371,7 +426,8 @@ public class UserInterface implements UserInterface_Interface
 			while (!done)
 			{
 				separate();
-				System.out.printf(String.format("%s\n",
+				StringBuilder sb = new StringBuilder();
+				sb.append(String.format("%s\n",
 						Messages.getMessages().getInfo(
 								Messages.INFO_UI_SELECT_SINGLE)));
 				HashMap<Integer, String> opt = soc.getSOptions();
@@ -380,14 +436,21 @@ public class UserInterface implements UserInterface_Interface
 				{
 					Integer id = e.getKey();
 					if (selected != null && id == selected)
-						System.out.printf("[%d]: %s\n", id, e.getValue());
+						sb.append(String.format("[%d]: %s\n", id, e.getValue()));
 					else
-						System.out.printf(" %d : %s\n", id, e.getValue());
+						sb.append(String.format(" %d : %s\n", id, e.getValue()));
 				}
-				if (in.hasNextInt())
-					responseID = in.nextInt();
-				else
-					in.next();
+				console.displayNewQuestion(sb.toString());
+				String rawInput = console.getUserInput();
+				/*
+				String rawInput = JOptionPane.showInternalInputDialog(
+						quizPanel, null, "Enter Integer",
+						JOptionPane.DEFAULT_OPTION);
+						*/
+				try
+				{
+					responseID = Integer.parseInt(rawInput);
+				} catch (NumberFormatException nfe) {}
 				if (opt.containsKey(responseID))
 					done = true;
 				else
@@ -447,38 +510,17 @@ public class UserInterface implements UserInterface_Interface
 		public void present()
 		{
 			separate();
+			StringBuilder sb = new StringBuilder();
 			String cEntry = fc.getEntry();
-			System.out.printf("%s: %s\n", fc.getStatement(),
-					(cEntry == null ? "" : cEntry));
-			/* Sometimes the input is empty. not allowed. */
-			String entry;
-			while ((entry = in.nextLine()).equals(""));
-			this.entry = entry;
-			in.reset();
+			sb.append(String.format("%s: %s\n", fc.getStatement(),
+					(cEntry == null ? "" : cEntry)));
+			console.displayNewQuestion(sb.toString());
+			this.entry = console.getUserInput();
 		}
 	}
-	
-	private static final String ANSI_RESET = "\u001B[0m";
-	private static final String ANSI_BLACK = "\u001B[30m";
-	private static final String ANSI_RED = "\u001B[31m";
-	private static final String ANSI_GREEN = "\u001B[32m";
-	private static final String ANSI_YELLOW = "\u001B[33m";
-	private static final String ANSI_BLUE = "\u001B[34m";
-	private static final String ANSI_PURPLE = "\u001B[35m";
-	private static final String ANSI_CYAN = "\u001B[36m";
-	private static final String ANSI_WHITE = "\u001B[37m";
-	
-	private Scanner in;
-	private static final int LINE_LENGTH = 80;
-	private static final String SEPARATION_CHARACTER = "-";
-	private static String separation;
-	
-	/* create the ------ line that separates output form the UI. */
-	static
-	{
-		StringBuilder sb = new StringBuilder(LINE_LENGTH);
-		for (int i = 0 ; i < LINE_LENGTH; ++i)
-			sb.append(SEPARATION_CHARACTER);
-		separation = sb.toString();
-	}
+	private PROM_PREM_Collector ppc;
+	private JButton restartButton, settingsButton,
+	resultsButton, databaseButton;
+	private SwingConsole console;
+	private static final long serialVersionUID = -3896988492887782839L;
 }

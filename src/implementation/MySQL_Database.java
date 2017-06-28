@@ -33,7 +33,7 @@ import java.util.Properties;
 import core.Utilities;
 import core.containers.MessageContainer;
 import core.containers.User;
-import core.interfaces.Database_interface;
+import core.interfaces.Database;
 import core.interfaces.Messages;
 
 /**
@@ -44,14 +44,14 @@ import core.interfaces.Messages;
  * @author Marcus Malmquist
  *
  */
-public class Database implements Database_interface
+public class MySQL_Database implements Database
 {
-	private static Database database;
+	private static MySQL_Database database;
 	/**
 	 * Initializes variables and loads the database configuration.
 	 * This class is a singleton and shouldonly be instantiated once.
 	 */
-	private Database()
+	private MySQL_Database()
 	{
 		try
 		{
@@ -66,10 +66,10 @@ public class Database implements Database_interface
 	 * 
 	 * @return The active instance of this class.
 	 */
-	public static synchronized Database getDatabase()
+	public static synchronized MySQL_Database getDatabase()
 	{
 		if (database == null)
-			database = new Database();
+			database = new MySQL_Database();
 		return database;
 	}
 

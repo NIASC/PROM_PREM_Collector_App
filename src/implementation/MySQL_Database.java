@@ -96,7 +96,6 @@ public class MySQL_Database implements Database
 			ret = CONNECT_SUCCESS;
 		} catch (SQLException se)
 		{
-			// se.printStackTrace();
 		}
 		return ret;
 	}
@@ -161,7 +160,7 @@ public class MySQL_Database implements Database
 	}
 
 	@Override
-	public User getUser(String username)
+	public synchronized User getUser(String username)
 	{
 		ResultSet rs = query("SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
 		if (rs == null)
@@ -238,7 +237,7 @@ public class MySQL_Database implements Database
 		}
 		catch (SQLException se)
 		{
-			se.printStackTrace();
+			// se.printStackTrace();
 		}
 		return ret;
 	}
@@ -264,7 +263,7 @@ public class MySQL_Database implements Database
 			rs = stmt.executeQuery(message);
 		} catch (SQLException se)
 		{
-			se.printStackTrace();
+			// se.printStackTrace();
 		}
 		return rs;
 	}

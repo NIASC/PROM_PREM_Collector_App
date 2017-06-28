@@ -3,6 +3,7 @@ package Testing;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -25,17 +27,18 @@ import core.containers.form.SingleOptionContainer;
 import core.interfaces.Messages;
 import core.interfaces.UserInterface;
 
-public class SwingUserInterface extends JFrame implements ActionListener, UserInterface
+public class SwingUserInterface extends JApplet implements ActionListener, UserInterface
 {
 	public SwingUserInterface()
 	{
-		super("PROM/PREM Collector GUI");
 		ppc = new PROM_PREM_Collector(this);
 		initGUI();
 	}
 	
 	private void initGUI()
 	{
+		frame = new JFrame("PROM/PREM Collector GUI");
+		frame.setContentPane(this);
 		setLayout(new BorderLayout());
 		
 		// panel for displaying and questions and answers
@@ -45,21 +48,21 @@ public class SwingUserInterface extends JFrame implements ActionListener, UserIn
 		add(makeMenuPanel(), BorderLayout.SOUTH);
 
 		// set focus to answer field
-		addWindowListener( new WindowAdapter() {
+		frame.addWindowListener( new WindowAdapter() {
 			public void windowOpened( WindowEvent e ){
 				console.requestFocus();
 			}
 		});
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setResizable(false);
-		setVisible(true);
-		pack();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+		frame.setVisible(true);
+		frame.pack();
 	}
 	
 	private JPanel makeMenuPanel()
 	{
-		Dimension dim = new Dimension(130, 25);
+		Dimension dim = new Dimension(150, 25);
 		JPanel bPanel = new JPanel(new GridLayout(1, 4));
 		restartButton = AddButton("(Re)start", "restart",
 				"Click here to (re)start the round.", true, true,
@@ -95,6 +98,7 @@ public class SwingUserInterface extends JFrame implements ActionListener, UserIn
 		button.setBorder(new LineBorder(border));
 		if (d != null)
 			button.setPreferredSize(d);
+		button.setFont(FONT);
 		return button;
 	}
 	
@@ -122,7 +126,7 @@ public class SwingUserInterface extends JFrame implements ActionListener, UserIn
 	public void displayError(String s)
 	{
 		JOptionPane.showMessageDialog(
-				null, "Error", s,
+				null, s, "Error",
 				JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -130,7 +134,7 @@ public class SwingUserInterface extends JFrame implements ActionListener, UserIn
 	public void displayMessage(String message)
 	{
 		JOptionPane.showMessageDialog(
-				null, "Message", message,
+				null, message, "Message",
 				JOptionPane.PLAIN_MESSAGE);
 	}
 
@@ -150,12 +154,10 @@ public class SwingUserInterface extends JFrame implements ActionListener, UserIn
 		for (Entry<Integer, String> e : opt.entrySet())
 			sb.append(String.format("%d: %s\n", e.getKey(), e.getValue()));
 		
-		console.displayNewQuestion(sb.toString());
-		String rawInput = console.getUserInput();
 		int input = UserInterface.ERROR;
 		try
 		{
-			input = Integer.parseInt(rawInput);
+			input = Integer.parseInt(getUserInput(sb.toString()));
 		} catch (NumberFormatException nfe) {}
 		return input;
 	}
@@ -260,7 +262,13 @@ public class SwingUserInterface extends JFrame implements ActionListener, UserIn
 	 */
 	public void close()
 	{
-		dispose();
+		frame.dispose();
+	}
+	
+	private String getUserInput(String message)
+	{
+		console.displayNewQuestion(message);
+		return console.getUserInput();
 	}
 	
 	/**
@@ -440,16 +448,10 @@ public class SwingUserInterface extends JFrame implements ActionListener, UserIn
 					else
 						sb.append(String.format(" %d : %s\n", id, e.getValue()));
 				}
-				console.displayNewQuestion(sb.toString());
-				String rawInput = console.getUserInput();
-				/*
-				String rawInput = JOptionPane.showInternalInputDialog(
-						quizPanel, null, "Enter Integer",
-						JOptionPane.DEFAULT_OPTION);
-						*/
+				
 				try
 				{
-					responseID = Integer.parseInt(rawInput);
+					responseID = Integer.parseInt(getUserInput(sb.toString()));
 				} catch (NumberFormatException nfe) {}
 				if (opt.containsKey(responseID))
 					done = true;
@@ -514,10 +516,12 @@ public class SwingUserInterface extends JFrame implements ActionListener, UserIn
 			String cEntry = fc.getEntry();
 			sb.append(String.format("%s: %s\n", fc.getStatement(),
 					(cEntry == null ? "" : cEntry)));
-			console.displayNewQuestion(sb.toString());
-			this.entry = console.getUserInput();
+			entry = getUserInput(sb.toString());
 		}
 	}
+	
+	public static final Font FONT = new Font("Courier", Font.PLAIN, 18);
+	private JFrame frame;
 	private PROM_PREM_Collector ppc;
 	private JButton restartButton, settingsButton,
 	resultsButton, databaseButton;

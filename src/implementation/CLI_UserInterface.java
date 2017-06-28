@@ -52,25 +52,6 @@ public class CLI_UserInterface implements UserInterface
 	/* 
 	 * Public methods required by the interface.
 	 */
-
-	/**
-	 * Opens the PROM/PREM Collector program.
-	 */
-	public void open()
-	{
-		in = new Scanner(System.in);
-		ppc = new PROM_PREM_Collector(this);
-		(new Thread(this)).start();
-	}
-
-	/**
-	 * Closes the user interface (if it is open).
-	 */
-	public void close()
-	{
-		if (in != null)
-			in.close();
-	}
 	
 	@Override
 	public void displayError(String message)
@@ -196,6 +177,25 @@ public class CLI_UserInterface implements UserInterface
 	{
 		while (!ppc.start());
 		close();
+	}
+
+	/**
+	 * Opens the PROM/PREM Collector program.
+	 */
+	public void open()
+	{
+		in = new Scanner(System.in);
+		ppc = new PROM_PREM_Collector(this);
+		(new Thread(this)).start();
+	}
+
+	/**
+	 * Closes the user interface (if it is open).
+	 */
+	public void close()
+	{
+		if (in != null)
+			in.close();
 	}
 	
 	/* 

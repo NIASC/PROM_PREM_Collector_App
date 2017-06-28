@@ -3,6 +3,7 @@ package Testing;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,12 +32,12 @@ public class SwingConsole extends JPanel implements ActionListener
 	{
 		setLayout(new BorderLayout());
 		progressLabel = new JLabel(String.format("%d/%d questions answered", 0, 0));
-		questionLabel = new JTextArea(20, 20);
+		progressLabel.setFont(SwingUserInterface.FONT);
+		questionLabel = new JTextArea(10, 20);
+		questionLabel.setFont(SwingUserInterface.FONT);
 		questionLabel.setEditable(false);
 		questionLabel.setLineWrap(true);
 		questionLabel.setWrapStyleWord(true);
-		questionLabel.setText("Hint: Hit return in the answer field to start a new "
-				+ "round with current (default) settings.");
 		scrollArea = new JScrollPane(questionLabel,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -44,6 +45,7 @@ public class SwingConsole extends JPanel implements ActionListener
 		// textfield to put answer in
 		JPanel answerPanel = new JPanel(new BorderLayout());
 		answerField = new JTextField(20);
+		answerField.setFont(SwingUserInterface.FONT);
 		answerField.setName("answer");
 		answerField.addActionListener(this);
 		answerField.requestFocusInWindow();
@@ -72,6 +74,7 @@ public class SwingConsole extends JPanel implements ActionListener
 		button.setBorder(new LineBorder(border));
 		if (d != null)
 			button.setPreferredSize(d);
+		button.setFont(SwingUserInterface.FONT);
 		return button;
 	}
 	
@@ -95,6 +98,7 @@ public class SwingConsole extends JPanel implements ActionListener
 	
 	public String getUserInput()
 	{
+		/* wait for user to answer. */
 		synchronized (this)
 		{
 			while (!userAnswered)

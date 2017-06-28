@@ -52,7 +52,8 @@ public class SingleOptionContainer extends FormContainer
 	}
 	
 	/**
-	 * Adds a new option to the container.
+	 * Adds a new option to the container. Avoid using UNSET as an
+	 * identifier.
 	 * 
 	 * @param identifier The identifier of the SOption. This is
 	 * 		typically used to identify what action should be taken
@@ -119,7 +120,7 @@ public class SingleOptionContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return selected == null;
+		return selected != null;
 	}
 	
 	/**

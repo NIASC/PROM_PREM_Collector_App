@@ -120,8 +120,11 @@ public interface UserInterface_Interface
 		/**
 		 * Retrieves the data from the user and fills the
 		 * implementation's instance of FormContainer with that data.
+		 * 
+		 * @return True if all entries were filled. False if some were
+		 * 		not filled.
 		 */
-		public void fillEntry();
+		public boolean fillEntry();
 		
 		/**
 		 * Checks if the entry has been filled.

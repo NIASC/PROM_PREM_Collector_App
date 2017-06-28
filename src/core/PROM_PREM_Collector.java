@@ -95,8 +95,9 @@ public class PROM_PREM_Collector
 		
 		while(!userHandle.isLoggedIn())
 		{
-			options.setSelected(ui.selectOption(null, options));
-			Integer identifier = options.getSelected();
+			Integer identifier = null;
+			if (options.setSelected(ui.selectOption(null, options)))
+				identifier = options.getSelected();
 			int response = identifier != null ? identifier : ERROR;
 			switch (response)
 			{
@@ -138,8 +139,9 @@ public class PROM_PREM_Collector
 		// present options and evaluate them
 		while (userHandle.isLoggedIn())
 		{
-			options.setSelected(ui.selectOption(null, options));
-			Integer identifier = options.getSelected();
+			Integer identifier = null;
+			if (options.setSelected(ui.selectOption(null, options)))
+				identifier = options.getSelected();
 			int response = identifier != null ? identifier : ERROR;
 			switch (response)
 			{
@@ -151,10 +153,6 @@ public class PROM_PREM_Collector
 				break;
 			case LOGOUT:
 				userHandle.logout();
-				break;
-			case ERROR:
-				ui.displayError(Messages.getMessages().getError(
-						Messages.ERROR_NULL_SELECTED));
 				break;
 			default:
 				ui.displayError(Messages.getMessages().getError(

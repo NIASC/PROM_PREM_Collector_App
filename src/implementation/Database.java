@@ -34,6 +34,7 @@ import core.Utilities;
 import core.containers.MessageContainer;
 import core.containers.User;
 import core.interfaces.Database_interface;
+import core.interfaces.Messages;
 
 /**
  * This class is an example of an implementation of
@@ -45,10 +46,12 @@ import core.interfaces.Database_interface;
  */
 public class Database implements Database_interface
 {
+	private static Database database;
 	/**
 	 * Initializes variables and loads the database configuration.
+	 * This class is a singleton and shouldonly be instantiated once.
 	 */
-	public Database()
+	private Database()
 	{
 		try
 		{
@@ -57,6 +60,24 @@ public class Database implements Database_interface
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 
+	 * @return The active instance of this class.
+	 */
+	public static synchronized Database getDatabase()
+	{
+		if (database == null)
+			database = new Database();
+		return database;
+	}
+
+	@Override
+	public final Object clone()
+			throws CloneNotSupportedException
+	{
+		throw new CloneNotSupportedException();
 	}
 	
 	/* 
@@ -75,7 +96,7 @@ public class Database implements Database_interface
 			ret = CONNECT_SUCCESS;
 		} catch (SQLException se)
 		{
-			se.printStackTrace();
+			// se.printStackTrace();
 		}
 		return ret;
 	}

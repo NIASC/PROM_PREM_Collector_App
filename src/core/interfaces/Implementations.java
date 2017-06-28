@@ -37,12 +37,12 @@ public abstract class Implementations
 	/**
 	 * Constructor for the implementation of Database_interface.
 	 * 
-	 * @return A new instance of the current implementation of
+	 * @return A new/running instance of the current implementation of
 	 * 		Database_interface.
 	 */
 	public static Database_interface Database()
 	{
-		return new Database();
+		return Database.getDatabase();
 	}
 	
 	/**

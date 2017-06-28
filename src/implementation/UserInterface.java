@@ -127,13 +127,13 @@ public class UserInterface implements UserInterface_Interface
 				entryState = msg.getInfo(Messages.INFO_UI_FILLED);
 			else
 				entryState = msg.getInfo(Messages.INFO_UI_UNFILLED);
-			
-			options.setSelected(selectOption(
+			Integer identifier = null;
+			if (options.setSelected(selectOption(
 					String.format("%s: %d/%d (%s)",
 							msg.getInfo(Messages.INFO_UI_ENTRY),
 							cIdx, nEntries-1, entryState),
-					options));
-			Integer identifier = options.getSelected();
+					options)))
+				identifier = options.getSelected();
 			int response = identifier != null ? identifier : ERROR;
 			switch(response)
 			{
@@ -155,10 +155,6 @@ public class UserInterface implements UserInterface_Interface
 				break;
 			case EXIT:
 				return false;
-			case ERROR:
-				displayError(Messages.getMessages().getError(
-						Messages.ERROR_NULL_SELECTED));
-				break;
 			default:
 				displayError(Messages.getMessages().getError(
 						Messages.ERROR_UNKNOWN_RESPONSE));
@@ -357,9 +353,9 @@ public class UserInterface implements UserInterface_Interface
 		}
 
 		@Override
-		public void fillEntry()
+		public boolean fillEntry()
 		{
-			soc.setSelected(responseID);
+			return soc.setSelected(responseID);
 		}
 
 		@Override
@@ -435,9 +431,10 @@ public class UserInterface implements UserInterface_Interface
 		}
 
 		@Override
-		public void fillEntry()
+		public boolean fillEntry()
 		{
 			fc.setEntry(entry);
+			return true;
 		}
 
 		@Override

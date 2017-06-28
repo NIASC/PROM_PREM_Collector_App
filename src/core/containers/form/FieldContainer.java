@@ -99,8 +99,6 @@ public class FieldContainer extends FormContainer
 	 */
 	public void setEntry(String entry)
 	{
-		if (entry != null && entry.equals(""))
-			return;
 		field.setValue(entry);
 	}
 

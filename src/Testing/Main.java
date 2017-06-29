@@ -48,9 +48,9 @@ public class Main
 			System.exit(1);
 		}
 		SwingUserInterface qf1 = new SwingUserInterface();
-		qf1.open();
+		qf1.start();
 		SwingUserInterface qf2 = new SwingUserInterface();
-		qf2.open();
+		qf2.start();
 		
 		/*
 		CLI_UserInterface ui = new CLI_UserInterface();

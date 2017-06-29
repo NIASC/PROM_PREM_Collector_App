@@ -172,13 +172,6 @@ public class CLI_UserInterface implements UserInterface
 		return (T) new FieldDisplay(this, fc);
 	}
 
-	@Override
-	public void run()
-	{
-		while (!ppc.start());
-		close();
-	}
-
 	/**
 	 * Opens the PROM/PREM Collector program.
 	 */
@@ -186,7 +179,7 @@ public class CLI_UserInterface implements UserInterface
 	{
 		in = new Scanner(System.in);
 		ppc = new PROM_PREM_Collector(this);
-		(new Thread(this)).start();
+		(new Thread(ppc)).start();
 	}
 
 	/**

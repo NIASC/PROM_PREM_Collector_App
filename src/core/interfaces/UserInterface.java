@@ -33,7 +33,7 @@ import core.containers.form.SingleOptionContainer;
  * @author Marcus Malmquist
  *
  */
-public interface UserInterface extends Runnable
+public interface UserInterface
 {
 	public static final int ERROR = -1;
 	

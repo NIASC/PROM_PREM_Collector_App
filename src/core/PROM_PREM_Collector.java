@@ -34,32 +34,42 @@ import core.interfaces.UserInterface;
  * @author Marcus Malmquist
  *
  */
-public class PROM_PREM_Collector
+public class PROM_PREM_Collector implements Runnable
 {
 	private UserHandle userHandle;
 	private Questionnaire questionaire;
 	private ViewData viewData;
-	
 	private UserInterface ui;
 
+	private boolean terminate;
+	
 	/**
 	 * Initializes class variables.
 	 */
 	public PROM_PREM_Collector(UserInterface ui)
 	{
+		terminate = false;
 		this.ui = ui;
 		userHandle = new UserHandle(ui);
 		questionaire = new Questionnaire(ui, userHandle);
 		viewData = new ViewData(ui, userHandle);
 	}
 	
-	public boolean start()
+	public void terminate()
 	{
-		boolean quit = false;
-		quit = loginOptions();
-		if (userHandle.isLoggedIn())
-			loginActions();
-		return quit;
+		terminate = true;
+	}
+
+	@Override
+	public void run()
+	{
+		while (!terminate)
+		{
+			terminate = loginOptions();
+			if (userHandle.isLoggedIn())
+				loginActions();
+		}
+		userHandle.logout();
 	}
 	
 	/**

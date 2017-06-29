@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -45,7 +46,7 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		add(console = new SwingConsole(), BorderLayout.CENTER);
 		
 		// panel with buttons
-		add(makeMenuPanel(), BorderLayout.SOUTH);
+		add(makeMenuPanel(), BorderLayout.NORTH);
 
 		// set focus to answer field
 		frame.addWindowListener( new WindowAdapter() {
@@ -74,8 +75,8 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		settingsButton = AddButton("Settings", "settings",
 				"Click here to modify the settings.", true, true,
 				Color.LIGHT_GRAY, Color.BLACK, dim);
-		databaseButton = AddButton("Database", "database",
-				"Click here to modify the database.", true, true,
+		databaseButton = AddButton("Exit", "exit",
+				"Click here to exit the program.", true, true,
 				Color.LIGHT_GRAY, Color.BLACK, dim);
 		bPanel.add(restartButton);
 		bPanel.add(resultsButton);
@@ -109,7 +110,10 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 			JButton b = (JButton) e.getSource();
 			if (b.getName() != null)
 			{
-				// unimplemented
+				if (b.getName().equals(databaseButton.getName()))
+				{
+					stop();
+				}
 			}
 		}
 		else if (e.getSource() instanceof JTextField)
@@ -242,29 +246,56 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	}
 
 	@Override
-	public void run()
+	public void init()
 	{
-		while (!ppc.start());
-		close();
-	}
-
-	/**
-	 * Opens the PROM/PREM Collector program.
-	 */
-	public void open()
-	{
-		ppc = new PROM_PREM_Collector(this);
-		(new Thread(this)).start();
-	}
-
-	/**
-	 * Closes the user interface (if it is open).
-	 */
-	public void close()
-	{
-		frame.dispose();
+		/* when the webpage is initialized */
+		System.out.println("Applet initialized");
 	}
 	
+	@Override
+	public void destroy()
+	{
+		/* when the webpage is destroyed */
+
+		System.out.println("Applet destroyed");
+
+		if (frame != null)
+			frame.dispose();
+	}
+	
+	@Override
+	public void start()
+	{
+		/* when the user returns to the webpage */
+		System.out.println("Applet started");
+		/* Maybe reload cached session?         */
+		
+		ppc = new PROM_PREM_Collector(this);
+		thread = new Thread(ppc);
+		thread.start();
+	}
+	
+	public void stop()
+	{
+		/* when the user leaves the web page. */
+		System.out.println("Applet stopped");
+		/* Maybe save session to cache?       */
+		
+		// signal thread to die, then wait for it to die
+		// TODO: signal thread to die.
+		ppc.terminate();
+		try {
+			thread.join();
+		} catch (InterruptedException e){ System.out.println("Interrupted");}
+	}
+	
+	/**
+	 * Displays the message to the user and waits for an answer.
+	 * 
+	 * @param message The message to display.
+	 * 
+	 * @return The use response.
+	 */
 	private String getUserInput(String message)
 	{
 		console.displayNewQuestion(message);
@@ -526,5 +557,6 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	private JButton restartButton, settingsButton,
 	resultsButton, databaseButton;
 	private SwingConsole console;
+	private Thread thread;
 	private static final long serialVersionUID = -3896988492887782839L;
 }

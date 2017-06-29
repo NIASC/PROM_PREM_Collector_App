@@ -142,6 +142,7 @@ public class UserHandle implements Runnable
 		if (!loggedIn)
 			return;
 		resetLoginVars();
+		UserManager.getUserManager().delUser(this);
 	}
 	
 	/**

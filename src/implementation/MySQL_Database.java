@@ -34,22 +34,22 @@ import core.Utilities;
 import core.containers.MessageContainer;
 import core.containers.User;
 import core.interfaces.Database;
-import core.interfaces.Messages;
 
 /**
  * This class is an example of an implementation of
  * Database_Interface. This is done using a MySQL database and a
  * MySQL Connector/J to provide a MySQL interface to Java.
  * 
+ * This class is designed to be thread safe and a singleton.
+ * 
  * @author Marcus Malmquist
  *
  */
 public class MySQL_Database implements Database
 {
-	private static MySQL_Database database;
 	/**
 	 * Initializes variables and loads the database configuration.
-	 * This class is a singleton and shouldonly be instantiated once.
+	 * This class is a singleton and should only be instantiated once.
 	 */
 	private MySQL_Database()
 	{
@@ -58,7 +58,7 @@ public class MySQL_Database implements Database
 			dbConfig = new DatabaseConfig();
 		} catch (IOException e)
 		{
-			e.printStackTrace();
+			// e.printStackTrace();
 		}
 	}
 	
@@ -160,7 +160,7 @@ public class MySQL_Database implements Database
 	{
 		if (mc == null)
 			return ERROR;
-		return getMessages("error_messages", mc) ? QUERY_SUCCESS : ERROR;
+		return getMessages("error_messages", mc);
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class MySQL_Database implements Database
 	{
 		if (mc == null)
 			return ERROR;
-		return getMessages("info_messages", mc) ? QUERY_SUCCESS : ERROR;
+		return getMessages("info_messages", mc);
 	}
 	
 	/* 
@@ -232,9 +232,9 @@ public class MySQL_Database implements Database
 	 * @param mc
 	 * @return
 	 */
-	private boolean getMessages(String tableName, MessageContainer mc)
+	private int getMessages(String tableName, MessageContainer mc)
 	{
-		boolean ret = false;
+		int ret = ERROR;
 		try (Connection conn = DriverManager.getConnection(
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
@@ -250,7 +250,7 @@ public class MySQL_Database implements Database
 					msg.put(rs.getString("locale"), rs.getString("message"));
 					mc.addMessage(rs.getInt("code"), rs.getString("name"), msg);
 				}
-				ret = true;
+				ret = QUERY_SUCCESS;
 			}
 		}
 		catch (SQLException e) { }
@@ -333,8 +333,7 @@ public class MySQL_Database implements Database
 			return password;
 		}
 	}
-	
+
+	private static MySQL_Database database;
 	private DatabaseConfig dbConfig;
-	private Connection conn;
-	private Statement stmt;
 }

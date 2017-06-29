@@ -22,7 +22,6 @@ package core.interfaces;
 import implementation.MySQL_Database;
 import implementation.No_Encryption;
 import implementation.Email_Registration;
-import implementation.CLI_UserInterface;
 
 /**
  * This class acts as an interface between the implementation of the

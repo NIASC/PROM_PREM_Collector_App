@@ -269,7 +269,6 @@ public class UserHandle
 	private int validateDetails(String username, String password)
 	{
 		User tmp = findDetails(username);
-		System.out.printf("%s, %b\n", username, tmp == null);
 		if (tmp == null)
 			return 0;
 		if (!tmp.passwordMatch(password))
@@ -289,7 +288,7 @@ public class UserHandle
 	 * 		it was found. If the user was not found or an error
 	 * 		occurred then null is returned.
 	 */
-	private synchronized User findDetails(String username)
+	private User findDetails(String username)
 	{
 		return user_db.getUser(username);
 	}

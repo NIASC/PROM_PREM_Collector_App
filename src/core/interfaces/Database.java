@@ -36,7 +36,7 @@ import core.containers.User;
 public interface Database
 {
 	public static final int ERROR = -1;
-	public static final int QUERY_SUCCESS = 0x10;
+	public static final int QUERY_SUCCESS = 1;
 	
 	/**
 	 * Adds a new user to the database.

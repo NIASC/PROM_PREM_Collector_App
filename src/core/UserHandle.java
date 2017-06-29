@@ -74,7 +74,6 @@ public class UserHandle
 	{
 		if (loggedIn)
 			return;
-		user_db.connect();
 		Form f = new Form();
 		FieldContainer usrnam = new FieldContainer(
 				Messages.getMessages().getInfo(
@@ -90,21 +89,22 @@ public class UserHandle
 			return;
 		
 		int ret = validateDetails(usrnam.getEntry(), pswrd.getEntry());
-		if ((ret & (USER_FOUND | DETAILS_MATCH)) != (USER_FOUND | DETAILS_MATCH))
+		if ((ret & (USER_FOUND | DETAILS_MATCH)) == (USER_FOUND | DETAILS_MATCH))
+		{
+			initLoginVars();
+			if (user.getUpdatePassword())
+			{
+				ui.displayMessage(Messages.getMessages().getInfo(
+						Messages.INFO_UH_UPDATE_PASSWORD));
+				setPassword();
+			}
+		}
+		else
 		{
 			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_INVALID_LOGIN));
 			// TODO: add functionality for resetting password.
-			return;
 		}
-		initLoginVars();
-		if (user.getUpdatePassword())
-		{
-			ui.displayMessage(Messages.getMessages().getInfo(
-					Messages.INFO_UH_UPDATE_PASSWORD));
-			setPassword();
-		}
-		user_db.disconnect();
 	}
 	
 	/**
@@ -269,6 +269,7 @@ public class UserHandle
 	private int validateDetails(String username, String password)
 	{
 		User tmp = findDetails(username);
+		System.out.printf("%s, %b\n", username, tmp == null);
 		if (tmp == null)
 			return 0;
 		if (!tmp.passwordMatch(password))
@@ -288,7 +289,7 @@ public class UserHandle
 	 * 		it was found. If the user was not found or an error
 	 * 		occurred then null is returned.
 	 */
-	private User findDetails(String username)
+	private synchronized User findDetails(String username)
 	{
 		return user_db.getUser(username);
 	}

@@ -79,10 +79,8 @@ public final class Messages
 		info = new MessageContainer();
 		
 		Database db = Implementations.Database();
-		db.connect();
 		int errMsgLoadCode = db.getErrorMessages(error);
 		int infoMsgLoadCode = db.getInfoMessages(info);
-		db.disconnect();
 		return errMsgLoadCode == Database.QUERY_SUCCESS
 				&& infoMsgLoadCode == Database.QUERY_SUCCESS;
 	}

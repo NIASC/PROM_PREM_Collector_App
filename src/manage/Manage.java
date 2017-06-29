@@ -71,16 +71,19 @@ public class Manage
 	 */
 	private void addUser()
 	{
-		System.out.printf("Username?\n");
+		System.out.printf("Enter Username\n");
 		String user = in.next();
-		in.reset();
 
-		System.out.printf("Password?\n");
+		System.out.printf("Enter Password\n");
 		String password = in.next();
-		in.reset();
 
-		System.out.printf("Clinic?\n");
 		HashMap<Integer, String> clinics = db.getClinics();
+		if (clinics.size() == 0)
+		{
+			System.out.printf("There are no clinics in the database\n");
+			return;
+		}
+		System.out.printf("Select Clinic\n");
 		for (Entry<Integer, String> e : clinics.entrySet())
 			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
 		Integer clinic = null;
@@ -89,29 +92,15 @@ public class Manage
 		else
 		{
 			in.next();
-			System.out.printf("No such clinic. Exting\n");
-			System.exit(1);
+			System.out.printf("No such clinic.\n");
+			return;
 		}
 
-		System.out.printf("Email?\n");
+		System.out.printf("Enter Email\n");
 		String email = in.next();
 		Encryption crypto = Implementations.Encryption();
 		String salt = crypto.getNewSalt();
 		db.addUser(user, crypto.hashString(password, salt), salt, clinic, email);
-	}
-
-	/** Open a connection */
-	public boolean dbConnect()
-	{
-		System.out.printf("%s\n", "Connecting to database.");
-		return db.connect() != Database.ERROR;
-	}
-
-	/** Close connection */
-	public boolean dbDisconnect()
-	{
-		System.out.println("Disconnecting from database.");
-		return db.disconnect() != Database.ERROR;
 	}
 	
 	/**
@@ -120,10 +109,6 @@ public class Manage
 	 */
 	public void runManager()
 	{
-		if (!dbConnect())
-			System.exit(1);
-		
-		// Execute a query
 		final int EXIT = 0, ADD_CLINIC = 1, ADD_USER = 2;
 		System.out.printf(
 				"What would you like to do?\n%d: %s\n%d: %s\n%d: %s\n",
@@ -152,8 +137,6 @@ public class Manage
 		default:
 			break;
 		}
-		if (!dbDisconnect())
-			System.exit(1);
 	}
 	
 	public static void main(String[] args)

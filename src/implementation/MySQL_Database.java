@@ -85,43 +85,6 @@ public class MySQL_Database implements Database
 	 */
 
 	@Override
-	public synchronized int connect()
-	{
-		int ret = ERROR;
-		try
-		{
-			conn = DriverManager.getConnection(dbConfig.getURL(),
-					dbConfig.getUser(), dbConfig.getPassword());
-			stmt = conn.createStatement();
-			ret = CONNECT_SUCCESS;
-		} catch (SQLException se)
-		{
-		}
-		return ret;
-	}
-	
-	@Override
-	public synchronized int disconnect()
-	{
-		int ret = ERROR;
-		try
-		{
-			if(stmt != null)
-				stmt.close();
-			stmt = null;
-			if(conn != null)
-				conn.close();
-			conn = null;
-			ret = DISCONNECT_SUCCESS;
-		}
-		catch(SQLException se)
-		{
-			se.printStackTrace();
-		}
-		return ret;
-	}
-
-	@Override
 	public int addUser(String username, String password,
 			String salt, int clinic, String email)
 	{
@@ -144,43 +107,39 @@ public class MySQL_Database implements Database
 	@Override
 	public HashMap<Integer, String> getClinics()
 	{
-		ResultSet rs = query("SELECT `id`, `name` FROM `clinics`");
-		if (rs == null)
-			return null;
 		HashMap<Integer, String> ret = new HashMap<Integer, String>();
-		try
+		try (Connection conn = DriverManager.getConnection(
+				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
-			while (rs.next())
-				ret.put(rs.getInt("id"), rs.getString("name"));
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
+			Statement s = conn.createStatement();
+			ResultSet rs = query(s, "SELECT `id`, `name` FROM `clinics`");
+			if (rs != null)
+				while (rs.next())
+					ret.put(rs.getInt("id"), rs.getString("name"));
+		} catch (SQLException e) { }
 		return ret;
 	}
 
 	@Override
-	public synchronized User getUser(String username)
+	public User getUser(String username)
 	{
-		ResultSet rs = query("SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
-		if (rs == null)
-			return null;
 		User user = null;
-		try
+		try (Connection conn = DriverManager.getConnection(
+				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
-			while (rs.next())
-			{
+			Statement s = conn.createStatement();
+			ResultSet rs = query(s, "SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
+			if (rs == null)
+				return null;
+
+			while (rs.next() && user == null)
 				if (rs.getString("name").equals(username))
-				{
-					user = new User(rs.getInt("clinic_id"), rs.getString("name"), rs.getString("password"),
-							rs.getString("email"), rs.getString("salt"), rs.getInt("update_password") != 0);
-					break;
-				}
-			}
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
+					user = new User(rs.getInt("clinic_id"),
+							rs.getString("name"), rs.getString("password"),
+							rs.getString("email"), rs.getString("salt"),
+							rs.getInt("update_password") != 0);
 		}
+		catch (SQLException se) { }
 		return user;
 	}
 
@@ -225,20 +184,16 @@ public class MySQL_Database implements Database
 	 * 
 	 * @return QUERY_SUCCESS on successful query, ERROR on failure.
 	 */
-	private synchronized int queryUpdate(String message)
+	private int queryUpdate(String message)
 	{
 		int ret = ERROR;
-		if (stmt == null)
-			return ret;
-		try
+		try (Connection c = DriverManager.getConnection(dbConfig.getURL(),
+				dbConfig.getUser(), dbConfig.getPassword()))
 		{
-			stmt.executeUpdate(message);
+			c.createStatement().executeUpdate(message);
 			ret = QUERY_SUCCESS;
 		}
-		catch (SQLException se)
-		{
-			// se.printStackTrace();
-		}
+		catch (SQLException se) { }
 		return ret;
 	}
 	
@@ -246,6 +201,10 @@ public class MySQL_Database implements Database
 	 * Query the database, typically for data (i.e. request data from
 	 * the database).
 	 * 
+	 * @param s The statement that executes the query. The statement
+	 * 		can be acquired by calling
+	 * 		Connection c = DriverManager.getConnection(...)
+	 * 		Statement s = c.createStatement()
 	 * @param message The command (specified by the SQL language)
 	 * 		to send to the database.
 	 * 
@@ -253,18 +212,14 @@ public class MySQL_Database implements Database
 	 * 		is not initialized or a query error occurs then null is
 	 * 		returned.
 	 */
-	private synchronized ResultSet query(String message)
+	private ResultSet query(Statement s, String message)
 	{
-		if (stmt == null)
-			return null;
 		ResultSet rs = null;
 		try
 		{
-			rs = stmt.executeQuery(message);
-		} catch (SQLException se)
-		{
-			// se.printStackTrace();
+			rs = s.executeQuery(message);
 		}
+		catch (SQLException se) { }
 		return rs;
 	}
 
@@ -279,27 +234,27 @@ public class MySQL_Database implements Database
 	 */
 	private boolean getMessages(String tableName, MessageContainer mc)
 	{
-		ResultSet rs = query(String.format(
-				("SELECT `code`, `name`, `locale`, `message` "
-						+ "FROM `%s`"), tableName));
-		if (rs == null)
-			return false;
-		try
+		boolean ret = false;
+		try (Connection conn = DriverManager.getConnection(
+				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
-			if (rs.isClosed())
-				return false;
-			while (rs.next())
+			Statement s = conn.createStatement();
+			ResultSet rs = query(s, String.format(
+					"SELECT `code`, `name`, `locale`, `message` FROM `%s`",
+					tableName));
+			if (rs != null)
 			{
-				HashMap<String, String> msg = new HashMap<String, String>();
-				msg.put(rs.getString("locale"), rs.getString("message"));
-				mc.addMessage(rs.getInt("code"), rs.getString("name"), msg);
+				while (rs.next())
+				{
+					HashMap<String, String> msg = new HashMap<String, String>();
+					msg.put(rs.getString("locale"), rs.getString("message"));
+					mc.addMessage(rs.getInt("code"), rs.getString("name"), msg);
+				}
+				ret = true;
 			}
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-			return false;
 		}
-		return true;
+		catch (SQLException e) { }
+		return ret;
 	}
 
 	/**

@@ -36,27 +36,7 @@ import core.containers.User;
 public interface Database
 {
 	public static final int ERROR = -1;
-	public static final int CONNECT_SUCCESS = 0x10;
-	public static final int DISCONNECT_SUCCESS = 0x20;
-	public static final int QUERY_SUCCESS = 0x40;
-	public static final int FOUND = 0x80;
-	public static final int NOT_FOUND = 0x100;
-
-	/**
-	 * Opens a connection to the database.
-	 * 
-	 * @return CONNECT_SUCCESS on successful connection,
-	 * 		ERROR on failure to connect.
-	 */
-	public int connect();
-
-	/**
-	 * Closes an open connection to the database.
-	 * 
-	 * @return DISCONNECT_SUCCESS on successful disconnection,
-	 * 		ERROR on failure to disconnect.
-	 */
-	public int disconnect();
+	public static final int QUERY_SUCCESS = 0x10;
 	
 	/**
 	 * Adds a new user to the database.

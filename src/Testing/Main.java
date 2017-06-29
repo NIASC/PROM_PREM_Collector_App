@@ -25,20 +25,22 @@ import core.UserHandle;
 import core.containers.User;
 import core.interfaces.Database;
 import core.interfaces.Implementations;
+import core.interfaces.Messages;
 import core.interfaces.UserInterface;
 
 public class Main
 {
 	public static void main(String[] args)
 	{
+		/*
 		Database db = Implementations.Database();
 		db.connect();
 		for (int i = 0; i < 20; ++i)
 		{
 			(new Thread(new tClass(db))).start();
 		}
+		*/
 		
-		/*
 		//printFonts();
 		if (!Messages.getMessages().loadMessages())
 		{
@@ -49,7 +51,7 @@ public class Main
 		qf1.open();
 		SwingUserInterface qf2 = new SwingUserInterface();
 		qf2.open();
-		*/
+		
 		/*
 		CLI_UserInterface ui = new CLI_UserInterface();
 		ui.open();

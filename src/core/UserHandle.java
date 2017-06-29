@@ -39,10 +39,8 @@ import core.interfaces.UserInterface;
  * @author Marcus Malmquist
  *
  */
-public class UserHandle
+public class UserHandle implements Runnable
 {
-	public static final int USER_FOUND = 0x10;
-	public static final int DETAILS_MATCH = 0x20;
 	
 	private Database user_db;
 	private UserInterface ui;
@@ -74,6 +72,7 @@ public class UserHandle
 	{
 		if (loggedIn)
 			return;
+		
 		Form f = new Form();
 		FieldContainer usrnam = new FieldContainer(
 				Messages.getMessages().getInfo(
@@ -88,9 +87,16 @@ public class UserHandle
 		if (!ui.presentForm(f))
 			return;
 		
-		int ret = validateDetails(usrnam.getEntry(), pswrd.getEntry());
-		if ((ret & (USER_FOUND | DETAILS_MATCH)) == (USER_FOUND | DETAILS_MATCH))
+		if (!validateDetails(usrnam.getEntry(), pswrd.getEntry()))
 		{
+			ui.displayError(Messages.getMessages().getError(
+					Messages.ERROR_UH_INVALID_LOGIN));
+			// TODO: add functionality for resetting password.
+			return;
+		}
+		switch(UserManager.getUserManager().addUser(this))
+		{
+		case UserManager.SUCCESS:
 			initLoginVars();
 			if (user.getUpdatePassword())
 			{
@@ -98,12 +104,19 @@ public class UserHandle
 						Messages.INFO_UH_UPDATE_PASSWORD));
 				setPassword();
 			}
-		}
-		else
-		{
+			break;
+		case UserManager.ALREADY_ONLINE:
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_INVALID_LOGIN));
-			// TODO: add functionality for resetting password.
+					Messages.ERROR_UH_ALREADY_ONLINE));
+			break;
+		case UserManager.SERVER_FULL:
+			ui.displayError(Messages.getMessages().getError(
+					Messages.ERROR_UH_SERVER_FULL));
+			break;
+		default:
+			ui.displayError(Messages.getMessages().getError(
+					Messages.ERROR_UNKNOWN_RESPONSE));
+			break;
 		}
 	}
 	
@@ -132,6 +145,29 @@ public class UserHandle
 	}
 	
 	/**
+	 * Attempts to match the supplied username and password with users
+	 * that are already in the database. If the username and password
+	 * matches the user information will be placed in the local user
+	 * object.
+	 * 
+	 * @param username The name of the user to look for.
+	 * @param password The password of the user to look for.
+	 * 
+	 * @return True if the user was found and the details matched.
+	 * 		False if not.
+	 */
+	protected boolean validateDetails(String username, String password)
+	{
+		User tmp = user_db.getUser(username);
+		if (tmp == null)
+			return false;
+		if (!tmp.passwordMatch(password))
+			return false;
+		user = tmp;
+		return true;
+	}
+	
+	/**
 	 * Returns the 'logged in' flag.
 	 * 
 	 * @return True if the user is logged in. False if not.
@@ -139,6 +175,11 @@ public class UserHandle
 	public boolean isLoggedIn()
 	{
 		return loggedIn;
+	}
+	
+	public User getUser()
+	{
+		return user;
 	}
 	
 	/**
@@ -249,51 +290,6 @@ public class UserHandle
 	}
 	
 	/**
-	 * Attempts to match the supplied username and password with users
-	 * that are already in the database. If the username and password
-	 * matches the user information will be placed in the local user
-	 * object.
-	 * Bitwise masking can be use to mask out different return values
-	 * (i.e. USER_FOUND | DETAILS_MATCH) is returned if the user is
-	 * found and the password matches.
-	 * 
-	 * Bitwise masks:
-	 * USER_FOUND		- User was found.
-	 * DETAILS_MATCH	- Entered password matches the user's password
-	 * 					  in the database.
-	 * 
-	 * @param username The name of the user to look for.
-	 * @param password The password of the user to look for.
-	 * @return A bitwise masking of USER_FOUND and DETAILS_MATCH
-	 */
-	private int validateDetails(String username, String password)
-	{
-		User tmp = findDetails(username);
-		if (tmp == null)
-			return 0;
-		if (!tmp.passwordMatch(password))
-			return 0;
-		// username and password matches if we reach this point
-		user = tmp;
-		return USER_FOUND | DETAILS_MATCH;
-	}
-	
-	/**
-	 * Query the database to look for the user with the supplied name
-	 * and return the instance of that user.
-	 * 
-	 * @param username The name of the user to look for in the
-	 * 		database.
-	 * @return The instance of the user with the supplied username if
-	 * 		it was found. If the user was not found or an error
-	 * 		occurred then null is returned.
-	 */
-	private User findDetails(String username)
-	{
-		return user_db.getUser(username);
-	}
-	
-	/**
 	 * Validates the password according to the security criterion.
 	 * This should typically be done when the user wants to set a new
 	 * password.
@@ -345,5 +341,11 @@ public class UserHandle
 	private void resetLoginVars()
 	{
 		loggedIn = false;
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 }

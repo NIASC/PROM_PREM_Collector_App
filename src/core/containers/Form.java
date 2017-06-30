@@ -331,31 +331,6 @@ public class Form
 	}
 	
 	/**
-	 * Determines if all entries are filled. if a form is not filled
-	 * the function will jump to to the first unfilled entry in this
-	 * form if specified by jumpToUnfilled.
-	 * 
-	 * @param jumpToUnfilled True if the method should jump to the
-	 * 		first unfilled entry in this form. False if it should not.
-	 * 
-	 * @return True if all entire are filled. False if there are
-	 * 		unfilled entries.
-	 */
-	public boolean allEntriesFilled(boolean jumpToUnfilled)
-	{
-		FormContainer tmp = currentFC;
-		jumpTo(AT_BEGIN);
-		boolean entriesFilled;
-		while(currentFC.hasEntry())
-			if (nextEntry() == null)
-				break;
-		entriesFilled = nextEntry() == null;
-		if (!jumpToUnfilled)
-			currentFC = tmp;
-		return entriesFilled;
-	}
-	
-	/**
 	 * Checks if this form has entries after the current entry.
 	 * 
 	 * @return True if current entry is the last one. False if there

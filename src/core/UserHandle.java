@@ -39,11 +39,13 @@ import core.interfaces.UserInterface;
  * @author Marcus Malmquist
  *
  */
-public class UserHandle implements Runnable
+public class UserHandle
 {
 	
 	private Database user_db;
 	private UserInterface ui;
+	private Questionnaire questionaire;
+	private ViewData viewData;
 	private User user;
 	
 	private boolean loggedIn;
@@ -57,6 +59,8 @@ public class UserHandle implements Runnable
 	{
 		this.ui = ui;
 		user_db = Implementations.Database();
+		questionaire = new Questionnaire(ui, this);
+		viewData = new ViewData(ui, this);
 		user = null;
 		loggedIn = false;
 	}
@@ -81,12 +85,6 @@ public class UserHandle implements Runnable
 		{
 		case UserManager.SUCCESS:
 			initLoginVars();
-			if (user.getUpdatePassword())
-			{
-				ui.displayMessage(Messages.getMessages().getInfo(
-						Messages.INFO_UH_UPDATE_PASSWORD));
-				setPassword();
-			}
 			break;
 		case UserManager.ALREADY_ONLINE:
 			ui.displayError(Messages.getMessages().getError(
@@ -161,7 +159,19 @@ public class UserHandle implements Runnable
 		return loggedIn;
 	}
 	
-	public User getUser()
+	public boolean updatePassword()
+	{
+		if (user.getUpdatePassword())
+		{
+			ui.displayMessage(Messages.getMessages().getInfo(
+					Messages.INFO_UH_UPDATE_PASSWORD));
+			setPassword();
+			return true;
+		}
+		return false;
+	}
+	
+	protected User getUser()
 	{
 		return user;
 	}
@@ -173,7 +183,7 @@ public class UserHandle implements Runnable
 	 * This function will query the user until the old and new password
 	 * fulfill the criterion described above.
 	 */
-	private void setPassword()
+	public void setPassword()
 	{
 		if (!loggedIn)
 			return; // no user to set password for
@@ -187,32 +197,42 @@ public class UserHandle implements Runnable
 		
 		
 		Form form = new Form();
-		FieldContainer currentPassword = new FieldContainer(CP_MSG);
+		FieldContainer currentPassword = new FieldContainer(false, true, CP_MSG);
 		form.insert(currentPassword, Form.AT_END);
-		FieldContainer newPassword1 = new FieldContainer(NP1_MSG);
+		FieldContainer newPassword1 = new FieldContainer(false, true, NP1_MSG);
 		form.insert(newPassword1, Form.AT_END);
-		FieldContainer newPassword2 = new FieldContainer(NP2_MSG);
+		FieldContainer newPassword2 = new FieldContainer(false, true, NP2_MSG);
 		form.insert(newPassword2, Form.AT_END);
 		form.jumpTo(Form.AT_BEGIN);
 		
-		boolean match = false;
-		while (!match)
+		ui.displayMessage(Messages.getMessages().getInfo(
+				Messages.INFO_NEW_PASS_INFO));
+		ui.presentForm(form, this::setPassReturn, null);
+	}
+	
+	/**
+	 * The function to return to after the user have entered a new password.
+	 * 
+	 * @param form The form that was sent to the UI.
+	 * 
+	 * @return True if the form was sent. False if not.
+	 */
+	private boolean setPassReturn(Form form)
+	{
+		form.jumpTo(Form.AT_BEGIN);
+		FieldContainer currentPassword = (FieldContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
+		FieldContainer newPassword1 = (FieldContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
+		FieldContainer newPassword2 = (FieldContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
+
+		if (newPassError(
+				currentPassword.getEntry(),
+				newPassword1.getEntry(),
+				newPassword2.getEntry()))
 		{
-			ui.displayMessage(Messages.getMessages().getInfo(
-					Messages.INFO_NEW_PASS_INFO));
-			if (!ui.presentForm(form, this::setPassReturn))
-				return;
-			if (newPassError(
-					currentPassword.getEntry(),
-					newPassword1.getEntry(),
-					newPassword2.getEntry()))
-			{
-				currentPassword.setEntry(null);
-				newPassword1.setEntry(null);
-				newPassword2.setEntry(null);
-			}
-			else
-				match = true;
+			return false;
 		}
 		Encryption crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
@@ -221,15 +241,13 @@ public class UserHandle implements Runnable
 				crypto.hashString(
 						newPassword1.getEntry(), newSalt),
 				newSalt);
-		if (tmpUser != null)
-			user = tmpUser;
-		else
+		if (tmpUser == null)
+		{
 			ui.displayError(Messages.DATABASE_ERROR);
-	}
-	
-	private void setPassReturn(Form form)
-	{
-		System.out.println("Returned from set password!");
+			return false;
+		}
+		user = tmpUser;
+		return true;
 	}
 	
 	/**
@@ -285,9 +303,11 @@ public class UserHandle implements Runnable
 	 * The criterion are:
 	 * password length: >5 and < 33 characters.
 	 * password strength: contain characters from at least 2 groups
-	 * 		out of [a-z], [A-Z], [0-9], [^a-zA-Z0-9] (symbols).
+	 * 		out of lowercase, uppercase, digits, punctuation
+	 * 		(including space).
 	 * 
 	 * @param password The password to validate.
+	 * 
 	 * @return <0 if the password does not fit the length constraint.
 	 * 		0 if the password does not fit the strength constraint.
 	 * 		>0 if the password fits the length constraint and strength
@@ -298,11 +318,14 @@ public class UserHandle implements Runnable
 		if (password.length() < 6 || password.length() > 32)
 			return -1;
 		Pattern[] pattern = new Pattern[]{
-				Pattern.compile("[a-z]"),
-				Pattern.compile("[A-Z]"),
-				Pattern.compile("[0-9]"),
-				Pattern.compile("[^a-zA-Z0-9]")
+				Pattern.compile("\\p{Lower}"), /* lowercase */
+				Pattern.compile("\\p{Upper}"), /* uppercase */
+				Pattern.compile("\\p{Digit}"), /* digits */
+				Pattern.compile("[\\p{Punct} ]") /* punctuation and space */
 		};
+		if (Pattern.compile("[^\\p{Print}]").matcher(password).find())
+			// expression contains non-ascii or non-printable characters
+			return 0;
 		int points = 0;
 		if (pattern[0].matcher(password).find())
 			++points;
@@ -330,11 +353,5 @@ public class UserHandle implements Runnable
 	private void resetLoginVars()
 	{
 		loggedIn = false;
-	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
 	}
 }

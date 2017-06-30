@@ -19,6 +19,8 @@
  */
 package core.containers.form;
 
+import java.util.regex.Pattern;
+
 import core.interfaces.UserInterface;
 import core.interfaces.UserInterface.FormComponentDisplay;
 
@@ -35,24 +37,32 @@ import core.interfaces.UserInterface.FormComponentDisplay;
 public class FieldContainer extends FormContainer
 {
 	private FieldEntry field;
+	private boolean secret;
 	
 	/**
-	 * Initializes this container as an empty container.
+	 * Initializes a field container that does not allow empty entries and
+	 * does not have secret entries.
 	 */
 	public FieldContainer()
 	{
-		field = null;
+		this(false, false, null);
 	}
 	
 	/**
 	 * Initializes this container with form with the supplied
 	 * statement.
-	 * 
+	 * @param allowEmptyEntries True if this container allows empty entry
+	 * 		(answer/response).
+	 * @param secretEntry True if the input should be hidden. Useful for
+	 * 		entering sensitive information such as passwords.
 	 * @param statement The statement to initialize this form with.
 	 */
-	public FieldContainer(String statement)
+	public FieldContainer(boolean allowEmptyEntries, boolean secretEntry,
+			String statement)
 	{
+		super(allowEmptyEntries);
 		field = new FieldEntry(statement);
+		secret = secretEntry;
 	}
 	
 	/**
@@ -65,6 +75,12 @@ public class FieldContainer extends FormContainer
 	 */
 	public void setField(String statement)
 	{
+		if (statement != null)
+		{
+			statement = statement.trim();
+			if (!allowEmpty && statement.isEmpty())
+				return;
+		}
 		field = new FieldEntry(statement);
 	}
 	
@@ -91,6 +107,15 @@ public class FieldContainer extends FormContainer
 	}
 	
 	/**
+	 * 
+	 * @return True if this form's entry should be hidden.
+	 */
+	public boolean isSecret()
+	{
+		return secret;
+	}
+	
+	/**
 	 * Sets the entry (i.e. the user input in response to the field's
 	 * statement) of this container's field. Setting the entry to null
 	 * can be used to reset the field.
@@ -103,7 +128,7 @@ public class FieldContainer extends FormContainer
 	}
 
 	@Override
-	public <T extends FormComponentDisplay> T draw(UserInterface ui)
+	public <T extends FormComponentDisplay> T getDisplayable(UserInterface ui)
 	{
 		return ui.createField(this);
 	}
@@ -111,7 +136,8 @@ public class FieldContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return field.getValue() != null;
+		return field.getValue() != null
+				&& (allowEmpty || !field.getValue().isEmpty());
 	}
 	
 	/**

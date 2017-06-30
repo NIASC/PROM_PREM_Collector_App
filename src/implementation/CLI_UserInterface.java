@@ -26,7 +26,6 @@ import java.util.Scanner;
 
 import javax.swing.JPanel;
 
-import core.PROM_PREM_Collector;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
@@ -96,7 +95,7 @@ public class CLI_UserInterface implements UserInterface
 	}
 
 	@Override
-	public boolean presentForm(Form form, Function function)
+	public boolean presentForm(Form form, ReturnFunction function, Object retpan)
 	{
 		HashMap<Integer, ExtraImplementation> components = fillContents(form);
 		int nEntries = components.size();
@@ -104,7 +103,7 @@ public class CLI_UserInterface implements UserInterface
 		final int ERROR = 0, EXIT = 1, CONTINUE = 2,
 				GOTO_PREV = 3, GOTO_NEXT = 4;
 		Messages msg = Messages.getMessages();
-		SingleOptionContainer options = new SingleOptionContainer();
+		SingleOptionContainer options = new SingleOptionContainer(false);
 		options.addSOption(CONTINUE, msg.getInfo(
 				Messages.INFO_UI_FORM_CONTINUE));
 		options.addSOption(GOTO_PREV, msg.getInfo(
@@ -180,8 +179,6 @@ public class CLI_UserInterface implements UserInterface
 	public void open()
 	{
 		in = new Scanner(System.in);
-		ppc = new PROM_PREM_Collector(this);
-		(new Thread(ppc)).start();
 	}
 
 	/**
@@ -312,7 +309,7 @@ public class CLI_UserInterface implements UserInterface
 		form.jumpTo(Form.AT_BEGIN);
 		do
 		{
-			contents.put(id++, form.currentEntry().draw(this));
+			contents.put(id++, form.currentEntry().getDisplayable(this));
 		} while(!form.endOfForm() && form.nextEntry() != null);
 		return contents;
 	}
@@ -496,6 +493,4 @@ public class CLI_UserInterface implements UserInterface
 			sb.append(SEPARATION_CHARACTER);
 		separation = sb.toString();
 	}
-	
-	private PROM_PREM_Collector ppc;
 }

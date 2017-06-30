@@ -41,10 +41,23 @@ public class SingleOptionContainer extends FormContainer
 	private Integer selected;
 	
 	/**
-	 * Initializes variables
+	 * Initializes a single-option container that does not allow empty
+	 * entries;
 	 */
 	public SingleOptionContainer()
 	{
+		this(false);
+	}
+	
+	/**
+	 * Initializes variables
+	 * 
+	 * @param allowEmptyEntry True if this container allows empty entry
+	 * 		(answer/response).
+	 */
+	public SingleOptionContainer(boolean allowEmptyEntry)
+	{
+		super(allowEmptyEntry);
 		nextFC = prevFC = null;
 		options = new HashMap<Integer, SingleOption>();
 		nextOption = 0;
@@ -112,7 +125,7 @@ public class SingleOptionContainer extends FormContainer
 	}
 
 	@Override
-	public <T extends FormComponentDisplay> T draw(UserInterface ui)
+	public <T extends FormComponentDisplay> T getDisplayable(UserInterface ui)
 	{
 		return ui.createSingleOption(this);
 	}

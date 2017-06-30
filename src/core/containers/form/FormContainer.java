@@ -40,6 +40,12 @@ import core.interfaces.UserInterface.FormComponentDisplay;
 public abstract class FormContainer
 {
 	protected FormContainer nextFC, prevFC;
+	protected boolean allowEmpty;
+	
+	protected FormContainer(boolean allowEmpty)
+	{
+		this.allowEmpty = allowEmpty;
+	}
 	
 	/**
 	 * Draws the objects contained in this container.
@@ -57,7 +63,7 @@ public abstract class FormContainer
 	 * @return The (subclass of) Object that is returned from the
 	 * 		method in the UserInterface class
 	 */
-	public abstract <T extends FormComponentDisplay> T draw(UserInterface ui);
+	public abstract <T extends FormComponentDisplay> T getDisplayable(UserInterface ui);
 	
 	/**
 	 * Check if this form has been filled (i.e. an option has been
@@ -66,6 +72,15 @@ public abstract class FormContainer
 	 * @return True if this form has entry/entries. False if not.
 	 */
 	public abstract boolean hasEntry();
+	
+	/**
+	 * 
+	 * @return True if this container allows empty entries. False if not.
+	 */
+	public boolean allowsEmpty()
+	{
+		return allowEmpty;
+	}
 	
 	/**
 	 * Retrieves the next FContainer.

@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
-import core.interfaces.UserInterface.Function;
+import core.interfaces.UserInterface.ReturnFunction;
 
 /**
  * This interface contains the methods required by the core part of
@@ -74,13 +74,15 @@ public interface UserInterface
 	 * class.
 	 * 
 	 * @param form The form container that the user should fill in.
-	 * @param function The function that should be called when the form
+	 * @param retfun The function that should be called when the form
 	 * 		has been filled.
+	 * @param retpan The displayable object (panel) to return to when
+	 * 		this function has returned.
 	 * 
 	 * @return True if the form was filled. False if the form was not
 	 * 		fully filled in.
 	 */
-	public boolean presentForm(Form form, Function function);
+	public boolean presentForm(Form form, ReturnFunction retfun, Object retpan);
 	
 	/**
 	 * Creates an object that can store a single-option container.
@@ -142,14 +144,16 @@ public interface UserInterface
 	 *
 	 */
 	@FunctionalInterface
-	interface Function
+	interface ReturnFunction
 	{
 		/**
 		 * This function should be called when the UserInterface has
 		 * displayed a form and should return with the results.
 		 * 
 		 * @param form The form that you received
+		 * 
+		 * @return TODO
 		 */
-		void call(Form form);
+		boolean call(Form form);
 	}
 }

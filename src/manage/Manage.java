@@ -21,6 +21,7 @@ package manage;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import core.interfaces.Database;
 import core.interfaces.Encryption;
@@ -59,7 +60,11 @@ public class Manage
 	{
 		System.out.printf("Clinic?\n");
 		String clinic = in.next();
-		in.reset();
+		if (Pattern.compile("[^\\p{Print}]").matcher(clinic).find())
+		{
+			System.err.println("Using non-ascii characters may cause trouble. Exiting.");
+			return;
+		}
 		
 		db.addClinic(clinic);
 	}
@@ -71,11 +76,22 @@ public class Manage
 	 */
 	private void addUser()
 	{
+		Pattern validsRegEx = Pattern.compile("[^\\p{Print}]");
 		System.out.printf("Enter Username\n");
 		String user = in.next();
+		if (validsRegEx.matcher(user).find())
+		{
+			System.err.println("Using non-ascii characters may cause trouble. Exiting.");
+			return;
+		}
 
 		System.out.printf("Enter Password\n");
 		String password = in.next();
+		if (validsRegEx.matcher(password).find())
+		{
+			System.err.println("Using non-ascii characters may cause trouble. Exiting.");
+			return;
+		}
 
 		HashMap<Integer, String> clinics = db.getClinics();
 		if (clinics.size() == 0)

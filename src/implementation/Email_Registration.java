@@ -76,22 +76,25 @@ public class Email_Registration implements Registration
 	public void registrationProcess()
 	{
 		Form f = new Form();
-		FieldContainer name = new FieldContainer(NAME_STR);
+		FieldContainer name = new FieldContainer(false, false, NAME_STR);
 		f.insert(name, Form.AT_END);
-		FieldContainer email = new FieldContainer(EMAIL_STR);
+		FieldContainer email = new FieldContainer(false, false, EMAIL_STR);
 		f.insert(email, Form.AT_END);
-		FieldContainer clinic = new FieldContainer(CLINIC_STR);
+		FieldContainer clinic = new FieldContainer(false, false, CLINIC_STR);
 		f.insert(clinic, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
 		
-		ui.presentForm(f, this::regProcReturn);
+		ui.presentForm(f, this::regProcReturn, null);
 	}
 	
 	/**
 	 * registration process should run this function when it is done;
-	 * @param form
+	 * 
+	 * @param form The form that was sent to the UI.
+	 * 
+	 * @return True if the form was accepted.
 	 */
-	private void regProcReturn(Form form)
+	private boolean regProcReturn(Form form)
 	{
 		form.jumpTo(Form.AT_BEGIN);
 		FieldContainer name = (FieldContainer) form.currentEntry();
@@ -100,6 +103,10 @@ public class Email_Registration implements Registration
 		form.jumpTo(Form.AT_NEXT);
 		FieldContainer clinic = (FieldContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
+		if ((name.getEntry() == null || name.getEntry().isEmpty())
+				|| (email.getEntry() == null || email.getEntry().isEmpty())
+				|| (clinic.getEntry() == null || clinic.getEntry().isEmpty()))
+			return false;
 		
 		String emailSubject = Messages.getMessages().getInfo(
 				Messages.INFO_REG_EMAIL_SUBJECT);
@@ -112,6 +119,7 @@ public class Email_Registration implements Registration
 				emailDescription, NAME_STR, name.getEntry(), EMAIL_STR,
 				email.getEntry(), CLINIC_STR, clinic.getEntry(), emailSignature);
 		send(adminEmail, emailSubject, emailBody, "text/html");
+		return true;
 	}
 	
 	/* 

@@ -207,7 +207,7 @@ public class UserHandle
 		
 		ui.displayMessage(Messages.getMessages().getInfo(
 				Messages.INFO_NEW_PASS_INFO));
-		ui.presentForm(form, this::setPassReturn, null);
+		ui.presentForm(form, this::setPassReturn);
 	}
 	
 	/**

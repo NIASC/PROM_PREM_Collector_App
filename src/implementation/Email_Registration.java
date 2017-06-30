@@ -84,7 +84,7 @@ public class Email_Registration implements Registration
 		f.insert(clinic, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
 		
-		ui.presentForm(f, this::regProcReturn, null);
+		ui.presentForm(f, this::regProcReturn);
 	}
 	
 	/**

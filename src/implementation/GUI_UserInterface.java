@@ -1,4 +1,23 @@
-package Testing;
+/**
+ * Copyright 2017 Marcus Malmquist
+ * 
+ * This file is part of PROM_PREM_Collector.
+ * 
+ * PROM_PREM_Collector is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ * 
+ * PROM_PREM_Collector is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with PROM_PREM_Collector.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+package implementation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,13 +29,9 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,20 +39,23 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
 import core.UserHandle;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
+import core.containers.form.FormContainer;
 import core.containers.form.SingleOptionContainer;
 import core.interfaces.Messages;
 import core.interfaces.UserInterface;
+import implementation.containerdisplay.ContainerDisplays;
+import implementation.containerdisplay.FieldDisplay;
+import implementation.containerdisplay.SingleOptionDisplay;
 
-public class SwingUserInterface extends JApplet implements ActionListener, UserInterface
+public class GUI_UserInterface extends JApplet implements ActionListener, UserInterface
 {
-	public SwingUserInterface()
+	public GUI_UserInterface()
 	{
 		uh = new UserHandle(this);
 		initGUI();
@@ -147,31 +165,7 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	}
 
 	@Override
-	public int selectOption(String message, SingleOptionContainer options)
-	{
-		separate();
-		StringBuilder sb = new StringBuilder();
-		if (message != null)
-		{
-			sb.append(String.format("%s\n", message));
-		}
-		sb.append(String.format("%s\n",
-				Messages.getMessages().getInfo(
-						Messages.INFO_UI_SELECT_SINGLE)));
-		HashMap<Integer, String> opt = options.getSOptions();
-		for (Entry<Integer, String> e : opt.entrySet())
-			sb.append(String.format("%d: %s\n", e.getKey(), e.getValue()));
-		
-		int input = UserInterface.ERROR;
-		try
-		{
-			input = Integer.parseInt(getUserInput(sb.toString()));
-		} catch (NumberFormatException nfe) {}
-		return input;
-	}
-
-	@Override
-	public boolean presentForm(Form form, ReturnFunction function, Object retpan)
+	public boolean presentForm(Form form, ReturnFunction function)
 	{
 		Component panel = null;
 		synchronized(pageContent.getTreeLock())
@@ -242,19 +236,11 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		*/
 		return true;
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Override
-	public <T extends FormComponentDisplay> T createSingleOption(SingleOptionContainer soc)
+	public FormComponentDisplay getContainerDisplay(FormContainer fc)
 	{
-		return (T) new SingleOptionDisplay(soc);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends FormComponentDisplay> T createField(FieldContainer fc)
-	{
-		return (T) new FieldDisplay(fc);
+		return ContainerDisplays.getDisplay(fc);
 	}
 
 	@Override
@@ -309,10 +295,10 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	}
 	
 	/**
-	 * Prints a line of characters to make it simple for the user
-	 * to separate active interface stuff (forms, options, messages
-	 * etc.) from inactive interface stuff. This part may only be
-	 * relevant when using CLI.
+	 * Prints a line of characters to make it simple for the user to
+	 * separate active interface stuff (forms, options, messages etc.)
+	 * from inactive interface stuff. This part may only be relevant
+	 * when using CLI.
 	 */
 	private void separate()
 	{
@@ -337,7 +323,8 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	 * 
 	 * @return The new index after incrementing.
 	 */
-	private int getNextEntry(int cIndex, int nEntries, int steps, boolean wrap)
+	private int getNextEntry(int cIndex, int nEntries, int steps,
+			boolean wrap)
 	{
 		if (wrap)
 			return (cIndex + steps + nEntries) % nEntries;
@@ -389,8 +376,8 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	 * 		displayable objects.
 	 * 
 	 * @return A map of displayable objects constructed from the
-	 * 		supplied form. The keys are the ID (i.e. order of appearance)
-	 * 		and the values are the displayable objects.
+	 * 		supplied form. The keys are the ID (i.e. order of
+	 * 		appearance) and the values are the displayable objects.
 	 */
 	private HashMap<Integer, FormComponentDisplay> fillContents(Form form)
 	{
@@ -478,7 +465,8 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 				JButton b = (JButton)e.getSource();
 				if (b.getName().equals(login.getName()))
 				{
-					uh.login(usernameTF.getText(), new String(passwordTF.getPassword()));
+					uh.login(usernameTF.getText(),
+							new String(passwordTF.getPassword()));
 					if (uh.isLoggedIn())
 					{
 						usernameTF.setText(null);
@@ -572,142 +560,6 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 					setContent(retpan);
 				}
 			}
-		}
-	}
-	
-	/**
-	 * This class is a displayable wrapper the for SingleOption
-	 * container. In this implementation this class displays the
-	 * SingleOption container and stores the response.
-	 * In a GUI implementaion a corresponding class could just extend
-	 * a JComponent that specializes in displaying select-single-option
-	 * content and not necessarily displaying the content itself.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
-	private class SingleOptionDisplay extends JPanel implements FormComponentDisplay, ItemListener
-	{
-		private static final long serialVersionUID = 7314170750059865699L;
-		private SingleOptionContainer soc;
-		private int responseID;
-		
-		private HashMap<String, JRadioButton> options;
-		private ButtonGroup group;
-		
-		/**
-		 * Initializes login variables.
-		 * 
-		 * @param soc The instance of the SingleOptionContainer that
-		 * 		the instance of this SingleOptionDisplay should act as
-		 * 		a wrapper for.
-		 */
-		public SingleOptionDisplay(SingleOptionContainer soc)
-		{
-			setLayout(new GridLayout(0, 1));
-			this.soc = soc;
-
-			group = new ButtonGroup();
-			
-			HashMap<Integer, String> opt = soc.getSOptions();
-			options = new HashMap<String, JRadioButton>();
-			for (Entry<Integer, String> e : opt.entrySet())
-			{
-				JRadioButton btn = new JRadioButton(e.getValue());
-				btn.setName(e.getValue());
-				group.add(btn);
-				btn.addItemListener(this);
-				add(btn);
-				options.put(Integer.toString(e.getKey()), btn);
-			}
-		}
-		
-		@Override
-		public void requestFocus()
-		{
-			
-		}
-
-		@Override
-		public void itemStateChanged(ItemEvent ev)
-		{
-			boolean selected = (ev.getStateChange() == ItemEvent.SELECTED);
-			AbstractButton button = (AbstractButton) ev.getItemSelectable();
-			JRadioButton sel = options.get(button.getName());
-			if (sel == null)
-				return;
-			if (selected) {
-				responseID = Integer.parseInt(button.getName());
-			}
-		}
-
-		@Override
-		public boolean fillEntry()
-		{
-			return soc.setSelected(responseID);
-		}
-
-		@Override
-		public boolean entryFilled() 
-		{
-			return soc.hasEntry();
-		}
-	}
-	
-	/**
-	 * This class is a displayable wrapper the for the Field container. 
-	 * In this implementation this class displays the Field container
-	 * and stores the response.
-	 * In a GUI implementaion a corresponding class could just extend
-	 * a JComponent that specializes in displaying text field content
-	 * and not necessarily displaying the content itself.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
-	private class FieldDisplay extends JPanel implements FormComponentDisplay
-	{
-		private static final long serialVersionUID = 2210804480530383502L;
-
-		private FieldContainer fc;
-		
-		private JLabel fieldLabel;
-		private JTextField field;
-		
-		/**
-		 * Initializes login variables.
-		 * @param fc The instance of the FieldContainer that
-		 * 		the instance of this FieldDisplay should act as a
-		 * 		wrapper for.
-		 */
-		public FieldDisplay(FieldContainer fc)
-		{
-			setLayout(new BorderLayout());
-			this.fc = fc;
-			fieldLabel = new JLabel(fc.getStatement());
-			add(fieldLabel, BorderLayout.WEST);
-			field = fc.isSecret() ? new JPasswordField(32) : new JTextField(32);
-			field.setPreferredSize(new Dimension(80, 25));
-			add(field, BorderLayout.CENTER);
-		}
-		
-		@Override
-		public void requestFocus()
-		{
-			field.requestFocus();
-		}
-
-		@Override
-		public boolean fillEntry()
-		{
-			fc.setEntry(field.getText());
-			return true;
-		}
-
-		@Override
-		public boolean entryFilled()
-		{
-			return fc.hasEntry();
 		}
 	}
 	

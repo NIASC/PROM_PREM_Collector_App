@@ -125,12 +125,6 @@ public class SingleOptionContainer extends FormContainer
 	}
 
 	@Override
-	public <T extends FormComponentDisplay> T getDisplayable(UserInterface ui)
-	{
-		return ui.createSingleOption(this);
-	}
-
-	@Override
 	public boolean hasEntry()
 	{
 		return selected != null;

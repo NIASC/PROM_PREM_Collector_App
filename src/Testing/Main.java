@@ -19,69 +19,20 @@
  */
 package Testing;
 
-import java.awt.GraphicsEnvironment;
-
-import core.UserHandle;
-import core.containers.User;
-import core.interfaces.Database;
-import core.interfaces.Implementations;
 import core.interfaces.Messages;
-import core.interfaces.UserInterface;
+import implementation.GUI_UserInterface;
 
 public class Main
 {
 	public static void main(String[] args)
 	{
-		/*
-		Database db = Implementations.Database();
-		db.connect();
-		for (int i = 0; i < 20; ++i)
-		{
-			(new Thread(new tClass(db))).start();
-		}
-		*/
-		
 		//printFonts();
 		if (!Messages.getMessages().loadMessages())
 		{
 			System.out.printf("%s\n", Messages.DATABASE_ERROR);
 			System.exit(1);
 		}
-		SwingUserInterface qf1 = new SwingUserInterface();
+		GUI_UserInterface qf1 = new GUI_UserInterface();
 		qf1.start();
-		
-		/*
-		CLI_UserInterface ui = new CLI_UserInterface();
-		ui.open();
-		 */
-	}
-	
-	public static class tClass implements Runnable
-	{
-		Database db;
-		public tClass(Database db)
-		{
-			this.db = db;
-		}
-		@Override
-		public void run() {
-			for (int i = 0; i < 10; ++i)
-			{
-				User user = db.getUser("user#0");
-				System.out.printf("%s, %b\n", user.getUsername(), user.passwordMatch("p4ssw0rd"));
-			}
-		}
-		
-	}
-	
-	public static void printFonts()
-	{
-		String fonts[] = 
-				GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-		
-		for ( int i = 0; i < fonts.length; i++ )
-		{
-			System.out.println(fonts[i]);
-		}
 	}
 }

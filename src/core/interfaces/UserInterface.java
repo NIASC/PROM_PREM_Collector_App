@@ -19,13 +19,8 @@
  */
 package core.interfaces;
 
-
-import javax.swing.JPanel;
-
 import core.containers.Form;
-import core.containers.form.FieldContainer;
-import core.containers.form.SingleOptionContainer;
-import core.interfaces.UserInterface.ReturnFunction;
+import core.containers.form.FormContainer;
 
 /**
  * This interface contains the methods required by the core part of
@@ -38,8 +33,6 @@ import core.interfaces.UserInterface.ReturnFunction;
  */
 public interface UserInterface
 {
-	public static final int ERROR = -1;
-	
 	/**
 	 * Presents an error message to the user. The message
 	 * should contain clear information about why the error
@@ -58,15 +51,6 @@ public interface UserInterface
 	public void displayMessage(String message);
 	
 	/**
-	 * Displays options and require the user to select one of them.
-	 * @param message A message to display along with the options.
-	 * @param options The options to display.
-	 * 
-	 * @return The id of the selected option
-	 */
-	public int selectOption(String message, SingleOptionContainer options);
-	
-	/**
 	 * Presents a form that the user should fill in. The form has
 	 * entries which follows the specifications of the abstract class
 	 * core.containers.FormContainer. One of those specifications are
@@ -76,43 +60,23 @@ public interface UserInterface
 	 * @param form The form container that the user should fill in.
 	 * @param retfun The function that should be called when the form
 	 * 		has been filled.
-	 * @param retpan The displayable object (panel) to return to when
-	 * 		this function has returned.
-	 * 
 	 * @return True if the form was filled. False if the form was not
 	 * 		fully filled in.
 	 */
-	public boolean presentForm(Form form, ReturnFunction retfun, Object retpan);
+	public boolean presentForm(Form form, ReturnFunction retfun);
 	
 	/**
-	 * Creates an object that can store a single-option container.
-	 * The function should return that object, or an Integer containing
-	 * the ID of the selected option if the method itself presents the
-	 * options from the single-option container.
+	 * Creates an object that can store a form container.
 	 * 
-	 * @param soc The container that stores the options.
+	 * @param fc The form container object.
 	 * 
-	 * @return The object that stores the container and implements
-	 * 		FormComponentDisplay.
+	 * @return An object that that can display the form container.
 	 */
-	public <T extends FormComponentDisplay> T createSingleOption(SingleOptionContainer soc);
-	
-	/**
-	 * Creates an object that can store a field container.
-	 * The function should return that object, or a string containing
-	 * the ID of the selected option if the method itself presents the
-	 * options from the single-option container.
-	 * 
-	 * @param fc
-	 * 
-	 * @return The object that stores the container and implements
-	 * 		FormComponentDisplay.
-	 */
-	public <T extends FormComponentDisplay> T createField(FieldContainer fc);
+	public FormComponentDisplay getContainerDisplay(FormContainer fc);
 
 	/**
-	 * This interface contains a set of functions that every class that
-	 * presents form entry objects must implement.
+	 * This interface contains a set of functions that every class
+	 * that presents form entry objects must implement.
 	 * 
 	 * @author Marcus Malmquist
 	 *

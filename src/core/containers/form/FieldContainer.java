@@ -128,12 +128,6 @@ public class FieldContainer extends FormContainer
 	}
 
 	@Override
-	public <T extends FormComponentDisplay> T getDisplayable(UserInterface ui)
-	{
-		return ui.createField(this);
-	}
-
-	@Override
 	public boolean hasEntry()
 	{
 		return field.getValue() != null

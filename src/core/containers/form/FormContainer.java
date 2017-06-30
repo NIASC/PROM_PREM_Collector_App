@@ -63,7 +63,10 @@ public abstract class FormContainer
 	 * @return The (subclass of) Object that is returned from the
 	 * 		method in the UserInterface class
 	 */
-	public abstract <T extends FormComponentDisplay> T getDisplayable(UserInterface ui);
+	public FormComponentDisplay getDisplayable(UserInterface ui)
+	{
+		return ui.getContainerDisplay(this);
+	}
 	
 	/**
 	 * Check if this form has been filled (i.e. an option has been

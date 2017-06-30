@@ -619,7 +619,6 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 	
 	/**
------------------------------------------------------------------------_--------
 	 * This class should create a form. a form should have two types of
 	 * layout:
 	 * 		* One question at a time

@@ -489,6 +489,7 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 				else if (b.getName().equals(register.getName()))
 				{
 					System.out.println("Register clicked");
+					uh.register();
 				}
 				else if (b.getName().equals(exit.getName()))
 				{

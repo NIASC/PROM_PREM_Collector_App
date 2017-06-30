@@ -45,6 +45,19 @@ import core.interfaces.UserInterface;
  */
 public class Email_Registration implements Registration
 {
+	private static final String NAME_STR, EMAIL_STR, CLINIC_STR;
+	
+	/* initialize static (final) variables */
+	static
+	{
+		NAME_STR = Messages.getMessages().getInfo(
+				Messages.INFO_REG_USER_NAME);
+		EMAIL_STR = Messages.getMessages().getInfo(
+				Messages.INFO_REG_USER_EMAIL);
+		CLINIC_STR = Messages.getMessages().getInfo(
+				Messages.INFO_REG_CLINIC_NAME);
+	}
+	
 	/**
 	 * Initializes Mailer class and loads configuration.
 	 */
@@ -62,22 +75,31 @@ public class Email_Registration implements Registration
 	@Override
 	public void registrationProcess()
 	{
-		String nameStr = Messages.getMessages().getInfo(
-				Messages.INFO_REG_USER_NAME);
-		String emailStr = Messages.getMessages().getInfo(
-				Messages.INFO_REG_USER_EMAIL);
-		String clinicStr = Messages.getMessages().getInfo(
-				Messages.INFO_REG_CLINIC_NAME);
 		Form f = new Form();
-		FieldContainer name = new FieldContainer(nameStr);
+		FieldContainer name = new FieldContainer(NAME_STR);
 		f.insert(name, Form.AT_END);
-		FieldContainer email = new FieldContainer(emailStr);
+		FieldContainer email = new FieldContainer(EMAIL_STR);
 		f.insert(email, Form.AT_END);
-		FieldContainer clinic = new FieldContainer(clinicStr);
+		FieldContainer clinic = new FieldContainer(CLINIC_STR);
 		f.insert(clinic, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
-		if (!ui.presentForm(f, this::regProcReturn))
-			return;
+		
+		ui.presentForm(f, this::regProcReturn);
+	}
+	
+	/**
+	 * registration process should run this function when it is done;
+	 * @param form
+	 */
+	private void regProcReturn(Form form)
+	{
+		form.jumpTo(Form.AT_BEGIN);
+		FieldContainer name = (FieldContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
+		FieldContainer email = (FieldContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
+		FieldContainer clinic = (FieldContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
 		
 		String emailSubject = Messages.getMessages().getInfo(
 				Messages.INFO_REG_EMAIL_SUBJECT);
@@ -87,18 +109,9 @@ public class Email_Registration implements Registration
 				Messages.INFO_REG_EMAIL_SIGNATURE);
 		String emailBody = String.format(
 				("%s:<br><br> %s: %s<br>%s: %s<br>%s: %s<br><br> %s"),
-				emailDescription, nameStr, name.getEntry(), emailStr,
-				email.getEntry(), clinicStr, clinic.getEntry(), emailSignature);
+				emailDescription, NAME_STR, name.getEntry(), EMAIL_STR,
+				email.getEntry(), CLINIC_STR, clinic.getEntry(), emailSignature);
 		send(adminEmail, emailSubject, emailBody, "text/html");
-	}
-	
-	/**
-	 * registration process should run this function when it is done;
-	 * @param form
-	 */
-	private void regProcReturn(Form form)
-	{
-		System.out.println("Returned from registration!");
 	}
 	
 	/* 

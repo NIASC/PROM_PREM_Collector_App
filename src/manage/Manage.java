@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import core.containers.User;
 import core.interfaces.Database;
 import core.interfaces.Encryption;
 import core.interfaces.Implementations;
@@ -63,33 +64,39 @@ public class Manage
 	 */
 	public void runManager()
 	{
+		boolean exit = false;
 		final int EXIT = 0, ADD_CLINIC = 1, ADD_USER = 2;
-		System.out.printf(
-				"What would you like to do?\n%d: %s\n%d: %s\n%d: %s\n",
-				ADD_CLINIC, "Add Clinic",
-				ADD_USER, "Add user",
-				EXIT, "Exit");
-		int input = EXIT;
-		if (in.hasNextInt())
-			input = in.nextInt();
-		else
+		while (!exit)
 		{
-			in.next();
-			System.out.printf("Unknown option. Exting\n");
-			System.exit(1);
-		}
-		switch (input)
-		{
-		case EXIT:
-			break;
-		case ADD_CLINIC:
-			addClinic();
-			break;
-		case ADD_USER:
-			addUser();
-			break;
-		default:
-			break;
+			System.out.printf(
+					"What would you like to do?\n%d: %s\n%d: %s\n%d: %s\n",
+					ADD_CLINIC, "Add Clinic",
+					ADD_USER, "Add user",
+					EXIT, "Exit");
+			int input = EXIT;
+			if (in.hasNextInt())
+				input = in.nextInt();
+			else
+			{
+				in.next();
+				System.out.printf("Unknown option.\n\n");
+				continue;
+			}
+			switch (input)
+			{
+			case EXIT:
+				exit = true;
+				break;
+			case ADD_CLINIC:
+				addClinic();
+				break;
+			case ADD_USER:
+				addUser();
+				break;
+			default:
+				System.out.printf("Unknown option.\n\n");
+				break;
+			}
 		}
 	}
 	
@@ -104,14 +111,23 @@ public class Manage
 	 */
 	private void addClinic()
 	{
+		HashMap<Integer, String> clinics = db.getClinics();
+		System.out.printf("Existing clinics:\n");
+		for (Entry<Integer, String> e : clinics.entrySet())
+			System.out.printf("%4d: %s\n", e.getKey(), e.getValue());
 		System.out.printf("Clinic?\n");
 		String clinic = in.next();
 		if (Pattern.compile("[^\\p{Print}]").matcher(clinic).find())
 		{
-			System.err.println("Using non-ascii characters may cause trouble. Exiting.");
+			System.out.printf("Using non-ascii characters may cause trouble.\n\n");
 			return;
 		}
-		
+		for (String s : clinics.values())
+			if (s.equals(clinic))
+			{
+				System.out.printf("That clinic already exist.\n\n");
+				return;
+			}
 		db.addClinic(clinic);
 	}
 	
@@ -123,29 +139,34 @@ public class Manage
 	private void addUser()
 	{
 		Pattern validsRegEx = Pattern.compile("[^\\p{Print}]");
-		System.out.printf("Enter Username\n");
+		System.out.printf("Enter Username:\n");
 		String user = in.next();
 		if (validsRegEx.matcher(user).find())
 		{
-			System.err.println("Using non-ascii characters may cause trouble. Exiting.");
+			System.out.printf("Using non-ascii characters may cause trouble.\n\n");
+			return;
+		}
+		if (db.getUser(user) != null)
+		{
+			System.out.printf("That username is not available.\n\n");
 			return;
 		}
 
-		System.out.printf("Enter Password\n");
+		System.out.printf("Enter Password:\n");
 		String password = in.next();
 		if (validsRegEx.matcher(password).find())
 		{
-			System.err.println("Using non-ascii characters may cause trouble. Exiting.");
+			System.out.printf("Using non-ascii characters may cause trouble.\n\n");
 			return;
 		}
 
 		HashMap<Integer, String> clinics = db.getClinics();
 		if (clinics.size() == 0)
 		{
-			System.out.printf("There are no clinics in the database\n");
+			System.out.printf("There are no clinics in the database.\n\n");
 			return;
 		}
-		System.out.printf("Select Clinic\n");
+		System.out.printf("Select Clinic:\n");
 		for (Entry<Integer, String> e : clinics.entrySet())
 			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
 		Integer clinic = null;
@@ -154,11 +175,11 @@ public class Manage
 		else
 		{
 			in.next();
-			System.out.printf("No such clinic.\n");
+			System.out.printf("No such clinic.\n\n");
 			return;
 		}
 
-		System.out.printf("Enter Email\n");
+		System.out.printf("Enter Email:\n");
 		String email = in.next();
 		Encryption crypto = Implementations.Encryption();
 		String salt = crypto.getNewSalt();

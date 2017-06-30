@@ -5,4 +5,9 @@ build/
 .project
 *~
 PROM_PREM_Collector.jar
-src/implementation/mailaccount_settings.ini
+flowchart/**/*.aux
+flowchart/**/*.log
+flowchart/**/*.out
+flowchart/**/*.pdf
+flowchart/**/*.tex
+flowchart/**/*.txt

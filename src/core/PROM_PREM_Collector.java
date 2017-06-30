@@ -82,6 +82,14 @@ public class PROM_PREM_Collector implements Runnable
 	 */
 	private boolean loginOptions()
 	{
+		/*
+		ui.displayLoginScreen(userHandle::loginReturn);
+		*/
+		synchronized(this)
+		{
+			try { wait(); } catch (InterruptedException ie) {}
+		}
+		/*
 		final int ERROR = 0, LOGIN = 1, REGISTER = 2, EXIT = 3;
 		SingleOptionContainer options = new SingleOptionContainer();
 		options.addSOption(LOGIN, Messages.getMessages().getInfo(
@@ -113,6 +121,7 @@ public class PROM_PREM_Collector implements Runnable
 				break;
 			}
 		}
+		*/
 		return false;
 	}
 	

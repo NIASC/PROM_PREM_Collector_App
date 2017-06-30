@@ -19,6 +19,8 @@
  */
 package core.interfaces;
 
+import core.containers.Form;
+
 /**
  * This interface contains the methods required by the core part of
  * this program to function. The purpose of this interface is to give

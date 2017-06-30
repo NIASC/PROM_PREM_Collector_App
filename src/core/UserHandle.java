@@ -68,26 +68,9 @@ public class UserHandle implements Runnable
 	 * (which can be used to verify that the user has logged in using
 	 * the function isLoggedIn).
 	 */
-	public void login()
+	public void login(String username, String password)
 	{
-		if (loggedIn)
-			return;
-		
-		Form f = new Form();
-		FieldContainer usrnam = new FieldContainer(
-				Messages.getMessages().getInfo(
-						Messages.INFO_UH_ENTER_USERNAME));
-		f.insert(usrnam, Form.AT_END);
-		FieldContainer pswrd = new FieldContainer(
-				Messages.getMessages().getInfo(
-						Messages.INFO_UH_ENTER_PASSWORD));
-		f.insert(pswrd, Form.AT_END);
-		f.jumpTo(Form.AT_BEGIN);
-		
-		if (!ui.presentForm(f))
-			return;
-		
-		if (!validateDetails(usrnam.getEntry(), pswrd.getEntry()))
+		if (!validateDetails(username, password))
 		{
 			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_INVALID_LOGIN));
@@ -217,7 +200,7 @@ public class UserHandle implements Runnable
 		{
 			ui.displayMessage(Messages.getMessages().getInfo(
 					Messages.INFO_NEW_PASS_INFO));
-			if (!ui.presentForm(form))
+			if (!ui.presentForm(form, this::setPassReturn))
 				return;
 			if (newPassError(
 					currentPassword.getEntry(),
@@ -242,6 +225,11 @@ public class UserHandle implements Runnable
 			user = tmpUser;
 		else
 			ui.displayError(Messages.DATABASE_ERROR);
+	}
+	
+	private void setPassReturn(Form form)
+	{
+		System.out.println("Returned from set password!");
 	}
 	
 	/**

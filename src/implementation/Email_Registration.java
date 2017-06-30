@@ -76,7 +76,7 @@ public class Email_Registration implements Registration
 		FieldContainer clinic = new FieldContainer(clinicStr);
 		f.insert(clinic, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
-		if (!ui.presentForm(f))
+		if (!ui.presentForm(f, this::regProcReturn))
 			return;
 		
 		String emailSubject = Messages.getMessages().getInfo(
@@ -90,6 +90,15 @@ public class Email_Registration implements Registration
 				emailDescription, nameStr, name.getEntry(), emailStr,
 				email.getEntry(), clinicStr, clinic.getEntry(), emailSignature);
 		send(adminEmail, emailSubject, emailBody, "text/html");
+	}
+	
+	/**
+	 * registration process should run this function when it is done;
+	 * @param form
+	 */
+	private void regProcReturn(Form form)
+	{
+		System.out.println("Returned from registration!");
 	}
 	
 	/* 

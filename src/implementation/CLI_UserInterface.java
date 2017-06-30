@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 
 import java.util.Scanner;
 
+import javax.swing.JPanel;
+
 import core.PROM_PREM_Collector;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
@@ -94,7 +96,7 @@ public class CLI_UserInterface implements UserInterface
 	}
 
 	@Override
-	public boolean presentForm(Form form)
+	public boolean presentForm(Form form, Function function)
 	{
 		HashMap<Integer, ExtraImplementation> components = fillContents(form);
 		int nEntries = components.size();

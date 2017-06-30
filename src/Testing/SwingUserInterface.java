@@ -2,26 +2,34 @@ package Testing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 
 import core.PROM_PREM_Collector;
+import core.UserHandle;
 import core.containers.Form;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
@@ -33,6 +41,7 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	public SwingUserInterface()
 	{
 		ppc = new PROM_PREM_Collector(this);
+		uh = new UserHandle(this);
 		initGUI();
 	}
 	
@@ -43,7 +52,10 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		setLayout(new BorderLayout());
 		
 		// panel for displaying and questions and answers
-		add(console = new SwingConsole(), BorderLayout.CENTER);
+		pageContent = new JPanel(new BorderLayout());
+		pageContent.setPreferredSize(new Dimension(500,400));
+		setContent(new LoginScreen());
+		add(pageContent, BorderLayout.CENTER);
 		
 		// panel with buttons
 		add(makeMenuPanel(), BorderLayout.NORTH);
@@ -51,7 +63,7 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		// set focus to answer field
 		frame.addWindowListener( new WindowAdapter() {
 			public void windowOpened( WindowEvent e ){
-				console.requestFocus();
+				pageContent.requestFocus();
 			}
 		});
 
@@ -167,8 +179,14 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	}
 
 	@Override
-	public boolean presentForm(Form form)
+	public boolean presentForm(Form form, Function function)
 	{
+		pageContent.removeAll();
+		pageContent.add(new GUIForm(form, function), BorderLayout.CENTER);
+		pageContent.revalidate();
+		pageContent.repaint();
+		frame.pack();
+		/*
 		HashMap<Integer, ExtraImplementation> components = fillContents(form);
 		int nEntries = components.size();
 
@@ -228,6 +246,7 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 				break;
 			}
 		}
+		*/
 		return true;
 	}
 
@@ -235,14 +254,14 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	@Override
 	public <T extends FormComponentDisplay> T createSingleOption(SingleOptionContainer soc)
 	{
-		return (T) new SingleOptionDisplay(this, soc);
+		return (T) new SingleOptionDisplay(soc);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends FormComponentDisplay> T createField(FieldContainer fc)
 	{
-		return (T) new FieldDisplay(this, fc);
+		return (T) new FieldDisplay(fc);
 	}
 
 	@Override
@@ -269,7 +288,7 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		/* when the user returns to the webpage */
 		System.out.println("Applet started");
 		/* Maybe reload cached session?         */
-		
+
 		ppc = new PROM_PREM_Collector(this);
 		thread = new Thread(ppc);
 		thread.start();
@@ -298,8 +317,11 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	 */
 	private String getUserInput(String message)
 	{
-		console.displayNewQuestion(message);
-		return console.getUserInput();
+		/*
+		pageContent.displayNewQuestion(message);
+		return pageContent.getUserInput();
+		*/
+		return null;
 	}
 	
 	/**
@@ -310,7 +332,10 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	 */
 	private void separate()
 	{
-		console.clearDisplayQuestion();
+		/*
+		pageContent.clearDisplayQuestion();
+		*/
+		return;
 	}
 	
 	/**
@@ -362,7 +387,7 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	 * 		and not found an unfilled entry.
 	 */
 	private int getNextUnfilledEntry(int currentIdx,
-			HashMap<Integer, ExtraImplementation> form)
+			HashMap<Integer, FormComponentDisplay> form)
 	{
 		int entries = form.size();
 		int i = getNextEntry(currentIdx, entries, 1, true);
@@ -383,10 +408,10 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	 * 		supplied form. The keys are the ID (i.e. order of appearance)
 	 * 		and the values are the displayable objects.
 	 */
-	private HashMap<Integer, ExtraImplementation> fillContents(Form form)
+	private HashMap<Integer, FormComponentDisplay> fillContents(Form form)
 	{
-		HashMap<Integer, ExtraImplementation> contents =
-				new HashMap<Integer, ExtraImplementation>();
+		HashMap<Integer, FormComponentDisplay> contents =
+				new HashMap<Integer, FormComponentDisplay>();
 		int id = 0;
 		form.jumpTo(Form.AT_BEGIN);
 		do
@@ -395,23 +420,141 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		} while(!form.endOfForm() && form.nextEntry() != null);
 		return contents;
 	}
-	
-	/**
-	 * This interface Is a superset of the FormComponentDisplay and
-	 * contains a set of methods that are require for this particular
-	 * implementation of the user interface to work.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
-	private interface ExtraImplementation extends FormComponentDisplay
+	private class LoginScreen extends JPanel implements ActionListener
 	{
-		/**
-		 * This method presents the container and stores the response
-		 * from the user. It is up to the implementation of this method
-		 * to prevent null/empty entries.
-		 */
-		public void present();
+		private static final long serialVersionUID = 2352904758935918090L;
+		private JPanel buttons, entryfields;
+		private JButton login, register, exit;
+		private JLabel usernameL, passwordL;
+		private JTextField usernameTF;
+		private JPasswordField passwordTF;
+
+		public LoginScreen()
+		{
+			/* button panel */
+			buttons = new JPanel(new GridLayout(1, 3));
+			login = new JButton("Login");
+			login.setName("login");
+			login.addActionListener(this);
+			register = new JButton("Register");
+			register.setName("register");
+			register.addActionListener(this);
+			exit = new JButton("Exit");
+			exit.setName("exit");
+			exit.addActionListener(this);
+			buttons.add(login);
+			buttons.add(register);
+			buttons.add(exit);
+			
+			/* entry fields */
+			entryfields = new JPanel(new BorderLayout());
+			
+			JPanel labels = new JPanel(new GridLayout(2, 1));
+			usernameL = new JLabel("Username");
+			labels.add(usernameL);
+			passwordL = new JLabel("Password");
+			labels.add(passwordL);
+			
+			JPanel tfields = new JPanel(new GridLayout(2, 1));
+			Dimension d = new Dimension(80, 25);
+			usernameTF = new JTextField(20);
+			usernameTF.setName("usernameTF");
+			usernameTF.addActionListener(this);
+			usernameTF.setPreferredSize(d);
+			tfields.add(usernameTF);
+			passwordTF = new JPasswordField(32);
+			passwordTF.setName("passwordTF");
+			passwordTF.addActionListener(this);
+			passwordTF.setPreferredSize(d);
+			tfields.add(passwordTF);
+			entryfields.add(labels, BorderLayout.WEST);
+			entryfields.add(tfields, BorderLayout.CENTER);
+			
+			add(entryfields, BorderLayout.CENTER);
+			add(buttons, BorderLayout.SOUTH);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			if (e.getSource() instanceof JButton)
+			{
+				JButton b = (JButton)e.getSource();
+				if (b.getName().equals(login.getName()))
+				{
+					uh.login(usernameTF.getText(), new String(passwordTF.getPassword()));
+					if (uh.isLoggedIn())
+						setContent(new WelcomeScreen());
+				}
+				else if (b.getName().equals(register.getName()))
+				{
+					System.out.println("Register clicked");
+				}
+				else if (b.getName().equals(exit.getName()))
+				{
+					System.out.println("Exit clicked");
+				}
+			}
+			else if (e.getSource() instanceof JTextField)
+			{
+				JTextField tf = (JTextField)e.getSource();
+				if (tf.getName().equals(usernameTF.getName()))
+				{
+					passwordTF.requestFocus();
+				}
+				else if (tf.getName().equals(passwordTF.getName()))
+				{
+					login.requestFocus();
+				}
+			}
+		}
+	}
+	
+	private class WelcomeScreen extends JPanel implements ActionListener
+	{
+		private JPanel buttons;
+		private JButton questionnaire, viewData, logout;
+		
+		public WelcomeScreen()
+		{
+			setLayout(new BorderLayout());
+			buttons = new JPanel(new GridLayout(1, 3));
+			questionnaire = new JButton("Start questionnaire");
+			questionnaire.setName("questionnaire");
+			questionnaire.addActionListener(this);
+			viewData = new JButton("View Statistics");
+			viewData.setName("viewData");
+			viewData.addActionListener(this);
+			logout = new JButton("Log out");
+			logout.setName("logout");
+			logout.addActionListener(this);
+			buttons.add(questionnaire);
+			buttons.add(viewData);
+			buttons.add(logout);
+			
+			add(buttons, BorderLayout.NORTH);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			if (e.getSource() instanceof JButton)
+			{
+				JButton b = (JButton)e.getSource();
+				if (b.getName().equals(questionnaire.getName()))
+				{
+					// start questionnaire
+				}
+				else if (b.getName().equals(viewData.getName()))
+				{
+					// view data
+				}
+				else if (b.getName().equals(logout.getName()))
+				{
+					// logout and display login screen
+				}
+			}
+		}
 	}
 	
 	/**
@@ -425,25 +568,52 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private class SingleOptionDisplay implements ExtraImplementation
+	private class SingleOptionDisplay extends JPanel implements FormComponentDisplay, ItemListener
 	{
 		private SingleOptionContainer soc;
-		private UserInterface ui;
 		private int responseID;
+		
+		private HashMap<String, JRadioButton> options;
+		private ButtonGroup group;
 		
 		/**
 		 * Initializes login variables.
 		 * 
-		 * @param ui The instance of the active UserInterface object.
 		 * @param soc The instance of the SingleOptionContainer that
 		 * 		the instance of this SingleOptionDisplay should act as
 		 * 		a wrapper for.
 		 */
-		public SingleOptionDisplay(UserInterface ui,
-				SingleOptionContainer soc)
+		public SingleOptionDisplay(SingleOptionContainer soc)
 		{
-			this.ui = ui;
+			setLayout(new GridLayout(0, 1));
 			this.soc = soc;
+
+			group = new ButtonGroup();
+			
+			HashMap<Integer, String> opt = soc.getSOptions();
+			options = new HashMap<String, JRadioButton>();
+			for (Entry<Integer, String> e : opt.entrySet())
+			{
+				JRadioButton btn = new JRadioButton(e.getValue());
+				btn.setName(e.getValue());
+				group.add(btn);
+				btn.addItemListener(this);
+				add(btn);
+				options.put(Integer.toString(e.getKey()), btn);
+			}
+		}
+
+		@Override
+		public void itemStateChanged(ItemEvent ev)
+		{
+			boolean selected = (ev.getStateChange() == ItemEvent.SELECTED);
+			AbstractButton button = (AbstractButton) ev.getItemSelectable();
+			JRadioButton sel = options.get(button.getName());
+			if (sel == null)
+				return;
+			if (selected) {
+				responseID = Integer.parseInt(button.getName());
+			}
 		}
 
 		@Override
@@ -456,41 +626,6 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		public boolean entryFilled() 
 		{
 			return soc.hasEntry();
-		}
-
-		@Override
-		public void present()
-		{
-			boolean done = false;
-			while (!done)
-			{
-				separate();
-				StringBuilder sb = new StringBuilder();
-				sb.append(String.format("%s\n",
-						Messages.getMessages().getInfo(
-								Messages.INFO_UI_SELECT_SINGLE)));
-				HashMap<Integer, String> opt = soc.getSOptions();
-				Integer selected = soc.getSelected();
-				for (Entry<Integer, String> e : opt.entrySet())
-				{
-					Integer id = e.getKey();
-					if (selected != null && id == selected)
-						sb.append(String.format("[%d]: %s\n", id, e.getValue()));
-					else
-						sb.append(String.format(" %d : %s\n", id, e.getValue()));
-				}
-				
-				try
-				{
-					responseID = Integer.parseInt(getUserInput(sb.toString()));
-				} catch (NumberFormatException nfe) {}
-				if (opt.containsKey(responseID))
-					done = true;
-				else
-					ui.displayError(Messages.getMessages().getError(
-							Messages.ERROR_UNKNOWN_RESPONSE));
-				
-			}
 		}
 	}
 	
@@ -505,31 +640,34 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private class FieldDisplay implements ExtraImplementation
+	private class FieldDisplay extends JPanel implements FormComponentDisplay
 	{
-		private UserInterface ui;
 		private FieldContainer fc;
-		private String entry;
+		
+		private JLabel fieldLabel;
+		private JTextField field;
 		
 		/**
 		 * Initializes login variables.
-		 * 
-		 * @param ui The instance of the active UserInterface object.
 		 * @param fc The instance of the FieldContainer that
 		 * 		the instance of this FieldDisplay should act as a
 		 * 		wrapper for.
 		 */
-		public FieldDisplay(UserInterface ui, FieldContainer fc)
+		public FieldDisplay(FieldContainer fc)
 		{
-			this.ui = ui;
+			setLayout(new BorderLayout());
 			this.fc = fc;
-			entry = null;
+			fieldLabel = new JLabel(fc.getStatement());
+			add(fieldLabel, BorderLayout.WEST);
+			field = new JTextField(20);
+			field.setPreferredSize(new Dimension(80, 25));
+			add(field, BorderLayout.CENTER);
 		}
 
 		@Override
 		public boolean fillEntry()
 		{
-			fc.setEntry(entry);
+			fc.setEntry(field.getText());
 			return true;
 		}
 
@@ -538,25 +676,138 @@ public class SwingUserInterface extends JApplet implements ActionListener, UserI
 		{
 			return fc.hasEntry();
 		}
-
-		@Override
-		public void present()
+	}
+	
+	/**
+	 * This class should create a form. a form should have two types of
+	 * layout:
+	 * 		* One question at a time
+	 * 		* All (or as many as the page cant fit) questions at a time.
+	 * 
+	 * Ths class should have methods to display the questions. should pass
+	 * the caller to this object, or like a template class that contains the
+	 * instance of the class, so we know where to return when the user has
+	 * filled in the form.
+	 * 
+	 * @author marcus
+	 *
+	 */
+	private class GUIForm extends JPanel implements ActionListener
+	{
+		private final int nEntries;
+		private int cIdx;
+		private Messages msg = Messages.getMessages();
+		
+		private JPanel formControl, formContent;
+		private JButton fc_continue, fc_previous, fc_next;
+		
+		private final HashMap<Integer, FormComponentDisplay> components;
+		private final Form form;
+		private final Function function;
+		
+		public GUIForm(Form form, final Function function)
 		{
-			separate();
-			StringBuilder sb = new StringBuilder();
-			String cEntry = fc.getEntry();
-			sb.append(String.format("%s: %s\n", fc.getStatement(),
-					(cEntry == null ? "" : cEntry)));
-			entry = getUserInput(sb.toString());
+			this.form = form;
+			this.function = function;
+			
+			setLayout(new BorderLayout());
+			components = fillContents(form); // TODO: move this function here
+			nEntries = components.size();
+			formControl = initControlPanel();
+			formContent = new JPanel(new GridLayout(0, 1));
+			add(formContent, BorderLayout.CENTER);
+			add(formControl, BorderLayout.SOUTH);
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			if (e.getSource() instanceof JButton)
+			{
+				JButton b = (JButton)e.getSource();
+				synchronized (this)
+				{ // because of cIdx
+					if (b.getName().equals(fc_continue.getName()))
+					{
+						components.get(cIdx).fillEntry();
+						int nextComponent = getNextUnfilledEntry(
+								cIdx, components);
+						if (nextComponent == cIdx)
+						{
+							/* this form has been filled. should return */
+							/* to where this function was called from.  */
+							function.call(form);
+						}
+						else
+						{
+							cIdx = nextComponent;
+							formContent.removeAll();
+							formContent.add((Component)components.get(cIdx));
+							formContent.revalidate();
+							formContent.repaint();
+						}
+					}
+					else if (b.getName().equals(fc_previous.getName()))
+					{
+						cIdx = getNextEntry(cIdx, nEntries, -1, false);
+						formContent.removeAll();
+						formContent.add((Component)components.get(cIdx));
+						formContent.revalidate();
+						formContent.repaint();
+					}
+					else if (b.getName().equals(fc_next.getName()))
+					{
+						cIdx = getNextEntry(cIdx, nEntries, 1, false);
+						formContent.removeAll();
+						formContent.add((Component)components.get(cIdx));
+						formContent.revalidate();
+						formContent.repaint();
+					}
+				} // end synchronized block
+			}
+		}
+		
+		private JPanel initControlPanel()
+		{
+			JPanel panel = new JPanel(new GridLayout(1, 3));
+			fc_continue = new JButton(msg.getInfo(
+					Messages.INFO_UI_FORM_CONTINUE));
+			fc_continue.setName("fc_continue");
+			fc_continue.addActionListener(this);
+			fc_previous = new JButton(msg.getInfo(
+					Messages.INFO_UI_FORM_PREVIOUS));
+			fc_previous.setName("fc_previous");
+			fc_previous.addActionListener(this);
+			fc_next = new JButton("Exit");
+			fc_next.setName("exit");
+			fc_next.addActionListener(this);
+			panel.add(fc_continue);
+			panel.add(fc_previous);
+			panel.add(fc_next);
+			return panel;
 		}
 	}
 	
-	public static final Font FONT = new Font("Courier", Font.PLAIN, 18);
+	public static final Font FONT = new Font("Courier", Font.PLAIN, 16);
 	private JFrame frame;
-	private PROM_PREM_Collector ppc;
+	public PROM_PREM_Collector ppc;
+	public UserHandle uh;
 	private JButton restartButton, settingsButton,
 	resultsButton, databaseButton;
-	private SwingConsole console;
+	private JPanel pageContent;
 	private Thread thread;
 	private static final long serialVersionUID = -3896988492887782839L;
+	
+	/**
+	 * Sets the page content.
+	 * 
+	 * @param panel The panel that contains the page content.
+	 */
+	public void setContent(JPanel panel)
+	{
+		pageContent.removeAll();
+		pageContent.add(panel, BorderLayout.CENTER);
+		pageContent.revalidate();
+		pageContent.repaint();
+	}
 }

@@ -36,6 +36,7 @@ Navigate to the project folder (it should contain a file called _build.xml_). Th
 * `ant build` Compiles the source from _src/_ and places it in _build/_ and links the external libraries located in _libs/_.
 * `ant clean` Deletes the _build/_ directory and its subdirectories; "cleans up the build process."
 * `ant jar` Builds the project and puts it in a _java archive_ (jar file).
+* `ant jarmanage` Builds the project and puts it in a _java archive_ (jar file). This file will run from the _Manage_ class.
 * `ant Manage` Starts the part of the program that allows you to add clinics and users to the database. For administration purpose only.
 * `ant Main` Starts the questionaire application (Main program).
 

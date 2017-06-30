@@ -4,7 +4,7 @@ build/
 .classpath
 .project
 *~
-PROM_PREM_Collector.jar
+PROM_PREM_Collector*.jar
 flowchart/**/*.aux
 flowchart/**/*.log
 flowchart/**/*.out

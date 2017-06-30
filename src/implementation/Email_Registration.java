@@ -45,18 +45,7 @@ import core.interfaces.UserInterface;
  */
 public class Email_Registration implements Registration
 {
-	private static final String NAME_STR, EMAIL_STR, CLINIC_STR;
-	
-	/* initialize static (final) variables */
-	static
-	{
-		NAME_STR = Messages.getMessages().getInfo(
-				Messages.INFO_REG_USER_NAME);
-		EMAIL_STR = Messages.getMessages().getInfo(
-				Messages.INFO_REG_USER_EMAIL);
-		CLINIC_STR = Messages.getMessages().getInfo(
-				Messages.INFO_REG_CLINIC_NAME);
-	}
+	/* Public */
 	
 	/**
 	 * Initializes Mailer class and loads configuration.
@@ -85,6 +74,32 @@ public class Email_Registration implements Registration
 		f.jumpTo(Form.AT_BEGIN);
 		
 		ui.presentForm(f, this::regProcReturn);
+	}
+	
+	/* Protected */
+	
+	/* Private */
+
+	private static final String NAME_STR, EMAIL_STR, CLINIC_STR;
+	
+	private Properties mailConfig;
+	private UserInterface ui;
+	private final String CONFIG_FILE =
+			"implementation/mail_settings.txt";
+	private final String ACCOUNT_FILE =
+			"implementation/mailaccount_settings.ini";
+	
+	// server mailing account
+	private String serverEmail, serverPassword, adminEmail;
+	
+	static
+	{ /* initialize static (final) variables */
+		NAME_STR = Messages.getMessages().getInfo(
+				Messages.INFO_REG_USER_NAME);
+		EMAIL_STR = Messages.getMessages().getInfo(
+				Messages.INFO_REG_USER_EMAIL);
+		CLINIC_STR = Messages.getMessages().getInfo(
+				Messages.INFO_REG_CLINIC_NAME);
 	}
 	
 	/**
@@ -227,14 +242,4 @@ public class Email_Registration implements Registration
 		}
 		return true;
 	}
-	
-	private Properties mailConfig;
-	private UserInterface ui;
-	private final String CONFIG_FILE =
-			"implementation/mail_settings.txt";
-	private final String ACCOUNT_FILE =
-			"implementation/mailaccount_settings.ini";
-	
-	// server mailing account
-	private String serverEmail, serverPassword, adminEmail;
 }

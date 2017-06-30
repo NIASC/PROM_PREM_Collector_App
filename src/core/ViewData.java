@@ -32,9 +32,8 @@ import core.interfaces.UserInterface;
  */
 public class ViewData
 {
-	private UserHandle userHandle;
-	private UserInterface userInterface;
-
+	/* Public */
+	
 	/**
 	 * Initialize variables.
 	 * 
@@ -61,4 +60,11 @@ public class ViewData
 		}
 		System.out.printf("%s\n", "Viewing data");
 	}
+	
+	/* Protected */
+	
+	/* Private */
+	
+	private UserHandle userHandle;
+	private UserInterface userInterface;
 }

@@ -30,6 +30,8 @@ import core.interfaces.Encryption;
  */
 public class No_Encryption implements Encryption
 {
+	/* Public */
+	
 	/**
 	 * Initializes variables.
 	 */
@@ -37,10 +39,6 @@ public class No_Encryption implements Encryption
 	{
 		
 	}
-	
-	/* 
-	 * Public methods required by the interface.
-	 */
 
 	@Override
 	public String hashString(String s, String salt)
@@ -53,5 +51,8 @@ public class No_Encryption implements Encryption
 	{
 		return "";
 	}
-
+	
+	/* Protected */
+	
+	/* Private */
 }

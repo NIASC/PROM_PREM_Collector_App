@@ -33,6 +33,8 @@ import core.containers.form.FormContainer;
  */
 public interface UserInterface
 {
+	/* Public */
+	
 	/**
 	 * Presents an error message to the user. The message
 	 * should contain clear information about why the error
@@ -120,4 +122,8 @@ public interface UserInterface
 		 */
 		boolean call(Form form);
 	}
+	
+	/* Protected */
+	
+	/* Private */
 }

@@ -33,22 +33,16 @@ import core.interfaces.UserInterface;
 
 /**
  * This class handles the user. This mostly means handling the login,
- * logout and redirecting to the registration form.
- * The purpose of this class is to handle user-related processes.
+ * logout and redirecting to the registration form as well as
+ * redirecting to the different applications that are available to
+ * users that have logged in.
  * 
  * @author Marcus Malmquist
  *
  */
 public class UserHandle
 {
-	
-	private Database user_db;
-	private UserInterface ui;
-	private Questionnaire questionaire;
-	private ViewData viewData;
-	private User user;
-	
-	private boolean loggedIn;
+	/* Public */
 	
 	/**
 	 * Initialize variables.
@@ -59,18 +53,19 @@ public class UserHandle
 	{
 		this.ui = ui;
 		user_db = Implementations.Database();
-		questionaire = new Questionnaire(ui, this);
+		questionnaire = new Questionnaire(ui, this);
 		viewData = new ViewData(ui, this);
 		user = null;
 		loggedIn = false;
 	}
 	
 	/**
-	 * Prompts the user for login details and attempts to match them
-	 * with data in the database.
-	 * If the user successfully logs in it will be flagged as logged in
-	 * (which can be used to verify that the user has logged in using
-	 * the function isLoggedIn).
+	 * Attempts to match the supplied user deatils with data in the
+	 * database. If the user successfully logs in it will be flagged
+	 * as logged in (which can be used to verify that the user has
+	 * logged in using the function isLoggedIn). This flag prevents
+	 * the same user from being logged in on the same account in
+	 * multiple instances.
 	 */
 	public void login(String username, String password)
 	{
@@ -116,7 +111,7 @@ public class UserHandle
 	
 	/**
 	 * Resets any variables that was initialized during login (in
-	 * particular it resets the 'logged in' flag).
+	 * particular it unflags the user as logged in).
 	 */
 	public void logout()
 	{
@@ -125,6 +120,89 @@ public class UserHandle
 		resetLoginVars();
 		UserManager.getUserManager().delUser(this);
 	}
+	
+	/**
+	 * Starts the questionnaire.
+	 */
+	public void startQuestionnaire()
+	{
+		if (!loggedIn)
+			return;
+		questionnaire.start();
+	}
+	
+	/**
+	 * Starts the data viewing.
+	 */
+	public void viewData()
+	{
+		if (!loggedIn)
+			return;
+		viewData.start();
+	}
+	
+	/**
+	 * Returns the 'logged in' flag.
+	 * 
+	 * @return True if the user is logged in. False if not.
+	 */
+	public boolean isLoggedIn()
+	{
+		return loggedIn;
+	}
+	
+	/**
+	 * If the user has/wants to update his password then this method
+	 * will call the part of program that displays that form.
+	 * 
+	 * @return True if the user needed to update its password. False
+	 * 		if not.
+	 */
+	public boolean updatePassword()
+	{
+		if (user.getUpdatePassword())
+		{
+			ui.displayMessage(Messages.getMessages().getInfo(
+					Messages.INFO_UH_UPDATE_PASSWORD));
+			setPassword();
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Query the user for current password and new password if the user
+	 * is logged in. If the old password is correct and the password
+	 * matches the valid passwords criterion.
+	 * This function will query the user until the old and new password
+	 * fulfill the criterion described above.
+	 */
+	public void setPassword()
+	{
+		if (!loggedIn)
+			return; // no user to set password for
+
+		Form form = new Form();
+		form.insert(new FieldContainer(false, true,
+				Messages.getMessages().getInfo(
+						Messages.INFO_CURRENT_PASSWORD)),
+				Form.AT_END);
+		form.insert(new FieldContainer(false, true,
+				Messages.getMessages().getInfo(
+						Messages.INFO_NEW_PASSWORD)),
+				Form.AT_END);
+		form.insert(new FieldContainer(false, true,
+				Messages.getMessages().getInfo(
+						Messages.INFO_RE_NEW_PASSWORD)),
+				Form.AT_END);
+		form.jumpTo(Form.AT_BEGIN);
+		
+		ui.displayMessage(Messages.getMessages().getInfo(
+				Messages.INFO_NEW_PASS_INFO));
+		ui.presentForm(form, this::setPassReturn);
+	}
+	
+	/* Protected */
 	
 	/**
 	 * Attempts to match the supplied username and password with users
@@ -150,68 +228,27 @@ public class UserHandle
 	}
 	
 	/**
-	 * Returns the 'logged in' flag.
 	 * 
-	 * @return True if the user is logged in. False if not.
+	 * @return This handle's active user. If this handle does not have
+	 * 		an active user then null is returned.
 	 */
-	public boolean isLoggedIn()
-	{
-		return loggedIn;
-	}
-	
-	public boolean updatePassword()
-	{
-		if (user.getUpdatePassword())
-		{
-			ui.displayMessage(Messages.getMessages().getInfo(
-					Messages.INFO_UH_UPDATE_PASSWORD));
-			setPassword();
-			return true;
-		}
-		return false;
-	}
-	
 	protected User getUser()
 	{
 		return user;
 	}
 	
-	/**
-	 * Query the user for current password and new password if the user
-	 * is logged in. If the old password is correct and the password
-	 * matches the valid passwords criterion.
-	 * This function will query the user until the old and new password
-	 * fulfill the criterion described above.
-	 */
-	public void setPassword()
-	{
-		if (!loggedIn)
-			return; // no user to set password for
-
-		final String CP_MSG = Messages.getMessages().getInfo(
-				Messages.INFO_CURRENT_PASSWORD);
-		final String NP1_MSG = Messages.getMessages().getInfo(
-				Messages.INFO_NEW_PASSWORD);
-		final String NP2_MSG = Messages.getMessages().getInfo(
-				Messages.INFO_RE_NEW_PASSWORD);
-		
-		
-		Form form = new Form();
-		FieldContainer currentPassword = new FieldContainer(false, true, CP_MSG);
-		form.insert(currentPassword, Form.AT_END);
-		FieldContainer newPassword1 = new FieldContainer(false, true, NP1_MSG);
-		form.insert(newPassword1, Form.AT_END);
-		FieldContainer newPassword2 = new FieldContainer(false, true, NP2_MSG);
-		form.insert(newPassword2, Form.AT_END);
-		form.jumpTo(Form.AT_BEGIN);
-		
-		ui.displayMessage(Messages.getMessages().getInfo(
-				Messages.INFO_NEW_PASS_INFO));
-		ui.presentForm(form, this::setPassReturn);
-	}
+	/* Private */
+	
+	private Database user_db;
+	private UserInterface ui;
+	private Questionnaire questionnaire;
+	private ViewData viewData;
+	private User user;
+	private boolean loggedIn;
 	
 	/**
-	 * The function to return to after the user have entered a new password.
+	 * The function to return to after the user have entered a new
+	 * password.
 	 * 
 	 * @param form The form that was sent to the UI.
 	 * 
@@ -220,27 +257,20 @@ public class UserHandle
 	private boolean setPassReturn(Form form)
 	{
 		form.jumpTo(Form.AT_BEGIN);
-		FieldContainer currentPassword = (FieldContainer) form.currentEntry();
+		FieldContainer current = (FieldContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
-		FieldContainer newPassword1 = (FieldContainer) form.currentEntry();
+		FieldContainer new1 = (FieldContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
-		FieldContainer newPassword2 = (FieldContainer) form.currentEntry();
+		FieldContainer new2 = (FieldContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
 
-		if (newPassError(
-				currentPassword.getEntry(),
-				newPassword1.getEntry(),
-				newPassword2.getEntry()))
-		{
+		if (newPassError(current.getEntry(), new1.getEntry(), new2.getEntry()))
 			return false;
-		}
+		
 		Encryption crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
-		User tmpUser = user_db.setPassword(
-				user, currentPassword.getEntry(),
-				crypto.hashString(
-						newPassword1.getEntry(), newSalt),
-				newSalt);
+		User tmpUser = user_db.setPassword(user, current.getEntry(),
+				crypto.hashString(new1.getEntry(), newSalt), newSalt);
 		if (tmpUser == null)
 		{
 			ui.displayError(Messages.DATABASE_ERROR);
@@ -324,8 +354,9 @@ public class UserHandle
 				Pattern.compile("[\\p{Punct} ]") /* punctuation and space */
 		};
 		if (Pattern.compile("[^\\p{Print}]").matcher(password).find())
-			// expression contains non-ascii or non-printable characters
+		{ // expression contains non-ascii or non-printable characters
 			return 0;
+		}
 		int points = 0;
 		if (pattern[0].matcher(password).find())
 			++points;
@@ -348,10 +379,11 @@ public class UserHandle
 	}
 	
 	/**
-	 * Resets any variable that was initialized through initLoginVars()
+	 * Resets any variable that was initialized through initLoginVars
 	 */
 	private void resetLoginVars()
 	{
 		loggedIn = false;
+		user = null;
 	}
 }

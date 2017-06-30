@@ -35,6 +35,8 @@ import core.containers.User;
  */
 public interface Database
 {
+	/* Public */
+	
 	public static final int ERROR = -1;
 	public static final int QUERY_SUCCESS = 1;
 	
@@ -115,4 +117,8 @@ public interface Database
 	 * 		loaded. ERROR if there was an error with the database.
 	 */
 	public int getInfoMessages(MessageContainer mc);
+	
+	/* Protected */
+	
+	/* Private */
 }

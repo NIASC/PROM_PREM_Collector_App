@@ -39,8 +39,14 @@ import java.util.Scanner;
  */
 public class Manage
 {
-	private Scanner in;
-	private Database db;
+	/* Public */
+	
+	public static void main(String[] args)
+	{
+		Manage m = new Manage();
+		m.runManager();
+		
+	}
 	
 	/**
 	 * Initializes login variables.
@@ -50,6 +56,46 @@ public class Manage
 		db = Implementations.Database();
 		in = new Scanner(System.in);
 	}
+	
+	/**
+	 * Runs the manager main loop. The administrator is presented with
+	 * available management operations and can choose which one to do.
+	 */
+	public void runManager()
+	{
+		final int EXIT = 0, ADD_CLINIC = 1, ADD_USER = 2;
+		System.out.printf(
+				"What would you like to do?\n%d: %s\n%d: %s\n%d: %s\n",
+				ADD_CLINIC, "Add Clinic",
+				ADD_USER, "Add user",
+				EXIT, "Exit");
+		int input = EXIT;
+		if (in.hasNextInt())
+			input = in.nextInt();
+		else
+		{
+			in.next();
+			System.out.printf("Unknown option. Exting\n");
+			System.exit(1);
+		}
+		switch (input)
+		{
+		case EXIT:
+			break;
+		case ADD_CLINIC:
+			addClinic();
+			break;
+		case ADD_USER:
+			addUser();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	/* Protected */
+	
+	/* Private */
 	
 	/**
 	 * Adds a new clinic to the database. The administrator will be
@@ -118,47 +164,6 @@ public class Manage
 		String salt = crypto.getNewSalt();
 		db.addUser(user, crypto.hashString(password, salt), salt, clinic, email);
 	}
-	
-	/**
-	 * Runs the manager main loop. The administrator is presented with
-	 * available management operations and can choose which one to do.
-	 */
-	public void runManager()
-	{
-		final int EXIT = 0, ADD_CLINIC = 1, ADD_USER = 2;
-		System.out.printf(
-				"What would you like to do?\n%d: %s\n%d: %s\n%d: %s\n",
-				ADD_CLINIC, "Add Clinic",
-				ADD_USER, "Add user",
-				EXIT, "Exit");
-		int input = EXIT;
-		if (in.hasNextInt())
-			input = in.nextInt();
-		else
-		{
-			in.next();
-			System.out.printf("Unknown option. Exting\n");
-			System.exit(1);
-		}
-		switch (input)
-		{
-		case EXIT:
-			break;
-		case ADD_CLINIC:
-			addClinic();
-			break;
-		case ADD_USER:
-			addUser();
-			break;
-		default:
-			break;
-		}
-	}
-	
-	public static void main(String[] args)
-	{
-		Manage m = new Manage();
-		m.runManager();
-		
-	}
+	private Scanner in;
+	private Database db;
 }

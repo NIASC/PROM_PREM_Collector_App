@@ -41,6 +41,8 @@ import core.interfaces.UserInterface.FormComponentDisplay;
  */
 public abstract class ContainerDisplays
 {
+	/* Public */
+	
 	/**
 	 * Puts the supplied FormContainer in a FormComponentDisplay
 	 * wrapper.
@@ -67,4 +69,8 @@ public abstract class ContainerDisplays
 			return null;
 		}
 	}
+	
+	/* Protected */
+	
+	/* Private */
 }

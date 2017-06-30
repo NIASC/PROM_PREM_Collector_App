@@ -31,9 +31,8 @@ import core.interfaces.UserInterface;
  */
 public class Questionnaire
 {
-	private UserHandle userHandle;
-	private UserInterface userInterface;
-
+	/* Public */
+	
 	/**
 	 * Initialize variables.
 	 * 
@@ -59,4 +58,11 @@ public class Questionnaire
 		}
 		System.out.printf("%s\n", "Starting Questionnaire");
 	}
+	
+	/* Protected */
+	
+	/* Private */
+
+	private UserHandle userHandle;
+	private UserInterface userInterface;
 }

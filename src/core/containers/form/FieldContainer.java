@@ -19,10 +19,6 @@
  */
 package core.containers.form;
 
-import java.util.regex.Pattern;
-
-import core.interfaces.UserInterface;
-import core.interfaces.UserInterface.FormComponentDisplay;
 
 /**
  * This class handles entry field object. It allows you to present a
@@ -36,8 +32,6 @@ import core.interfaces.UserInterface.FormComponentDisplay;
  */
 public class FieldContainer extends FormContainer
 {
-	private FieldEntry field;
-	private boolean secret;
 	
 	/**
 	 * Initializes a field container that does not allow empty entries and
@@ -51,10 +45,10 @@ public class FieldContainer extends FormContainer
 	/**
 	 * Initializes this container with form with the supplied
 	 * statement.
-	 * @param allowEmptyEntries True if this container allows empty entry
-	 * 		(answer/response).
-	 * @param secretEntry True if the input should be hidden. Useful for
-	 * 		entering sensitive information such as passwords.
+	 * @param allowEmptyEntries True if this container allows empty
+	 * 		entry (answer/response).
+	 * @param secretEntry True if the input should be hidden. Useful
+	 * 		for entering sensitive information such as passwords.
 	 * @param statement The statement to initialize this form with.
 	 */
 	public FieldContainer(boolean allowEmptyEntries, boolean secretEntry,
@@ -64,14 +58,21 @@ public class FieldContainer extends FormContainer
 		field = new FieldEntry(statement);
 		secret = secretEntry;
 	}
+
+	@Override
+	public boolean hasEntry()
+	{
+		return field.getValue() != null
+				&& (allowEmpty || !field.getValue().isEmpty());
+	}
 	
 	/**
 	 * Sets the content of this container. A field container is only
 	 * allowed to contain one field so if thie container already have
 	 * an entry it will be overwritten
 	 * 
-	 * @param statement The statement that you want the user to respond
-	 * 		to.
+	 * @param statement The statement that you want the user to
+	 * 		respond to.
 	 */
 	public void setField(String statement)
 	{
@@ -85,8 +86,8 @@ public class FieldContainer extends FormContainer
 	}
 	
 	/**
-	 * Retrieves the statement (i.e. the statement that you request the
-	 * user to respond to)
+	 * Retrieves the statement (i.e. the statement that you request
+	 * the user to respond to)
 	 * 
 	 * @return This container's statement.
 	 */
@@ -126,19 +127,19 @@ public class FieldContainer extends FormContainer
 	{
 		field.setValue(entry);
 	}
+	
+	/* Protected */
+	
+	/* Private */
 
-	@Override
-	public boolean hasEntry()
-	{
-		return field.getValue() != null
-				&& (allowEmpty || !field.getValue().isEmpty());
-	}
+	private FieldEntry field;
+	private boolean secret;
 	
 	/**
-	 * This class is a data container for field entries. It is designed
-	 * with extensibility in mind and it should be possible to modify
-	 * FieldContainer to be able to container several field entries
-	 * using this class as a container for the entries.
+	 * This class is a data container for field entries. It is
+	 * designed with extensibility in mind and it should be possible
+	 * to modify FieldContainer to be able to container several field
+	 * entries using this class as a container for the entries.
 	 * 
 	 * @author Marcus Malmquist
 	 *
@@ -160,18 +161,6 @@ public class FieldContainer extends FormContainer
 		{
 			entryKey = key;
 			entryValue = null;
-		}
-		
-		/**
-		 * Copies this FieldEntry.
-		 * 
-		 * @return The copied FieldEntry.
-		 */
-		public FieldEntry copy()
-		{
-			FieldEntry fe = new FieldEntry(entryKey);
-			fe.setValue(entryValue);
-			return fe;
 		}
 		
 		/**

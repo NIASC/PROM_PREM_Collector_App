@@ -35,73 +35,9 @@ import core.containers.MessageContainer;
  */
 public final class Messages
 {
-	private static Messages messages;
-	private MessageContainer error, info;
-	private String locale = "en";
-	public final String fallbackLocale = "en";
-	public static final String DATABASE_ERROR = "Database error.";
+	/* Public */
 	
-	/**
-	 * This class is a singleton.
-	 */
-	private Messages()
-	{
-		
-	}
-	
-	/**
-	 * 
-	 * @return The active instance of this class.
-	 */
-	public static synchronized Messages getMessages()
-	{
-		if (messages == null)
-			messages = new Messages();
-		return messages;
-	}
 
-	@Override
-	public final Object clone()
-			throws CloneNotSupportedException
-	{
-		throw new CloneNotSupportedException();
-	}
-	
-	/**
-	 * Attempts to load messages from the database.
-	 * 
-	 * @return True if messages was successfully loaded. False if an
-	 * 		error occurred while loading messages.
-	 */
-	public final boolean loadMessages()
-	{
-		error = new MessageContainer();
-		info = new MessageContainer();
-		
-		Database db = Implementations.Database();
-		int errMsgLoadCode = db.getErrorMessages(error);
-		int infoMsgLoadCode = db.getInfoMessages(info);
-		return errMsgLoadCode == Database.QUERY_SUCCESS
-				&& infoMsgLoadCode == Database.QUERY_SUCCESS;
-	}
-	
-	public final String getError(String errorName)
-	{
-		return getMessage(error, errorName, locale);
-	}
-	
-	public final String getInfo(String infoName)
-	{
-		return getMessage(info, infoName, locale);
-	}
-	
-	private final String getMessage(
-			MessageContainer mc, String messageName, String locale)
-	{
-		if (mc == null && !Messages.getMessages().loadMessages())
-			return null;
-		return mc.getMessage(messageName, locale);
-	}
 	
 	public static final String
 	ERROR_UH_PR_PASSWORD_SIMPLE = "UH_PR_PASSWORD_SIMPLE",
@@ -149,4 +85,88 @@ public final class Messages
 	INFO_UI_FORM_CONTINUE = "UI_FORM_CONTINUE",
 	INFO_UI_SELECT_SINGLE = "UI_SELECT_SINGLE"
 	;
+	
+	public final String fallbackLocale = "en";
+	public static final String DATABASE_ERROR = "Database error.";
+
+	@Override
+	public final Object clone()
+			throws CloneNotSupportedException
+	{
+		throw new CloneNotSupportedException();
+	}
+	
+	/**
+	 * 
+	 * @return The active instance of this class.
+	 */
+	public static synchronized Messages getMessages()
+	{
+		if (messages == null)
+			messages = new Messages();
+		return messages;
+	}
+	
+	/**
+	 * Attempts to load messages from the database.
+	 * 
+	 * @return True if messages was successfully loaded. False if an
+	 * 		error occurred while loading messages.
+	 */
+	public final boolean loadMessages()
+	{
+		error = new MessageContainer();
+		info = new MessageContainer();
+		
+		Database db = Implementations.Database();
+		int errMsgLoadCode = db.getErrorMessages(error);
+		int infoMsgLoadCode = db.getInfoMessages(info);
+		return errMsgLoadCode == Database.QUERY_SUCCESS
+				&& infoMsgLoadCode == Database.QUERY_SUCCESS;
+	}
+	
+	public final String getError(String errorName)
+	{
+		return getMessage(error, errorName, locale);
+	}
+	
+	public final String getInfo(String infoName)
+	{
+		return getMessage(info, infoName, locale);
+	}
+	
+	/* Protected */
+	
+	/* Private */
+
+	private static Messages messages;
+	private MessageContainer error, info;
+	private String locale = "en";
+	
+	/**
+	 * This class is a singleton.
+	 */
+	private Messages()
+	{
+		
+	}
+	
+	/**
+	 * Loads messages from the databse.
+	 * 
+	 * @param mc The message container to get the message from.
+	 * @param messageName The name of the message to look for.
+	 * @param locale The locale of the message to look for.
+	 * 
+	 * @return The message for the supplied locale. If the message
+	 * 		does not exist in the requested locale then the message
+	 * 		for the default locale is returned.
+	 */
+	private final String getMessage(
+			MessageContainer mc, String messageName, String locale)
+	{
+		if (mc == null && !Messages.getMessages().loadMessages())
+			return null;
+		return mc.getMessage(messageName, locale);
+	}
 }

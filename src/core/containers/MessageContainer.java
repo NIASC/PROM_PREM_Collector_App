@@ -36,8 +36,7 @@ import core.interfaces.Messages;
  */
 public class MessageContainer
 {
-	private HashMap<String, Message> messages;
-	private HashMap<Integer, String> codeToName;
+	/* Public */
 
 	/**
 	 * Creates a container for Messages.
@@ -121,6 +120,13 @@ public class MessageContainer
 		}
 		return null;
 	}
+	
+	/* Protected */
+	
+	/* Private */
+	
+	private HashMap<String, Message> messages;
+	private HashMap<Integer, String> codeToName;
 	
 	/**
 	 * This class is a data container for Messages. A message is a

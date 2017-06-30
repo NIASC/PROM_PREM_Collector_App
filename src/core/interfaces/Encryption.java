@@ -29,6 +29,8 @@ package core.interfaces;
  */
 public interface Encryption
 {
+	/* Public */
+	
 	/**
 	 * Creates a hashed version of the input string.
 	 * 
@@ -45,4 +47,8 @@ public interface Encryption
 	 * @return A new salt
 	 */
 	public String getNewSalt();
+	
+	/* Protected */
+	
+	/* Private */
 }

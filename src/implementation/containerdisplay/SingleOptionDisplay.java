@@ -46,45 +46,7 @@ import core.interfaces.UserInterface.FormComponentDisplay;
  */
 public class SingleOptionDisplay extends JPanel implements FormComponentDisplay, ItemListener
 {
-	private static final long serialVersionUID = 7314170750059865699L;
-	private SingleOptionContainer soc;
-	private int responseID;
-	
-	private HashMap<String, JRadioButton> options;
-	private ButtonGroup group;
-	
-	/**
-	 * This constructor should not be used.
-	 */
-	@SuppressWarnings("unused")
-	private SingleOptionDisplay() { }
-	
-	/**
-	 * Initializes login variables.
-	 * 
-	 * @param soc The instance of the SingleOptionContainer that
-	 * 		the instance of this SingleOptionDisplay should act as
-	 * 		a wrapper for.
-	 */
-	protected SingleOptionDisplay(SingleOptionContainer soc)
-	{
-		setLayout(new GridLayout(0, 1));
-		this.soc = soc;
-
-		group = new ButtonGroup();
-		
-		HashMap<Integer, String> opt = soc.getSOptions();
-		options = new HashMap<String, JRadioButton>();
-		for (Entry<Integer, String> e : opt.entrySet())
-		{
-			JRadioButton btn = new JRadioButton(e.getValue());
-			btn.setName(e.getValue());
-			group.add(btn);
-			btn.addItemListener(this);
-			add(btn);
-			options.put(Integer.toString(e.getKey()), btn);
-		}
-	}
+	/* Public */
 	
 	@Override
 	public void requestFocus()
@@ -116,4 +78,42 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	{
 		return soc.hasEntry();
 	}
+	
+	/* Protected */
+	
+	/**
+	 * Initializes login variables.
+	 * 
+	 * @param soc The instance of the SingleOptionContainer that
+	 * 		the instance of this SingleOptionDisplay should act as
+	 * 		a wrapper for.
+	 */
+	protected SingleOptionDisplay(SingleOptionContainer soc)
+	{
+		setLayout(new GridLayout(0, 1));
+		this.soc = soc;
+
+		group = new ButtonGroup();
+		
+		HashMap<Integer, String> opt = soc.getSOptions();
+		options = new HashMap<String, JRadioButton>();
+		for (Entry<Integer, String> e : opt.entrySet())
+		{
+			JRadioButton btn = new JRadioButton(e.getValue());
+			btn.setName(e.getValue());
+			group.add(btn);
+			btn.addItemListener(this);
+			add(btn);
+			options.put(Integer.toString(e.getKey()), btn);
+		}
+	}
+	
+	/* Private */
+	
+	private static final long serialVersionUID = 7314170750059865699L;
+	private SingleOptionContainer soc;
+	private int responseID;
+	
+	private HashMap<String, JRadioButton> options;
+	private ButtonGroup group;
 }

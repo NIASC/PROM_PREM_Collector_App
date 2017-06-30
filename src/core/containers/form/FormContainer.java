@@ -39,34 +39,7 @@ import core.interfaces.UserInterface.FormComponentDisplay;
  */
 public abstract class FormContainer
 {
-	protected FormContainer nextFC, prevFC;
-	protected boolean allowEmpty;
-	
-	protected FormContainer(boolean allowEmpty)
-	{
-		this.allowEmpty = allowEmpty;
-	}
-	
-	/**
-	 * Draws the objects contained in this container.
-	 * NOTE: Since the object that is returned from this method should
-	 * be defined in the implementation of the user interface, this
-	 * method should only be called in the implementation of the user
-	 * interface to be of any use.
-	 * 
-	 * The drawing method should redirect the call to this method to
-	 * the appropriate method provided by the user interface and
-	 * return whatever that method returns.
-	 * 
-	 * @param ui The instance of the active user interface.
-	 * 
-	 * @return The (subclass of) Object that is returned from the
-	 * 		method in the UserInterface class
-	 */
-	public FormComponentDisplay getDisplayable(UserInterface ui)
-	{
-		return ui.getContainerDisplay(this);
-	}
+	/* Public */
 	
 	/**
 	 * Check if this form has been filled (i.e. an option has been
@@ -77,8 +50,27 @@ public abstract class FormContainer
 	public abstract boolean hasEntry();
 	
 	/**
+	 * Creates a displayable wrapper for this container and puts this
+	 * container inside it.
 	 * 
-	 * @return True if this container allows empty entries. False if not.
+	 * NOTE: Since the object that is returned from this method should
+	 * be defined in the implementation of the user interface, this
+	 * method should only be called in the implementation of the user
+	 * interface to be of any use.
+	 * 
+	 * @param ui The instance of the active user interface.
+	 * 
+	 * @return A displayable wrapper object for the this container.
+	 */
+	public FormComponentDisplay getDisplayable(UserInterface ui)
+	{
+		return ui.getContainerDisplay(this);
+	}
+	
+	/**
+	 * 
+	 * @return True if this container allows empty entries. False if
+	 * 		not.
 	 */
 	public boolean allowsEmpty()
 	{
@@ -86,9 +78,9 @@ public abstract class FormContainer
 	}
 	
 	/**
-	 * Retrieves the next FContainer.
+	 * Retrieves the next FormContainer.
 	 * 
-	 * @return The next FContainer.
+	 * @return The next FormContainer.
 	 */
 	public FormContainer getNextFC()
 	{
@@ -96,9 +88,9 @@ public abstract class FormContainer
 	}
 	
 	/**
-	 * Retrieves the previous FContainer.
+	 * Retrieves the previous FormContainer.
 	 * 
-	 * @return The previous FContainer.
+	 * @return The previous FormContainer.
 	 */
 	public FormContainer getPrevFC()
 	{
@@ -106,13 +98,14 @@ public abstract class FormContainer
 	}
 	
 	/**
-	 * Sets the next FContainer to the supplied FContainer and returns
-	 * the FContainer that currently is the next.
+	 * Sets the next FormContainer to the supplied FormContainer and
+	 * returns the FormContainer that currently is the next.
 	 * 
-	 * @param fc The FContainer that will be the FContainer after this.
+	 * @param fc The FormContainer that will be the FormContainer
+	 * 		after this.
 	 * 
-	 * @return The FContainer that currently is the FContainer after
-	 * 		this.
+	 * @return The FormContainer that currently is the FormContainer
+	 * 		after this.
 	 */
 	public FormContainer setNextFC(FormContainer fc)
 	{
@@ -121,7 +114,16 @@ public abstract class FormContainer
 		return old;
 	}
 	
-	/** sets the previous FContainer and returns the previous previous */
+	/**
+	 * Sets the previous FormContainer to the supplied FormContainer
+	 * and returns the FormContainer that currently is the previous.
+	 * 
+	 * @param fc The FormContainer that will be the FormContainer
+	 * 		before this.
+	 * 
+	 * @return The FormContainer that currently is the FormContainer
+	 * 		before this.
+	 */
 	public FormContainer setPrevFC(FormContainer fc)
 	{
 		FormContainer old = prevFC;
@@ -129,4 +131,22 @@ public abstract class FormContainer
 		return old;
 	}
 	
+	/* Protected */
+
+	protected FormContainer nextFC, prevFC;
+	protected boolean allowEmpty;
+	
+	/**
+	 * Initializes this container as either optional (allows empty) or
+	 * mandatory (does not allow empty).
+	 * 
+	 * @param allowEmpty True if this container should allow empty
+	 * 		entries.
+	 */
+	protected FormContainer(boolean allowEmpty)
+	{
+		this.allowEmpty = allowEmpty;
+	}
+	
+	/* Private */
 }

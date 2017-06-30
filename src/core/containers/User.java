@@ -33,10 +33,7 @@ import core.interfaces.Implementations;
  */
 public class User
 {
-	private Encryption crypto;
-	private String username, password, email, salt;
-	private int clinicID;
-	private boolean updatePass;
+	/* Public */
 	
 	/**
 	 * Initializes a user with the given parameters.
@@ -51,8 +48,8 @@ public class User
 	 * @param updatePass True if the user is flagged for password
 	 * 		update.
 	 */
-	public User(int clinicID, String username, String password, String email,
-			String salt, boolean updatePass)
+	public User(int clinicID, String username, String password,
+			String email, String salt, boolean updatePass)
 	{
 		this.clinicID = clinicID;
 		this.username = username;
@@ -114,4 +111,13 @@ public class User
 	{
 		return crypto.hashString(unhashedPass, salt).equals(password);
 	}
+	
+	/* Protected */
+	
+	/* Private */
+
+	private Encryption crypto;
+	private String username, password, email, salt;
+	private int clinicID;
+	private boolean updatePass;
 }

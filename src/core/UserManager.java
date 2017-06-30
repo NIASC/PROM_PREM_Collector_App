@@ -22,27 +22,23 @@ package core;
 import java.util.HashMap;
 
 /**
+ * This class keeps track of which users are online and how many users
+ * that can be online at any time. This class adds users to the list
+ * of online users if they are allowed to log in, and removes them
+ * from the list when they log out.
  * 
  * @author Marcus Malmquist
  *
  */
 public class UserManager
 {
-	public static final int ERROR = -1;
-	public static final int SUCCESS = 0;
-	public static final int SERVER_FULL = 2;
-	public static final int ALREADY_ONLINE = 4;
-	
-	private static UserManager manager;
-	private static final int MAX_USERS = 2;
-	private HashMap<String, UserHandle> userHandle;
+	/* Public */
 
-	/**
-	 * Singleton class
-	 */
-	private UserManager()
+	@Override
+	public final Object clone()
+			throws CloneNotSupportedException
 	{
-		userHandle = new HashMap<String, UserHandle>();
+		throw new CloneNotSupportedException();
 	}
 	
 	/**
@@ -55,13 +51,11 @@ public class UserManager
 			manager = new UserManager();
 		return manager;
 	}
+	
+	/* Protected */
 
-	@Override
-	public final Object clone()
-			throws CloneNotSupportedException
-	{
-		throw new CloneNotSupportedException();
-	}
+	protected static final int ERROR = -1, SUCCESS = 0,
+			SERVER_FULL = 2, ALREADY_ONLINE = 4;
 	
 	/**
 	 * Adds the supplied user to the list of online users if they
@@ -98,5 +92,24 @@ public class UserManager
 			return false;
 		userHandle.remove(uh.getUser().getUsername());
 		return true;
+	}
+	
+	/* Private */
+	
+	private static UserManager manager;
+	private static final int MAX_USERS;
+	private HashMap<String, UserHandle> userHandle;
+
+	/**
+	 * Singleton class
+	 */
+	private UserManager()
+	{
+		userHandle = new HashMap<String, UserHandle>();
+	}
+	
+	static
+	{
+		MAX_USERS = 2;
 	}
 }

@@ -34,6 +34,8 @@ import java.net.URLDecoder;
  */
 public class Utilities
 {
+	/* Public */
+	
 	/**
 	 * Finds the system path to the folder where the supplied class
 	 * is located. This function is useful for finding resources that
@@ -75,4 +77,8 @@ public class Utilities
 	{
 		return c.getClassLoader().getResourceAsStream(filePath);
 	}
+	
+	/* Protected */
+	
+	/* Private */
 }

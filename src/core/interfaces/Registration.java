@@ -34,6 +34,8 @@ import core.containers.Form;
  */
 public interface Registration
 {
+	/* Public */
+	
 	/**
 	 * Presets a registration form to the user. The form should
 	 * contain necessary information to be able to register the user.
@@ -43,4 +45,8 @@ public interface Registration
 	 * a user).
 	 */
 	public void registrationProcess();
+	
+	/* Protected */
+	
+	/* Private */
 }

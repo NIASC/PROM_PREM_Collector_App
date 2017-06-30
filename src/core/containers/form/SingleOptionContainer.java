@@ -36,9 +36,7 @@ import core.interfaces.UserInterface.FormComponentDisplay;
  */
 public class SingleOptionContainer extends FormContainer
 {
-	private HashMap<Integer, SingleOption> options;
-	private int nextOption;
-	private Integer selected;
+	/* Public */
 	
 	/**
 	 * Initializes a single-option container that does not allow empty
@@ -62,6 +60,12 @@ public class SingleOptionContainer extends FormContainer
 		options = new HashMap<Integer, SingleOption>();
 		nextOption = 0;
 		selected = null;
+	}
+
+	@Override
+	public boolean hasEntry()
+	{
+		return selected != null;
 	}
 	
 	/**
@@ -123,12 +127,14 @@ public class SingleOptionContainer extends FormContainer
 	{
 		return selected;
 	}
-
-	@Override
-	public boolean hasEntry()
-	{
-		return selected != null;
-	}
+	
+	/* Protected */
+	
+	/* Private */
+	
+	private HashMap<Integer, SingleOption> options;
+	private int nextOption;
+	private Integer selected;
 	
 	/**
 	 * This class is a data container for single-option form entries.

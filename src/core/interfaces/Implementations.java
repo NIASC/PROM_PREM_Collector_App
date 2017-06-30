@@ -70,4 +70,8 @@ public abstract class Implementations
 	{
 		return new Email_Registration(ui);
 	}
+	
+	/* Protected */
+	
+	/* Private */
 }

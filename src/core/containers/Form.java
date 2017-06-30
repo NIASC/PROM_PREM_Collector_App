@@ -35,10 +35,10 @@ import core.containers.form.FormContainer;
  */
 public class Form
 {
+	/* Public */
+	
 	public static final int AT_BEGIN = 0, AT_END = 1,
 			AT_PREVIOUS = 2, AT_NEXT = 3;
-	
-	private FormContainer currentFC;
 	
 	/**
 	 * Initializes an empty form.
@@ -89,42 +89,6 @@ public class Form
 	}
 	
 	/**
-	 * Inserts the supplied FContainer after current container. If the
-	 * current container or the supplied container is null then
-	 * nothing is done.
-	 * 
-	 * @param fc The FContainer to insert.
-	 */
-	private void insertAfter(FormContainer fc)
-	{
-		if (fc == null || currentFC == null)
-			return;
-		fc.setPrevFC(currentFC);
-		fc.setNextFC(currentFC.getNextFC());
-		currentFC.setNextFC(fc);
-		if (fc.getNextFC() != null)
-			fc.getNextFC().setPrevFC(fc);
-	}
-	
-	/**
-	 * Inserts the supplied FContainer before current container. If
-	 * the current container or the supplied container is null then
-	 * nothing is done.
-	 * 
-	 * @param fc The FContainer to insert.
-	 */
-	private void insertBefore(FormContainer fc)
-	{
-		if (fc == null || currentFC == null)
-			return;
-		fc.setPrevFC(currentFC.getPrevFC());
-		fc.setNextFC(currentFC);
-		currentFC.setPrevFC(fc);
-		if (fc.getPrevFC() != null)
-			fc.getPrevFC().setNextFC(fc);
-	}
-	
-	/**
 	 * Delete an entry from the form. An deletion can occur at the
 	 * beginning, at the end, before or after the current position.
 	 * 
@@ -161,52 +125,6 @@ public class Form
 			break;
 		}
 		currentFC = tmp;
-		return del;
-	}
-	
-	/**
-	 * Deletes the FContainer after the current. If the current
-	 * FContainer of the one after the current is null, nothing is
-	 * done.
-	 * 
-	 * @return The FContainer that was deleted.
-	 */
-	private FormContainer deleteAfter()
-	{
-		if (currentFC == null || currentFC.getNextFC() == null)
-			return null;
-		
-		FormContainer del = currentFC.getNextFC();
-		currentFC.setNextFC(del.getNextFC());
-		if (del.getNextFC() != null)
-			del.getNextFC().setPrevFC(currentFC);
-		
-		/* delete links to other containers. */
-		del.setNextFC(null);
-		del.setPrevFC(null);
-		return del;
-	}
-	
-	/**
-	 * Deletes the FContainer before the current. If the current
-	 * FContainer of the one before the current is null, nothing is
-	 * done.
-	 * 
-	 * @return The FContainer that was deleted.
-	 */
-	private FormContainer deleteBefore()
-	{
-		if (currentFC == null || currentFC.getPrevFC() == null)
-			return null;
-		
-		FormContainer del = currentFC.getPrevFC();
-		currentFC.setPrevFC(del.getPrevFC());
-		if (del.getPrevFC() != null)
-			del.getPrevFC().setNextFC(currentFC);
-		
-		/* delete links to other containers. */
-		del.setNextFC(null);
-		del.setPrevFC(null);
 		return del;
 	}
 	
@@ -293,6 +211,116 @@ public class Form
 	}
 	
 	/**
+	 * Checks if this form has entries after the current entry.
+	 * 
+	 * @return True if current entry is the last one. False if there
+	 * 		are more entries.
+	 */
+	public boolean endOfForm()
+	{
+		return currentFC.getNextFC() == null;
+	}
+	
+	/**
+	 * Checks if this form has entries before the current entry.
+	 * 
+	 * @return True if current entry is the first one. False if there
+	 * 		are previous entries.
+	 */
+	public boolean beginningOfForm()
+	{
+		return currentFC.getPrevFC() == null;
+	}
+	
+	/* Protected */
+	
+	/* Private */
+	
+	private FormContainer currentFC;
+	
+	/**
+	 * Inserts the supplied FContainer after current container. If the
+	 * current container or the supplied container is null then
+	 * nothing is done.
+	 * 
+	 * @param fc The FContainer to insert.
+	 */
+	private void insertAfter(FormContainer fc)
+	{
+		if (fc == null || currentFC == null)
+			return;
+		fc.setPrevFC(currentFC);
+		fc.setNextFC(currentFC.getNextFC());
+		currentFC.setNextFC(fc);
+		if (fc.getNextFC() != null)
+			fc.getNextFC().setPrevFC(fc);
+	}
+	
+	/**
+	 * Inserts the supplied FContainer before current container. If
+	 * the current container or the supplied container is null then
+	 * nothing is done.
+	 * 
+	 * @param fc The FContainer to insert.
+	 */
+	private void insertBefore(FormContainer fc)
+	{
+		if (fc == null || currentFC == null)
+			return;
+		fc.setPrevFC(currentFC.getPrevFC());
+		fc.setNextFC(currentFC);
+		currentFC.setPrevFC(fc);
+		if (fc.getPrevFC() != null)
+			fc.getPrevFC().setNextFC(fc);
+	}
+	
+	/**
+	 * Deletes the FContainer after the current. If the current
+	 * FContainer of the one after the current is null, nothing is
+	 * done.
+	 * 
+	 * @return The FContainer that was deleted.
+	 */
+	private FormContainer deleteAfter()
+	{
+		if (currentFC == null || currentFC.getNextFC() == null)
+			return null;
+		
+		FormContainer del = currentFC.getNextFC();
+		currentFC.setNextFC(del.getNextFC());
+		if (del.getNextFC() != null)
+			del.getNextFC().setPrevFC(currentFC);
+		
+		/* delete links to other containers. */
+		del.setNextFC(null);
+		del.setPrevFC(null);
+		return del;
+	}
+	
+	/**
+	 * Deletes the FContainer before the current. If the current
+	 * FContainer of the one before the current is null, nothing is
+	 * done.
+	 * 
+	 * @return The FContainer that was deleted.
+	 */
+	private FormContainer deleteBefore()
+	{
+		if (currentFC == null || currentFC.getPrevFC() == null)
+			return null;
+		
+		FormContainer del = currentFC.getPrevFC();
+		currentFC.setPrevFC(del.getPrevFC());
+		if (del.getPrevFC() != null)
+			del.getPrevFC().setNextFC(currentFC);
+		
+		/* delete links to other containers. */
+		del.setNextFC(null);
+		del.setPrevFC(null);
+		return del;
+	}
+	
+	/**
 	 * Moves forward a number of steps. If the number of steps are
 	 * <= 0 then nothing is done.
 	 * 
@@ -328,27 +356,5 @@ public class Form
 			currentFC = currentFC.getPrevFC();
 			jumpBackward(steps - 1);
 		}
-	}
-	
-	/**
-	 * Checks if this form has entries after the current entry.
-	 * 
-	 * @return True if current entry is the last one. False if there
-	 * 		are more entries.
-	 */
-	public boolean endOfForm()
-	{
-		return currentFC.getNextFC() == null;
-	}
-	
-	/**
-	 * Checks if this form has entries before the current entry.
-	 * 
-	 * @return True if current entry is the first one. False if there
-	 * 		are previous entries.
-	 */
-	public boolean beginningOfForm()
-	{
-		return currentFC.getPrevFC() == null;
 	}
 }

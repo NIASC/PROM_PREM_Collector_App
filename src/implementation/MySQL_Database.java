@@ -47,20 +47,7 @@ import core.interfaces.Database;
  */
 public class MySQL_Database implements Database
 {
-	/**
-	 * Initializes variables and loads the database configuration.
-	 * This class is a singleton and should only be instantiated once.
-	 */
-	private MySQL_Database()
-	{
-		try
-		{
-			dbConfig = new DatabaseConfig();
-		} catch (IOException e)
-		{
-			// e.printStackTrace();
-		}
-	}
+	/* Public */
 	
 	/**
 	 * 
@@ -171,9 +158,27 @@ public class MySQL_Database implements Database
 		return getMessages("info_messages", mc);
 	}
 	
-	/* 
-	 * Private methods not required by the interface.
+	/* Protected */
+	
+	/* Private */
+
+	private static MySQL_Database database;
+	private DatabaseConfig dbConfig;
+	
+	/**
+	 * Initializes variables and loads the database configuration.
+	 * This class is a singleton and should only be instantiated once.
 	 */
+	private MySQL_Database()
+	{
+		try
+		{
+			dbConfig = new DatabaseConfig();
+		} catch (IOException e)
+		{
+			// e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Query the database to update an entry i.e. modify an existing
@@ -333,7 +338,4 @@ public class MySQL_Database implements Database
 			return password;
 		}
 	}
-
-	private static MySQL_Database database;
-	private DatabaseConfig dbConfig;
 }

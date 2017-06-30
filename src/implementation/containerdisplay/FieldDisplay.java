@@ -43,18 +43,28 @@ import core.interfaces.UserInterface.FormComponentDisplay;
  */
 public class FieldDisplay extends JPanel implements FormComponentDisplay
 {
-	private static final long serialVersionUID = 2210804480530383502L;
+	/* Public */
+	
+	@Override
+	public void requestFocus()
+	{
+		field.requestFocus();
+	}
 
-	private FieldContainer fc;
+	@Override
+	public boolean fillEntry()
+	{
+		fc.setEntry(field.getText());
+		return true;
+	}
+
+	@Override
+	public boolean entryFilled()
+	{
+		return fc.hasEntry();
+	}
 	
-	private JLabel fieldLabel;
-	private JTextField field;
-	
-	/**
-	 * This constructor should not be used.
-	 */
-	@SuppressWarnings("unused")
-	private FieldDisplay() { }
+	/* Protected */
 	
 	/**
 	 * Initializes login variables.
@@ -72,23 +82,13 @@ public class FieldDisplay extends JPanel implements FormComponentDisplay
 		field.setPreferredSize(new Dimension(80, 25));
 		add(field, BorderLayout.CENTER);
 	}
-	/*
-	@Override
-	public void requestFocus()
-	{
-		field.requestFocus();
-	}*/
+	
+	/* Private */
+	
+	private static final long serialVersionUID = 2210804480530383502L;
 
-	@Override
-	public boolean fillEntry()
-	{
-		fc.setEntry(field.getText());
-		return true;
-	}
-
-	@Override
-	public boolean entryFilled()
-	{
-		return fc.hasEntry();
-	}
+	private FieldContainer fc;
+	
+	private JLabel fieldLabel;
+	private JTextField field;
 }

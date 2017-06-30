@@ -22,7 +22,6 @@ package implementation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -30,7 +29,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import javax.swing.JApplet;
 import javax.swing.JButton;
@@ -44,87 +42,25 @@ import javax.swing.border.LineBorder;
 
 import core.UserHandle;
 import core.containers.Form;
-import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
-import core.containers.form.SingleOptionContainer;
 import core.interfaces.Messages;
 import core.interfaces.UserInterface;
 import implementation.containerdisplay.ContainerDisplays;
-import implementation.containerdisplay.FieldDisplay;
-import implementation.containerdisplay.SingleOptionDisplay;
 
 public class GUI_UserInterface extends JApplet implements ActionListener, UserInterface
 {
-	public GUI_UserInterface()
+	/* Public */
+	
+	public static final Font FONT = new Font("Courier", Font.PLAIN, 16);
+	
+	public GUI_UserInterface(boolean embedded)
 	{
+		this.embedded = embedded;
 		uh = new UserHandle(this);
 		initGUI();
 	}
 	
-	private void initGUI()
-	{
-		frame = new JFrame("PROM/PREM Collector GUI");
-		frame.setContentPane(this);
-		setLayout(new BorderLayout());
-		
-		// panel for displaying and questions and answers
-		pageContent = new JPanel(new BorderLayout());
-		pageContent.setPreferredSize(new Dimension(400,300));
-		pageContent.setMinimumSize(new Dimension(200,100));
-		add(pageContent, BorderLayout.CENTER);
-		
-		// panel with buttons
-		add(makeMenuPanel(), BorderLayout.NORTH);
-
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.setVisible(true);
-		frame.pack();
-		setContent(new LoginScreen());
-	}
-	
-	private JPanel makeMenuPanel()
-	{
-		Dimension dim = new Dimension(150, 25);
-		JPanel bPanel = new JPanel(new GridLayout(1, 4));
-		restartButton = AddButton("(Re)start", "restart",
-				"Click here to (re)start the round.", true, true,
-				Color.LIGHT_GRAY, Color.BLACK, dim);
-		resultsButton = AddButton("Show results", "results",
-				String.format("%s %s", "Click here to show the results.",
-						"Doing so will end the round."), true, true,
-				Color.LIGHT_GRAY, Color.BLACK, dim);
-		settingsButton = AddButton("Settings", "settings",
-				"Click here to modify the settings.", true, true,
-				Color.LIGHT_GRAY, Color.BLACK, dim);
-		databaseButton = AddButton("Exit", "exit",
-				"Click here to exit the program.", true, true,
-				Color.LIGHT_GRAY, Color.BLACK, dim);
-		bPanel.add(restartButton);
-		bPanel.add(resultsButton);
-		bPanel.add(settingsButton);
-		bPanel.add(databaseButton);
-		return bPanel;
-	}
-	
-	private JButton AddButton(String buttonText, String nameSet, String tooltip,
-			boolean actionListen, boolean opaque, Color background,
-			Color border, Dimension d)
-	{
-		JButton button = new JButton(buttonText);
-		button.setName(nameSet);
-		button.setToolTipText(tooltip);
-		if(actionListen)
-			button.addActionListener(this);
-		button.setOpaque(opaque);
-		button.setBackground(background);
-		button.setBorder(new LineBorder(border));
-		if (d != null)
-			button.setPreferredSize(d);
-		button.setFont(FONT);
-		return button;
-	}
-	
+	@Override
 	public void actionPerformed(ActionEvent e)
 	{
 		if(e.getSource() instanceof JButton)
@@ -132,7 +68,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			JButton b = (JButton) e.getSource();
 			if (b.getName() != null)
 			{
-				if (b.getName().equals(databaseButton.getName()))
+				if (b.getName().equals(exitButton.getName()))
 				{
 					stop();
 				}
@@ -257,7 +193,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 
 		System.out.println("Applet destroyed");
 
-		if (frame != null)
+		if (!embedded && frame != null)
 			frame.dispose();
 	}
 	
@@ -279,33 +215,141 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 	
 	/**
-	 * Displays the message to the user and waits for an answer.
+	 * Sets the page content.
 	 * 
-	 * @param message The message to display.
-	 * 
-	 * @return The use response.
+	 * @param panel The panel that contains the page content.
 	 */
-	private String getUserInput(String message)
+	public void setContent(Component panel)
 	{
-		/*
-		pageContent.displayNewQuestion(message);
-		return pageContent.getUserInput();
-		*/
-		return null;
+		if (panel == null)
+			return;
+		pageContent.removeAll();
+		pageContent.add(panel, BorderLayout.CENTER);
+		panel.requestFocus();
+		pageContent.revalidate();
+		pageContent.repaint();
+	}
+	
+	/* Protected */
+	
+	/* Private */
+	
+	private boolean embedded;
+	
+	private JFrame frame;
+	private UserHandle uh;
+	private JButton menuButton0, menuButton2, menuButton1, exitButton;
+	private JPanel pageContent;
+	private static final long serialVersionUID = -3896988492887782839L;
+	
+	static
+	{
+		/* Prints (an estimation of the) memory usage of this
+		 * application. The code is a placeholder for future
+		 * statistics. */
+		Runtime runtime = Runtime.getRuntime();
+
+		StringBuilder sb = new StringBuilder();
+		long maxMemory = runtime.maxMemory();
+		long allocatedMemory = runtime.totalMemory();
+		long freeMemory = runtime.freeMemory();
+		sb.append("_______________________________\n");
+		sb.append("|     Memory     |   Size     |\n");
+		sb.append("|----------------|------------|\n");
+		sb.append(String.format("| Free:\t\t\t | %7d Kb |\n", (freeMemory/1024)));
+		sb.append(String.format("| Allocated:\t | %7d Kb |\n", (allocatedMemory/1024)));
+		sb.append(String.format("| Max:\t\t\t | %7d Kb |\n", (maxMemory/1024)));
+		sb.append(String.format("| Total free:\t | %7d Kb |\n", ((freeMemory + (maxMemory - allocatedMemory))/1024)));
+		sb.append("|________________|____________|\n");
+		System.out.println(sb.toString());
 	}
 	
 	/**
-	 * Prints a line of characters to make it simple for the user to
-	 * separate active interface stuff (forms, options, messages etc.)
-	 * from inactive interface stuff. This part may only be relevant
-	 * when using CLI.
+	 * Initializes the GUI. 
 	 */
-	private void separate()
+	private void initGUI()
 	{
-		/*
-		pageContent.clearDisplayQuestion();
-		*/
-		return;
+		setLayout(new BorderLayout());
+		
+		pageContent = new JPanel(new BorderLayout());
+		pageContent.setPreferredSize(new Dimension(400,300));
+		pageContent.setMinimumSize(new Dimension(200,100));
+		add(pageContent, BorderLayout.CENTER);
+		
+		add(makeMenuPanel(), BorderLayout.NORTH);
+		
+		if (!embedded)
+		{
+			frame = new JFrame("PROM/PREM Collector GUI");
+			frame.setContentPane(this);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setResizable(false);
+			frame.setVisible(true);
+			frame.pack();
+		}
+		
+		setContent(new LoginScreen());
+	}
+	
+	/**
+	 * Creates the static menu bars. The menu bars are not part of
+	 * the page content so they should not be changed anywhere except
+	 * in this class.
+	 * 
+	 * @return The panel containing menu buttons.
+	 */
+	private JPanel makeMenuPanel()
+	{
+		Dimension dim = new Dimension(150, 25);
+		JPanel bPanel = new JPanel(new GridLayout(1, 4));
+		menuButton0 = AddButton("Dummy0", "menuButton0", "Unused.",
+				true, true, Color.LIGHT_GRAY, Color.BLACK, dim);
+		menuButton1 = AddButton("Dummy1", "menuButton1", "Unused.",
+				true, true, Color.LIGHT_GRAY, Color.BLACK, dim);
+		menuButton2 = AddButton("Dummy2", "menuButton2", "Unused.",
+				true, true, Color.LIGHT_GRAY, Color.BLACK, dim);
+		exitButton = AddButton("Exit", "exit",
+				"Click here to exit the program.", true, true,
+				Color.LIGHT_GRAY, Color.BLACK, dim);
+		bPanel.add(menuButton0);
+		bPanel.add(menuButton1);
+		bPanel.add(menuButton2);
+		bPanel.add(exitButton);
+		return bPanel;
+	}
+	
+	/**
+	 * Creates a button with various attributes.
+	 * 
+	 * @param buttonText The text to put on the button.
+	 * @param nameSet The name of the button. Used for determining
+	 * 		which button is clicked in the action listener.
+	 * @param tooltip The tooltip text.
+	 * @param actionListen the action listener.
+	 * @param opaque Whether or not the button should be opaque.
+	 * @param background The background color.
+	 * @param border The border color.
+	 * @param d The preferred dimension of the button.
+	 * 
+	 * @return A button with the default settings with the addition of
+	 * 		the supplied settings.
+	 */
+	private JButton AddButton(String buttonText, String nameSet, String tooltip,
+			boolean actionListen, boolean opaque, Color background,
+			Color border, Dimension d)
+	{
+		JButton button = new JButton(buttonText);
+		button.setName(nameSet);
+		button.setToolTipText(tooltip);
+		if(actionListen)
+			button.addActionListener(this);
+		button.setOpaque(opaque);
+		button.setBackground(background);
+		button.setBorder(new LineBorder(border));
+		if (d != null)
+			button.setPreferredSize(d);
+		button.setFont(FONT);
+		return button;
 	}
 	
 	/**
@@ -399,12 +443,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	 */
 	private class LoginScreen extends JPanel implements ActionListener
 	{
-		private static final long serialVersionUID = 2352904758935918090L;
-		private JPanel buttons, entryfields;
-		private JButton login, register, exit;
-		private JLabel usernameL, passwordL;
-		private JTextField usernameTF;
-		private JPasswordField passwordTF;
+		/* Public */
 
 		public LoginScreen()
 		{
@@ -503,15 +542,21 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 				}
 			}
 		}
+		/* Protected */
+		
+		/* Private */
+		
+		private static final long serialVersionUID = 2352904758935918090L;
+		private JPanel buttons, entryfields;
+		private JButton login, register, exit;
+		private JLabel usernameL, passwordL;
+		private JTextField usernameTF;
+		private JPasswordField passwordTF;
 	}
 	
 	private class WelcomeScreen extends JPanel implements ActionListener
 	{
-		private static final long serialVersionUID = 2805273101165405918L;
-		private JPanel buttons;
-		private JButton questionnaire, viewData, logout;
-		
-		private Component retpan;
+		/* Public */
 		
 		public WelcomeScreen(Component retpan)
 		{
@@ -548,11 +593,11 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 				JButton b = (JButton)e.getSource();
 				if (b.getName().equals(questionnaire.getName()))
 				{
-					// start questionnaire
+					uh.startQuestionnaire();
 				}
 				else if (b.getName().equals(viewData.getName()))
 				{
-					// view data
+					uh.viewData();
 				}
 				else if (b.getName().equals(logout.getName()))
 				{
@@ -561,6 +606,16 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 				}
 			}
 		}
+		
+		/* Protected */
+		
+		/* Private */
+		
+		private static final long serialVersionUID = 2805273101165405918L;
+		private JPanel buttons;
+		private JButton questionnaire, viewData, logout;
+		
+		private Component retpan;
 	}
 	
 	/**
@@ -581,18 +636,6 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	 */
 	private class GUIForm extends JPanel implements ActionListener
 	{
-		private static final long serialVersionUID = -7513730435118997364L;
-		private final int nEntries;
-		private int cIdx;
-		private Messages msg = Messages.getMessages();
-		
-		private JPanel formControl, formContent;
-		private JButton fc_continue, fc_previous, fc_next, fc_exit;
-		
-		private final HashMap<Integer, FormComponentDisplay> components;
-		private final Form form;
-		private final ReturnFunction function;
-		private final Component retpan;
 		
 		/**
 		 * 
@@ -673,6 +716,23 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			}
 		}
 		
+		/* Protected */
+		
+		/* Private */
+		
+		private static final long serialVersionUID = -7513730435118997364L;
+		private final int nEntries;
+		private int cIdx;
+		private Messages msg = Messages.getMessages();
+		
+		private JPanel formControl, formContent;
+		private JButton fc_continue, fc_previous, fc_next, fc_exit;
+		
+		private final HashMap<Integer, FormComponentDisplay> components;
+		private final Form form;
+		private final ReturnFunction function;
+		private final Component retpan;
+		
 		private void setFormContent(int id)
 		{
 			if (components.get(id) == null)
@@ -709,59 +769,5 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			panel.add(fc_exit);
 			return panel;
 		}
-	}
-	
-	public static final Font FONT = new Font("Courier", Font.PLAIN, 16);
-	private JFrame frame;
-	public UserHandle uh;
-	private JButton restartButton, settingsButton,
-	resultsButton, databaseButton;
-	private JPanel pageContent;
-	private static final long serialVersionUID = -3896988492887782839L;
-	
-	/**
-	 * Sets the page content.
-	 * 
-	 * @param panel The panel that contains the page content.
-	 */
-	public void setContent(Component panel)
-	{
-		if (panel == null)
-			return;
-		pageContent.removeAll();
-		pageContent.add(panel, BorderLayout.CENTER);
-		panel.requestFocus();
-		pageContent.revalidate();
-		pageContent.repaint();
-	}
-	
-	public void setContent(Container contentContainer, Component panel)
-	{
-		if (contentContainer == null || panel == null)
-			return;
-		contentContainer.removeAll();
-		contentContainer.add(panel, BorderLayout.CENTER);
-		panel.requestFocus();
-		contentContainer.revalidate();
-		contentContainer.repaint();
-	}
-	
-	static
-	{
-		Runtime runtime = Runtime.getRuntime();
-
-		StringBuilder sb = new StringBuilder();
-		long maxMemory = runtime.maxMemory();
-		long allocatedMemory = runtime.totalMemory();
-		long freeMemory = runtime.freeMemory();
-		sb.append("_______________________________\n");
-		sb.append("|     Memory     |   Size     |\n");
-		sb.append("|----------------|------------|\n");
-		sb.append(String.format("| Free:\t\t\t | %7d Kb |\n", (freeMemory/1024)));
-		sb.append(String.format("| Allocated:\t | %7d Kb |\n", (allocatedMemory/1024)));
-		sb.append(String.format("| Max:\t\t\t | %7d Kb |\n", (maxMemory/1024)));
-		sb.append(String.format("| Total free:\t | %7d Kb |\n", ((freeMemory + (maxMemory - allocatedMemory))/1024)));
-		sb.append("|________________|____________|\n");
-		System.out.println(sb.toString());
 	}
 }

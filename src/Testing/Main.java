@@ -32,7 +32,7 @@ public class Main
 			System.out.printf("%s\n", Messages.DATABASE_ERROR);
 			System.exit(1);
 		}
-		GUI_UserInterface qf1 = new GUI_UserInterface();
+		GUI_UserInterface qf1 = new GUI_UserInterface(false);
 		qf1.start();
 	}
 }

@@ -22,14 +22,20 @@ package implementation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
+import javax.swing.BoxLayout;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -37,7 +43,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JViewport;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 
 import core.UserHandle;
@@ -214,6 +223,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		pageContent = new JPanel(new BorderLayout());
 		pageContent.setPreferredSize(new Dimension(400,300));
 		pageContent.setMinimumSize(new Dimension(200,100));
+		pageContent.setMaximumSize(new Dimension(400,300));
 		add(pageContent, BorderLayout.CENTER);
 		
 		add(makeMenuPanel(), BorderLayout.NORTH);
@@ -575,7 +585,6 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	 */
 	private class GUIForm extends JPanel implements ActionListener
 	{
-		
 		/**
 		 * 
 		 * @param form The form to display.
@@ -595,25 +604,35 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			this.displayMultiple = displayMultiple;
 			
 			setLayout(new BorderLayout());
-			components = fillContents(form); // TODO: move this function here
+			
+			components = fillContents(form);
 			nEntries = components.size();
+			
 			formControl = initControlPanel();
-			formContent = new JPanel(new FlowLayout());
-			formContent.setPreferredSize(new Dimension(150, 30));
-			add(formContent, BorderLayout.CENTER);
+			
+			formContent = new JPanel(new GridBagLayout());
+			scrollArea = new JScrollPane(formContent,
+					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			
+			add(scrollArea, BorderLayout.CENTER);
 			add(formControl, BorderLayout.SOUTH);
+			
 			setFormContent();
 		}
 		
 		@Override
 		public void requestFocus()
 		{
+			Component[] c = null;
 			synchronized(formContent.getTreeLock())
 			{
-				Component c = formContent.getComponents()[0];
-				if (c != null)
-					c.requestFocus();
+				c = formContent.getComponents();
 			}
+			if (c != null)
+				for (Component comp : c)
+					if (comp != null && comp == (Component) components.get(cIdx))
+						comp.requestFocus();
 		}
 		
 		@Override
@@ -669,6 +688,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		private Messages msg = Messages.getMessages();
 		
 		private JPanel formControl, formContent;
+		private JScrollPane scrollArea;
 		private JButton fc_continue, fc_previous, fc_next, fc_exit;
 		
 		private final HashMap<Integer, FormComponentDisplay> components;
@@ -679,18 +699,25 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		private void setFormContent()
 		{
 			formContent.removeAll();
+			
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.anchor = GridBagConstraints.EAST;
+			gbc.gridx = 0;
+			
 			if (displayMultiple)
 			{
 				for (int i = 0; i < components.size(); ++i)
-					if (components.get(i) != null)
-						formContent.add((Component) components.get(i));
+				{
+					gbc.gridy = i;
+					formContent.add((Component) components.get(i), gbc);
+				}
 			}
 			else
-				if (components.get(cIdx) != null)
-				{
-					formContent.add((Component) components.get(cIdx));
-					requestFocus();
-				}
+			{
+				gbc.gridy = 0; 
+				formContent.add((Component) components.get(cIdx), gbc);
+			}
+			requestFocus();
 			formContent.revalidate();
 			formContent.repaint();
 		}

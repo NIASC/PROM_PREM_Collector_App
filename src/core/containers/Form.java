@@ -63,6 +63,9 @@ public class Form
 			currentFC = fc;
 			return;
 		}
+		if (duplicateEntry(fc))
+			return;
+		
 		final FormContainer tmp = currentFC;
 		switch(location)
 		{
@@ -356,5 +359,22 @@ public class Form
 			currentFC = currentFC.getPrevFC();
 			jumpBackward(steps - 1);
 		}
+	}
+	
+	private boolean duplicateEntry(FormContainer fc)
+	{
+		final FormContainer tmp = currentFC;
+		jumpTo(AT_BEGIN);
+		boolean duplicate = false;
+		do
+		{
+			if (fc == currentEntry())
+			{
+				duplicate = true;
+				break;
+			}
+		} while (nextEntry() != null);
+		currentFC = tmp;
+		return duplicate;
 	}
 }

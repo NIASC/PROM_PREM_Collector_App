@@ -59,13 +59,23 @@ public interface UserInterface
 	 * a method to display themselves using the implementation of this
 	 * class.
 	 * 
+	 * This interface does not guarantee that displayMultiple will be
+	 * used in the implementation but it should serve as a hint if the
+	 * form should have all of its entries displayed at the same time
+	 * or not.
+	 * 
 	 * @param form The form container that the user should fill in.
 	 * @param retfun The function that should be called when the form
 	 * 		has been filled.
+	 * @param displayMultiple True if the UserInterface implementation
+	 * 		should display all form entries at the same time. False
+	 * 		if only one entry should be display at a time.
+	 * 
 	 * @return True if the form was filled. False if the form was not
 	 * 		fully filled in.
 	 */
-	public boolean presentForm(Form form, ReturnFunction retfun);
+	public boolean presentForm(Form form, ReturnFunction retfun,
+			boolean displayMultiple);
 	
 	/**
 	 * Creates an object that can store a form container.
@@ -95,7 +105,9 @@ public interface UserInterface
 		public boolean fillEntry();
 		
 		/**
-		 * Checks if the entry has been filled.
+		 * Checks if the entry has been filled. It is recommended that
+		 * this function also calls fillEntry in case the entry have
+		 * been filled without fillEntry have been called.
 		 * 
 		 * @return True if the entry has been filled. False it not.
 		 */

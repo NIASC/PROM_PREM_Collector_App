@@ -61,6 +61,7 @@ public class FieldDisplay extends JPanel implements FormComponentDisplay
 	@Override
 	public boolean entryFilled()
 	{
+		fillEntry();
 		return fc.hasEntry();
 	}
 	

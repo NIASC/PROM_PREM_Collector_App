@@ -76,6 +76,7 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	@Override
 	public boolean entryFilled() 
 	{
+		fillEntry();
 		return soc.hasEntry();
 	}
 	

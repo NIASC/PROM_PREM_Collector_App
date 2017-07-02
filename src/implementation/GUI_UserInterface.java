@@ -101,75 +101,15 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 
 	@Override
-	public boolean presentForm(Form form, ReturnFunction function)
+	public boolean presentForm(Form form, ReturnFunction function,
+			boolean displayMultiple)
 	{
 		Component panel = null;
 		synchronized(pageContent.getTreeLock())
 		{
 			panel = pageContent.getComponents()[0];
 		}
-		setContent(new GUIForm(form, function, panel));
-		/*
-		HashMap<Integer, ExtraImplementation> components = fillContents(form);
-		int nEntries = components.size();
-
-		final int ERROR = 0, EXIT = 1, CONTINUE = 2,
-				GOTO_PREV = 3, GOTO_NEXT = 4;
-		Messages msg = Messages.getMessages();
-		SingleOptionContainer options = new SingleOptionContainer();
-		options.addSOption(CONTINUE, msg.getInfo(
-				Messages.INFO_UI_FORM_CONTINUE));
-		options.addSOption(GOTO_PREV, msg.getInfo(
-				Messages.INFO_UI_FORM_PREVIOUS));
-		options.addSOption(GOTO_NEXT, msg.getInfo(
-				Messages.INFO_UI_FORM_NEXT));
-		options.addSOption(EXIT, msg.getInfo(
-				Messages.INFO_UI_FORM_EXIT));
-
-		int cIdx = 0;
-		boolean allFilled = false;
-		while(!allFilled)
-		{
-			String entryState;
-			if (components.get(cIdx).entryFilled())
-				entryState = msg.getInfo(Messages.INFO_UI_FILLED);
-			else
-				entryState = msg.getInfo(Messages.INFO_UI_UNFILLED);
-			Integer identifier = null;
-			if (options.setSelected(selectOption(
-					String.format("%s: %d/%d (%s)",
-							msg.getInfo(Messages.INFO_UI_ENTRY),
-							cIdx, nEntries-1, entryState),
-					options)))
-				identifier = options.getSelected();
-			int response = identifier != null ? identifier : ERROR;
-			switch(response)
-			{
-			case CONTINUE:
-				components.get(cIdx).present();
-				components.get(cIdx).fillEntry();
-				int nextComponent = getNextUnfilledEntry(cIdx,
-						components);
-				if (nextComponent == cIdx)
-					allFilled = true;
-				else
-					cIdx = nextComponent;
-				break;
-			case GOTO_PREV:
-				cIdx = getNextEntry(cIdx, nEntries, -1, false);
-				break;
-			case GOTO_NEXT:
-				cIdx = getNextEntry(cIdx, nEntries, 1, false);
-				break;
-			case EXIT:
-				return false;
-			default:
-				displayError(Messages.getMessages().getError(
-						Messages.ERROR_UNKNOWN_RESPONSE));
-				break;
-			}
-		}
-		*/
+		setContent(new GUIForm(form, function, panel, displayMultiple));
 		return true;
 	}
 	
@@ -643,13 +583,16 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		 * 		filled.
 		 * @param retpan The displayable object (panel) to return to
 		 * 		when this function has returned.
+		 * @param displayMultiple True if the form should display
+		 * 		multiple entries at the same time.
 		 */
 		public GUIForm(final Form form, final ReturnFunction function,
-				final Component retpan)
+				final Component retpan, boolean displayMultiple)
 		{
 			this.form = form;
 			this.function = function;
 			this.retpan = retpan;
+			this.displayMultiple = displayMultiple;
 			
 			setLayout(new BorderLayout());
 			components = fillContents(form); // TODO: move this function here
@@ -659,7 +602,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			formContent.setPreferredSize(new Dimension(150, 30));
 			add(formContent, BorderLayout.CENTER);
 			add(formControl, BorderLayout.SOUTH);
-			setFormContent(cIdx);
+			setFormContent();
 		}
 		
 		@Override
@@ -694,18 +637,18 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 						else
 						{
 							cIdx = nextComponent;
-							setFormContent(cIdx);
+							setFormContent();
 						}
 					}
 					else if (b.getName().equals(fc_previous.getName()))
 					{
 						cIdx = getNextEntry(cIdx, nEntries, -1, false);
-						setFormContent(cIdx);
+						setFormContent();
 					}
 					else if (b.getName().equals(fc_next.getName()))
 					{
 						cIdx = getNextEntry(cIdx, nEntries, 1, false);
-						setFormContent(cIdx);
+						setFormContent();
 					}
 					else if (b.getName().equals(fc_exit.getName()))
 					{
@@ -721,6 +664,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		private static final long serialVersionUID = -7513730435118997364L;
 		private final int nEntries;
+		private boolean displayMultiple;
 		private int cIdx;
 		private Messages msg = Messages.getMessages();
 		
@@ -732,13 +676,21 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		private final ReturnFunction function;
 		private final Component retpan;
 		
-		private void setFormContent(int id)
+		private void setFormContent()
 		{
-			if (components.get(id) == null)
-				return;
 			formContent.removeAll();
-			formContent.add((Component) components.get(id));
-			requestFocus();
+			if (displayMultiple)
+			{
+				for (int i = 0; i < components.size(); ++i)
+					if (components.get(i) != null)
+						formContent.add((Component) components.get(i));
+			}
+			else
+				if (components.get(cIdx) != null)
+				{
+					formContent.add((Component) components.get(cIdx));
+					requestFocus();
+				}
 			formContent.revalidate();
 			formContent.repaint();
 		}

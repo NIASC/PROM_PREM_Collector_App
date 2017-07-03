@@ -116,7 +116,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 					null, message, "Error",
 					JOptionPane.ERROR_MESSAGE);
 		else
-			displayEmbeddedMessage(String.format("ERROR: %s", message),
+			displayEmbeddedMessage(String.format("%s", message),
 					Color.RED);
 	}
 
@@ -703,8 +703,13 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 								cIdx, components);
 						if (nextComponent == cIdx && components.get(cIdx).entryFilled())
 						{
-							if (function.call(form))
+							RetFunContainer rfc = function.call(form);
+							if (rfc.valid)
+							{
 								setContent(retpan);
+								if (rfc.nextfunc != null)
+									rfc.nextfunc.call();
+							}
 						}
 						else
 						{

@@ -41,7 +41,17 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public SingleOptionContainer()
 	{
-		this(false);
+		this(false, null);
+	}
+	
+	/**
+	 * Initializes this container without a description.
+	 * 
+	 * @param allowEmptyEntry
+	 */
+	public SingleOptionContainer(boolean allowEmptyEntry)
+	{
+		this(allowEmptyEntry, null);
 	}
 	
 	/**
@@ -49,26 +59,29 @@ public class SingleOptionContainer extends FormContainer
 	 * 
 	 * @param allowEmptyEntry {@code true} if this container allows
 	 * 		empty entry (answer/response). {@code false} if not.
+	 * @param description The description of this entry, i.e. what the
+	 * 		different options mean.
 	 */
-	public SingleOptionContainer(boolean allowEmptyEntry)
+	public SingleOptionContainer(boolean allowEmptyEntry, String description)
 	{
 		super(allowEmptyEntry);
+		this.description = description;
 		nextFC = prevFC = null;
 		options = new HashMap<Integer, SingleOption>();
 		nextOption = 0;
-		selected = null;
+		selectedID = null;
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return selected != null;
+		return allowEmpty || selectedID != null;
 	}
 
 	@Override
 	public FormContainer copy()
 	{
-		SingleOptionContainer soc = new SingleOptionContainer(allowEmpty);
+		SingleOptionContainer soc = new SingleOptionContainer(allowEmpty, description);
 		for (Entry<Integer, SingleOption> e : options.entrySet())
 			soc.addSingleOption(e.getKey(), e.getValue().getText());
 		return soc;
@@ -114,10 +127,9 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public boolean setSelected(int id)
 	{
-		SingleOption sel = options.get(id);
-		if (sel == null)
+		if (options.get(id) == null)
 			return false;
-		selected = sel.getIdentifier();
+		selectedID = id;
 		return true;
 	}
 	
@@ -130,16 +142,43 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public Integer getSelected()
 	{
-		return selected;
+		if (selectedID == null)
+			return null;
+		return options.get(selectedID).getIdentifier();
+	}
+	
+	public Integer getSelectedID()
+	{
+		return selectedID;
+	}
+	
+	/**
+	 * Sets this container's description to {@code description}.
+	 * 
+	 * @param description This container's description.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+	
+	/**
+	 * 
+	 * @return This container's description.
+	 */
+	public String getDescription()
+	{
+		return description;
 	}
 	
 	/* Protected */
 	
 	/* Private */
 	
+	private String description;
 	private HashMap<Integer, SingleOption> options;
 	private int nextOption;
-	private Integer selected;
+	private Integer selectedID;
 	
 	/**
 	 * This class is a data container for single-option form entries.

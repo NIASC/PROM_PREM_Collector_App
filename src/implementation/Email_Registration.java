@@ -35,6 +35,7 @@ import core.containers.form.FieldContainer;
 import core.interfaces.Messages;
 import core.interfaces.Registration;
 import core.interfaces.UserInterface;
+import core.interfaces.UserInterface.RetFunContainer;
 
 /**
  * This class is an example of an implementation of
@@ -109,8 +110,9 @@ public class Email_Registration implements Registration
 	 * 
 	 * @return True if the form was accepted.
 	 */
-	private boolean regProcReturn(Form form)
+	private RetFunContainer regProcReturn(Form form)
 	{
+		RetFunContainer rfc = new RetFunContainer(null);
 		form.jumpTo(Form.AT_BEGIN);
 		FieldContainer name = (FieldContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
@@ -121,8 +123,9 @@ public class Email_Registration implements Registration
 		if ((name.getEntry() == null || name.getEntry().isEmpty())
 				|| (email.getEntry() == null || email.getEntry().isEmpty())
 				|| (clinic.getEntry() == null || clinic.getEntry().isEmpty()))
-			return false;
-		
+		{
+			return rfc;
+		}
 		String emailSubject = Messages.getMessages().getInfo(
 				Messages.INFO_REG_EMAIL_SUBJECT);
 		String emailDescription = Messages.getMessages().getInfo(
@@ -134,7 +137,8 @@ public class Email_Registration implements Registration
 				emailDescription, NAME_STR, name.getEntry(), EMAIL_STR,
 				email.getEntry(), CLINIC_STR, clinic.getEntry(), emailSignature);
 		send(adminEmail, emailSubject, emailBody, "text/html");
-		return true;
+		rfc.valid = true;
+		return rfc;
 	}
 	
 	/* 

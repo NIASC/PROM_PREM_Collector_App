@@ -22,6 +22,7 @@ package core.interfaces;
 import java.util.HashMap;
 
 import core.containers.MessageContainer;
+import core.containers.Patient;
 import core.containers.User;
 
 /**
@@ -53,6 +54,16 @@ public interface Database
 	 */
 	public int addUser(String username,
 			String password, String salt, int clinic, String email);
+	
+	/**
+	 * Adds a new patient to the database.
+	 * 
+	 * @param patient The patient to add
+	 * @param answers The questionnaire form.
+	 * 
+	 * @return QUERY_SUCCESS on successful update, ERROR on failure.
+	 */
+	public int addQuestionnaireAnswers(Patient patient, String... answers);
 
 	/**
 	 * Adds a new clinic to the database.
@@ -79,6 +90,16 @@ public interface Database
 	 * 		returned else null.
 	 */
 	public User getUser(String username);
+	
+	/**
+	 * Collects the information about the patient from the database.
+	 * 
+	 * @param pnr The personal number of the patient to look for.
+	 * 
+	 * @return If the patient was found the instance of the patient is
+	 * 		returnes else null.
+	 */
+	public boolean patientInDatabase(String pnr);
 
 	/**
 	 * Updates the user's password and salt to newPass and newSalt if

@@ -32,6 +32,7 @@ import java.util.Properties;
 
 import core.Utilities;
 import core.containers.MessageContainer;
+import core.containers.Patient;
 import core.containers.User;
 import core.interfaces.Database;
 
@@ -84,6 +85,31 @@ public class MySQL_Database implements Database
 	}
 
 	@Override
+	public int addQuestionnaireAnswers(Patient patient, String... answers)
+	{
+		System.out.println(answers.length);
+		if (answers.length < 5)
+			/* currently 5 questions */
+			return ERROR;
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String qInsert0 = String.format(
+				"INSERT INTO `patients` (`clinic_id`, `pnr`, `forename`, `lastname`, `id`) VALUES ('%d', '%s', '%s', '%s', NULL)",
+				patient.getClinicID(), patient.getPersonalNumber(), patient.getForename(), patient.getLastname());
+		String qInsert1 = String.format(
+				"INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, `question0`, `question1`, `question2`, `question3`, `question4`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+				patient.getClinicID(), patient.getPersonalNumber(), sdf.format(new Date()), answers[0], answers[1], answers[2], answers[3], answers[4]);
+		int ret = QUERY_SUCCESS;
+		if (!patientInDatabase(patient.getPersonalNumber()))
+			ret = queryUpdate(qInsert0);
+		System.out.println(ret +", "+ patientInDatabase(patient.getPersonalNumber()));
+		if (ret == QUERY_SUCCESS && queryUpdate(qInsert1) == ret)
+			return ret;
+		else
+			return ERROR;
+	}
+
+	@Override
 	public int addClinic(String clinicName)
 	{
 		String qInsert = String.format(
@@ -128,6 +154,25 @@ public class MySQL_Database implements Database
 		}
 		catch (SQLException se) { }
 		return user;
+	}
+	
+	@Override
+	public boolean patientInDatabase(String pnr)
+	{
+		try (Connection conn = DriverManager.getConnection(
+				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		{
+			Statement s = conn.createStatement();
+			ResultSet rs = query(s, "SELECT `pnr` FROM `patients`");
+			if (rs == null)
+				return false;
+
+			while (rs.next())
+				if (rs.getString("pnr").equals(pnr))
+					return true;
+		}
+		catch (SQLException se) { }
+		return false;
 	}
 
 	@Override

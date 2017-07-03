@@ -78,7 +78,14 @@ public class FieldDisplay extends JPanel implements FormComponentDisplay
 		this.fc = fc;
 		fieldLabel = new JLabel(String.format("%s: ", fc.getStatement()));
 		add(fieldLabel, BorderLayout.WEST);
-		field = fc.isSecret() ? new JPasswordField(32) : new JTextField(32);
+		if (fc.isSecret())
+			field = new JPasswordField(32);
+		else
+		{
+			field = new JTextField(32);
+			field.setText(fc.getEntry());
+		}
+		
 		field.setPreferredSize(new Dimension(80, 25));
 		add(field, BorderLayout.CENTER);
 	}

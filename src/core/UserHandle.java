@@ -30,6 +30,7 @@ import core.interfaces.Implementations;
 import core.interfaces.Messages;
 import core.interfaces.Registration;
 import core.interfaces.UserInterface;
+import core.interfaces.UserInterface.RetFunContainer;
 
 /**
  * This class handles the user. This mostly means handling the login,
@@ -261,8 +262,9 @@ public class UserHandle
 	 * 
 	 * @see Form
 	 */
-	private boolean setPassReturn(Form form)
+	private RetFunContainer setPassReturn(Form form)
 	{
+		RetFunContainer rfc = new RetFunContainer(null);
 		form.jumpTo(Form.AT_BEGIN);
 		FieldContainer current = (FieldContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
@@ -272,7 +274,7 @@ public class UserHandle
 		form.jumpTo(Form.AT_NEXT);
 
 		if (newPassError(current.getEntry(), new1.getEntry(), new2.getEntry()))
-			return false;
+			return rfc;
 		
 		Encryption crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
@@ -281,10 +283,11 @@ public class UserHandle
 		if (tmpUser == null)
 		{
 			ui.displayError(Messages.DATABASE_ERROR, false);
-			return false;
+			return rfc;
 		}
 		user = tmpUser;
-		return true;
+		rfc.valid = true;
+		return rfc;
 	}
 	
 	/**

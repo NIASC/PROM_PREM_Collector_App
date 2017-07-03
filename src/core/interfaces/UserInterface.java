@@ -151,16 +151,97 @@ public interface UserInterface
 		 * 
 		 * @param form The {@code Form} that you received.
 		 * 
-		 * @return {@code true} if the function accepted the response.
-		 * 		{@code false} if the response was rejected by the
-		 * 		function.
+		 * @return A {@code RetFunContainer} containing information
+		 * 		about if the function accepted the {@code Form}
+		 * 		entries. The {@code RetFunContainer} also contains
+		 * 		a functional interface {@code NextFunction} which
+		 * 		should be called if the {@code Form} was accepted (and
+		 * 		the function is not null). If the {@code Form} was not
+		 * 		accepted by the function then {@code null} is
+		 * 		returned.
 		 * 
 		 * @see UserInterface
 		 * @see Form
+		 * @see NextFunction#call()
 		 * 
 		 * @author Marcus Malmquist
 		 */
-		boolean call(Form form);
+		RetFunContainer call(Form form);
+	}
+	
+	/**
+	 * This class is intended to be used along with the functional
+	 * interfaces {@code ReturnFunction} and {@code NextFunction}.
+	 * The purpose of this class is to provide {@code ReturnFunction}
+	 * a way of telling its caller that it accepted or rejected
+	 * whatever it received as well as allowing the caller of
+	 * {@code ReturnFunction} to display the next content if it should
+	 * not return to displaying its parent menu.
+	 * 
+	 * @author Marcus Malmquist
+	 * 
+	 * @see ReturnFunction#call(Form)
+	 * @see NextFunction#call()
+	 */
+	public class RetFunContainer
+	{
+		/**
+		 * This flag should be set to true if {@code ReturnFunction}
+		 * are ready to call {@code NextFunction}, meaning that it was
+		 * satisfied with whatever it got. 
+		 * 
+		 * @see ReturnFunction#call(Form)
+		 * @see NextFunction#call()
+		 */
+		public boolean valid;
+		/**
+		 * This functional interface object should be called when
+		 * {@code valid} is set to true. This function is intended to
+		 * be used to display the next content to the user if the
+		 * program should not return to the parent content of
+		 * {@code ReturnFunction} when it has finished, which is the
+		 * default action if this variable is {@code null}.
+		 * 
+		 * @see RetFunContainer#valid
+		 * @see ReturnFunction#call(Form)
+		 */
+		public final NextFunction nextfunc;
+		
+		/**
+		 * Initializes this container with the next function set to
+		 * {@code nextfunc} and the valid flag set to false.
+		 * 
+		 * @param nextfunc The function to be called if {@code valid}
+		 * 		is true.
+		 * 
+		 * @see #valid
+		 * @see #nextfunc
+		 * @see NextFunction#call()
+		 */
+		public RetFunContainer(final NextFunction nextfunc)
+		{
+			this.nextfunc = nextfunc;
+			valid = false;
+		}
+
+		/**
+		 * This is a functional interface designed is to allow
+		 * functions to be passed as arguments to other function.
+		 * 
+		 * @author Marcus Malmquist
+		 *
+		 */
+		@FunctionalInterface
+		public interface NextFunction
+		{
+			/**
+			 * This function should be called if the {@code valid}
+			 * flag is true.
+			 * 
+			 * @see RetFunContainer#valid
+			 */
+			void call();
+		}
 	}
 	
 	/* Protected */

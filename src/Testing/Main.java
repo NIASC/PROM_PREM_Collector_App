@@ -34,7 +34,5 @@ public class Main
 		}
 		GUI_UserInterface qf1 = new GUI_UserInterface(false);
 		qf1.start();
-		GUI_UserInterface qf2 = new GUI_UserInterface(false);
-		qf2.start();
 	}
 }

@@ -521,17 +521,30 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		{
 
 			setLayout(new BorderLayout());
-			buttons = new JPanel(new GridLayout(1, 3));
+			buttons = new JPanel(new GridBagLayout());
+			scrollArea = new JScrollPane(buttons,
+					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			
 			questionnaire = new JButton("Start questionnaire");
 			questionnaire.setName("questionnaire");
 			questionnaire.addActionListener(this);
+			
 			viewData = new JButton("View Statistics");
 			viewData.setName("viewData");
 			viewData.addActionListener(this);
-			buttons.add(questionnaire);
-			buttons.add(viewData);
+
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+			gbc.anchor = GridBagConstraints.CENTER;
+			gbc.insets.bottom = gbc.insets.top = 5;
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			buttons.add(questionnaire, gbc);
+			gbc.gridy = 1;
+			buttons.add(viewData, gbc);
 			
-			add(buttons, BorderLayout.NORTH);
+			add(scrollArea, BorderLayout.CENTER);
 		}
 		
 		@Override
@@ -563,6 +576,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		private static final long serialVersionUID = 2805273101165405918L;
 		private JPanel buttons;
+		private JScrollPane scrollArea;
 		private JButton questionnaire, viewData;
 	}
 	
@@ -700,6 +714,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.anchor = GridBagConstraints.EAST;
+			gbc.insets.bottom = gbc.insets.top = 2;
 			gbc.gridx = 0;
 			if (displayMultiple)
 			{

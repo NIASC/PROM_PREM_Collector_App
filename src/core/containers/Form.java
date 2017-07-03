@@ -64,7 +64,7 @@ public class Form
 			return;
 		}
 		if (duplicateEntry(fc))
-			return;
+			fc = fc.copy(); // duplicates causes errors.
 		
 		final FormContainer tmp = currentFC;
 		switch(location)
@@ -361,6 +361,16 @@ public class Form
 		}
 	}
 	
+	/**
+	 * Compares the containers in this form and checks if the supplied
+	 * container is a reference to an object already in this form.
+	 * 
+	 * @param fc The container to check if it already exists in this
+	 * 		form.
+	 * 
+	 * @return True if this form already contains the supplied
+	 * 		container. False if not.
+	 */
 	private boolean duplicateEntry(FormContainer fc)
 	{
 		final FormContainer tmp = currentFC;

@@ -50,6 +50,15 @@ public abstract class FormContainer
 	public abstract boolean hasEntry();
 	
 	/**
+	 * Creates a copy of this container. It is implementation
+	 * dependent whether or not the references to the next and
+	 * previous containers.
+	 * 
+	 * @return A copy of this container.
+	 */
+	public abstract FormContainer copy();
+	
+	/**
 	 * Creates a displayable wrapper for this container and puts this
 	 * container inside it.
 	 * 

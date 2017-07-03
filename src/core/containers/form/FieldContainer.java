@@ -62,13 +62,21 @@ public class FieldContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return field.getValue() != null
-				&& (allowEmpty || !field.getValue().isEmpty());
+		return field.getEntry() != null
+				&& (allowEmpty || !field.getEntry().isEmpty());
+	}
+
+	@Override
+	public FormContainer copy()
+	{
+		FieldContainer fc = new FieldContainer(allowEmpty, secret, field.getStatement());
+		fc.setEntry(field.getEntry());
+		return fc;
 	}
 	
 	/**
 	 * Sets the content of this container. A field container is only
-	 * allowed to contain one field so if thie container already have
+	 * allowed to contain one field so if this container already have
 	 * an entry it will be overwritten
 	 * 
 	 * @param statement The statement that you want the user to
@@ -93,7 +101,7 @@ public class FieldContainer extends FormContainer
 	 */
 	public String getStatement()
 	{
-		return field.getKey();
+		return field.getStatement();
 	}
 	
 	/**
@@ -104,7 +112,7 @@ public class FieldContainer extends FormContainer
 	 */
 	public String getEntry()
 	{
-		return field.getValue();
+		return field.getEntry();
 	}
 	
 	/**
@@ -122,10 +130,19 @@ public class FieldContainer extends FormContainer
 	 * can be used to reset the field.
 	 * 
 	 * @param entry The user entry to set.
+	 * @return TODO
 	 */
-	public void setEntry(String entry)
+	public boolean setEntry(String entry)
 	{
-		field.setValue(entry);
+		if (entry == null)
+			field.setEntry(entry);
+		else
+		{
+			if (entry.trim().isEmpty() && !allowEmpty)
+				return false;
+			field.setEntry(entry.trim());
+		}
+		return true;
 	}
 	
 	/* Protected */
@@ -146,8 +163,7 @@ public class FieldContainer extends FormContainer
 	 */
 	private class FieldEntry
 	{
-		private String entryKey;
-		private String entryValue;
+		/* Public */
 		
 		/**
 		 * Creates a field entry. The field is represented on the form
@@ -155,40 +171,47 @@ public class FieldContainer extends FormContainer
 		 * of what you expect the value to be, e.g. in the form
 		 * 'Age: 30' the key is 'Age' and the value is '30'.
 		 * 
-		 * @param key This field's key/description.
+		 * @param statement This field's key/description.
 		 */
-		public FieldEntry(String key)
+		public FieldEntry(String statement)
 		{
-			entryKey = key;
-			entryValue = null;
+			this.statement = statement;
+			entry = null;
 		}
 		
 		/**
 		 * 
 		 * @return This field's key.
 		 */
-		public String getKey()
+		public String getStatement()
 		{
-			return entryKey;
+			return statement;
 		}
 		
 		/**
 		 * 
 		 * @return This field's value.
 		 */
-		public String getValue()
+		public String getEntry()
 		{
-			return entryValue;
+			return entry;
 		}
 		
 		/**
 		 * Sets the value of this field.
 		 * 
-		 * @param value The value to set for this field.
+		 * @param entry The value to set for this field.
 		 */
-		public void setValue(String value)
+		public void setEntry(String entry)
 		{
-			entryValue = value;
+			this.entry = entry;
 		}
+		
+		/* Protected */
+		
+		/* Private */
+
+		private String statement;
+		private String entry;
 	}
 }

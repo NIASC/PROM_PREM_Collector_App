@@ -77,7 +77,23 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			JButton b = (JButton) e.getSource();
 			if (b.getName() != null)
 			{
-				if (b.getName().equals(exitButton.getName()))
+				if (b.getName().equals(mainmenuButton.getName()))
+				{
+					if (uh.isLoggedIn())
+						setContent(new WelcomeScreen());
+					else
+						setContent(new LoginScreen());
+				}
+				else if (b.getName().equals(menuButton1.getName()))
+				{
+					// unused
+				}
+				else if (b.getName().equals(logoutButton.getName()))
+				{
+					uh.logout();
+					setContent(new LoginScreen());
+				}
+				else if (b.getName().equals(exitButton.getName()))
 				{
 					stop();
 				}
@@ -159,6 +175,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		/* when the user leaves the web page. */
 		System.out.println("Applet stopped");
 		/* Maybe save session to cache?       */
+		uh.logout();
 		if (frame != null)
 			frame.dispose();
 	}
@@ -187,7 +204,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	
 	private JFrame frame;
 	private UserHandle uh;
-	private JButton menuButton0, menuButton2, menuButton1, exitButton;
+	private JButton mainmenuButton, logoutButton, menuButton1, exitButton;
 	private JPanel pageContent;
 	private static final long serialVersionUID = -3896988492887782839L;
 	
@@ -252,18 +269,18 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	{
 		Dimension dim = new Dimension(150, 25);
 		JPanel bPanel = new JPanel(new GridLayout(1, 4));
-		menuButton0 = AddButton("Dummy0", "menuButton0", "Unused.",
+		mainmenuButton = AddButton("Main menu", "mainmenuButton", "Return to main menu.",
 				true, true, Color.LIGHT_GRAY, Color.BLACK, dim);
 		menuButton1 = AddButton("Dummy1", "menuButton1", "Unused.",
 				true, true, Color.LIGHT_GRAY, Color.BLACK, dim);
-		menuButton2 = AddButton("Dummy2", "menuButton2", "Unused.",
+		logoutButton = AddButton("Logout", "logoutButton", "Log out.",
 				true, true, Color.LIGHT_GRAY, Color.BLACK, dim);
 		exitButton = AddButton("Exit", "exit",
-				"Click here to exit the program.", true, true,
+				"Exit.", true, true,
 				Color.LIGHT_GRAY, Color.BLACK, dim);
-		bPanel.add(menuButton0);
+		bPanel.add(mainmenuButton);
 		bPanel.add(menuButton1);
-		bPanel.add(menuButton2);
+		bPanel.add(logoutButton);
 		bPanel.add(exitButton);
 		return bPanel;
 	}
@@ -405,12 +422,8 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			register = new JButton("Register");
 			register.setName("register");
 			register.addActionListener(this);
-			exit = new JButton("Exit");
-			exit.setName("exit");
-			exit.addActionListener(this);
 			buttons.add(login);
 			buttons.add(register);
-			buttons.add(exit);
 			
 			/* entry fields */
 			entryfields = new JPanel(new BorderLayout());
@@ -460,17 +473,13 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 					{
 						usernameTF.setText(null);
 						passwordTF.setText(null);
-						setContent(new WelcomeScreen(this));
+						setContent(new WelcomeScreen());
 						uh.updatePassword();
 					}
 				}
 				else if (b.getName().equals(register.getName()))
 				{
 					uh.register();
-				}
-				else if (b.getName().equals(exit.getName()))
-				{
-					stop();
 				}
 			}
 			else if (e.getSource() instanceof JTextField)
@@ -498,7 +507,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		private static final long serialVersionUID = 2352904758935918090L;
 		private JPanel buttons, entryfields;
-		private JButton login, register, exit;
+		private JButton login, register;
 		private JLabel usernameL, passwordL;
 		private JTextField usernameTF;
 		private JPasswordField passwordTF;
@@ -508,9 +517,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	{
 		/* Public */
 		
-		public WelcomeScreen(Component retpan)
+		public WelcomeScreen()
 		{
-			this.retpan = retpan;
+
 			setLayout(new BorderLayout());
 			buttons = new JPanel(new GridLayout(1, 3));
 			questionnaire = new JButton("Start questionnaire");
@@ -519,12 +528,8 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			viewData = new JButton("View Statistics");
 			viewData.setName("viewData");
 			viewData.addActionListener(this);
-			logout = new JButton("Log out");
-			logout.setName("logout");
-			logout.addActionListener(this);
 			buttons.add(questionnaire);
 			buttons.add(viewData);
-			buttons.add(logout);
 			
 			add(buttons, BorderLayout.NORTH);
 		}
@@ -549,11 +554,6 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 				{
 					uh.viewData();
 				}
-				else if (b.getName().equals(logout.getName()))
-				{
-					uh.logout();
-					setContent(retpan);
-				}
 			}
 		}
 		
@@ -563,9 +563,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		private static final long serialVersionUID = 2805273101165405918L;
 		private JPanel buttons;
-		private JButton questionnaire, viewData, logout;
-		
-		private Component retpan;
+		private JButton questionnaire, viewData;
 	}
 	
 	/**
@@ -614,7 +612,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			scrollArea = new JScrollPane(formContent,
 					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			
+
 			add(scrollArea, BorderLayout.CENTER);
 			add(formControl, BorderLayout.SOUTH);
 			
@@ -703,7 +701,6 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.anchor = GridBagConstraints.EAST;
 			gbc.gridx = 0;
-			
 			if (displayMultiple)
 			{
 				for (int i = 0; i < components.size(); ++i)
@@ -714,9 +711,10 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			}
 			else
 			{
-				gbc.gridy = 0; 
+				gbc.gridy = 0;
 				formContent.add((Component) components.get(cIdx), gbc);
 			}
+			
 			requestFocus();
 			formContent.revalidate();
 			formContent.repaint();

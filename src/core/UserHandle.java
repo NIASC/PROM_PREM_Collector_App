@@ -117,8 +117,8 @@ public class UserHandle
 	{
 		if (!loggedIn)
 			return;
-		resetLoginVars();
 		UserManager.getUserManager().delUser(this);
+		resetLoginVars();
 	}
 	
 	/**

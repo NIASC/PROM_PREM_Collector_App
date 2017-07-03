@@ -67,6 +67,15 @@ public class SingleOptionContainer extends FormContainer
 	{
 		return selected != null;
 	}
+
+	@Override
+	public FormContainer copy()
+	{
+		SingleOptionContainer soc = new SingleOptionContainer(allowEmpty);
+		for (Entry<Integer, SingleOption> e : options.entrySet())
+			soc.addSOption(e.getKey(), e.getValue().getText());
+		return soc;
+	}
 	
 	/**
 	 * Adds a new option to the container. Avoid using UNSET as an
@@ -144,8 +153,7 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	private class SingleOption
 	{
-		private int identifier;
-		private String text;
+		/* Public */
 		
 		/**
 		 * Initializes the class with an identifier and a text.
@@ -179,15 +187,11 @@ public class SingleOptionContainer extends FormContainer
 			return text;
 		}
 		
-		/**
-		 * Copies the option from the supplied Option.
-		 * 
-		 * @param opt The option to copy from.
-		 * @return A copy of the supplied Option.
-		 */
-		public SingleOption makeCopy()
-		{
-			return new SingleOption(identifier, text);
-		}
+		/* Protected */
+		
+		/* Private */
+		
+		private int identifier;
+		private String text;
 	}
 }

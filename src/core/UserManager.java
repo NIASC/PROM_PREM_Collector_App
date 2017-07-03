@@ -20,6 +20,7 @@
 package core;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 /**
  * This class keeps track of which users are online and how many users

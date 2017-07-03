@@ -168,7 +168,7 @@ public class Email_Registration implements Registration
 			Transport transport = getMailSession.getTransport();
 			transport.connect(serverEmail, serverPassword);
 			ui.displayMessage(Messages.getMessages().getInfo(
-					Messages.INFO_REG_REQUEST_SENDING));
+					Messages.INFO_REG_REQUEST_SENDING), false);
 			transport.sendMessage(generateMailMessage,
 					generateMailMessage.getAllRecipients());
 			transport.close();
@@ -177,7 +177,7 @@ public class Email_Registration implements Registration
 			me.printStackTrace();
 		}
 		ui.displayMessage(Messages.getMessages().getInfo(
-				Messages.INFO_REG_REQUEST_SENT));
+				Messages.INFO_REG_REQUEST_SENT), false);
 	}
 	
 	/**

@@ -42,16 +42,22 @@ public interface UserInterface
 	 * {@link #displayMessage}.
 	 * 
 	 * @param message The error message.
+	 * @param popup {@code true} if the error message should be
+	 * 		displayed in a frame of its own. {@code false} if the
+	 * 		message should be embedded in the main frame.
 	 */
-	public void displayError(String message);
+	public void displayError(String message, boolean popup);
 	
 	/**
 	 * Displays a message to the user. For displaying error messages
 	 * please use {@link #displayError}.
 	 * 
 	 * @param message The message to display to the user.
+	 * @param popup {@code true} if the error message should be
+	 * 		displayed in a frame of its own. {@code false} if the
+	 * 		message should be embedded in the main frame.
 	 */
-	public void displayMessage(String message);
+	public void displayMessage(String message, boolean popup);
 	
 	/**
 	 * Presents a {@code Form} that the user should fill in. The

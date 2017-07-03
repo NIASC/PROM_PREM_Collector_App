@@ -34,12 +34,15 @@ import java.util.HashMap;
 
 import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
@@ -106,22 +109,26 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 
 	@Override
-	public void displayError(String s)
+	public void displayError(String message, boolean popup)
 	{
-		JOptionPane.showInternalMessageDialog(
-				null, s, "Error",
-				JOptionPane.ERROR_MESSAGE);
-		/*JOptionPane.showMessageDialog(
-				null, s, "Error",
-				JOptionPane.ERROR_MESSAGE);*/
+		if (popup)
+			JOptionPane.showMessageDialog(
+					null, message, "Error",
+					JOptionPane.ERROR_MESSAGE);
+		else
+			displayEmbeddedMessage(String.format("ERROR: %s", message),
+					Color.RED);
 	}
 
 	@Override
-	public void displayMessage(String message)
+	public void displayMessage(String message, boolean popup)
 	{
-		JOptionPane.showMessageDialog(
-				null, message, "Message",
-				JOptionPane.PLAIN_MESSAGE);
+		if (popup)
+			JOptionPane.showMessageDialog(
+					null, message, "Message",
+					JOptionPane.PLAIN_MESSAGE);
+		else
+			displayEmbeddedMessage(message, Color.BLACK);
 	}
 
 	@Override
@@ -219,7 +226,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	private UserHandle uh;
 	private JButton mainmenuButton, logoutButton, menuButton1, exitButton;
 	private JPanel pageContent;
-	private JScrollPane pageScroll;
+	private JScrollPane pageScroll, messagePanel;
 	private static final long serialVersionUID = -3896988492887782839L;
 	
 	static
@@ -258,8 +265,14 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		pageContent.add(pageScroll, BorderLayout.CENTER);
 		
+		messagePanel = new JScrollPane(null,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		messagePanel.getViewport().setPreferredSize(new Dimension(200, 100));
+		
 		add(pageContent, BorderLayout.CENTER);
 		add(makeMenuPanel(), BorderLayout.NORTH);
+		add(messagePanel, BorderLayout.SOUTH);
 		
 		if (!embedded)
 		{
@@ -413,6 +426,22 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			contents.put(id++, form.currentEntry().getDisplayable(this));
 		} while(!form.endOfForm() && form.nextEntry() != null);
 		return contents;
+	}
+	
+	private void displayEmbeddedMessage(String message, Color textColor)
+	{
+		JTextArea jtf = new JTextArea();
+		jtf.setEditable(false);
+		jtf.setLineWrap(true);
+		jtf.setWrapStyleWord(true);
+		jtf.setForeground(textColor);
+		jtf.setBackground(new Color(0xf0, 0xf0, 0xf0));
+		jtf.setText(message);
+		JViewport jvp = messagePanel.getViewport();
+		jvp.removeAll();
+		jvp.add(jtf);
+		jvp.revalidate();
+		jvp.repaint();
 	}
 	
 	/**

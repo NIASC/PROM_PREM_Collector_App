@@ -74,7 +74,7 @@ public class UserHandle
 		if (!validateDetails(username, password))
 		{
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_INVALID_LOGIN));
+					Messages.ERROR_UH_INVALID_LOGIN), false);
 			// TODO: add functionality for resetting password.
 			return;
 		}
@@ -85,15 +85,15 @@ public class UserHandle
 			break;
 		case UserManager.ALREADY_ONLINE:
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_ALREADY_ONLINE));
+					Messages.ERROR_UH_ALREADY_ONLINE), false);
 			break;
 		case UserManager.SERVER_FULL:
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_SERVER_FULL));
+					Messages.ERROR_UH_SERVER_FULL), false);
 			break;
 		default:
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UNKNOWN_RESPONSE));
+					Messages.ERROR_UNKNOWN_RESPONSE), false);
 			break;
 		}
 	}
@@ -165,7 +165,7 @@ public class UserHandle
 		if (user.getUpdatePassword())
 		{
 			ui.displayMessage(Messages.getMessages().getInfo(
-					Messages.INFO_UH_UPDATE_PASSWORD));
+					Messages.INFO_UH_UPDATE_PASSWORD), true);
 			setPassword();
 			return true;
 		}
@@ -200,7 +200,7 @@ public class UserHandle
 		form.jumpTo(Form.AT_BEGIN);
 		
 		ui.displayMessage(Messages.getMessages().getInfo(
-				Messages.INFO_NEW_PASS_INFO));
+				Messages.INFO_NEW_PASS_INFO), false);
 		ui.presentForm(form, this::setPassReturn, true);
 	}
 	
@@ -280,7 +280,7 @@ public class UserHandle
 				crypto.hashString(new1.getEntry(), newSalt), newSalt);
 		if (tmpUser == null)
 		{
-			ui.displayError(Messages.DATABASE_ERROR);
+			ui.displayError(Messages.DATABASE_ERROR, false);
 			return false;
 		}
 		user = tmpUser;
@@ -308,26 +308,26 @@ public class UserHandle
 		if (!user.passwordMatch(oldPass))
 		{
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_PR_INVALID_CURRENT));
+					Messages.ERROR_UH_PR_INVALID_CURRENT), false);
 			return true;
 		}
 		if (!newPass1.equals(newPass2))
 		{
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_PR_MISMATCH_NEW));
+					Messages.ERROR_UH_PR_MISMATCH_NEW), false);
 			return true;
 		}
 		int ret = validatePassword(newPass1);
 		if (ret < 0)
 		{
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_PR_INVALID_LENGTH));
+					Messages.ERROR_UH_PR_INVALID_LENGTH), false);
 			return true;
 		}
 		else if (ret == 0)
 		{
 			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_PR_PASSWORD_SIMPLE));
+					Messages.ERROR_UH_PR_PASSWORD_SIMPLE), false);
 			return true;
 		}
 		return false;

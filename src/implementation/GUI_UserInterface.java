@@ -47,6 +47,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.ViewportLayout;
 import javax.swing.border.LineBorder;
 
 import core.UserHandle;
@@ -130,9 +131,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			boolean displayMultiple)
 	{
 		Component panel = null;
-		synchronized(pageContent.getTreeLock())
+		synchronized(pageScroll.getViewport().getTreeLock())
 		{
-			panel = pageContent.getComponents()[0];
+			panel = pageScroll.getViewport().getComponents()[0];
 		}
 		setContent(new GUIForm(form, function, panel, displayMultiple));
 		return true;
@@ -189,11 +190,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	{
 		if (panel == null)
 			return;
-		pageContent.removeAll();
-		pageContent.add(panel, BorderLayout.CENTER);
+		JViewport jvp = pageScroll.getViewport();
+		jvp.removeAll();
+		jvp.add(panel);
 		panel.requestFocus();
-		pageContent.revalidate();
-		pageContent.repaint();
+		jvp.revalidate();
+		jvp.repaint();
 	}
 	
 	/* Protected */
@@ -206,6 +208,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	private UserHandle uh;
 	private JButton mainmenuButton, logoutButton, menuButton1, exitButton;
 	private JPanel pageContent;
+	private JScrollPane pageScroll;
 	private static final long serialVersionUID = -3896988492887782839L;
 	
 	static
@@ -239,10 +242,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		pageContent = new JPanel(new BorderLayout());
 		pageContent.setPreferredSize(new Dimension(400,300));
-		pageContent.setMinimumSize(new Dimension(200,100));
-		pageContent.setMaximumSize(new Dimension(400,300));
-		add(pageContent, BorderLayout.CENTER);
+		pageScroll = new JScrollPane(null,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		pageContent.add(pageScroll, BorderLayout.CENTER);
 		
+		add(pageContent, BorderLayout.CENTER);
 		add(makeMenuPanel(), BorderLayout.NORTH);
 		
 		if (!embedded)
@@ -414,43 +419,57 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 
 		public LoginScreen()
 		{
+			setLayout(new GridBagLayout());
+			
+			/* entry fields */
+			Dimension d = new Dimension(80, 25);
+			
+			JPanel userPanel = new JPanel(new BorderLayout());
+			usernameL = new JLabel(String.format("%s: ", "Username"));
+			userPanel.add(usernameL, BorderLayout.WEST);
+			usernameTF = new JTextField(32);
+			usernameTF.setName("usernameTF");
+			usernameTF.addActionListener(this);
+			usernameTF.setPreferredSize(d);
+			userPanel.add(usernameTF, BorderLayout.CENTER);
+			
+			JPanel passPanel = new JPanel(new BorderLayout());
+			passwordL = new JLabel(String.format("%s: ", "Password"));
+			passPanel.add(passwordL, BorderLayout.WEST);
+			passwordTF = new JPasswordField(32);
+			passwordTF.setName("passwordTF");
+			passwordTF.addActionListener(this);
+			passwordTF.setPreferredSize(d);
+			passPanel.add(passwordTF, BorderLayout.CENTER);
+			
 			/* button panel */
-			buttons = new JPanel(new GridLayout(1, 3));
+			buttons = new JPanel(new GridLayout(1, 0));
 			login = new JButton("Login");
 			login.setName("login");
 			login.addActionListener(this);
 			register = new JButton("Register");
 			register.setName("register");
 			register.addActionListener(this);
+
 			buttons.add(login);
 			buttons.add(register);
 			
-			/* entry fields */
-			entryfields = new JPanel(new BorderLayout());
-			
-			JPanel labels = new JPanel(new GridLayout(2, 1));
-			usernameL = new JLabel("Username");
-			labels.add(usernameL);
-			passwordL = new JLabel("Password");
-			labels.add(passwordL);
-			
-			JPanel tfields = new JPanel(new GridLayout(2, 1));
-			Dimension d = new Dimension(80, 25);
-			usernameTF = new JTextField(20);
-			usernameTF.setName("usernameTF");
-			usernameTF.addActionListener(this);
-			usernameTF.setPreferredSize(d);
-			tfields.add(usernameTF);
-			passwordTF = new JPasswordField(32);
-			passwordTF.setName("passwordTF");
-			passwordTF.addActionListener(this);
-			passwordTF.setPreferredSize(d);
-			tfields.add(passwordTF);
-			entryfields.add(labels, BorderLayout.WEST);
-			entryfields.add(tfields, BorderLayout.CENTER);
-			
-			add(entryfields, BorderLayout.CENTER);
-			add(buttons, BorderLayout.SOUTH);
+			/* add components */
+
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.anchor = GridBagConstraints.EAST;
+			gbc.insets.bottom = gbc.insets.top = 1;
+			gbc.gridx = 0;
+			int gridy = 0;
+
+			gbc.gridy = gridy++;
+			add(userPanel, gbc);
+			gbc.gridy = gridy++;
+			add(passPanel, gbc);
+			gbc.anchor = GridBagConstraints.CENTER;
+			gbc.insets.bottom = gbc.insets.top = 5;
+			gbc.gridy = gridy++;
+			add(buttons, gbc);
 		}
 		
 		@Override
@@ -506,7 +525,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		/* Private */
 		
 		private static final long serialVersionUID = 2352904758935918090L;
-		private JPanel buttons, entryfields;
+		private JPanel buttons;
 		private JButton login, register;
 		private JLabel usernameL, passwordL;
 		private JTextField usernameTF;
@@ -519,12 +538,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		public WelcomeScreen()
 		{
-
-			setLayout(new BorderLayout());
-			buttons = new JPanel(new GridBagLayout());
-			scrollArea = new JScrollPane(buttons,
-					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			setLayout(new GridBagLayout());
 			
 			questionnaire = new JButton("Start questionnaire");
 			questionnaire.setName("questionnaire");
@@ -540,11 +554,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			gbc.insets.bottom = gbc.insets.top = 5;
 			gbc.gridx = 0;
 			gbc.gridy = 0;
-			buttons.add(questionnaire, gbc);
+			add(questionnaire, gbc);
 			gbc.gridy = 1;
-			buttons.add(viewData, gbc);
-			
-			add(scrollArea, BorderLayout.CENTER);
+			add(viewData, gbc);
 		}
 		
 		@Override
@@ -575,8 +587,6 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		/* Private */
 		
 		private static final long serialVersionUID = 2805273101165405918L;
-		private JPanel buttons;
-		private JScrollPane scrollArea;
 		private JButton questionnaire, viewData;
 	}
 	
@@ -615,20 +625,15 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			this.retpan = retpan;
 			this.displayMultiple = displayMultiple;
 			
-			setLayout(new BorderLayout());
+			setLayout(new GridBagLayout());
+			gbc = new GridBagConstraints();
+			gbc.anchor = GridBagConstraints.EAST;
+			gbc.gridx = 0;
 			
 			components = fillContents(form);
 			nEntries = components.size();
 			
 			formControl = initControlPanel();
-			
-			formContent = new JPanel(new GridBagLayout());
-			scrollArea = new JScrollPane(formContent,
-					ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-			add(scrollArea, BorderLayout.CENTER);
-			add(formControl, BorderLayout.SOUTH);
 			
 			setFormContent();
 		}
@@ -637,9 +642,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		public void requestFocus()
 		{
 			Component[] c = null;
-			synchronized(formContent.getTreeLock())
+			synchronized(getTreeLock())
 			{
-				c = formContent.getComponents();
+				c = getComponents();
 			}
 			if (c != null)
 				for (Component comp : c)
@@ -681,7 +686,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 						cIdx = getNextEntry(cIdx, nEntries, 1, false);
 						setFormContent();
 					}
-					else if (b.getName().equals(fc_exit.getName()))
+					else if (b.getName().equals(fc_back.getName()))
 					{
 						setContent(retpan);
 					}
@@ -699,9 +704,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		private int cIdx;
 		private Messages msg = Messages.getMessages();
 		
-		private JPanel formControl, formContent;
-		private JScrollPane scrollArea;
-		private JButton fc_continue, fc_previous, fc_next, fc_exit;
+		private JPanel formControl;
+		private JButton fc_continue, fc_previous, fc_next, fc_back;
+		private GridBagConstraints gbc;
 		
 		private final HashMap<Integer, FormComponentDisplay> components;
 		private final Form form;
@@ -710,34 +715,35 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		private void setFormContent()
 		{
-			formContent.removeAll();
-			
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.anchor = GridBagConstraints.EAST;
-			gbc.insets.bottom = gbc.insets.top = 2;
-			gbc.gridx = 0;
+			removeAll();
+
+			int i = 0;
+			gbc.insets.bottom = gbc.insets.top = 1;
 			if (displayMultiple)
 			{
-				for (int i = 0; i < components.size(); ++i)
+				for (; i < components.size(); ++i)
 				{
 					gbc.gridy = i;
-					formContent.add((Component) components.get(i), gbc);
+					add((Component) components.get(i), gbc);
 				}
 			}
 			else
 			{
-				gbc.gridy = 0;
-				formContent.add((Component) components.get(cIdx), gbc);
+				gbc.gridy = i++;
+				add((Component) components.get(cIdx), gbc);
 			}
+			gbc.gridy = i;
+			gbc.insets.bottom = gbc.insets.top = 5;
+			add(formControl, gbc);
 			
 			requestFocus();
-			formContent.revalidate();
-			formContent.repaint();
+			revalidate();
+			repaint();
 		}
 		
 		private JPanel initControlPanel()
 		{
-			JPanel panel = new JPanel(new GridLayout(1, 3));
+			JPanel panel = new JPanel(new GridLayout(1, 0));
 			fc_continue = new JButton(msg.getInfo(
 					Messages.INFO_UI_FORM_CONTINUE));
 			fc_continue.setName("fc_continue");
@@ -750,14 +756,18 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 					Messages.INFO_UI_FORM_NEXT));
 			fc_next.setName("fc_next");
 			fc_next.addActionListener(this);
-			fc_exit = new JButton(msg.getInfo(
-					Messages.INFO_UI_FORM_EXIT));
-			fc_exit.setName("fc_exit");
-			fc_exit.addActionListener(this);
+			fc_back = new JButton(msg.getInfo(
+					Messages.INFO_UI_FORM_BACK));
+			fc_back.setName("fc_back");
+			fc_back.addActionListener(this);
+			
 			panel.add(fc_continue);
-			panel.add(fc_previous);
-			panel.add(fc_next);
-			panel.add(fc_exit);
+			if (!displayMultiple)
+			{
+				panel.add(fc_previous);
+				panel.add(fc_next);
+			}
+			panel.add(fc_back);
 			return panel;
 		}
 	}

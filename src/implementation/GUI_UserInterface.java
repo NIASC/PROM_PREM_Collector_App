@@ -22,20 +22,16 @@ package implementation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
-import javax.swing.BoxLayout;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -47,7 +43,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.ViewportLayout;
 import javax.swing.border.LineBorder;
 
 import core.UserHandle;
@@ -113,9 +108,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	@Override
 	public void displayError(String s)
 	{
-		JOptionPane.showMessageDialog(
+		JOptionPane.showInternalMessageDialog(
 				null, s, "Error",
 				JOptionPane.ERROR_MESSAGE);
+		/*JOptionPane.showMessageDialog(
+				null, s, "Error",
+				JOptionPane.ERROR_MESSAGE);*/
 	}
 
 	@Override
@@ -128,14 +126,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 
 	@Override
 	public boolean presentForm(Form form, ReturnFunction function,
-			boolean displayMultiple)
+			boolean multiple)
 	{
-		Component panel = null;
-		synchronized(pageScroll.getViewport().getTreeLock())
-		{
-			panel = pageScroll.getViewport().getComponents()[0];
-		}
-		setContent(new GUIForm(form, function, panel, displayMultiple));
+		setContent(new GUIForm(form, function, getContent(), multiple));
 		return true;
 	}
 	
@@ -149,16 +142,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	public void init()
 	{
 		/* when the webpage is initialized */
-		System.out.println("Applet initialized");
 	}
 	
 	@Override
 	public void destroy()
 	{
 		/* when the webpage is destroyed */
-
-		System.out.println("Applet destroyed");
-
 		if (!embedded && frame != null)
 			frame.dispose();
 	}
@@ -166,19 +155,26 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	@Override
 	public void start()
 	{
-		/* when the user returns to the webpage */
-		System.out.println("Applet started");
-		/* Maybe reload cached session?         */
+		/* when the user returns to the webpage. */
+		if (!embedded)
+		{
+			frame.setVisible(true);
+			frame.pack();
+		}
+		setContent(new LoginScreen());
 	}
 	
 	public void stop()
 	{
 		/* when the user leaves the web page. */
-		System.out.println("Applet stopped");
-		/* Maybe save session to cache?       */
+		/* stores the page in cache              */
+		
 		uh.logout();
 		if (frame != null)
+		{
+			frame.setVisible(false);
 			frame.dispose();
+		}
 	}
 	
 	/**
@@ -186,7 +182,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	 * 
 	 * @param panel The panel that contains the page content.
 	 */
-	public void setContent(Component panel)
+	public void setContent(Container panel)
 	{
 		if (panel == null)
 			return;
@@ -196,6 +192,21 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		panel.requestFocus();
 		jvp.revalidate();
 		jvp.repaint();
+	}
+	
+	/**
+	 * Retrieves the current contaient container.
+	 * 
+	 * @return The current content container.
+	 */
+	public Container getContent()
+	{
+		Container c = null;
+		synchronized(pageScroll.getViewport().getTreeLock())
+		{
+			c = (Container) pageScroll.getViewport().getComponent(0);
+		}
+		return c;
 	}
 	
 	/* Protected */
@@ -222,14 +233,14 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		long maxMemory = runtime.maxMemory();
 		long allocatedMemory = runtime.totalMemory();
 		long freeMemory = runtime.freeMemory();
-		sb.append("_______________________________\n");
-		sb.append("|     Memory     |   Size     |\n");
-		sb.append("|----------------|------------|\n");
-		sb.append(String.format("| Free:\t\t\t | %7d Kb |\n", (freeMemory/1024)));
-		sb.append(String.format("| Allocated:\t | %7d Kb |\n", (allocatedMemory/1024)));
-		sb.append(String.format("| Max:\t\t\t | %7d Kb |\n", (maxMemory/1024)));
-		sb.append(String.format("| Total free:\t | %7d Kb |\n", ((freeMemory + (maxMemory - allocatedMemory))/1024)));
-		sb.append("|________________|____________|\n");
+		sb.append("_____________________________\n");
+		sb.append("|    Memory    |    Size    |\n");
+		sb.append("|______________|____________|\n");
+		sb.append(String.format("| Free:        | %7d Kb |\n", (freeMemory/1024)));
+		sb.append(String.format("| Allocated:   | %7d Kb |\n", (allocatedMemory/1024)));
+		sb.append(String.format("| Max:         | %7d Kb |\n", (maxMemory/1024)));
+		sb.append(String.format("| Total free:  | %7d Kb |\n", ((freeMemory + (maxMemory - allocatedMemory))/1024)));
+		sb.append("|______________|____________|\n");
 		System.out.println(sb.toString());
 	}
 	
@@ -256,11 +267,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			frame.setContentPane(this);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setResizable(false);
-			frame.setVisible(true);
-			frame.pack();
 		}
-		
-		setContent(new LoginScreen());
 	}
 	
 	/**
@@ -618,7 +625,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		 * 		multiple entries at the same time.
 		 */
 		public GUIForm(final Form form, final ReturnFunction function,
-				final Component retpan, boolean displayMultiple)
+				final Container retpan, boolean displayMultiple)
 		{
 			this.form = form;
 			this.function = function;
@@ -711,7 +718,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		private final HashMap<Integer, FormComponentDisplay> components;
 		private final Form form;
 		private final ReturnFunction function;
-		private final Component retpan;
+		private final Container retpan;
 		
 		private void setFormContent()
 		{

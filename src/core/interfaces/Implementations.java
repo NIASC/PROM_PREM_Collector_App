@@ -37,10 +37,12 @@ import implementation.Email_Registration;
 public abstract class Implementations
 {
 	/**
-	 * Constructor for the implementation of Database_interface.
+	 * Constructor for the implementation of {@code Database}.
 	 * 
 	 * @return A new/running instance of the current implementation of
-	 * 		Database_interface.
+	 * 		{@code Database}.
+	 * 
+	 * @see Database
 	 */
 	public static Database Database()
 	{
@@ -48,10 +50,12 @@ public abstract class Implementations
 	}
 	
 	/**
-	 * Constructor for the implementation of Encryption_interface.
+	 * Constructor for the implementation of {@code Encryption}.
 	 * 
 	 * @return A new instance of the current implementation of
-	 * 		Encryption_interface.
+	 * 		{@code Encryption}.
+	 * 
+	 * @see Encryption
 	 */
 	public static Encryption Encryption()
 	{
@@ -59,12 +63,15 @@ public abstract class Implementations
 	}
 	
 	/**
-	 * Constructor for the implementation of Registration_Interface.
+	 * Constructor for the implementation of {@code Registration}.
 	 * 
-	 * @param ui The active user interface.
+	 * @param ui The active instance of {@code UserInterface}.
 	 * 
 	 * @return A new instance of the current implementation of
-	 * 		Registration_Interface.
+	 * 		{@code Registration}.
+	 * 
+	 * @see Registration
+	 * @see UserInterface
 	 */
 	public static Registration Registration(UserInterface ui)
 	{

@@ -59,12 +59,14 @@ public class UserManager
 			SERVER_FULL = 2, ALREADY_ONLINE = 4;
 	
 	/**
-	 * Adds the supplied user to the list of online users if they
-	 * exist.
+	 * Adds {@code uh} to the list of online users if they exist.
 	 * 
-	 * @param uh The user to add.
+	 * @param uh The {@code UserHandle} to add.
 	 * 
-	 * @return True if the user was added. False if not.
+	 * @return {@code true} if the {@code UserHandle} was added.
+	 * 		{@code false} if not.
+	 * 
+	 * @see UserHandle
 	 */
 	protected int addUser(UserHandle uh)
 	{
@@ -79,12 +81,14 @@ public class UserManager
 	}
 	
 	/**
-	 * Removes the supplied user from the list of online users if they
-	 * exist.
+	 * Removes {@code uh} from the list of online users if they exist.
 	 * 
-	 * @param uh The user to delete.
+	 * @param uh The {@code UserHandle} to delete.
 	 * 
-	 * @return True if the user was deleted
+	 * @return {@code true} if the user was deleted. False if the user
+	 * 		did not exist in the list of users.
+	 * 
+	 * @see UserHandle
 	 */
 	protected boolean delUser(UserHandle uh)
 	{

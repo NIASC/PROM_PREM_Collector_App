@@ -22,9 +22,6 @@ package core.containers.form;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import core.interfaces.UserInterface;
-import core.interfaces.UserInterface.FormComponentDisplay;
-
 /**
  * This class handles single-option objects. It allows you to
  * group several options with individual identifiers and text to form
@@ -50,8 +47,8 @@ public class SingleOptionContainer extends FormContainer
 	/**
 	 * Initializes variables
 	 * 
-	 * @param allowEmptyEntry True if this container allows empty entry
-	 * 		(answer/response).
+	 * @param allowEmptyEntry {@code true} if this container allows
+	 * 		empty entry (answer/response). {@code false} if not.
 	 */
 	public SingleOptionContainer(boolean allowEmptyEntry)
 	{
@@ -73,20 +70,19 @@ public class SingleOptionContainer extends FormContainer
 	{
 		SingleOptionContainer soc = new SingleOptionContainer(allowEmpty);
 		for (Entry<Integer, SingleOption> e : options.entrySet())
-			soc.addSOption(e.getKey(), e.getValue().getText());
+			soc.addSingleOption(e.getKey(), e.getValue().getText());
 		return soc;
 	}
 	
 	/**
-	 * Adds a new option to the container. Avoid using UNSET as an
-	 * identifier.
+	 * Adds a new option to the container.
 	 * 
-	 * @param identifier The identifier of the SOption. This is
+	 * @param identifier The identifier of the option. This is
 	 * 		typically used to identify what action should be taken
 	 * 		if this option is selected.
 	 * @param text The text that describes what this option means.
 	 */
-	public void addSOption(int identifier, String text)
+	public void addSingleOption(int identifier, String text)
 	{
 		options.put(nextOption++, new SingleOption(identifier, text));
 	}
@@ -99,7 +95,7 @@ public class SingleOptionContainer extends FormContainer
 	 * 
 	 * @return
 	 */
-	public HashMap<Integer, String> getSOptions()
+	public HashMap<Integer, String> getSingleOptions()
 	{
 		HashMap<Integer, String> sopts = new HashMap<Integer, String>();
 		for (Entry<Integer, SingleOption> e : options.entrySet())

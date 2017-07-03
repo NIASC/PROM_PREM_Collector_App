@@ -47,7 +47,9 @@ public class UserHandle
 	/**
 	 * Initialize variables.
 	 * 
-	 * @param ui The active instance of the user interface.
+	 * @param ui The active instance of the {@code UserInterface}.
+	 * 
+	 * @see UserInterface
 	 */
 	public UserHandle(UserInterface ui)
 	{
@@ -199,7 +201,7 @@ public class UserHandle
 		
 		ui.displayMessage(Messages.getMessages().getInfo(
 				Messages.INFO_NEW_PASS_INFO));
-		ui.presentForm(form, this::setPassReturn, false);
+		ui.presentForm(form, this::setPassReturn, true);
 	}
 	
 	/* Protected */
@@ -213,8 +215,8 @@ public class UserHandle
 	 * @param username The name of the user to look for.
 	 * @param password The password of the user to look for.
 	 * 
-	 * @return True if the user was found and the details matched.
-	 * 		False if not.
+	 * @return {@code true} if the user was found and the details
+	 * 		matched. {@code false} if not.
 	 */
 	protected boolean validateDetails(String username, String password)
 	{
@@ -229,8 +231,10 @@ public class UserHandle
 	
 	/**
 	 * 
-	 * @return This handle's active user. If this handle does not have
-	 * 		an active user then null is returned.
+	 * @return This handle's active {@code User}. If this handle does
+	 * 		not have an active user then {@code null} is returned.
+	 * 
+	 * @see User
 	 */
 	protected User getUser()
 	{
@@ -250,9 +254,12 @@ public class UserHandle
 	 * The function to return to after the user have entered a new
 	 * password.
 	 * 
-	 * @param form The form that was sent to the UI.
+	 * @param form The {@code Form} that was sent to the UI.
 	 * 
-	 * @return True if the form was sent. False if not.
+	 * @return {@code true} if the form was sent. {@code false} if
+	 * 		not.
+	 * 
+	 * @see Form
 	 */
 	private boolean setPassReturn(Form form)
 	{
@@ -292,8 +299,8 @@ public class UserHandle
 	 * @param newPass1 The first entry of the new unhashed password.
 	 * @param newPass2 The second entry of the new unhashed password.
 	 *  
-	 * @return True if an error occurred (see description above). False
-	 * 		if no errors were found.
+	 * @return {@code true} if an error occurred (see description
+	 * 		above). {@code false} if no errors were found.
 	 */
 	private boolean newPassError(
 			String oldPass, String newPass1, String newPass2)

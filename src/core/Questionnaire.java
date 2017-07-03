@@ -39,7 +39,7 @@ public class Questionnaire
 	 * @param ui The active instance of the user interface.
 	 * @param uh The active instance of the user handle.
 	 */
-	public Questionnaire(UserInterface ui, UserHandle uh)
+	protected Questionnaire(UserInterface ui, UserHandle uh)
 	{
 		userInterface = ui;
 		userHandle = uh;

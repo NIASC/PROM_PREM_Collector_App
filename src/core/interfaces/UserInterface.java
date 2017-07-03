@@ -36,53 +36,60 @@ public interface UserInterface
 	/* Public */
 	
 	/**
-	 * Presents an error message to the user. The message
-	 * should contain clear information about why the error
-	 * was displayed.
+	 * Presents an error message to the user. The message should
+	 * contain clear information about why the error was displayed.
+	 * For displaying information messages please use
+	 * {@link #displayMessage}.
 	 * 
-	 * @param s The error message.
+	 * @param message The error message.
 	 */
-	public void displayError(String s);
+	public void displayError(String message);
 	
 	/**
-	 * Displays information to the user. For displaying error messages
-	 * please use displayForm.
+	 * Displays a message to the user. For displaying error messages
+	 * please use {@link #displayError}.
 	 * 
 	 * @param message The message to display to the user.
 	 */
 	public void displayMessage(String message);
 	
 	/**
-	 * Presents a form that the user should fill in. The form has
-	 * entries which follows the specifications of the abstract class
-	 * core.containers.FormContainer. One of those specifications are
-	 * a method to display themselves using the implementation of this
-	 * class.
+	 * Presents a {@code Form} that the user should fill in. The
+	 * {@code Form} has entries which follows the specifications of
+	 * {@code FormContainer}.
 	 * 
-	 * This interface does not guarantee that displayMultiple will be
+	 * This interface does not guarantee that {@code multiple} will be
 	 * used in the implementation but it should serve as a hint if the
-	 * form should have all of its entries displayed at the same time
-	 * or not.
+	 * {@code Form} should have all of its entries displayed at the
+	 * same time or not.
 	 * 
-	 * @param form The form container that the user should fill in.
-	 * @param retfun The function that should be called when the form
-	 * 		has been filled.
-	 * @param displayMultiple True if the UserInterface implementation
-	 * 		should display all form entries at the same time. False
-	 * 		if only one entry should be display at a time.
+	 * @param form The {@code Form} that the user should fill in.
+	 * @param retfun The {@code FormContainer} that should be called
+	 * 		when the form has been filled.
+	 * @param multiple {@code true} if the UserInterface
+	 * 		implementation should display all form entries at the same
+	 * 		time. {@code false} if only one entry should be displayed
+	 * 		at a time.
 	 * 
-	 * @return True if the form was filled. False if the form was not
-	 * 		fully filled in.
+	 * @return {@code true} if the form was filled. {@code false} if
+	 * 		the form was not fully filled in.
+	 * 
+	 * @see Form
+	 * @see ReturnFunction
 	 */
 	public boolean presentForm(Form form, ReturnFunction retfun,
-			boolean displayMultiple);
+			boolean multiple);
 	
 	/**
 	 * Creates an object that can store a form container.
 	 * 
-	 * @param fc The form container object.
+	 * @param fc The {@code FormContainer} object.
 	 * 
-	 * @return An object that that can display the form container.
+	 * @return A {@code FormComponentDisplay} object that that
+	 * 		can display the {@code FormContainer}.
+	 * 
+	 * @see FormContainer
+	 * @see FormComponentDisplay
 	 */
 	public FormComponentDisplay getContainerDisplay(FormContainer fc);
 
@@ -91,46 +98,61 @@ public interface UserInterface
 	 * that presents form entry objects must implement.
 	 * 
 	 * @author Marcus Malmquist
-	 *
+	 * 
 	 */
 	public interface FormComponentDisplay
 	{
 		/**
 		 * Retrieves the data from the user and fills the
-		 * implementation's instance of FormContainer with that data.
+		 * implementation's instance of {@code FormContainer} with
+		 * that data.
 		 * 
-		 * @return True if all entries were filled. False if some were
-		 * 		not filled.
+		 * @return {@code true} if all entries were filled.
+		 * 		{@code false} if some were not filled.
+		 * 
+		 * @see FormContainer
 		 */
 		public boolean fillEntry();
 		
 		/**
 		 * Checks if the entry has been filled. It is recommended that
-		 * this function also calls fillEntry in case the entry have
-		 * been filled without fillEntry have been called.
+		 * this function also calls {@code fillEntry()} in case the
+		 * entry have been filled without {@code fillEntry()} have
+		 * been called.
 		 * 
-		 * @return True if the entry has been filled. False it not.
+		 * @return {@code true} if the entry has been filled.
+		 * 		{@code false} it not.
+		 * 
+		 * @see #fillEntry()
 		 */
 		public boolean entryFilled();
 	}
 
 	/**
-	 * This is a functional interface designed to allow functions to
-	 * be passed as arguments to other function.
+	 * This is a functional interface designed is to allow functions
+	 * to be passed as arguments to other function.
 	 * 
 	 * @author Marcus Malmquist
-	 *
+	 * 
 	 */
 	@FunctionalInterface
-	interface ReturnFunction
+	public interface ReturnFunction
 	{
 		/**
-		 * This function should be called when the UserInterface has
-		 * displayed a form and should return with the results.
+		 * This function should be called when the
+		 * {@code UserInterface} has displayed a form and should
+		 * return with the results.
 		 * 
-		 * @param form The form that you received
+		 * @param form The {@code Form} that you received.
 		 * 
-		 * @return TODO
+		 * @return {@code true} if the function accepted the response.
+		 * 		{@code false} if the response was rejected by the
+		 * 		function.
+		 * 
+		 * @see UserInterface
+		 * @see Form
+		 * 
+		 * @author Marcus Malmquist
 		 */
 		boolean call(Form form);
 	}

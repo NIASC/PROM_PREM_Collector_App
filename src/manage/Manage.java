@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import core.containers.User;
 import core.interfaces.Database;
 import core.interfaces.Encryption;
 import core.interfaces.Implementations;
@@ -115,7 +114,7 @@ public class Manage
 		System.out.printf("Existing clinics:\n");
 		for (Entry<Integer, String> e : clinics.entrySet())
 			System.out.printf("%4d: %s\n", e.getKey(), e.getValue());
-		System.out.printf("Clinic?\n");
+		System.out.printf("Enter new clinic:\n");
 		String clinic = in.next();
 		if (Pattern.compile("[^\\p{Print}]").matcher(clinic).find())
 		{

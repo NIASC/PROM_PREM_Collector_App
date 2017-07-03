@@ -48,7 +48,7 @@ public class MessageContainer
 	}
 	
 	/**
-	 * Adds a Message to this container. If a message with the same
+	 * Adds a message to this container. If a message with the same
 	 * name as the supplied message exists in this container then the
 	 * supplied message will be merged with the existing message.
 	 * 
@@ -125,7 +125,13 @@ public class MessageContainer
 	
 	/* Private */
 	
+	/**
+	 * format: <locale, message>
+	 */
 	private HashMap<String, Message> messages;
+	/**
+	 * format: <id, locale>
+	 */
 	private HashMap<Integer, String> codeToName;
 	
 	/**
@@ -141,13 +147,10 @@ public class MessageContainer
 	 */
 	private class Message
 	{
-		private int code;
-		private String name;
-		private HashMap<String, String> messages;
 		
 		/**
-		 * Creates a Message that has a code, name and a list of
-		 * messages for different locales (for multiple language
+		 * Creates a {@code Message} that has a code, name and a list
+		 * of messages for different locales (for multiple language
 		 * support).
 		 * 
 		 * @param code The message code/id.
@@ -162,31 +165,6 @@ public class MessageContainer
 			this.name = name;
 			messages = new HashMap<String, String>();
 			messages.putAll(message);
-		}
-		
-		/**
-		 * Adds a message to this Message.
-		 * This function can be used for adding messages for different
-		 * locales to this Message. It is up to the database
-		 * maintainers to make sure that the message has the same
-		 * meaning for all locales.
-		 * 
-		 * @param message The message to add.
-		 * @param locale The locale that this message was written for.
-		 * @param replace Previously stored messages for the supplied
-		 * 		locale will be replaced if replace is true and kept if
-		 * 		replace is false.
-		 * 
-		 * @return If this Message already contains a message for the
-		 * 		supplied locale and replace is true then that message
-		 * 		will be returned. Else null will be returned.
-		 */
-		private String addMessage(String message, String locale,
-				boolean replace)
-		{
-			if (replace || getMessage(locale) == null)
-				return messages.put(locale, message);
-			return null;
 		}
 		
 		/**
@@ -217,12 +195,13 @@ public class MessageContainer
 		}
 		
 		/**
-		 * Merges the supplied Message with this Message by copying the
-		 * messages and locales to this Message.
+		 * Merges the supplied {@code Message} with this
+		 * {@code Message} by copying the messages and locales to this
+		 * Message.
 		 * If there are overlapping locales (and messages) then the
-		 * messages contained in this Message are kept.
+		 * messages contained in this {@code Message} are kept.
 		 * 
-		 * @param message
+		 * @param message The {@code Message} to merge with this.
 		 */
 		public void merge(final Message message)
 		{
@@ -249,6 +228,43 @@ public class MessageContainer
 		public int getCode()
 		{
 			return code;
+		}
+		
+		/* Protected */
+		
+		/* Private */
+		
+		private int code;
+		private String name;
+		/**
+		 * format: <locale, message>
+		 */
+		private HashMap<String, String> messages;
+		
+		/**
+		 * Adds a message to this {@code Message}.
+		 * This function can be used for adding messages for different
+		 * locales to this {@code Message}. It is up to the database
+		 * maintainers to make sure that the message has the same
+		 * meaning for all locales.
+		 * 
+		 * @param message The message to add.
+		 * @param locale The locale that this message was written for.
+		 * @param replace Previously stored messages for the supplied
+		 * 		locale will be replaced if replace is {@code true} and
+		 * 		kept if replace is {@code false}.
+		 * 
+		 * @return If this {@code Message} already contains a message
+		 * 		for the supplied locale and replace is {@code true}
+		 * 		then that message will be returned. Else {@code null}
+		 * 		will be returned.
+		 */
+		private String addMessage(String message, String locale,
+				boolean replace)
+		{
+			if (replace || getMessage(locale) == null)
+				return messages.put(locale, message);
+			return null;
 		}
 	}
 }

@@ -19,17 +19,17 @@
  */
 package core.interfaces;
 
-import core.containers.Form;
-
 /**
  * This interface contains the methods required by the core part of
  * this program to function. The purpose of this interface is to give
  * the freedom of choosing your own registration process and what
- * it should contain. Since the database implementation can also be
- * chosen freely you are not limited to a pre-defined user structure
- * defined by the database.
+ * it should contain. Since the {@code Database} implementation can
+ * also be chosen freely you are not limited to a pre-defined user
+ * structure defined by the {@code Database}.
  * 
  * @author Marcus Malmquist
+ * 
+ * @see Database
  *
  */
 public interface Registration

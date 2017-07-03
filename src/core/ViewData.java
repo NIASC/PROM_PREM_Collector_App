@@ -37,10 +37,13 @@ public class ViewData
 	/**
 	 * Initialize variables.
 	 * 
-	 * @param ui The active instance of the user interface.
-	 * @param uh The active instance of the user handle.
+	 * @param ui The active instance of {@code UserInterface}.
+	 * @param uh The active instance of {@code UserHandle}.
+	 * 
+	 * @see UserInterface
+	 * @see UserHandle
 	 */
-	public ViewData(UserInterface ui, UserHandle uh)
+	protected ViewData(UserInterface ui, UserHandle uh)
 	{
 		userInterface = ui;
 		userHandle = uh;

@@ -19,22 +19,26 @@
  */
 package core.containers.form;
 
+import core.containers.Form;
 import core.interfaces.UserInterface;
 import core.interfaces.UserInterface.FormComponentDisplay;
 
 /**
  * This class is the base class of data types that should be included
- * in a form. These data types can for example be a text field question,
- * single option question or multiple option question.
+ * in a form. These data types can for example be a text field
+ * question, single option question or multiple option question.
  * 
  * In addition to providing doubly-linked list properties, this class
  * includes an abstract method for drawing/presenting the
- * implementation of this class. This means that the user interface has
- * to provide a way of presenting the data type of the implementation
- * and the drawing/presenting method should redirect the function call
- * to the appropriate method in the user interface.
+ * implementation of this class. This means that the
+ * {@code UserInteface} has to provide a way of presenting the data
+ * type of the implementation and the drawing/presenting method should
+ * redirect the function call to the appropriate method in the
+ * {@code UserInteface}.
  * 
  * @author Marcus Malmquist
+ * 
+ * @see UserInterface#getContainerDisplay(FormContainer)
  *
  */
 public abstract class FormContainer
@@ -42,10 +46,11 @@ public abstract class FormContainer
 	/* Public */
 	
 	/**
-	 * Check if this form has been filled (i.e. an option has been
-	 * selected or the field has text in it etc.).
+	 * Check if this {@code FormContainer} has been filled (i.e. an
+	 * option has been selected or the field has text in it etc.).
 	 * 
-	 * @return True if this form has entry/entries. False if not.
+	 * @return {@code true} if this form has entry/entries.
+	 * 		{@code false} if not.
 	 */
 	public abstract boolean hasEntry();
 	
@@ -63,13 +68,15 @@ public abstract class FormContainer
 	 * container inside it.
 	 * 
 	 * NOTE: Since the object that is returned from this method should
-	 * be defined in the implementation of the user interface, this
+	 * be defined in the implementation of {@code UserInterface}, this
 	 * method should only be called in the implementation of the user
 	 * interface to be of any use.
 	 * 
 	 * @param ui The instance of the active user interface.
 	 * 
 	 * @return A displayable wrapper object for the this container.
+	 * 
+	 * @see UserInterface#getContainerDisplay(FormContainer)
 	 */
 	public FormComponentDisplay getDisplayable(UserInterface ui)
 	{
@@ -90,6 +97,8 @@ public abstract class FormContainer
 	 * Retrieves the next FormContainer.
 	 * 
 	 * @return The next FormContainer.
+	 * 
+	 * @see Form
 	 */
 	public FormContainer getNextFC()
 	{
@@ -100,6 +109,8 @@ public abstract class FormContainer
 	 * Retrieves the previous FormContainer.
 	 * 
 	 * @return The previous FormContainer.
+	 * 
+	 * @see Form
 	 */
 	public FormContainer getPrevFC()
 	{
@@ -115,6 +126,8 @@ public abstract class FormContainer
 	 * 
 	 * @return The FormContainer that currently is the FormContainer
 	 * 		after this.
+	 * 
+	 * @see Form
 	 */
 	public FormContainer setNextFC(FormContainer fc)
 	{
@@ -132,6 +145,8 @@ public abstract class FormContainer
 	 * 
 	 * @return The FormContainer that currently is the FormContainer
 	 * 		before this.
+	 * 
+	 * @see Form
 	 */
 	public FormContainer setPrevFC(FormContainer fc)
 	{
@@ -142,7 +157,23 @@ public abstract class FormContainer
 	
 	/* Protected */
 
-	protected FormContainer nextFC, prevFC;
+	/**
+	 * The next container in the {@code Form}
+	 * 
+	 * @see Form
+	 */
+	protected FormContainer nextFC;
+	/**
+	 * The next container in the {@code Form}
+	 * 
+	 * @see Form
+	 */
+	protected FormContainer prevFC;
+	/**
+	 * if the {@code FormContainer} should allow empty entries (i.e.
+	 * the entry is optional) this should be {@code true}, else
+	 * {@code false}.
+	 */
 	protected boolean allowEmpty;
 	
 	/**

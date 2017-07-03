@@ -37,6 +37,11 @@ public class Form
 {
 	/* Public */
 	
+	/**
+	 * This variable is an identifier that will be used to tell the
+	 * methods of this class where to put/look for entries in this
+	 * form.
+	 */
 	public static final int AT_BEGIN = 0, AT_END = 1,
 			AT_PREVIOUS = 2, AT_NEXT = 3;
 	
@@ -52,9 +57,11 @@ public class Form
 	 * Insert an entry to the form. An insertion can occur at the
 	 * beginning, at the end, before or after the current position.
 	 * 
-	 * @param fc The FContainer to insert.
+	 * @param fc The {@code FormContainer} to insert.
 	 * @param location The location to insert. The location is
 	 * 		specified by the AT_* flags.
+	 * 
+	 * @see FormContainer
 	 */
 	public void insert(FormContainer fc, int location)
 	{
@@ -98,7 +105,9 @@ public class Form
 	 * @param location The location to delete. The location is
 	 * 		specified by the AT_* flags.
 	 * 
-	 * @return The deleted FContainer.
+	 * @return The deleted {@code FormContainer}.
+	 * 
+	 * @see FormContainer
 	 */
 	public FormContainer delete(int location)
 	{
@@ -137,6 +146,8 @@ public class Form
 	 * 
 	 * @return The new current entry, or null if there are no next
 	 * 		entries.
+	 * 
+	 * @see FormContainer
 	 */
 	public FormContainer nextEntry()
 	{
@@ -150,6 +161,8 @@ public class Form
 	 * 
 	 * @return The current entry in this form or null if this form has
 	 * 		no entries.
+	 * 
+	 * @see FormContainer
 	 */
 	public FormContainer currentEntry()
 	{
@@ -163,6 +176,8 @@ public class Form
 	 * 
 	 * @return The new current entry, or null if there are no previous
 	 * 		entries.
+	 * 
+	 * @see FormContainer
 	 */
 	public FormContainer prevEntry()
 	{
@@ -172,8 +187,8 @@ public class Form
 	}
 	
 	/**
-	 * Jumps to the entry at location. The location should be specified
-	 * by the AT_* flags.
+	 * Jumps to the entry at location. The location should be
+	 * specified by the AT_* flags.
 	 * 
 	 * @param location The location to jump to.
 	 */
@@ -216,8 +231,8 @@ public class Form
 	/**
 	 * Checks if this form has entries after the current entry.
 	 * 
-	 * @return True if current entry is the last one. False if there
-	 * 		are more entries.
+	 * @return {@code true} if current entry is the last one.
+	 * 		{@code true} if there are more entries.
 	 */
 	public boolean endOfForm()
 	{
@@ -227,8 +242,8 @@ public class Form
 	/**
 	 * Checks if this form has entries before the current entry.
 	 * 
-	 * @return True if current entry is the first one. False if there
-	 * 		are previous entries.
+	 * @return {@code true} if current entry is the first one.
+	 * 		{@code false} if there are previous entries.
 	 */
 	public boolean beginningOfForm()
 	{
@@ -242,11 +257,13 @@ public class Form
 	private FormContainer currentFC;
 	
 	/**
-	 * Inserts the supplied FContainer after current container. If the
-	 * current container or the supplied container is null then
-	 * nothing is done.
+	 * Inserts the supplied FormContainer after current container. If
+	 * the current container or the supplied container is {@code null}
+	 * then nothing is done.
 	 * 
-	 * @param fc The FContainer to insert.
+	 * @param fc The {@code FormContainer} to insert.
+	 * 
+	 * @see FormContainer
 	 */
 	private void insertAfter(FormContainer fc)
 	{
@@ -260,11 +277,13 @@ public class Form
 	}
 	
 	/**
-	 * Inserts the supplied FContainer before current container. If
-	 * the current container or the supplied container is null then
-	 * nothing is done.
+	 * Inserts the supplied {@code FormContainer} before current
+	 * container. If the current container or the supplied container
+	 * is {@code null} then nothing is done.
 	 * 
-	 * @param fc The FContainer to insert.
+	 * @param fc The {@code FormContainer} to insert.
+	 * 
+	 * @see FormContainer
 	 */
 	private void insertBefore(FormContainer fc)
 	{
@@ -278,11 +297,13 @@ public class Form
 	}
 	
 	/**
-	 * Deletes the FContainer after the current. If the current
-	 * FContainer of the one after the current is null, nothing is
-	 * done.
+	 * Deletes the {@code FormContainer} after the current. If the
+	 * current {@code FormContainer} of the one after the current is
+	 * {@code null}, nothing is done.
 	 * 
-	 * @return The FContainer that was deleted.
+	 * @return The {@code FormContainer} that was deleted.
+	 * 
+	 * @see FormContainer
 	 */
 	private FormContainer deleteAfter()
 	{
@@ -301,11 +322,13 @@ public class Form
 	}
 	
 	/**
-	 * Deletes the FContainer before the current. If the current
-	 * FContainer of the one before the current is null, nothing is
-	 * done.
+	 * Deletes the {@code FormContainer} before the current. If the
+	 * current {@code FormContainer} of the one before the current is
+	 * {@code null}, nothing is done.
 	 * 
-	 * @return The FContainer that was deleted.
+	 * @return The {@code FormContainer} that was deleted.
+	 * 
+	 * @see FormContainer
 	 */
 	private FormContainer deleteBefore()
 	{
@@ -362,14 +385,14 @@ public class Form
 	}
 	
 	/**
-	 * Compares the containers in this form and checks if the supplied
-	 * container is a reference to an object already in this form.
+	 * Compares the {@code FormContainer} in this form and checks if
+	 * {@code fc} is a reference to an object already in this form.
 	 * 
-	 * @param fc The container to check if it already exists in this
-	 * 		form.
+	 * @param fc The {@code FormContainer} to check if it already
+	 * 		exists in this form.
 	 * 
-	 * @return True if this form already contains the supplied
-	 * 		container. False if not.
+	 * @return {@code true} if this form already contains the supplied
+	 * 		container. {@code true} if not.
 	 */
 	private boolean duplicateEntry(FormContainer fc)
 	{

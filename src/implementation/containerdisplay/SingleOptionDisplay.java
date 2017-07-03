@@ -96,7 +96,7 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 
 		group = new ButtonGroup();
 		
-		HashMap<Integer, String> opt = soc.getSOptions();
+		HashMap<Integer, String> opt = soc.getSingleOptions();
 		options = new HashMap<String, JRadioButton>();
 		for (Entry<Integer, String> e : opt.entrySet())
 		{

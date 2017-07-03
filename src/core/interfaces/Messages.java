@@ -22,23 +22,28 @@ package core.interfaces;
 import core.containers.MessageContainer;
 
 /**
- * This class should contain error and information messages fomr the
- * database.
- * The purpose of this class is to store messages from the database in
- * a local class so you don't have to query the database every time
- * you want to display a message to the user.
+ * This class should contain error and information messages from the
+ * {@code Database}.
+ * The purpose of this class is to store messages from the
+ * {@code Database} in a local class so you don't have to query the
+ * {@code Database} every time you want to display a message to the
+ * user.
  * This implementation allows you do easily choose the language to
  * display messages for and quick access to messages.
  * 
  * @author Marcus Malmquist
+ * 
+ * @see Database
  *
  */
 public final class Messages
 {
 	/* Public */
-	
-
-	
+	/**
+	 * Name of the error message. This variable can be seen as an
+	 * implementation-independent pointer to the
+	 * implementation-dependent error message.
+	 */
 	public static final String
 	ERROR_UH_PR_PASSWORD_SIMPLE = "UH_PR_PASSWORD_SIMPLE",
 	ERROR_UH_PR_INVALID_LENGTH = "UH_PR_INVALID_LENGTH",
@@ -52,7 +57,12 @@ public final class Messages
 	ERROR_UH_ALREADY_ONLINE = "UH_ALREADY_ONLINE",
 	ERROR_UH_SERVER_FULL = "UH_SERVER_FULL"
 	;
-	
+
+	/**
+	 * Name of the information message. This variable can be seen as
+	 * an implementation-independent pointer to the
+	 * implementation-dependent information message.
+	 */
 	public static final String
 	INFO_SELECT_OPTION = "SELECT_OPTION",
 	INFO_EXIT = "EXIT",
@@ -86,7 +96,17 @@ public final class Messages
 	INFO_UI_SELECT_SINGLE = "UI_SELECT_SINGLE"
 	;
 	
+	/**
+	 * This locale must have entries for all messages in the language
+	 * related to this locale. This locale will be used if a message
+	 * is requested for a locale that the message has no entry for.
+	 */
 	public final String fallbackLocale = "en";
+	/**
+	 * If the messages was not retrieved from the database this
+	 * message (in English) should be used to notify the caller that
+	 * there was a database error.
+	 */
 	public static final String DATABASE_ERROR = "Database error.";
 
 	@Override
@@ -108,10 +128,12 @@ public final class Messages
 	}
 	
 	/**
-	 * Attempts to load messages from the database.
+	 * Attempts to load messages from the {@code Database}.
 	 * 
-	 * @return True if messages was successfully loaded. False if an
-	 * 		error occurred while loading messages.
+	 * @return {@code true} if messages was successfully loaded.
+	 * 		{@code false} if an error occurred while loading messages.
+	 * 
+	 * @see Database
 	 */
 	public final boolean loadMessages()
 	{
@@ -125,11 +147,33 @@ public final class Messages
 				&& infoMsgLoadCode == Database.QUERY_SUCCESS;
 	}
 	
+	/**
+	 * Retrieves the error message associated with {@code errorName}
+	 * in the current locale.
+	 * 
+	 * @param errorName The name of the error, defined by the static
+	 * 		variables {@code ERROR_*}.
+	 * 
+	 * @return The error message for the current locale. If the
+	 * 		message does not exist in the current locale then the
+	 * 		message for the default locale is returned.
+	 */
 	public final String getError(String errorName)
 	{
 		return getMessage(error, errorName, locale);
 	}
 	
+	/**
+	 * Retrieves the error message associated with {@code infoName}
+	 * in the current locale.
+	 * 
+	 * @param infoName The name of the information, defined by the
+	 * 		static variables {@code INFO_*}.
+	 * 
+	 * @return The information message for the current locale. If the
+	 * 		message does not exist in the current locale then the
+	 * 		message for the default locale is returned.
+	 */
 	public final String getInfo(String infoName)
 	{
 		return getMessage(info, infoName, locale);
@@ -152,15 +196,17 @@ public final class Messages
 	}
 	
 	/**
-	 * Loads messages from the databse.
+	 * Loads messages from the {@code Database}.
 	 * 
-	 * @param mc The message container to get the message from.
+	 * @param mc The {@code MessageContainer} to get the message from.
 	 * @param messageName The name of the message to look for.
 	 * @param locale The locale of the message to look for.
 	 * 
 	 * @return The message for the supplied locale. If the message
 	 * 		does not exist in the requested locale then the message
 	 * 		for the default locale is returned.
+	 * 
+	 * @see MessageContainer
 	 */
 	private final String getMessage(
 			MessageContainer mc, String messageName, String locale)

@@ -45,6 +45,7 @@ public class FieldContainer extends FormContainer
 	/**
 	 * Initializes this container with form with the supplied
 	 * statement.
+	 * 
 	 * @param allowEmptyEntries True if this container allows empty
 	 * 		entry (answer/response).
 	 * @param secretEntry True if the input should be hidden. Useful
@@ -117,7 +118,8 @@ public class FieldContainer extends FormContainer
 	
 	/**
 	 * 
-	 * @return True if this form's entry should be hidden.
+	 * @return {@code true} if this form's entry should be hidden.
+	 * 		{@code false} if it should be displayed in plain text.
 	 */
 	public boolean isSecret()
 	{

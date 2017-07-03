@@ -89,8 +89,8 @@ public class User
 	
 	/**
 	 * 
-	 * @return True if the user is flagged to password update.
-	 * 		False if not.
+	 * @return {@code true} if the user is flagged to password update.
+	 * 		{@code false} if not.
 	 */
 	public boolean getUpdatePassword()
 	{
@@ -104,8 +104,8 @@ public class User
 	 * @param unhashedPass The unhashed password to be compared with
 	 * 		the user's password.
 	 * 
-	 * @return True if the hashed version of the password matches the
-	 * 		user's password. False if not.
+	 * @return {@code true} if the hashed version of the password
+	 * 		matches the user's password. {@code false} if not.
 	 */
 	public boolean passwordMatch(String unhashedPass)
 	{

@@ -28,11 +28,13 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import core.Utilities;
 import core.containers.MessageContainer;
 import core.containers.Patient;
+import core.containers.QuestionContainer;
 import core.containers.User;
 import core.interfaces.Database;
 
@@ -85,24 +87,33 @@ public class MySQL_Database implements Database
 	}
 
 	@Override
-	public int addQuestionnaireAnswers(Patient patient, String... answers)
+	public int addQuestionnaireAnswers(Patient patient, List<Object> answers)
 	{
-		System.out.println(answers.length);
-		if (answers.length < 5)
+		if (answers.size() < 5)
 			/* currently 5 questions */
 			return ERROR;
+		String[] ans = new String[5];
+		for (int i = 0; i < ans.length; ++i)
+		{
+			if (answers.get(i) instanceof Integer)
+				ans[i] = "option" + answers.get(i).toString();
+			else if (answers.get(i) instanceof String)
+				ans[i] = answers.get(i).toString();
+			else
+				ans[i] = "";
+		}
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String qInsert0 = String.format(
-				"INSERT INTO `patients` (`clinic_id`, `pnr`, `forename`, `lastname`, `id`) VALUES ('%d', '%s', '%s', '%s', NULL)",
+		String qInsert0 = String.format("INSERT INTO `patients` (`clinic_id`, `pnr`, `forename`, `lastname`, `id`) VALUES ('%d', '%s', '%s', '%s', NULL)",
 				patient.getClinicID(), patient.getPersonalNumber(), patient.getForename(), patient.getLastname());
-		String qInsert1 = String.format(
-				"INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, `question0`, `question1`, `question2`, `question3`, `question4`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
-				patient.getClinicID(), patient.getPersonalNumber(), sdf.format(new Date()), answers[0], answers[1], answers[2], answers[3], answers[4]);
+		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, `question0`, `question1`, `question2`, `question3`, `question4`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+				patient.getClinicID(), patient.getPersonalNumber(), sdf.format(new Date()),
+				ans[0], ans[1], ans[2], ans[3], ans[4]);
+		
 		int ret = QUERY_SUCCESS;
 		if (!patientInDatabase(patient.getPersonalNumber()))
 			ret = queryUpdate(qInsert0);
-		System.out.println(ret +", "+ patientInDatabase(patient.getPersonalNumber()));
+		
 		if (ret == QUERY_SUCCESS && queryUpdate(qInsert1) == ret)
 			return ret;
 		else
@@ -201,6 +212,33 @@ public class MySQL_Database implements Database
 		if (mc == null)
 			return ERROR;
 		return getMessages("info_messages", mc);
+	}
+	
+	@Override
+	public int loadQuestions(QuestionContainer qc)
+	{
+		int ret = ERROR;
+		try (Connection conn = DriverManager.getConnection(
+				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		{
+			Statement s = conn.createStatement();
+			ResultSet rs = query(s, "SELECT `id`, `type`, `optional`, `question`, `option0`, `option1`, `option2` FROM `questionnaire`");
+			if (rs != null)
+			{
+				while (rs.next())
+				{
+					qc.addQuestion(rs.getInt("id"), rs.getString("type"),
+							rs.getString("question"), new String[]{
+									rs.getString("option0"),
+									rs.getString("option1"),
+									rs.getString("option2")},
+							rs.getInt("optional") != 0);
+				}
+				ret = QUERY_SUCCESS;
+			}
+		}
+		catch (SQLException e) { }
+		return ret;
 	}
 	
 	/* Protected */

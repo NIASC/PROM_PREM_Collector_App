@@ -21,6 +21,7 @@ package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -76,6 +77,7 @@ public class FieldDisplay extends JPanel implements FormComponentDisplay
 	{
 		setLayout(new BorderLayout());
 		this.fc = fc;
+		
 		fieldLabel = new JLabel(String.format("%s: ", fc.getStatement()));
 		add(fieldLabel, BorderLayout.WEST);
 		if (fc.isSecret())

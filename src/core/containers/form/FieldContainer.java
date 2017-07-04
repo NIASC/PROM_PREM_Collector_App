@@ -75,6 +75,12 @@ public class FieldContainer extends FormContainer
 		return fc;
 	}
 	
+	@Override
+	public String getEntry()
+	{
+		return field.getEntry();
+	}
+	
 	/**
 	 * Sets the content of this container. A field container is only
 	 * allowed to contain one field so if this container already have
@@ -103,17 +109,6 @@ public class FieldContainer extends FormContainer
 	public String getStatement()
 	{
 		return field.getStatement();
-	}
-	
-	/**
-	 * Retrieves the entry (i.e. the user input in response to the
-	 * field's statement) of this container's field.
-	 * 
-	 * @return This container's user entry.
-	 */
-	public String getEntry()
-	{
-		return field.getEntry();
 	}
 	
 	/**

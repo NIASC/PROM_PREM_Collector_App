@@ -64,6 +64,13 @@ public abstract class FormContainer
 	public abstract FormContainer copy();
 	
 	/**
+	 * Retrieves the entry/answer for this container.
+	 * 
+	 * @return This container's user entry.
+	 */
+	public abstract Object getEntry();
+	
+	/**
 	 * Creates a displayable wrapper for this container and puts this
 	 * container inside it.
 	 * 

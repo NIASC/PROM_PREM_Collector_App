@@ -21,6 +21,7 @@ package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -116,7 +117,7 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets.bottom = gbc.insets.top = 1;
 		gbc.gridx = 0;
-		add(buttonPanel, BorderLayout.CENTER);
+		add(buttonPanel, BorderLayout.WEST);
 
 		group = new ButtonGroup();
 		HashMap<Integer, String> opt = soc.getSingleOptions();

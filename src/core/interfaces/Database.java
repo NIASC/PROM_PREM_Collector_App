@@ -20,9 +20,11 @@
 package core.interfaces;
 
 import java.util.HashMap;
+import java.util.List;
 
 import core.containers.MessageContainer;
 import core.containers.Patient;
+import core.containers.QuestionContainer;
 import core.containers.User;
 
 /**
@@ -50,7 +52,8 @@ public interface Database
 	 * @param clinic The clinic ID that the new user belongs to.
 	 * @param email The email of the new user.
 	 * 
-	 * @return QUERY_SUCCESS on successful update, ERROR on failure.
+	 * @return {@code QUERY_SUCCESS} on successful update,
+	 *		{@code ERROR} on failure.
 	 */
 	public int addUser(String username,
 			String password, String salt, int clinic, String email);
@@ -61,16 +64,18 @@ public interface Database
 	 * @param patient The patient to add
 	 * @param answers The questionnaire form.
 	 * 
-	 * @return QUERY_SUCCESS on successful update, ERROR on failure.
+	 * @return {@code QUERY_SUCCESS} on successful update,
+	 * 		{@code ERROR} on failure.
 	 */
-	public int addQuestionnaireAnswers(Patient patient, String... answers);
+	public int addQuestionnaireAnswers(Patient patient, List<Object> answers);
 
 	/**
 	 * Adds a new clinic to the database.
 	 * 
 	 * @param clinicName The name of the clinic.
 	 * 
-	 * @return QUERY_SUCCESS on successful update, ERROR on failure.
+	 * @return {@code QUERY_SUCCESS} on successful update,
+	 * 		{@code ERROR} on failure.
 	 */
 	public int addClinic(String clinicName);
 	
@@ -86,8 +91,9 @@ public interface Database
 	 * Collects the information about the user from the database.
 	 * 
 	 * @param username The name of the user to look for.
+	 * 
 	 * @return If the user was found the instance of the user is
-	 * 		returned else null.
+	 * 		returned else {@code null}.
 	 */
 	public User getUser(String username);
 	
@@ -97,7 +103,7 @@ public interface Database
 	 * @param pnr The personal number of the patient to look for.
 	 * 
 	 * @return If the patient was found the instance of the patient is
-	 * 		returnes else null.
+	 * 		returned else {@code null}.
 	 */
 	public boolean patientInDatabase(String pnr);
 
@@ -123,8 +129,9 @@ public interface Database
 	 * 
 	 * @param mc The (empty) message container to put error messages in.
 	 * 
-	 * @return QUERY_SUCCESS if the error messages were successfully
-	 * 		loaded. ERROR if there was an error with the database.
+	 * @return {@code QUERY_SUCCESS} if the error messages were
+	 * 		successfully loaded. {@code ERROR} if there was an error
+	 * 		with the database.
 	 */
 	public int getErrorMessages(MessageContainer mc);
 	
@@ -134,10 +141,26 @@ public interface Database
 	 * 
 	 * @param mc The (empty) message container to put info messages in.
 	 * 
-	 * @return QUERY_SUCCESS if the info messages were successfully
-	 * 		loaded. ERROR if there was an error with the database.
+	 * @return {@code QUERY_SUCCESS} if the info messages were
+	 * 		successfully loaded. {@code ERROR} if there was an error
+	 * 		with the database.
 	 */
 	public int getInfoMessages(MessageContainer mc);
+	
+	/**
+	 * Loads questions from the database and stores them in a list
+	 * of questions.
+	 * 
+	 * @param qc The {@code QuestionContainer} to put the questions
+	 * 		in.
+	 * 
+	 * @return {@code QUERY_SUCCESS} if the questions were successfully
+	 * 		loaded. {@code ERROR} if there was an error with the
+	 * 		database.
+	 * 
+	 * @see QuestionContainer
+	 */
+	public int loadQuestions(QuestionContainer qc);
 	
 	/* Protected */
 	

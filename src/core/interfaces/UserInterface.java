@@ -194,6 +194,19 @@ public interface UserInterface
 		 * @see NextFunction#call()
 		 */
 		public boolean valid;
+		
+		/**
+		 * This is a message that can be used to send an error
+		 * message from {@code ReturnFunction} to its caller. This is
+		 * typically useful if the {@code valid} flag is {@code false}
+		 * to send a message to the user about why the flag was set to
+		 * {@code false}.
+		 * 
+		 * @see ReturnFunction#call(Form)
+		 * @see #valid
+		 */
+		public String message;
+		
 		/**
 		 * This functional interface object should be called when
 		 * {@code valid} is set to true. This function is intended to

@@ -706,10 +706,13 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 							RetFunContainer rfc = function.call(form);
 							if (rfc.valid)
 							{
+								displayMessage("", false);
 								setContent(retpan);
 								if (rfc.nextfunc != null)
 									rfc.nextfunc.call();
 							}
+							else if (rfc.message != null)
+								displayError(rfc.message, false);
 						}
 						else
 						{

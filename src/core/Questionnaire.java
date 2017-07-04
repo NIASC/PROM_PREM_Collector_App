@@ -22,10 +22,14 @@ package core;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import core.containers.Form;
 import core.containers.Patient;
+import core.containers.QuestionContainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.SingleOptionContainer;
 import core.interfaces.Implementations;
@@ -54,6 +58,8 @@ public class Questionnaire
 	{
 		userInterface = ui;
 		userHandle = uh;
+		questions = new QuestionContainer();
+		Implementations.Database().loadQuestions(questions);
 	}
 	
 	/**
@@ -100,18 +106,8 @@ public class Questionnaire
 		if (patient == null)
 			return;
 		Form form = new Form();
-		SingleOptionContainer soc0 = new SingleOptionContainer(false, "Select level");
-		soc0.addSingleOption(0, "high");
-		soc0.addSingleOption(1, "medium");
-		soc0.addSingleOption(2, "low");
-		form.insert(soc0, Form.AT_END);
-
-		SingleOptionContainer soc1 = new SingleOptionContainer(false, "Select frequency");
-		soc1.addSingleOption(0, "always");
-		soc1.addSingleOption(1, "sometimes");
-		soc1.addSingleOption(2, "never");
-		form.insert(soc1, Form.AT_END);
-		
+		for (int i = 0; i < questions.getSize(); ++i)
+			form.insert(questions.getQuestion(i), Form.AT_END);
 		form.jumpTo(Form.AT_BEGIN);
 		
 		userInterface.presentForm(form, this::saveQuestionaire, false);
@@ -129,12 +125,22 @@ public class Questionnaire
 		form.jumpTo(Form.AT_NEXT);
 		String personalNumber = validDate(pnr.getEntry());
 		if (personalNumber == null)
+		{
+			rfc.message = String.format(
+					"Valid personal numbers are: %s, %s, %s, %s",
+					"yymmddxxxx", "yymmdd-xxxx", "yyyymmddxxxx", "yyyymmdd-xxxx");
 			return rfc;
+		}
 		try {
 			patient = new Patient(
 					forename.getEntry(), lastname.getEntry(),
 					personalNumber, userHandle.getUser());
-		} catch (NullPointerException npe) { return rfc; }
+		} catch (NullPointerException npe)
+		{
+			rfc.message = Messages.getMessages().getError(
+					Messages.ERROR_NOT_LOGGED_IN);
+			return rfc;
+		}
 		rfc.valid = true;
 		return rfc;
 	}
@@ -142,22 +148,16 @@ public class Questionnaire
 	private RetFunContainer saveQuestionaire(Form form)
 	{
 		RetFunContainer rfc = new RetFunContainer(null);
+		List<Object> answers = new ArrayList<Object>();
 		form.jumpTo(Form.AT_BEGIN);
-		SingleOptionContainer soc0 = (SingleOptionContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		Integer sel0 = soc0.getSelected();
-		System.out.printf("Selected0: %d\n", sel0);
-		SingleOptionContainer soc1 = (SingleOptionContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		Integer sel1 = soc1.getSelected();
-		System.out.printf("Selected1: %d\n", sel1);
+		if (form.currentEntry() == null)
+			return rfc;
+		do
+			answers.add(form.currentEntry().getEntry());
+		while (form.nextEntry() != null);
 		
-		/*
-		 * store patient and questionnaire answers in database
-		 */
-		Implementations.Database().addQuestionnaireAnswers(patient,
-				soc0.getSelected().toString(), soc1.getSelected().toString(),
-				"0", "0", "0");
+		Implementations.Database().addQuestionnaireAnswers(
+				patient, answers);
 		
 		patient = null;
 		rfc.valid = true;
@@ -195,13 +195,14 @@ public class Questionnaire
 		{
 			return null;
 		}
-		System.out.println(String.format("%s-%d",
+		System.out.println(String.format("%s-%04d",
 				(new SimpleDateFormat("yyyyMMdd")).format(date), lastFour));
-		return String.format("%s-%d",
+		return String.format("%s-%04d",
 				(new SimpleDateFormat("yyyyMMdd")).format(date), lastFour);
 	}
 
 	private UserHandle userHandle;
 	private UserInterface userInterface;
 	private Patient patient;
+	private QuestionContainer questions;
 }

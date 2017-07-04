@@ -61,7 +61,7 @@ public class MessageContainer
 	public void addMessage(int code, String name, HashMap<String, String> text)
 	{
 		Message message = new Message(code, name, text);
-		if (messages.get(name) == null)
+		if (!messages.containsKey(name))
 		{ // new message
 			messages.put(name, message);
 			codeToName.put(code, name);

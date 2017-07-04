@@ -87,6 +87,12 @@ public class SingleOptionContainer extends FormContainer
 		return soc;
 	}
 	
+	@Override
+	public Integer getEntry()
+	{
+		return getSelected();
+	}
+	
 	/**
 	 * Adds a new option to the container.
 	 * 

@@ -19,6 +19,8 @@
  */
 package core;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import core.containers.Form;
@@ -265,24 +267,25 @@ public class UserHandle
 	private RetFunContainer setPassReturn(Form form)
 	{
 		RetFunContainer rfc = new RetFunContainer(null);
+		List<String> answers = new ArrayList<String>();
 		form.jumpTo(Form.AT_BEGIN);
-		FieldContainer current = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		FieldContainer new1 = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		FieldContainer new2 = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
+		do
+			answers.add((String) form.currentEntry().getEntry());
+		while (form.nextEntry() != null);
+		String current = answers.get(0);
+		String new1 = answers.get(1);
+		String new2 = answers.get(2);
 
-		if (newPassError(current.getEntry(), new1.getEntry(), new2.getEntry()))
+		if (newPassError(current, new1, new2))
 			return rfc;
 		
 		Encryption crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
-		User tmpUser = user_db.setPassword(user, current.getEntry(),
-				crypto.hashString(new1.getEntry(), newSalt), newSalt);
+		User tmpUser = user_db.setPassword(user, current,
+				crypto.hashString(new1, newSalt), newSalt);
 		if (tmpUser == null)
 		{
-			ui.displayError(Messages.DATABASE_ERROR, false);
+			rfc.message = Messages.DATABASE_ERROR;
 			return rfc;
 		}
 		user = tmpUser;

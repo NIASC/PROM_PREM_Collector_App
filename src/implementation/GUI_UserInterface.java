@@ -193,6 +193,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	{
 		if (panel == null)
 			return;
+		displayMessage("", false); // reset any error messages
 		JViewport jvp = pageScroll.getViewport();
 		jvp.removeAll();
 		jvp.add(panel);

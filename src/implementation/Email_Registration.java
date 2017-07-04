@@ -20,6 +20,8 @@
 package implementation;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -104,28 +106,25 @@ public class Email_Registration implements Registration
 	}
 	
 	/**
-	 * registration process should run this function when it is done;
+	 * Formats the user registration form into a registration request
+	 * and sends in to an administrator.
 	 * 
 	 * @param form The form that was sent to the UI.
 	 * 
-	 * @return True if the form was accepted.
+	 * @return {@code true} if the form was accepted.
 	 */
 	private RetFunContainer regProcReturn(Form form)
 	{
 		RetFunContainer rfc = new RetFunContainer(null);
+		List<String> answers = new ArrayList<String>();
 		form.jumpTo(Form.AT_BEGIN);
-		FieldContainer name = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		FieldContainer email = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		FieldContainer clinic = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		if ((name.getEntry() == null || name.getEntry().isEmpty())
-				|| (email.getEntry() == null || email.getEntry().isEmpty())
-				|| (clinic.getEntry() == null || clinic.getEntry().isEmpty()))
-		{
-			return rfc;
-		}
+		do
+			answers.add((String) form.currentEntry().getEntry());
+		while (form.nextEntry() != null);
+		String name = answers.get(0);
+		String email = answers.get(1);
+		String clinic = answers.get(2);
+		
 		String emailSubject = Messages.getMessages().getInfo(
 				Messages.INFO_REG_EMAIL_SUBJECT);
 		String emailDescription = Messages.getMessages().getInfo(
@@ -134,16 +133,12 @@ public class Email_Registration implements Registration
 				Messages.INFO_REG_EMAIL_SIGNATURE);
 		String emailBody = String.format(
 				("%s:<br><br> %s: %s<br>%s: %s<br>%s: %s<br><br> %s"),
-				emailDescription, NAME_STR, name.getEntry(), EMAIL_STR,
-				email.getEntry(), CLINIC_STR, clinic.getEntry(), emailSignature);
+				emailDescription, NAME_STR, name, EMAIL_STR,
+				email, CLINIC_STR, clinic, emailSignature);
 		send(adminEmail, emailSubject, emailBody, "text/html");
 		rfc.valid = true;
 		return rfc;
 	}
-	
-	/* 
-	 * Private methods not required by the interface.
-	 */
 	
 	/**
 	 * Sends an email from the program's email account.

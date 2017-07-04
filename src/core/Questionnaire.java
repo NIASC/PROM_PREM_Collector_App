@@ -30,14 +30,16 @@ import core.containers.Form;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
 import core.containers.form.FieldContainer;
+import core.interfaces.Database;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
 import core.interfaces.UserInterface;
 import core.interfaces.UserInterface.RetFunContainer;
 
 /**
- * This class is the central point for the questionaire part of the
- * program. This is where the questionare loop is run from.
+ * This class is the central point for the questionnaire part of the
+ * program. It handles creating and validating the patient
+ * registration as well as the questionnaire.
  * 
  * @author Marcus Malmquist
  *
@@ -45,6 +47,23 @@ import core.interfaces.UserInterface.RetFunContainer;
 public class Questionnaire
 {
 	/* Public */
+	
+	/**
+	 * Starts the questionnaire. The questionnaire is preceded by
+	 * a patient registration form.
+	 */
+	public void start()
+	{
+		if (!userHandle.isLoggedIn())
+		{
+			userInterface.displayError(Messages.getMessages().getError(
+					Messages.ERROR_NOT_LOGGED_IN), false);
+			return;
+		}
+		createPatientRegistration();
+	}
+	
+	/* Protected */
 	
 	/**
 	 * Initialize variables.
@@ -60,30 +79,23 @@ public class Questionnaire
 		Implementations.Database().loadQuestions(questions);
 	}
 	
-	/**
-	 * Starts the questionnaire.
-	 */
-	public void start()
-	{
-		if (!userHandle.isLoggedIn())
-		{
-			userInterface.displayError(Messages.getMessages().getError(
-					Messages.ERROR_NOT_LOGGED_IN), false);
-			return;
-		}
-		displayPatientRegistration();
-	}
-	
-	/* Protected */
-	
 	/* Private */
+
+	private UserHandle userHandle;
+	private UserInterface userInterface;
+	private Patient patient;
+	private QuestionContainer questions;
 	
-	private void displayPatientRegistration()
+	/**
+	 * Displays a patient registration form. This registration form is
+	 * used to link the patient to the questionnaire.
+	 */
+	private void createPatientRegistration()
 	{
 		Form form = new Form();
 		FieldContainer forename = new FieldContainer(false, false, "Patient forename");
 		form.insert(forename, Form.AT_END);
-		FieldContainer lastname = new FieldContainer(false, false, "Patient lastname");
+		FieldContainer lastname = new FieldContainer(false, false, "Patient surname");
 		form.insert(lastname, Form.AT_END);
 		FieldContainer pnr = new FieldContainer(false, false, "Patient Personal number");
 		if (patient != null)
@@ -99,7 +111,12 @@ public class Questionnaire
 		userInterface.presentForm(form, this::validatePatient, true);
 	}
 	
-	private void displayQuestionnaire()
+	/**
+	 * Creates the questionnaire form and sends it to the
+	 * {@code UserInterface}. It is required to fill in the patient
+	 * form before the questionnaire is able to start.
+	 */
+	private void createQuestionnaire()
 	{
 		if (patient == null)
 			return;
@@ -111,29 +128,50 @@ public class Questionnaire
 		userInterface.presentForm(form, this::saveQuestionaire, false);
 	}
 	
+	/**
+	 * Validates the patient data.
+	 * 
+	 * @param form The form that should have been filled by the user.
+	 * 
+	 * @return The {@code RetFunContainer} for this form.
+	 */
 	private RetFunContainer validatePatient(Form form)
 	{
-		RetFunContainer rfc = new RetFunContainer(this::displayQuestionnaire);
+		RetFunContainer rfc = new RetFunContainer(this::createQuestionnaire);
+		List<String> answers = new ArrayList<String>();
 		form.jumpTo(Form.AT_BEGIN);
-		FieldContainer forename = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		FieldContainer lastname = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		FieldContainer pnr = (FieldContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
-		String personalNumber = validDate(pnr.getEntry());
+		do
+			answers.add((String) form.currentEntry().getEntry());
+		while (form.nextEntry() != null);
+		String forename = answers.get(0);
+		String lastname = answers.get(1);
+		String pnr = answers.get(2);
+		
+		String personalNumber = validDate(pnr);
+		if (forename == null || forename.isEmpty())
+		{
+			rfc.message = "You must enter a forename";
+			return rfc;
+		}
+		if (lastname == null || lastname.isEmpty())
+		{
+			rfc.message = "You must enter a surname";
+			return rfc;
+		}
 		if (personalNumber == null)
 		{
 			rfc.message = String.format(
-					"Valid personal numbers are: %s, %s, %s, %s",
+					"Valid personal numbers formats are: %s, %s, %s, %s",
 					"yymmddxxxx", "yymmdd-xxxx", "yyyymmddxxxx", "yyyymmdd-xxxx");
 			return rfc;
 		}
-		try {
-			patient = new Patient(
-					forename.getEntry(), lastname.getEntry(),
+		
+		try
+		{
+			patient = new Patient(forename, lastname,
 					personalNumber, userHandle.getUser());
-		} catch (NullPointerException npe)
+		}
+		catch (NullPointerException npe)
 		{
 			rfc.message = Messages.getMessages().getError(
 					Messages.ERROR_NOT_LOGGED_IN);
@@ -142,21 +180,28 @@ public class Questionnaire
 		rfc.valid = true;
 		return rfc;
 	}
-	
+	/**
+	 * Validates the questionnaire data.
+	 * 
+	 * @param form The form that should have been filled by the user.
+	 * 
+	 * @return The {@code RetFunContainer} for this form.
+	 */
 	private RetFunContainer saveQuestionaire(Form form)
 	{
 		RetFunContainer rfc = new RetFunContainer(null);
 		List<Object> answers = new ArrayList<Object>();
 		form.jumpTo(Form.AT_BEGIN);
-		if (form.currentEntry() == null)
-			return rfc;
 		do
 			answers.add(form.currentEntry().getEntry());
 		while (form.nextEntry() != null);
 		
-		Implementations.Database().addQuestionnaireAnswers(
-				patient, answers);
-		
+		if (Implementations.Database().addQuestionnaireAnswers(
+				patient, answers) == Database.ERROR)
+		{
+			rfc.message = Messages.DATABASE_ERROR;
+			return rfc;
+		}
 		patient = null;
 		rfc.valid = true;
 		return rfc;
@@ -196,9 +241,4 @@ public class Questionnaire
 		return String.format("%s-%04d",
 				(new SimpleDateFormat("yyyyMMdd")).format(date), lastFour);
 	}
-
-	private UserHandle userHandle;
-	private UserInterface userInterface;
-	private Patient patient;
-	private QuestionContainer questions;
 }

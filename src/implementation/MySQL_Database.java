@@ -89,26 +89,40 @@ public class MySQL_Database implements Database
 	@Override
 	public int addQuestionnaireAnswers(Patient patient, List<Object> answers)
 	{
-		if (answers.size() < 5)
-			/* currently 5 questions */
+		if (answers.size() < 6)
+			/* currently 6 questions */
 			return ERROR;
-		String[] ans = new String[5];
+		String[] ans = new String[6];
 		for (int i = 0; i < ans.length; ++i)
 		{
-			if (answers.get(i) instanceof Integer)
+			/* might not be the best way of doing this, but if there
+			 * will be a lot of variety of questions unordered then
+			 * this could be the way to go.
+			 */
+			switch(i)
+			{
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4: // single option
 				ans[i] = "option" + answers.get(i).toString();
-			else if (answers.get(i) instanceof String)
+				break;
+			case 5: // slider
 				ans[i] = answers.get(i).toString();
-			else
+				break;
+			default: // unknown
 				ans[i] = "";
+				break;
+			}
 		}
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String qInsert0 = String.format("INSERT INTO `patients` (`clinic_id`, `pnr`, `forename`, `lastname`, `id`) VALUES ('%d', '%s', '%s', '%s', NULL)",
 				patient.getClinicID(), patient.getPersonalNumber(), patient.getForename(), patient.getLastname());
-		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, `question0`, `question1`, `question2`, `question3`, `question4`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, `question0`, `question1`, `question2`, `question3`, `question4`, `question5`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
 				patient.getClinicID(), patient.getPersonalNumber(), sdf.format(new Date()),
-				ans[0], ans[1], ans[2], ans[3], ans[4]);
+				ans[0], ans[1], ans[2], ans[3], ans[4], ans[5]);
 		
 		int ret = QUERY_SUCCESS;
 		if (!patientInDatabase(patient.getPersonalNumber()))
@@ -222,7 +236,7 @@ public class MySQL_Database implements Database
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
 			Statement s = conn.createStatement();
-			ResultSet rs = query(s, "SELECT `id`, `type`, `optional`, `question`, `option0`, `option1`, `option2` FROM `questionnaire`");
+			ResultSet rs = query(s, "SELECT `id`, `type`, `optional`, `question`, `option0`, `option1`, `option2`, `max_val`, `min_val` FROM `questionnaire`");
 			if (rs != null)
 			{
 				while (rs.next())
@@ -232,7 +246,8 @@ public class MySQL_Database implements Database
 									rs.getString("option0"),
 									rs.getString("option1"),
 									rs.getString("option2")},
-							rs.getInt("optional") != 0);
+							rs.getInt("optional") != 0,
+							rs.getInt("max_val"), rs.getInt("min_val"));
 				}
 				ret = QUERY_SUCCESS;
 			}

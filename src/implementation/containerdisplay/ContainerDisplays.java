@@ -22,6 +22,7 @@ package implementation.containerdisplay;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
 import core.containers.form.SingleOptionContainer;
+import core.containers.form.SliderContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
 
 /**
@@ -63,6 +64,8 @@ public abstract class ContainerDisplays
 			return new SingleOptionDisplay((SingleOptionContainer) fc);
 		else if (fc instanceof FieldContainer)
 			return new FieldDisplay((FieldContainer) fc);
+		else if (fc instanceof SliderContainer)
+			return new SliderDisplay((SliderContainer) fc);
 		else
 		{
 			System.out.println("Unknown Form container");

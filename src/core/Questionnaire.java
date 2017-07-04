@@ -24,14 +24,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import core.containers.Form;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
 import core.containers.form.FieldContainer;
-import core.containers.form.SingleOptionContainer;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
 import core.interfaces.UserInterface;

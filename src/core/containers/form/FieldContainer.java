@@ -84,7 +84,7 @@ public class FieldContainer extends FormContainer
 	/**
 	 * Sets the content of this container. A field container is only
 	 * allowed to contain one field so if this container already have
-	 * an entry it will be overwritten
+	 * an entry it will be overwritten.
 	 * 
 	 * @param statement The statement that you want the user to
 	 * 		respond to.

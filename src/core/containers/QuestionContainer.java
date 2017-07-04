@@ -24,6 +24,7 @@ import java.util.HashMap;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
 import core.containers.form.SingleOptionContainer;
+import core.containers.form.SliderContainer;
 
 public class QuestionContainer
 {
@@ -37,11 +38,12 @@ public class QuestionContainer
 	}
 	
 	public void addQuestion(int id, String type, String question,
-			String[] options, boolean optional)
+			String[] options, boolean optional, Integer upper, Integer lower)
 	{
 		if (questions.containsKey(id))
 			return;
-		Question q = new Question(id, type, question, options, optional);
+		Question q = new Question(
+				id, type, question, options, optional, upper, lower);
 		questions.put(id, q);
 		indexToID.put(index++, id);
 	}
@@ -80,13 +82,16 @@ public class QuestionContainer
 		/* public */
 		
 		public Question(int id, String type, String question,
-				String[] options, boolean optional)
+				String[] options, boolean optional,
+				Integer max, Integer min)
 		{
 			this.id = id;
 			this.type = type;
 			this.question = question;
 			this.options = options;
 			this.optional = optional;
+			max_val = max;
+			min_val = min;
 		}
 		
 		public String type()
@@ -120,9 +125,10 @@ public class QuestionContainer
 				return soc;
 			}
 			else if (type.equalsIgnoreCase("Field"))
-			{
 				return new FieldContainer(optional, false, question);
-			}
+			else if (type.equalsIgnoreCase("Slider"))
+				return new SliderContainer(
+						optional, question, min_val, max_val);
 			else
 				return null;
 		}
@@ -136,5 +142,6 @@ public class QuestionContainer
 		private String type;
 		private String question;
 		private String[] options;
+		private Integer max_val, min_val;
 	}
 }

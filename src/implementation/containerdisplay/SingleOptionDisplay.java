@@ -63,13 +63,16 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	@Override
 	public void itemStateChanged(ItemEvent ev)
 	{
-		boolean selected = (ev.getStateChange() == ItemEvent.SELECTED);
-		AbstractButton button = (AbstractButton) ev.getItemSelectable();
-		JRadioButton sel = options.get(button.getName());
-		if (sel == null)
-			return;
-		if (selected)
-			responseID = Integer.parseInt(button.getName());
+		if (ev.getItemSelectable() instanceof AbstractButton)
+		{
+			AbstractButton button = (AbstractButton) ev.getItemSelectable();
+			boolean selected = (ev.getStateChange() == ItemEvent.SELECTED);
+			JRadioButton sel = options.get(button.getName());
+			if (sel == null)
+				return;
+			if (selected)
+				responseID = Integer.parseInt(button.getName());
+		}
 	}
 
 	@Override

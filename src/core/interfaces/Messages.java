@@ -102,12 +102,6 @@ public final class Messages
 	 * is requested for a locale that the message has no entry for.
 	 */
 	public final String fallbackLocale = "en";
-	/**
-	 * If the messages was not retrieved from the database this
-	 * message (in English) should be used to notify the caller that
-	 * there was a database error.
-	 */
-	public static final String DATABASE_ERROR = "Database error.";
 
 	@Override
 	public final Object clone()
@@ -137,12 +131,16 @@ public final class Messages
 	 */
 	public final boolean loadMessages()
 	{
-		error = new MessageContainer();
-		info = new MessageContainer();
-		
 		Database db = Implementations.Database();
-		int errMsgLoadCode = db.getErrorMessages(error);
-		int infoMsgLoadCode = db.getInfoMessages(info);
+		int errMsgLoadCode = Database.ERROR;
+		int infoMsgLoadCode = Database.ERROR;
+		synchronized(this)
+		{
+			error = new MessageContainer();
+			info = new MessageContainer();
+			errMsgLoadCode = db.getErrorMessages(error);
+			infoMsgLoadCode = db.getInfoMessages(info);
+		}
 		return errMsgLoadCode == Database.QUERY_SUCCESS
 				&& infoMsgLoadCode == Database.QUERY_SUCCESS;
 	}
@@ -211,8 +209,10 @@ public final class Messages
 	private final String getMessage(
 			MessageContainer mc, String messageName, String locale)
 	{
-		if (mc == null && !Messages.getMessages().loadMessages())
+		if (mc == null && !loadMessages())
 			return null;
-		return mc.getMessage(messageName, locale);
+		String str = null;
+		str = mc.getMessage(messageName, locale);
+		return str;
 	}
 }

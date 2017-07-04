@@ -281,11 +281,12 @@ public class UserHandle
 		
 		Encryption crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
-		User tmpUser = user_db.setPassword(user, current,
+		User tmpUser;
+		tmpUser = user_db.setPassword(user, current,
 				crypto.hashString(new1, newSalt), newSalt);
 		if (tmpUser == null)
 		{
-			rfc.message = Messages.DATABASE_ERROR;
+			rfc.message = Database.DATABASE_ERROR;
 			return rfc;
 		}
 		user = tmpUser;

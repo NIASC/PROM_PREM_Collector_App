@@ -33,6 +33,7 @@ import core.containers.form.FieldContainer;
 import core.interfaces.Database;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
+import core.interfaces.Questions;
 import core.interfaces.UserInterface;
 import core.interfaces.UserInterface.RetFunContainer;
 
@@ -54,9 +55,9 @@ public class Questionnaire
 	 */
 	public void start()
 	{
-		if (!userHandle.isLoggedIn())
+		if (!uh.isLoggedIn())
 		{
-			userInterface.displayError(Messages.getMessages().getError(
+			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_NOT_LOGGED_IN), false);
 			return;
 		}
@@ -68,21 +69,20 @@ public class Questionnaire
 	/**
 	 * Initialize variables.
 	 * 
-	 * @param ui The active instance of the user interface.
-	 * @param uh The active instance of the user handle.
+	 * @param ui The active instance of the {@code UserInterface}.
+	 * @param uh The active instance of the {@code UserHandle}.
 	 */
 	protected Questionnaire(UserInterface ui, UserHandle uh)
 	{
-		userInterface = ui;
-		userHandle = uh;
-		questions = new QuestionContainer();
-		Implementations.Database().loadQuestions(questions);
+		this.ui = ui;
+		this.uh = uh;
+		questions = Questions.getQuestions().getContainer();
 	}
 	
 	/* Private */
 
-	private UserHandle userHandle;
-	private UserInterface userInterface;
+	private UserHandle uh;
+	private UserInterface ui;
 	private Patient patient;
 	private QuestionContainer questions;
 	
@@ -108,7 +108,7 @@ public class Questionnaire
 
 		form.jumpTo(Form.AT_BEGIN);
 
-		userInterface.presentForm(form, this::validatePatient, true);
+		ui.presentForm(form, this::validatePatient, true);
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public class Questionnaire
 			form.insert(questions.getQuestion(i), Form.AT_END);
 		form.jumpTo(Form.AT_BEGIN);
 		
-		userInterface.presentForm(form, this::saveQuestionaire, false);
+		ui.presentForm(form, this::saveQuestionaire, false);
 	}
 	
 	/**
@@ -169,7 +169,7 @@ public class Questionnaire
 		try
 		{
 			patient = new Patient(forename, lastname,
-					personalNumber, userHandle.getUser());
+					personalNumber, uh.getUser());
 		}
 		catch (NullPointerException npe)
 		{
@@ -199,7 +199,7 @@ public class Questionnaire
 		if (Implementations.Database().addQuestionnaireAnswers(
 				patient, answers) == Database.ERROR)
 		{
-			rfc.message = Messages.DATABASE_ERROR;
+			rfc.message = Database.DATABASE_ERROR;
 			return rfc;
 		}
 		patient = null;

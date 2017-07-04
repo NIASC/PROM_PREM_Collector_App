@@ -76,7 +76,7 @@ public class QuestionContainer
 	 * 
 	 * @see Questionnaire
 	 */
-	public void addQuestion(int id, String type, String question,
+	public synchronized void addQuestion(int id, String type, String question,
 			String[] options, boolean optional, Integer upper, Integer lower)
 	{
 		if (questions.containsKey(id))
@@ -115,6 +115,21 @@ public class QuestionContainer
 		return index;
 	}
 	
+	public QuestionContainer copy()
+	{
+		QuestionContainer qc = new QuestionContainer();
+		synchronized (this)
+		{
+			for (int i = 0; i < index; ++i)
+			{
+				Question q = questions.get(indexToID.get(i));
+				qc.addQuestion(indexToID.get(i), q.type(), q.question(),
+						q.options(), q.optional(), q.getUpper(), q.getLower());
+			}
+		}
+		return qc;
+	}
+	
 	/* protected */
 	
 	/* private */
@@ -134,27 +149,27 @@ public class QuestionContainer
 		/* public */
 		
 		/**
-	 * Adds a {@code Questionnaire} entry to this container.
-	 * 
-	 * @param id The ID of the question (as it appears in the
-	 * 		database).
-	 * @param type The type of question (Slider, SelectOption, Field
-	 * 		etc.) as it appears in the database.
-	 * @param question The question/statement that the user should
-	 * 		respond to.
-	 * @param options The available options to select in response to
-	 * 		the question/statement. If this entry type does not have
-	 * 		options this variable will be discarded can be set to
-	 * 		{@null}.
-	 * @param optional If it is <i><b>not</b></i> required to answer
-	 * 		this question this should be set to {@code true} else
-	 * 		{@code false}.
-	 * @param upper The upper limit for this entry. If this user is
-	 * 		supposed to enter a numerical value this should be the
-	 * 		upper limit for that value.
-	 * @param lower The lower limit for this entry. If this user is
-	 * 		supposed to enter a numerical value this should be the
-	 * 		lower limit for that value.
+		 * Adds a {@code Questionnaire} entry to this container.
+		 * 
+		 * @param id The ID of the question (as it appears in the
+		 * 		database).
+		 * @param type The type of question (Slider, SelectOption,
+		 * 		Field etc.) as it appears in the database.
+		 * @param question The question/statement that the user should
+		 * 		respond to.
+		 * @param options The available options to select in response
+		 * 		to the question/statement. If this entry type does not
+		 * 		have options this variable will be discarded can be
+		 * 		set to {@null}.
+		 * @param optional If it is <i><b>not</b></i> required to
+		 * 		answer this question this should be set to
+		 * 		{@code true} else {@code false}.
+		 * @param upper The upper limit for this entry. If this user
+		 * 		is supposed to enter a numerical value this should be
+		 * 		the upper limit for that value.
+		 * @param lower The lower limit for this entry. If this user
+		 * 		is supposed to enter a numerical value this should be
+		 * 		the lower limit for that value.
 		 */
 		public Question(int id, String type, String question,
 				String[] options, boolean optional,
@@ -205,6 +220,24 @@ public class QuestionContainer
 		public boolean optional()
 		{
 			return optional;
+		}
+		
+		/**
+		 * 
+		 * @return The upper limit for this entry.
+		 */
+		public Integer getUpper()
+		{
+			return maxVal;
+		}
+		
+		/**
+		 * 
+		 * @return The lower limit for this entry.
+		 */
+		public Integer getLower()
+		{
+			return minVal;
 		}
 		
 		/**

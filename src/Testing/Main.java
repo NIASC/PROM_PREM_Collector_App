@@ -19,7 +19,9 @@
  */
 package Testing;
 
+import core.interfaces.Database;
 import core.interfaces.Messages;
+import core.interfaces.Questions;
 import implementation.GUI_UserInterface;
 
 public class Main
@@ -27,9 +29,10 @@ public class Main
 	public static void main(String[] args)
 	{
 		//printFonts();
-		if (!Messages.getMessages().loadMessages())
+		if (!Messages.getMessages().loadMessages()
+				|| !Questions.getQuestions().loadQuestionnaire())
 		{
-			System.out.printf("%s\n", Messages.DATABASE_ERROR);
+			System.out.printf("%s\n", Database.DATABASE_ERROR);
 			System.exit(1);
 		}
 		GUI_UserInterface qf1 = new GUI_UserInterface(false);

@@ -58,7 +58,7 @@ public class MessageContainer
 	 * 		format should be <locale, message> e.g <"en", "Hello">,
 	 * 		<"fr", "Bonjour"> etc.
 	 */
-	public void addMessage(int code, String name, HashMap<String, String> text)
+	public synchronized void addMessage(int code, String name, HashMap<String, String> text)
 	{
 		Message message = new Message(code, name, text);
 		if (!messages.containsKey(name))
@@ -263,7 +263,11 @@ public class MessageContainer
 				boolean replace)
 		{
 			if (replace || getMessage(locale) == null)
-				return messages.put(locale, message);
+			{
+				String str = null;
+				str = messages.put(locale, message);
+				return str;
+			}
 			return null;
 		}
 	}

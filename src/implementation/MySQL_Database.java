@@ -89,37 +89,23 @@ public class MySQL_Database implements Database
 	@Override
 	public int addQuestionnaireAnswers(Patient patient, List<Object> answers)
 	{
-		if (answers.size() < 6)
-			/* currently 6 questions */
+		int nQuestions = 6;
+		if (answers.size() < nQuestions)
 			return ERROR;
-		String[] ans = new String[6];
+		String[] ans = new String[nQuestions];
 		for (int i = 0; i < ans.length; ++i)
 		{
-			/* might not be the best way of doing this, but if there
-			 * will be a lot of variety of questions unordered then
-			 * this could be the way to go.
-			 */
-			switch(i)
-			{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-			case 4: // single option
+			if (i < 5) // single option
 				ans[i] = "option" + answers.get(i).toString();
-				break;
-			case 5: // slider
+			else if (i == 5) // slider
 				ans[i] = answers.get(i).toString();
-				break;
-			default: // unknown
+			else
 				ans[i] = "";
-				break;
-			}
 		}
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String qInsert0 = String.format("INSERT INTO `patients` (`clinic_id`, `pnr`, `forename`, `lastname`, `id`) VALUES ('%d', '%s', '%s', '%s', NULL)",
-				patient.getClinicID(), patient.getPersonalNumber(), patient.getForename(), patient.getLastname());
+				patient.getClinicID(), patient.getPersonalNumber(), patient.getForename(), patient.getSurname());
 		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, `question0`, `question1`, `question2`, `question3`, `question4`, `question5`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
 				patient.getClinicID(), patient.getPersonalNumber(), sdf.format(new Date()),
 				ans[0], ans[1], ans[2], ans[3], ans[4], ans[5]);

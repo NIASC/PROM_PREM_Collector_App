@@ -27,8 +27,13 @@ import java.util.Map.Entry;
  * group several options with individual identifiers and text to form
  * a complete set of options to choose from as well as a way of
  * retrieving the selected option.
+ * A single-option object consists of a statement and multiple options
+ * to choose from and it only allows the user to choose one of the
+ * options.
  * 
  * @author Marcus Malmquist
+ * 
+ * @see FormContainer
  *
  */
 public class SingleOptionContainer extends FormContainer
@@ -55,7 +60,7 @@ public class SingleOptionContainer extends FormContainer
 	}
 	
 	/**
-	 * Initializes variables
+	 * Creates a container for single-option objects.
 	 * 
 	 * @param allowEmptyEntry {@code true} if this container allows
 	 * 		empty entry (answer/response). {@code false} if not.

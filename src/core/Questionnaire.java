@@ -89,7 +89,7 @@ public class Questionnaire
 		if (patient != null)
 		{
 			forename.setEntry(patient.getForename());
-			lastname.setEntry(patient.getLastname());
+			lastname.setEntry(patient.getSurname());
 			pnr.setEntry(patient.getPersonalNumber());
 		}
 		form.insert(pnr, Form.AT_END);
@@ -193,8 +193,6 @@ public class Questionnaire
 		{
 			return null;
 		}
-		System.out.println(String.format("%s-%04d",
-				(new SimpleDateFormat("yyyyMMdd")).format(date), lastFour));
 		return String.format("%s-%04d",
 				(new SimpleDateFormat("yyyyMMdd")).format(date), lastFour);
 	}

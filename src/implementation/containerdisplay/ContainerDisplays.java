@@ -45,18 +45,19 @@ public abstract class ContainerDisplays
 	/* Public */
 	
 	/**
-	 * Puts the supplied FormContainer in a FormComponentDisplay
-	 * wrapper.
+	 * Puts {@code fc} in a {@code FormComponentDisplay} wrapper.
 	 * 
-	 * The supplied container should be an implementation of the
-	 * abstract class FormContainer and the returned wrapper should be
-	 * an implementation of the interface FormComponentDisplay which is
-	 * specialized in displaying the supplied instance of
-	 * FormContainer.
+	 * {@code fc} should be an implementation of {@code FormContainer}
+	 * and the returned wrapper should be an implementation of
+	 * {@code FormComponentDisplay} which is specialized in displaying
+	 * {@code fc}.
 	 * 
-	 * @param fc The form container to put in a wrapper.
+	 * @param fc The {@code FormContainer} to put in a wrapper.
 	 * 
 	 * @return A wrapper object for the supplied form container.
+	 * 
+	 * @see FormContainer
+	 * @see FormComponentDisplay
 	 */
 	public static FormComponentDisplay getDisplay(FormContainer fc)
 	{

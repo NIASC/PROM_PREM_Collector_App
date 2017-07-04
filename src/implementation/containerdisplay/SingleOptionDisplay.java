@@ -37,17 +37,19 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
 import core.containers.form.SingleOptionContainer;
+import core.containers.form.SliderContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
 
 /**
- * This class is a displayable wrapper the for SingleOption
- * container. In this implementation this class displays the
- * SingleOption container and stores the response.
- * In a GUI implementaion a corresponding class could just extend
- * a JComponent that specializes in displaying select-single-option
- * content and not necessarily displaying the content itself.
+ * This class is a displayable wrapper the for
+ * {@code SingleOptionContainer}.
+ * It handles placing the {@code SingleOptionContainer} in an object
+ * that the implementation of the {@code UserInterface} can display.
  * 
  * @author Marcus Malmquist
+ * 
+ * @see SingleOptionContainer
+ * @see UserInterface
  *
  */
 public class SingleOptionDisplay extends JPanel implements FormComponentDisplay, ItemListener
@@ -93,7 +95,7 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	/* Protected */
 	
 	/**
-	 * Initializes login variables.
+	 * Creates a displayable wrapper for {@code soc}.
 	 * 
 	 * @param soc The instance of the SingleOptionContainer that
 	 * 		the instance of this SingleOptionDisplay should act as
@@ -122,7 +124,7 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		gbc.gridx = 0;
 		add(buttonPanel, BorderLayout.WEST);
 
-		group = new ButtonGroup();
+		ButtonGroup group = new ButtonGroup();
 		HashMap<Integer, String> opt = soc.getSingleOptions();
 		Integer selected = soc.getSelectedID();
 		options = new HashMap<String, JRadioButton>();
@@ -149,5 +151,4 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	private Integer responseID;
 	
 	private HashMap<String, JRadioButton> options;
-	private ButtonGroup group;
 }

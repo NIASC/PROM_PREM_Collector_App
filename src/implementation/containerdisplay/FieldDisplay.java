@@ -29,17 +29,18 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import core.containers.form.FieldContainer;
+import core.containers.form.SliderContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
 
 /**
- * This class is a displayable wrapper the for the Field container. 
- * In this implementation this class displays the Field container
- * and stores the response.
- * In a GUI implementaion a corresponding class could just extend
- * a JComponent that specializes in displaying text field content
- * and not necessarily displaying the content itself.
+ * This class is a displayable wrapper for {@code FieldContainer}.
+ * It handles placing the {@code FieldContainer} in an object that
+ * the implementation of the {@code UserInterface} can display.
  * 
  * @author Marcus Malmquist
+ * 
+ * @see FieldContainer
+ * @see UserInterface
  *
  */
 public class FieldDisplay extends JPanel implements FormComponentDisplay
@@ -68,10 +69,13 @@ public class FieldDisplay extends JPanel implements FormComponentDisplay
 	/* Protected */
 	
 	/**
-	 * Initializes login variables.
-	 * @param fc The instance of the FieldContainer that
-	 * 		the instance of this FieldDisplay should act as a
+	 * Creates a displayable wrapper for {@code fc}.
+	 * 
+	 * @param fc The instance of the {@code FieldContainer} that
+	 * 		the instance of this {@code FieldDisplay} should act as a
 	 * 		wrapper for.
+	 * 
+	 * @see FieldContainer
 	 */
 	protected FieldDisplay(FieldContainer fc)
 	{

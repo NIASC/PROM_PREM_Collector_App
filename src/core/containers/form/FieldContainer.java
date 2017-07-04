@@ -24,10 +24,10 @@ package core.containers.form;
  * This class handles entry field object. It allows you to present a
  * statement or a question that you want the user to respond to. The
  * response can then be stored in this container and retrieved later.
- * The purpose of this class is to encapsulate this information into a
- * class so it can be passed as an argument and be easily modifiable.
  * 
  * @author Marcus Malmquist
+ * 
+ * @see FormContainer
  *
  */
 public class FieldContainer extends FormContainer

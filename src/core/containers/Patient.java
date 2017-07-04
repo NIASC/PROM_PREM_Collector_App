@@ -19,42 +19,80 @@
  */
 package core.containers;
 
+/**
+ * This class is a data container for Patient data. A patient has a set
+ * of properties which should be defined in the database.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class Patient
 {
 	/* Public */
 	
-	public Patient(String forename, String lastname, String pnr,
+	/**
+	 * 
+	 * @param forename The forename of this patient.
+	 * @param surname The surname of this patient.
+	 * @param pnr The personal number of this patient.
+	 * @param user The user that added this patient.
+	 * 
+	 * @throws NullPointerException If the supplied user is null.
+	 */
+	public Patient(String forename, String surname, String pnr,
 			final User user) throws NullPointerException
 	{
 		if (user == null)
 			throw new NullPointerException();
 		this.forename = forename;
-		this.lastname = lastname;
+		this.surname = surname;
 		this.pnr = pnr;
 		this.user = user;
 		this.clinicID = user.getClinicID();
 	}
 	
+	/**
+	 * 
+	 * @return This patient's forename
+	 */
 	public String getForename()
 	{
 		return forename;
 	}
 	
-	public String getLastname()
+	/**
+	 * 
+	 * @return This patient's surname.
+	 */
+	public String getSurname()
 	{
-		return lastname;
+		return surname;
 	}
 	
+	/**
+	 * 
+	 * @return This patient's personal number.
+	 */
 	public String getPersonalNumber()
 	{
 		return pnr;
 	}
 	
+	/**
+	 * 
+	 * @return The user that added this patient.
+	 */
 	public User getUser()
 	{
 		return user;
 	}
 	
+	/**
+	 * 
+	 * @return The clinic ID that this user belongs to. This will be
+	 * 		the same clinic ID as that of the user who added this
+	 * 		patient.
+	 */
 	public int getClinicID()
 	{
 		return clinicID;
@@ -64,7 +102,7 @@ public class Patient
 	
 	/* Private */
 	
-	private String forename, lastname, pnr;
+	private String forename, surname, pnr;
 	private int clinicID;
 	private final User user;
 }

@@ -21,15 +21,29 @@ package core.containers;
 
 import java.util.HashMap;
 
+import core.Questionnaire;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
 import core.containers.form.SingleOptionContainer;
 import core.containers.form.SliderContainer;
 
+/**
+ * This class is a container for {@code Questionnaire} entries.
+ * The class is capable of storing the questions in an ordered manner
+ * determined by the order at which they are added to this container.
+ * 
+ * @author Marcus Malmquist
+ * 
+ * @see Questionnaire
+ *
+ */
 public class QuestionContainer
 {
 	/* public */
 	
+	/**
+	 * Creates a container for {@code Questionnaire} entries.
+	 */
 	public QuestionContainer()
 	{
 		questions = new HashMap<Integer, Question>();
@@ -37,6 +51,31 @@ public class QuestionContainer
 		index = 0;
 	}
 	
+	/**
+	 * Adds a {@code Questionnaire} entry to this container.
+	 * 
+	 * @param id The ID of the question (as it appears in the
+	 * 		database).
+	 * @param type The type of question (Slider, SelectOption, Field
+	 * 		etc.) as it appears in the database.
+	 * @param question The question/statement that the user should
+	 * 		respond to.
+	 * @param options The available options to select in response to
+	 * 		the question/statement. If this entry type does not have
+	 * 		options this variable will be discarded can be set to
+	 * 		{@null}.
+	 * @param optional If it is <i><b>not</b></i> required to answer
+	 * 		this question this should be set to {@code true} else
+	 * 		{@code false}.
+	 * @param upper The upper limit for this entry. If this user is
+	 * 		supposed to enter a numerical value this should be the
+	 * 		upper limit for that value.
+	 * @param lower The lower limit for this entry. If this user is
+	 * 		supposed to enter a numerical value this should be the
+	 * 		lower limit for that value.
+	 * 
+	 * @see Questionnaire
+	 */
 	public void addQuestion(int id, String type, String question,
 			String[] options, boolean optional, Integer upper, Integer lower)
 	{
@@ -48,6 +87,15 @@ public class QuestionContainer
 		indexToID.put(index++, id);
 	}
 	
+	/**
+	 * Retrieves the question labeled with {@code index} which
+	 * represents the order in which questions were added.
+	 * 
+	 * @param index The index for the question.
+	 * 
+	 * @return The container for the question labeled with
+	 * 		{@code index}.
+	 */
 	public FormContainer getQuestion(int index)
 	{
 		if (indexToID.containsKey(index)
@@ -58,6 +106,10 @@ public class QuestionContainer
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @return The size (number of entries) of this container.
+	 */
 	public int getSize()
 	{
 		return index;
@@ -81,39 +133,88 @@ public class QuestionContainer
 	{
 		/* public */
 		
+		/**
+	 * Adds a {@code Questionnaire} entry to this container.
+	 * 
+	 * @param id The ID of the question (as it appears in the
+	 * 		database).
+	 * @param type The type of question (Slider, SelectOption, Field
+	 * 		etc.) as it appears in the database.
+	 * @param question The question/statement that the user should
+	 * 		respond to.
+	 * @param options The available options to select in response to
+	 * 		the question/statement. If this entry type does not have
+	 * 		options this variable will be discarded can be set to
+	 * 		{@null}.
+	 * @param optional If it is <i><b>not</b></i> required to answer
+	 * 		this question this should be set to {@code true} else
+	 * 		{@code false}.
+	 * @param upper The upper limit for this entry. If this user is
+	 * 		supposed to enter a numerical value this should be the
+	 * 		upper limit for that value.
+	 * @param lower The lower limit for this entry. If this user is
+	 * 		supposed to enter a numerical value this should be the
+	 * 		lower limit for that value.
+		 */
 		public Question(int id, String type, String question,
 				String[] options, boolean optional,
-				Integer max, Integer min)
+				Integer upper, Integer lower)
 		{
 			this.id = id;
 			this.type = type;
 			this.question = question;
 			this.options = options;
 			this.optional = optional;
-			max_val = max;
-			min_val = min;
+			maxVal = upper;
+			minVal = lower;
 		}
 		
+		/**
+		 * 
+		 * @return The type of this question (Slider, SelectOption,
+		 * 		Field etc.)
+		 */
 		public String type()
 		{
 			return type;
 		}
 		
+		/**
+		 * 
+		 * @return The question/statement of this question.
+		 */
 		public String question()
 		{
 			return question;
 		}
 		
+		/**
+		 * 
+		 * @return the available options for this question.
+		 */
 		public String[] options()
 		{
 			return options;
 		}
 		
+		/**
+		 * 
+		 * @return {@code true} if it is not required to answer this
+		 * 		question. Else {@code false}.
+		 */
 		public boolean optional()
 		{
 			return optional;
 		}
 		
+		/**
+		 * Places this question in an appropriate container based on
+		 * the type of question this is.
+		 * 
+		 * @return The container for this question.
+		 * 
+		 * @see FormContainer
+		 */
 		public FormContainer getContainer()
 		{
 			if (type.equalsIgnoreCase("SingleOption"))
@@ -128,7 +229,7 @@ public class QuestionContainer
 				return new FieldContainer(optional, false, question);
 			else if (type.equalsIgnoreCase("Slider"))
 				return new SliderContainer(
-						optional, question, min_val, max_val);
+						optional, question, minVal, maxVal);
 			else
 				return null;
 		}
@@ -142,6 +243,6 @@ public class QuestionContainer
 		private String type;
 		private String question;
 		private String[] options;
-		private Integer max_val, min_val;
+		private Integer maxVal, minVal;
 	}
 }

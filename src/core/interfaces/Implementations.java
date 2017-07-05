@@ -22,6 +22,7 @@ package core.interfaces;
 import implementation.MySQL_Database;
 import implementation.No_Encryption;
 import implementation.Email_Registration;
+import implementation.Locale_se;
 
 /**
  * This class acts as an interface between the implementation of the
@@ -76,6 +77,19 @@ public abstract class Implementations
 	public static Registration Registration(UserInterface ui)
 	{
 		return new Email_Registration(ui);
+	}
+	
+	/**
+	 * Constructor for the implementation of {@code Locale}.
+	 * 
+	 * @return A new/running instance of the current implementation of
+	 * 		{@code Locale}.
+	 * 
+	 * @see Locale
+	 */
+	public static Locale Locale()
+	{
+		return Locale_se.getLocale();
 	}
 	
 	/* Protected */

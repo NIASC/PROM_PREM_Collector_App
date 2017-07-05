@@ -391,7 +391,8 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			Dimension d = new Dimension(240, 25);
 			
 			JPanel userPanel = new JPanel(new BorderLayout());
-			JLabel usernameL = SwingComponents.makeLabel(String.format("%s: ", "Username"),
+			JLabel usernameL = SwingComponents.makeLabel(String.format("%s: ",
+					Messages.getMessages().getInfo(Messages.INFO_UH_ENTER_USERNAME)),
 					null, null, false, null, null, null, null);
 			userPanel.add(usernameL, BorderLayout.WEST);
 			usernameTF = SwingComponents.makeTextField(null, "usernameTF", null, true,
@@ -399,7 +400,8 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			userPanel.add(usernameTF, BorderLayout.CENTER);
 			
 			JPanel passPanel = new JPanel(new BorderLayout());
-			JLabel passwordL = SwingComponents.makeLabel(String.format("%s: ", "Password"),
+			JLabel passwordL = SwingComponents.makeLabel(String.format("%s: ",
+					Messages.getMessages().getInfo(Messages.INFO_UH_ENTER_PASSWORD)),
 					null, null, false, null, null, null, null);
 			passPanel.add(passwordL, BorderLayout.WEST);
 			passwordTF = SwingComponents.makeSecretTextField(null, "passwordTF", null,
@@ -408,10 +410,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			
 			/* button panel */
 			JPanel buttons = new JPanel(new GridLayout(1, 0));
-			login = SwingComponents.makeButton("Login", "login", "Click to log in",
-					false, null, null, null, null, this);
-			register = SwingComponents.makeButton("Register", "register", "Click to Register",
-					false, null, null, null, null, this);
+			login = SwingComponents.makeButton(
+					Messages.getMessages().getInfo(Messages.INFO_LOGIN),
+					"login", null, false, null, null, null, null, this);
+			register = SwingComponents.makeButton(
+					Messages.getMessages().getInfo(Messages.INFO_REGISTER),
+					"register", null, false, null, null, null, null, this);
 
 			buttons.add(login);
 			buttons.add(register);
@@ -468,12 +472,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		{
 			setLayout(new GridBagLayout());
 
-			questionnaire = SwingComponents.makeButton("Start questionnaire", "questionnaire",
-					"Click to start the questionnaire",
-					false, null, null, null, null, this);
-			viewData = SwingComponents.makeButton("View Statistics", "viewData",
-					"Click to start the questionnaire",
-					false, null, null, null, null, this);
+			questionnaire = SwingComponents.makeButton(
+					Messages.getMessages().getInfo(Messages.INFO_START_QUESTIONNAIRE),
+					"questionnaire", null, false, null, null, null, null, this);
+			viewData = SwingComponents.makeButton(
+					Messages.getMessages().getInfo(Messages.INFO_VIEW_STATISTICS),
+					"viewData", null, false, null, null, null, null, this);
 
 			GridBagConstraints gbc = new GridBagConstraints();
 			gbc.fill = GridBagConstraints.HORIZONTAL;

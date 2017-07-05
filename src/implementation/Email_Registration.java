@@ -161,17 +161,18 @@ public class Email_Registration implements Registration
 			/* login to server email account and send email. */
 			Transport transport = getMailSession.getTransport();
 			transport.connect(config.serverEmail, config.serverPassword);
-			ui.displayMessage(Messages.getMessages().getInfo(
-					Messages.INFO_REG_REQUEST_SENDING), false);
 			transport.sendMessage(generateMailMessage,
 					generateMailMessage.getAllRecipients());
 			transport.close();
 		} catch (MessagingException me)
 		{
 			me.printStackTrace();
+			ui.displayMessage(Messages.getMessages().getError(
+					Messages.ERROR_REG_REQUEST_FAILED), true);
+			return;
 		}
 		ui.displayMessage(Messages.getMessages().getInfo(
-				Messages.INFO_REG_REQUEST_SENT), false);
+				Messages.INFO_REG_REQUEST_SENT), true);
 	}
 	
 	private final class EmailConfig

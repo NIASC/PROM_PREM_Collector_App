@@ -19,11 +19,7 @@
  */
 package core;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import core.containers.Form;
@@ -147,29 +143,18 @@ public class Questionnaire
 		String lastname = answers.get(1);
 		String pnr = answers.get(2);
 		
-		String personalNumber = validDate(pnr);
-		if (forename == null || forename.isEmpty())
+		String pID = Implementations.Locale().formatPersonalID(pnr);
+		if (pID == null)
 		{
-			rfc.message = "You must enter a forename";
-			return rfc;
-		}
-		if (lastname == null || lastname.isEmpty())
-		{
-			rfc.message = "You must enter a surname";
-			return rfc;
-		}
-		if (personalNumber == null)
-		{
-			rfc.message = String.format(
-					"Valid personal numbers formats are: %s, %s, %s, %s",
-					"yymmddxxxx", "yymmdd-xxxx", "yyyymmddxxxx", "yyyymmdd-xxxx");
+			rfc.message = Messages.getMessages().getError(
+					Messages.ERROR_QP_INVALID_PID);
 			return rfc;
 		}
 		
 		try
 		{
 			patient = new Patient(forename, lastname,
-					personalNumber, uh.getUser());
+					pID, uh.getUser());
 		}
 		catch (NullPointerException npe)
 		{
@@ -205,40 +190,5 @@ public class Questionnaire
 		patient = null;
 		rfc.valid = true;
 		return rfc;
-	}
-	
-	private String validDate(String dateStr)
-	{
-		DateFormat dateFormat;
-		Date date = null;
-		dateStr = dateStr.trim();
-		Integer lastFour = null;
-		try
-		{
-			switch(dateStr.length())
-			{
-			case 10: // yymmddxxx
-			case 11: // yymmdd-xxxx
-				dateFormat = new SimpleDateFormat("yyMMdd");
-				dateFormat.setLenient(false);
-				date = dateFormat.parse(dateStr.substring(0, 6));
-				lastFour = Integer.parseInt(dateStr.substring(dateStr.length()-4));
-				break;
-			case 12: // yyyymmddxxx
-			case 13: // yyyymmdd-xxxx
-				dateFormat = new SimpleDateFormat("yyyyMMdd");
-				dateFormat.setLenient(false);
-				date = dateFormat.parse(dateStr.substring(0, 8));
-				lastFour = Integer.parseInt(dateStr.substring(dateStr.length()-4));
-				break;
-			default:
-				throw new ParseException("Unknown format", 0);
-			}
-		} catch (ParseException pe)
-		{
-			return null;
-		}
-		return String.format("%s-%04d",
-				(new SimpleDateFormat("yyyyMMdd")).format(date), lastFour);
 	}
 }

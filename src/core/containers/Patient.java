@@ -102,7 +102,7 @@ public class Patient
 	
 	/* Private */
 	
-	private String forename, surname, pnr;
-	private int clinicID;
+	private final String forename, surname, pnr;
+	private final int clinicID;
 	private final User user;
 }

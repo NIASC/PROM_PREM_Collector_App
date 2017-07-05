@@ -21,10 +21,9 @@ package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashMap;
@@ -37,8 +36,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
 import core.containers.form.SingleOptionContainer;
-import core.containers.form.SliderContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
+import implementation.SwingComponents;
 
 /**
  * This class is a displayable wrapper the for
@@ -107,14 +106,8 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		this.soc = soc;
 		responseID = null;
 
-		JTextArea jtf = new JTextArea(0, 35);
-		jtf.setEditable(false);
-		jtf.setLineWrap(true);
-		jtf.setWrapStyleWord(true);
-		jtf.setForeground(Color.BLACK);
-		jtf.setBackground(new Color(0xf0, 0xf0, 0xf0));
-		jtf.setText(soc.getDescription());
-		add(jtf, BorderLayout.NORTH);
+		JTextArea jta = AddTextArea(soc.getDescription());
+		add(jta, BorderLayout.NORTH);
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -122,7 +115,6 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets.bottom = gbc.insets.top = 1;
 		gbc.gridx = 0;
-		add(buttonPanel, BorderLayout.WEST);
 
 		ButtonGroup group = new ButtonGroup();
 		HashMap<Integer, String> opt = soc.getSingleOptions();
@@ -132,16 +124,16 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		for (Entry<Integer, String> e : opt.entrySet())
 		{
 			gbc.gridy = gridy++;
-			JRadioButton btn = new JRadioButton(e.getValue());
+			String buttonName = Integer.toString(e.getKey());
+			JRadioButton btn = addToggleButton(
+					e.getValue(), buttonName, this);
 			if (selected != null && selected == e.getKey())
 				btn.setSelected(true);
-			String buttonName = Integer.toString(e.getKey());
-			btn.setName(buttonName);
 			group.add(btn);
-			btn.addItemListener(this);
 			buttonPanel.add(btn, gbc);
 			options.put(buttonName, btn);
 		}
+		add(buttonPanel, BorderLayout.WEST);
 	}
 	
 	/* Private */
@@ -151,4 +143,17 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	private Integer responseID;
 	
 	private HashMap<String, JRadioButton> options;
+	
+	private static JRadioButton addToggleButton(
+			String buttonText, String name, ItemListener listener)
+	{
+		return SwingComponents.addToggleButton(buttonText, name,
+				null, false, null, null, null, null, listener);
+	}
+	
+	private static JTextArea AddTextArea(String text)
+	{
+		return SwingComponents.makeTextArea(text, null, null, false,
+				null, null, null, null, null, false, 0, 0);
+	}
 }

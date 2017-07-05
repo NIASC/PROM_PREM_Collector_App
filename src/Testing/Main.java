@@ -19,6 +19,8 @@
  */
 package Testing;
 
+import java.awt.GraphicsEnvironment;
+
 import core.interfaces.Database;
 import core.interfaces.Messages;
 import core.interfaces.Questions;
@@ -37,5 +39,16 @@ public class Main
 		}
 		GUI_UserInterface qf1 = new GUI_UserInterface(false);
 		qf1.start();
+	}
+	
+	public static void printFonts()
+	{
+		String fonts[] = 
+				GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+
+		for ( int i = 0; i < fonts.length; i++ )
+		{
+			System.out.println(fonts[i]);
+		}
 	}
 }

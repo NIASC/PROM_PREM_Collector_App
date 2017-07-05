@@ -88,7 +88,7 @@ public class SingleOptionContainer extends FormContainer
 	{
 		SingleOptionContainer soc = new SingleOptionContainer(allowEmpty, description);
 		for (Entry<Integer, SingleOption> e : options.entrySet())
-			soc.addSingleOption(e.getKey(), e.getValue().getText());
+			soc.addSingleOption(e.getKey(), e.getValue().text);
 		return soc;
 	}
 	
@@ -106,7 +106,7 @@ public class SingleOptionContainer extends FormContainer
 	 * 		if this option is selected.
 	 * @param text The text that describes what this option means.
 	 */
-	public void addSingleOption(int identifier, String text)
+	public synchronized void addSingleOption(int identifier, String text)
 	{
 		options.put(nextOption++, new SingleOption(identifier, text));
 	}
@@ -123,7 +123,7 @@ public class SingleOptionContainer extends FormContainer
 	{
 		HashMap<Integer, String> sopts = new HashMap<Integer, String>();
 		for (Entry<Integer, SingleOption> e : options.entrySet())
-			sopts.put(e.getKey(), e.getValue().getText());
+			sopts.put(e.getKey(), e.getValue().text);
 		return sopts;
 	}
 	
@@ -155,7 +155,7 @@ public class SingleOptionContainer extends FormContainer
 	{
 		if (selectedID == null)
 			return null;
-		return options.get(selectedID).getIdentifier();
+		return options.get(selectedID).identifier;
 	}
 	
 	public Integer getSelectedID()
@@ -197,9 +197,16 @@ public class SingleOptionContainer extends FormContainer
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private class SingleOption
+	private final class SingleOption
 	{
-		/* Public */
+		/**
+		 * The identifier for this Option.
+		 */
+		final int identifier;
+		/**
+		 * The text for this Option.
+		 */
+		final String text;
 		
 		/**
 		 * Initializes the class with an identifier and a text.
@@ -209,35 +216,10 @@ public class SingleOptionContainer extends FormContainer
 		 * @param identifier The option identifier.
 		 * @param text The option text.
 		 */
-		public SingleOption(int identifier, String text)
+		SingleOption(int identifier, String text)
 		{
 			this.identifier = identifier;
 			this.text = text;
 		}
-		
-		/**
-		 * 
-		 * @return The identifier for this Option.
-		 */
-		public int getIdentifier()
-		{
-			return identifier;
-		}
-		
-		/**
-		 * 
-		 * @return The text for this Option.
-		 */
-		public String getText()
-		{
-			return text;
-		}
-		
-		/* Protected */
-		
-		/* Private */
-		
-		private int identifier;
-		private String text;
 	}
 }

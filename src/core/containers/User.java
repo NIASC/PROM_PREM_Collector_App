@@ -110,12 +110,18 @@ public class User
 		return crypto.hashString(unhashedPass, salt).equals(password);
 	}
 	
+	public User copy()
+	{
+		return new User(clinicID, username, password,
+				email, salt, updatePass);
+	}
+	
 	/* Protected */
 	
 	/* Private */
 
-	private Encryption crypto;
-	private String username, password, email, salt;
-	private int clinicID;
-	private boolean updatePass;
+	private final Encryption crypto;
+	private final String username, password, email, salt;
+	private final int clinicID;
+	private final boolean updatePass;
 }

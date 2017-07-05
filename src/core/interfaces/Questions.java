@@ -32,15 +32,11 @@ public final class Questions
 	 * 
 	 * @see Database
 	 */
-	public final boolean loadQuestionnaire()
+	public synchronized final boolean loadQuestionnaire()
 	{
-		int qMsgLoadCode = Database.ERROR;
-		synchronized (this)
-		{
-			qEntries = new QuestionContainer();
-			qMsgLoadCode = Implementations.Database().loadQuestions(qEntries);
-		}
-		return qMsgLoadCode == Database.QUERY_SUCCESS;
+		qEntries = new QuestionContainer();
+		return Implementations.Database().loadQuestions(qEntries)
+				== Database.QUERY_SUCCESS;
 	}
 	
 	/**

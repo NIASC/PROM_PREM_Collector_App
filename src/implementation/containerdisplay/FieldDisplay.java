@@ -20,8 +20,10 @@
 package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,6 +33,7 @@ import javax.swing.JTextField;
 import core.containers.form.FieldContainer;
 import core.containers.form.SliderContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
+import implementation.SwingComponents;
 
 /**
  * This class is a displayable wrapper for {@code FieldContainer}.
@@ -82,26 +85,39 @@ public class FieldDisplay extends JPanel implements FormComponentDisplay
 		setLayout(new BorderLayout());
 		this.fc = fc;
 		
-		fieldLabel = new JLabel(String.format("%s: ", fc.getStatement()));
+		fieldLabel = AddLabel(String.format("%s: ", fc.getStatement()));
 		add(fieldLabel, BorderLayout.WEST);
-		if (fc.isSecret())
-			field = new JPasswordField(32);
-		else
-		{
-			field = new JTextField(32);
-			field.setText(fc.getEntry());
-		}
 		
-		field.setPreferredSize(new Dimension(80, 25));
+		Dimension d = new Dimension(240, 25);
+		if (fc.isSecret())
+			field = AddSecretTextField(fc.getEntry(), d);
+		else
+			field = AddTextField(fc.getEntry(), d);
 		add(field, BorderLayout.CENTER);
 	}
 	
 	/* Private */
 	
 	private static final long serialVersionUID = 2210804480530383502L;
-
 	private FieldContainer fc;
-	
 	private JLabel fieldLabel;
 	private JTextField field;
+	
+	private static JLabel AddLabel(String labelText)
+	{
+		return SwingComponents.makeLabel(
+				labelText, null, null, false, null, null, null, null);
+	}
+	
+	private static JTextField AddTextField(String text, Dimension d)
+	{
+		return SwingComponents.makeTextField(text, null, null, true,
+				null, null, null, d, null, true);
+	}
+	
+	private static JPasswordField AddSecretTextField(String text, Dimension d)
+	{
+		return SwingComponents.makeSecretTextField(text, null, null,
+				true, null, null, null, d, null, true);
+	}
 }

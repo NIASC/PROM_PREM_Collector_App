@@ -33,6 +33,7 @@ import javax.swing.event.ChangeListener;
 import core.containers.form.FieldContainer;
 import core.containers.form.SliderContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
+import implementation.SwingComponents;
 
 /**
  * This class is a displayable wrapper for {@code SliderContainer}.
@@ -100,24 +101,10 @@ public class SliderDisplay extends JPanel implements FormComponentDisplay, Chang
 		this.sc = sc;
 		response = null;
 
-		JTextArea jtf = new JTextArea(0, 35);
-		jtf.setEditable(false);
-		jtf.setLineWrap(true);
-		jtf.setWrapStyleWord(true);
-		jtf.setForeground(Color.BLACK);
-		jtf.setBackground(new Color(0xf0, 0xf0, 0xf0));
-		jtf.setText(sc.getStatement());
+		JTextArea jtf = AddTextArea(sc.getStatement(), 0, 35);
 		add(jtf, BorderLayout.NORTH);
 		
-		slider = new JSlider(JSlider.HORIZONTAL,
-				sc.getLowerBound(), sc.getUpperBound(),
-				(sc.getLowerBound() + sc.getUpperBound()) / 2);
-		slider.addChangeListener(this);
-		slider.setMajorTickSpacing((sc.getLowerBound() + sc.getUpperBound()) / 2);
-		slider.setMinorTickSpacing((sc.getLowerBound() + sc.getUpperBound()) / 10);
-		slider.setPaintTicks(true);
-		slider.setPaintLabels(true);
-		slider.setSnapToTicks(true);
+		slider = makeSlider(this, sc.getLowerBound(), sc.getUpperBound());
 		add(slider, BorderLayout.CENTER);
 	}
 	
@@ -127,4 +114,18 @@ public class SliderDisplay extends JPanel implements FormComponentDisplay, Chang
 	private SliderContainer sc;
 	private Integer response;
 	private JSlider slider;
+	
+	private static JTextArea AddTextArea(
+			String text, int row, int column)
+	{
+		return SwingComponents.makeTextArea(text, null, null, false,
+				null, null, null, null, null, false, row, column);
+	}
+
+	private static JSlider makeSlider(
+			ChangeListener listener, int lowerBound, int upperBound)
+	{
+		return SwingComponents.makeSlider(null, null, null, false, null,
+				null, null, null, listener, lowerBound, upperBound);
+	}
 }

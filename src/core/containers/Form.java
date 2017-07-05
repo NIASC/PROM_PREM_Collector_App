@@ -77,16 +77,14 @@ public class Form
 		switch(location)
 		{
 		case AT_BEGIN:
-			while (currentFC.getPrevFC() != null)
-				currentFC = currentFC.getPrevFC();
+			jumpTo(AT_BEGIN);
 			insertBefore(fc);
 			break;
 		case AT_PREVIOUS:
 			insertBefore(fc);
 			break;
 		case AT_END:
-			while (currentFC.getNextFC() != null)
-				currentFC = currentFC.getNextFC();
+			jumpTo(AT_END);
 			insertAfter(fc);
 			break;
 		case AT_NEXT:
@@ -118,18 +116,12 @@ public class Form
 		switch(location)
 		{
 		case AT_BEGIN:
-			while (currentFC.getPrevFC() != null)
-				currentFC = currentFC.getPrevFC();
-			del = deleteBefore();
-			break;
+			jumpTo(AT_BEGIN);
 		case AT_PREVIOUS:
 			del = deleteBefore();
 			break;
 		case AT_END:
-			while (currentFC.getNextFC() != null)
-				currentFC = currentFC.getNextFC();
-			del = deleteAfter();
-			break;
+			jumpTo(AT_END);
 		case AT_NEXT:
 			del = deleteAfter();
 			break;
@@ -149,9 +141,9 @@ public class Form
 	 * 
 	 * @see FormContainer
 	 */
-	public FormContainer nextEntry()
+	public synchronized FormContainer nextEntry()
 	{
-		if (currentFC.getNextFC() == null)
+		if (currentFC == null || currentFC.getNextFC() == null)
 			return null;
 		return currentFC = currentFC.getNextFC();
 	}
@@ -164,7 +156,7 @@ public class Form
 	 * 
 	 * @see FormContainer
 	 */
-	public FormContainer currentEntry()
+	public synchronized FormContainer currentEntry()
 	{
 		return currentFC;
 	}
@@ -179,9 +171,9 @@ public class Form
 	 * 
 	 * @see FormContainer
 	 */
-	public FormContainer prevEntry()
+	public synchronized FormContainer prevEntry()
 	{
-		if (currentFC.getPrevFC() == null)
+		if (currentFC == null || currentFC.getPrevFC() == null)
 			return null;
 		return currentFC = currentFC.getPrevFC();
 	}
@@ -194,6 +186,8 @@ public class Form
 	 */
 	public void jumpTo(int location)
 	{
+		if (currentFC == null)
+			return;
 		switch(location)
 		{
 		case AT_BEGIN:
@@ -236,7 +230,7 @@ public class Form
 	 */
 	public boolean endOfForm()
 	{
-		return currentFC.getNextFC() == null;
+		return currentFC == null || currentFC.getNextFC() == null;
 	}
 	
 	/**
@@ -247,7 +241,7 @@ public class Form
 	 */
 	public boolean beginningOfForm()
 	{
-		return currentFC.getPrevFC() == null;
+		return currentFC == null || currentFC.getPrevFC() == null;
 	}
 	
 	/* Protected */
@@ -265,7 +259,7 @@ public class Form
 	 * 
 	 * @see FormContainer
 	 */
-	private void insertAfter(FormContainer fc)
+	private synchronized void insertAfter(FormContainer fc)
 	{
 		if (fc == null || currentFC == null)
 			return;
@@ -285,7 +279,7 @@ public class Form
 	 * 
 	 * @see FormContainer
 	 */
-	private void insertBefore(FormContainer fc)
+	private synchronized void insertBefore(FormContainer fc)
 	{
 		if (fc == null || currentFC == null)
 			return;
@@ -305,7 +299,7 @@ public class Form
 	 * 
 	 * @see FormContainer
 	 */
-	private FormContainer deleteAfter()
+	private synchronized FormContainer deleteAfter()
 	{
 		if (currentFC == null || currentFC.getNextFC() == null)
 			return null;
@@ -330,7 +324,7 @@ public class Form
 	 * 
 	 * @see FormContainer
 	 */
-	private FormContainer deleteBefore()
+	private synchronized FormContainer deleteBefore()
 	{
 		if (currentFC == null || currentFC.getPrevFC() == null)
 			return null;
@@ -358,9 +352,8 @@ public class Form
 			return;
 		else
 		{
-			if (currentFC.getNextFC() == null)
+			if (nextEntry() == null)
 				return;
-			currentFC = currentFC.getNextFC();
 			jumpForward(steps - 1);
 		}
 	}
@@ -377,9 +370,8 @@ public class Form
 			return;
 		else
 		{
-			if (currentFC.getPrevFC() == null)
+			if (prevEntry() == null)
 				return;
-			currentFC = currentFC.getPrevFC();
 			jumpBackward(steps - 1);
 		}
 	}

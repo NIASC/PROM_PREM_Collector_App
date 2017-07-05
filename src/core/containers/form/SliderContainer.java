@@ -65,41 +65,22 @@ public class SliderContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return allowEmpty || slider.getValue() != null;
+		return allowEmpty || slider.value != null;
 	}
 
 	@Override
 	public FormContainer copy()
 	{
 		SliderContainer sc = new SliderContainer(
-				allowEmpty, slider.getStatement(), lower, upper);
-		sc.setEntry(slider.getValue());
+				allowEmpty, slider.statement, lower, upper);
+		sc.setEntry(slider.value);
 		return sc;
 	}
 
 	@Override
 	public Integer getEntry()
 	{
-		return slider.getValue();
-	}
-	
-	/**
-	 * Sets the content of this container. A slider container is only
-	 * allowed to contain one slider so if this container already have
-	 * an entry it will be overwritten.
-	 * 
-	 * @param statement The statement that you want the user to
-	 * 		respond to.
-	 */
-	public void setSlider(String statement)
-	{
-		if (statement != null)
-		{
-			statement = statement.trim();
-			if (!allowEmpty && statement.isEmpty())
-				return;
-		}
-		slider = new Slider(statement);
+		return slider.value;
 	}
 	
 	/**
@@ -110,7 +91,7 @@ public class SliderContainer extends FormContainer
 	 */
 	public String getStatement()
 	{
-		return slider.getStatement();
+		return slider.statement;
 	}
 	
 	/**
@@ -127,7 +108,7 @@ public class SliderContainer extends FormContainer
 	{
 		if (withinBounds(entry))
 		{
-			slider.setValue(entry);
+			slider.value = entry;
 			return true;
 		}
 		return false;
@@ -156,7 +137,7 @@ public class SliderContainer extends FormContainer
 	/* Private */
 	
 	private Slider slider;
-	private int upper, lower;
+	private final int upper, lower;
 	
 	/**
 	 * Checks if {@code val} is within the slider bounds. the
@@ -182,9 +163,17 @@ public class SliderContainer extends FormContainer
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private class Slider
+	private final class Slider
 	{
-		/* Public */
+		/**
+		 * The statements that the user should respond to.
+		 */
+		final String statement;
+		
+		/**
+		 * The value of this slider (i.e. the user's response).
+		 */
+		Integer value;
 		
 		/**
 		 * Creates a new Slider object with the statement set to
@@ -198,42 +187,5 @@ public class SliderContainer extends FormContainer
 			this.statement = statement;
 			value = null;
 		}
-		
-		/**
-		 * Sets the value of this slider.
-		 * 
-		 * @param val The value to set.
-		 */
-		public void setValue(int val)
-		{
-			value = val;
-		}
-		
-		/**
-		 * 
-		 * @return The statements that the user should respond to.
-		 */
-		public String getStatement()
-		{
-			return statement;
-		}
-		
-		/**
-		 * 
-		 * @return The value of this slider (i.e. the user's response).
-		 * 		If no value have been set this method returns
-		 * 		{@code null}.
-		 */
-		public Integer getValue()
-		{
-			return value;
-		}
-		
-		/* Protected */
-		
-		/* Private */
-		
-		private String statement;
-		private Integer value;
 	}
 }

@@ -56,8 +56,7 @@ public class Email_Registration implements Registration
 	public Email_Registration(UserInterface ui)
 	{
 		this.ui = ui;
-		mailConfig = new Properties();
-		refreshConfig();
+		config = new EmailConfig();
 	}
 	
 	/* 
@@ -85,15 +84,10 @@ public class Email_Registration implements Registration
 
 	private static final String NAME_STR, EMAIL_STR, CLINIC_STR;
 	
-	private Properties mailConfig;
 	private UserInterface ui;
-	private final String CONFIG_FILE =
-			"implementation/mail_settings.txt";
-	private final String ACCOUNT_FILE =
-			"implementation/mailaccount_settings.ini";
 	
-	// server mailing account
-	private String serverEmail, serverPassword, adminEmail;
+	private EmailConfig config;
+	
 	
 	static
 	{ /* initialize static (final) variables */
@@ -135,7 +129,7 @@ public class Email_Registration implements Registration
 				("%s:<br><br> %s: %s<br>%s: %s<br>%s: %s<br><br> %s"),
 				emailDescription, NAME_STR, name, EMAIL_STR,
 				email, CLINIC_STR, clinic, emailSignature);
-		send(adminEmail, emailSubject, emailBody, "text/html");
+		send(config.adminEmail, emailSubject, emailBody, "text/html");
 		rfc.valid = true;
 		return rfc;
 	}
@@ -153,7 +147,8 @@ public class Email_Registration implements Registration
 			String emailBody, String bodyFormat)
 	{
 		/* generate session and message instances */
-		Session getMailSession = Session.getDefaultInstance(mailConfig, null);
+		Session getMailSession = Session.getDefaultInstance(
+				config.mailConfig, null);
 		MimeMessage generateMailMessage = new MimeMessage(getMailSession);
 		try
 		{
@@ -165,7 +160,7 @@ public class Email_Registration implements Registration
 			
 			/* login to server email account and send email. */
 			Transport transport = getMailSession.getTransport();
-			transport.connect(serverEmail, serverPassword);
+			transport.connect(config.serverEmail, config.serverPassword);
 			ui.displayMessage(Messages.getMessages().getInfo(
 					Messages.INFO_REG_REQUEST_SENDING), false);
 			transport.sendMessage(generateMailMessage,
@@ -179,66 +174,84 @@ public class Email_Registration implements Registration
 				Messages.INFO_REG_REQUEST_SENT), false);
 	}
 	
-	/**
-	 * reloads the javax.mail config properties as well as
-	 * the email account config.
-	 */
-	private void refreshConfig()
+	private final class EmailConfig
 	{
-		loadConfig(CONFIG_FILE);
-		loadEmailAccounts(ACCOUNT_FILE);
-	}
-	
-	/**
-	 * Loads the javax.mail config properties contained in the
-	 * supplied config file.
-	 * 
-	 * @param filePath The file while the javax.mail config
-	 * 		properties are located.
-	 * 
-	 * @return True if the file was loaded. False if an error
-	 * 		occurred.
-	 */
-	private boolean loadConfig(String filePath)
-	{
-		if (!mailConfig.isEmpty())
-			mailConfig.clear();
-		try
+		final String CONFIG_FILE =
+				"implementation/mail_settings.txt";
+		final String ACCOUNT_FILE =
+				"implementation/mailaccount_settings.ini";
+		Properties mailConfig;
+		
+		// server mailing account
+		String serverEmail, serverPassword, adminEmail;
+		
+		EmailConfig()
 		{
-			mailConfig.load(Utilities.getResourceStream(getClass(), filePath));
+			mailConfig = new Properties();
+			refreshConfig();
 		}
-		catch(IOException ioe)
+		
+		/**
+		 * reloads the javax.mail config properties as well as
+		 * the email account config.
+		 */
+		synchronized void refreshConfig()
 		{
-			return false;
+			loadConfig(CONFIG_FILE);
+			loadEmailAccounts(ACCOUNT_FILE);
 		}
-		return true;
-	}
-	
-	/**
-	 * Loads the registration program's email account information
-	 * as well as the email address of the administrator who will
-	 * receive registration requests.
-	 * 
-	 * @param filePath The file that contains the email account
-	 * 		information.
-	 * 
-	 * @return True if the file was loaded. False if an error
-	 * 		occurred.
-	 */
-	private boolean loadEmailAccounts(String filePath)
-	{
-		try
+		
+		/**
+		 * Loads the javax.mail config properties contained in the
+		 * supplied config file.
+		 * 
+		 * @param filePath The file while the javax.mail config
+		 * 		properties are located.
+		 * 
+		 * @return True if the file was loaded. False if an error
+		 * 		occurred.
+		 */
+		synchronized boolean loadConfig(String filePath)
 		{
-			Properties props = new Properties();
-			props.load(Utilities.getResourceStream(getClass(), filePath));
-			adminEmail = props.getProperty("admin_email");
-			serverEmail = props.getProperty("server_email");
-			serverPassword = props.getProperty("server_password");
-			props.clear();
-		} catch (IOException ioe)
-		{
-			return false;
+			if (!mailConfig.isEmpty())
+				mailConfig.clear();
+			try
+			{
+				mailConfig.load(Utilities.getResourceStream(getClass(), filePath));
+			}
+			catch(IOException ioe)
+			{
+				return false;
+			}
+			return true;
 		}
-		return true;
+		
+		/**
+		 * Loads the registration program's email account information
+		 * as well as the email address of the administrator who will
+		 * receive registration requests.
+		 * 
+		 * @param filePath The file that contains the email account
+		 * 		information.
+		 * 
+		 * @return True if the file was loaded. False if an error
+		 * 		occurred.
+		 */
+		synchronized boolean loadEmailAccounts(String filePath)
+		{
+			try
+			{
+				Properties props = new Properties();
+				props.load(Utilities.getResourceStream(getClass(), filePath));
+				adminEmail = props.getProperty("admin_email");
+				serverEmail = props.getProperty("server_email");
+				serverPassword = props.getProperty("server_password");
+				props.clear();
+			} catch (IOException ioe)
+			{
+				return false;
+			}
+			return true;
+		}
 	}
 }

@@ -145,8 +145,14 @@ public class MessageContainer
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private class Message
+	private final class Message
 	{
+		int code;
+		String name;
+		/**
+		 * format: <locale, message>
+		 */
+		HashMap<String, String> messages;
 		
 		/**
 		 * Creates a {@code Message} that has a code, name and a list
@@ -159,7 +165,7 @@ public class MessageContainer
 		 * 		The format should be <locale, message> e.g
 		 * 		<"en", "Hello"> or <"fr", "Bonjour">.
 		 */
-		public Message(int code, String name, HashMap<String, String> message)
+		Message(int code, String name, HashMap<String, String> message)
 		{
 			this.code = code;
 			this.name = name;
@@ -176,7 +182,7 @@ public class MessageContainer
 		 * 		If no message exists for the supplied locale then null
 		 * 		is returned.
 		 */
-		public String getMessage(String locale)
+		String getMessage(String locale)
 		{
 			return messages.get(locale);
 		}
@@ -187,7 +193,7 @@ public class MessageContainer
 		 * 
 		 * @return A map that contains the locales and messages.
 		 */
-		public HashMap<String, String> getMessages()
+		HashMap<String, String> getMessages()
 		{
 			HashMap<String, String> tmp = new HashMap<String, String>();
 			tmp.putAll(messages);
@@ -203,7 +209,7 @@ public class MessageContainer
 		 * 
 		 * @param message The {@code Message} to merge with this.
 		 */
-		public void merge(final Message message)
+		void merge(final Message message)
 		{
 			HashMap<String, String> msgMap = message.getMessages();
 			for (Entry<String, String> e: msgMap.entrySet())
@@ -211,35 +217,6 @@ public class MessageContainer
 				addMessage(e.getValue(), e.getKey(), false);
 			}
 		}
-		
-		/**
-		 * 
-		 * @return The message's name.
-		 */
-		public String getName()
-		{
-			return name;
-		}
-		
-		/**
-		 * 
-		 * @return The message's code.
-		 */
-		public int getCode()
-		{
-			return code;
-		}
-		
-		/* Protected */
-		
-		/* Private */
-		
-		private int code;
-		private String name;
-		/**
-		 * format: <locale, message>
-		 */
-		private HashMap<String, String> messages;
 		
 		/**
 		 * Adds a message to this {@code Message}.
@@ -259,7 +236,7 @@ public class MessageContainer
 		 * 		then that message will be returned. Else {@code null}
 		 * 		will be returned.
 		 */
-		private String addMessage(String message, String locale,
+		String addMessage(String message, String locale,
 				boolean replace)
 		{
 			if (replace || getMessage(locale) == null)

@@ -20,7 +20,6 @@
 package core;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 /**
  * This class keeps track of which users are online and how many users
@@ -68,7 +67,7 @@ public class UserManager
 	 * 
 	 * @see UserHandle
 	 */
-	protected int addUser(UserHandle uh)
+	protected synchronized int addUser(UserHandle uh)
 	{
 		if (uh == null || uh.getUser() == null)
 			return ERROR;
@@ -90,7 +89,7 @@ public class UserManager
 	 * 
 	 * @see UserHandle
 	 */
-	protected boolean delUser(UserHandle uh)
+	protected synchronized boolean delUser(UserHandle uh)
 	{
 		if (uh == null || uh.getUser() == null
 				|| !userHandle.containsKey(uh.getUser().getUsername()))

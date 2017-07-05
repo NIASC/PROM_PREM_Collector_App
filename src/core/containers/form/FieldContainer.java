@@ -36,10 +36,11 @@ public class FieldContainer extends FormContainer
 	/**
 	 * Initializes a field container that does not allow empty entries and
 	 * does not have secret entries.
+	 * @param statement The statement to initialize this form with.
 	 */
-	public FieldContainer()
+	public FieldContainer(String statement)
 	{
-		this(false, false, null);
+		this(false, false, statement);
 	}
 	
 	/**
@@ -63,41 +64,22 @@ public class FieldContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return field.getEntry() != null
-				&& (allowEmpty || !field.getEntry().isEmpty());
+		return field.entry != null
+				&& (allowEmpty || !field.entry.isEmpty());
 	}
 
 	@Override
 	public FormContainer copy()
 	{
-		FieldContainer fc = new FieldContainer(allowEmpty, secret, field.getStatement());
-		fc.setEntry(field.getEntry());
+		FieldContainer fc = new FieldContainer(allowEmpty, secret, field.statement);
+		fc.setEntry(field.entry);
 		return fc;
 	}
 	
 	@Override
 	public String getEntry()
 	{
-		return field.getEntry();
-	}
-	
-	/**
-	 * Sets the content of this container. A field container is only
-	 * allowed to contain one field so if this container already have
-	 * an entry it will be overwritten.
-	 * 
-	 * @param statement The statement that you want the user to
-	 * 		respond to.
-	 */
-	public void setField(String statement)
-	{
-		if (statement != null)
-		{
-			statement = statement.trim();
-			if (!allowEmpty && statement.isEmpty())
-				return;
-		}
-		field = new FieldEntry(statement);
+		return field.entry;
 	}
 	
 	/**
@@ -108,7 +90,7 @@ public class FieldContainer extends FormContainer
 	 */
 	public String getStatement()
 	{
-		return field.getStatement();
+		return field.statement;
 	}
 	
 	/**
@@ -132,12 +114,12 @@ public class FieldContainer extends FormContainer
 	public boolean setEntry(String entry)
 	{
 		if (entry == null)
-			field.setEntry(entry);
+			field.entry = entry;
 		else
 		{
 			if (entry.trim().isEmpty() && !allowEmpty)
 				return false;
-			field.setEntry(entry.trim());
+			field.entry = entry.trim();
 		}
 		return true;
 	}
@@ -147,7 +129,7 @@ public class FieldContainer extends FormContainer
 	/* Private */
 
 	private FieldEntry field;
-	private boolean secret;
+	private final boolean secret;
 	
 	/**
 	 * This class is a data container for field entries. It is
@@ -158,9 +140,18 @@ public class FieldContainer extends FormContainer
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private class FieldEntry
+	private final class FieldEntry
 	{
-		/* Public */
+		
+		/**
+		 * This field's statement that the user should respond to.
+		 */
+		final String statement;
+		
+		/**
+		 * This field's user entry/response.
+		 */
+		String entry;
 		
 		/**
 		 * Creates a field entry. The field is represented on the form
@@ -170,45 +161,10 @@ public class FieldContainer extends FormContainer
 		 * 
 		 * @param statement This field's key/description.
 		 */
-		public FieldEntry(String statement)
+		FieldEntry(String statement)
 		{
 			this.statement = statement;
 			entry = null;
 		}
-		
-		/**
-		 * 
-		 * @return This field's key.
-		 */
-		public String getStatement()
-		{
-			return statement;
-		}
-		
-		/**
-		 * 
-		 * @return This field's value.
-		 */
-		public String getEntry()
-		{
-			return entry;
-		}
-		
-		/**
-		 * Sets the value of this field.
-		 * 
-		 * @param entry The value to set for this field.
-		 */
-		public void setEntry(String entry)
-		{
-			this.entry = entry;
-		}
-		
-		/* Protected */
-		
-		/* Private */
-
-		private String statement;
-		private String entry;
 	}
 }

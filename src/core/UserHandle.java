@@ -57,7 +57,7 @@ public class UserHandle
 	public UserHandle(UserInterface ui)
 	{
 		this.ui = ui;
-		user_db = Implementations.Database();
+		db = Implementations.Database();
 		questionnaire = new Questionnaire(ui, this);
 		viewData = new ViewData(ui, this);
 		user = null;
@@ -223,7 +223,7 @@ public class UserHandle
 	 */
 	protected boolean validateDetails(String username, String password)
 	{
-		User tmp = user_db.getUser(username);
+		User tmp = db.getUser(username);
 		if (tmp == null)
 			return false;
 		if (!tmp.passwordMatch(password))
@@ -241,12 +241,12 @@ public class UserHandle
 	 */
 	protected User getUser()
 	{
-		return user;
+		return user.copy();
 	}
 	
 	/* Private */
 	
-	private Database user_db;
+	private Database db;
 	private UserInterface ui;
 	private Questionnaire questionnaire;
 	private ViewData viewData;
@@ -282,7 +282,7 @@ public class UserHandle
 		Encryption crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
 		User tmpUser;
-		tmpUser = user_db.setPassword(user, current,
+		tmpUser = db.setPassword(user, current,
 				crypto.hashString(new1, newSalt), newSalt);
 		if (tmpUser == null)
 		{

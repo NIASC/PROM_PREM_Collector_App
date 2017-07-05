@@ -136,7 +136,7 @@ public abstract class FormContainer
 	 * 
 	 * @see Form
 	 */
-	public FormContainer setNextFC(FormContainer fc)
+	public synchronized FormContainer setNextFC(FormContainer fc)
 	{
 		FormContainer old = nextFC;
 		nextFC = fc;
@@ -155,7 +155,7 @@ public abstract class FormContainer
 	 * 
 	 * @see Form
 	 */
-	public FormContainer setPrevFC(FormContainer fc)
+	public synchronized FormContainer setPrevFC(FormContainer fc)
 	{
 		FormContainer old = prevFC;
 		prevFC = fc;
@@ -181,7 +181,7 @@ public abstract class FormContainer
 	 * the entry is optional) this should be {@code true}, else
 	 * {@code false}.
 	 */
-	protected boolean allowEmpty;
+	protected final boolean allowEmpty;
 	
 	/**
 	 * Initializes this container as either optional (allows empty) or

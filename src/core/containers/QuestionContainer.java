@@ -123,8 +123,8 @@ public class QuestionContainer
 			for (int i = 0; i < index; ++i)
 			{
 				Question q = questions.get(indexToID.get(i));
-				qc.addQuestion(indexToID.get(i), q.type(), q.question(),
-						q.options(), q.optional(), q.getUpper(), q.getLower());
+				qc.addQuestion(indexToID.get(i), q.type, q.question,
+						q.options, q.optional, q.upper, q.lower);
 			}
 		}
 		return qc;
@@ -144,9 +144,37 @@ public class QuestionContainer
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private class Question
+	private final class Question
 	{
-		/* public */
+		int id;
+		
+		/**
+		 * Whether or not it is not required to answer this question.
+		 */
+		boolean optional;
+		/**
+		 * The type of question (Slider, SelectOption, Field etc.)
+		 */
+		String type;
+		
+		/**
+		 * The question/statement of this question.
+		 */
+		String question;
+		/**
+		 * The available options for this question.
+		 */
+		String[] options;
+		
+		/**
+		 * The upper limit for this entry.
+		 */
+		Integer upper;
+		
+		/**
+		 * The lower limit for this entry.
+		 */
+		Integer lower;
 		
 		/**
 		 * Adds a {@code Questionnaire} entry to this container.
@@ -180,64 +208,8 @@ public class QuestionContainer
 			this.question = question;
 			this.options = options;
 			this.optional = optional;
-			maxVal = upper;
-			minVal = lower;
-		}
-		
-		/**
-		 * 
-		 * @return The type of this question (Slider, SelectOption,
-		 * 		Field etc.)
-		 */
-		public String type()
-		{
-			return type;
-		}
-		
-		/**
-		 * 
-		 * @return The question/statement of this question.
-		 */
-		public String question()
-		{
-			return question;
-		}
-		
-		/**
-		 * 
-		 * @return the available options for this question.
-		 */
-		public String[] options()
-		{
-			return options;
-		}
-		
-		/**
-		 * 
-		 * @return {@code true} if it is not required to answer this
-		 * 		question. Else {@code false}.
-		 */
-		public boolean optional()
-		{
-			return optional;
-		}
-		
-		/**
-		 * 
-		 * @return The upper limit for this entry.
-		 */
-		public Integer getUpper()
-		{
-			return maxVal;
-		}
-		
-		/**
-		 * 
-		 * @return The lower limit for this entry.
-		 */
-		public Integer getLower()
-		{
-			return minVal;
+			this.upper = upper;
+			this.lower = lower;
 		}
 		
 		/**
@@ -262,20 +234,9 @@ public class QuestionContainer
 				return new FieldContainer(optional, false, question);
 			else if (type.equalsIgnoreCase("Slider"))
 				return new SliderContainer(
-						optional, question, minVal, maxVal);
+						optional, question, lower, upper);
 			else
 				return null;
 		}
-		
-		/* protected */
-		
-		/* private */
-		
-		private int id;
-		private boolean optional;
-		private String type;
-		private String question;
-		private String[] options;
-		private Integer maxVal, minVal;
 	}
 }

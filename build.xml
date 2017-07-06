@@ -53,7 +53,7 @@
   <!--
       Places the project in an executable jar file.
   -->
-  <target name="jar" depends="build">
+  <target name="jarmain" depends="build">
     <jar basedir="${build}" destfile="${jar}.jar">
       <zipgroupfileset dir="${lib}" includes="*.jar" />
       <manifest>

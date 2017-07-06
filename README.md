@@ -8,7 +8,7 @@ The prerequisits are labled as
 * __[Impl]__: Required for the default implementation.
 * __[incl]__: Dependency is included in the software.
 ### Prerequisits
-* __[Core]__ [Java Development Kit](http://openjdk.java.net/) version 7 or later. For the JVM and compiler.
+* __[Core]__ [Java Development Kit](http://openjdk.java.net/) version 8 or later. For the JVM and compiler (and some jdk8 feartures).
 * __[Core]__ [Apache Ant](https://ant.apache.org/). For building the program.
 * __[Impl]__ [XAMPP](https://www.apachefriends.org/index.html) version 7.1.4 (or similar). For Starting MySQL.
 * __[Impl, incl]__ [MySQL Connector/J](https://dev.mysql.com/downloads/connector/j/) (version 5.1.42 included). For MySQL interface to Java.

@@ -13,8 +13,10 @@ import java.util.Locale;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -31,6 +33,7 @@ public class DateDisplay extends JPanel implements ChangeListener, ItemListener
 		frame.pack();
 		frame.setVisible(true);
 	}
+	
 	public DateDisplay()
 	{
 		setLayout(new GridBagLayout());
@@ -38,56 +41,39 @@ public class DateDisplay extends JPanel implements ChangeListener, ItemListener
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(1, 1, 1, 1);
-		gbc.gridy = 0;
 		
 		date = new DateContainer();
-
+		
+		JLabel dayLabel = new JLabel("Day");
+		JLabel monthLabel = new JLabel("Month");
+		JLabel yearLabel = new JLabel("Year");
+		
 		dayDropDown = new JComboBox<String>();
-		dayDropDown.setName("dayDropDown");
-		initDays();
 		monthDropDown = new JComboBox<String>();
-		monthDropDown.setName("monthDropDown");
-		initMonths(Locale.getDefault());
 		yearDropDown = new JComboBox<String>();
-		yearDropDown.setName("yearDropDown");
-		initYears();
+		initDropDownLists();
 		
 		daySpinner = new JSpinner();
 		monthSpinner = new JSpinner();
 		yearSpinner = new JSpinner();
+		initSpinners();
 
-		daySpinner.setName("daySpinner");
-		daySpinner.setPreferredSize(new Dimension(150, 30));
-		daySpinner.setValue(date.getDay());
-		dayDropDown.setBorder(new EmptyBorder(0, 0, 0, 0));
-		daySpinner.setEditor(dayDropDown);
-
-		yearSpinner.setName("yearSpinner");
-		yearSpinner.setPreferredSize(new Dimension(150, 30));
-		yearSpinner.setValue(date.getYear());
-		yearDropDown.setBorder(new EmptyBorder(0, 0, 0, 0));
-		yearSpinner.setEditor(yearDropDown);
-		
-		monthSpinner.setName("monthSpinner");
-		monthSpinner.setPreferredSize(new Dimension(150, 30));
-		monthSpinner.setValue(date.getMonth());
-		monthDropDown.setBorder(new EmptyBorder(0, 0, 0, 0));
-		monthSpinner.setEditor(monthDropDown);
-
-		daySpinner.addChangeListener(this);
-		yearSpinner.addChangeListener(this);
-		monthSpinner.addChangeListener(this);
-		
-		dayDropDown.addItemListener(this);
-		monthDropDown.addItemListener(this);
-		yearDropDown.addItemListener(this);
-		
+		addListeners();
 
 		gbc.gridx = 0;
-		add(daySpinner, gbc);
+		gbc.gridy = 0;
+		add(dayLabel, gbc);
+		gbc.gridy = 1;
+		add(monthLabel, gbc);
+		gbc.gridy = 2;
+		add(yearLabel, gbc);
+
 		gbc.gridx = 1;
+		gbc.gridy = 0;
+		add(daySpinner, gbc);
+		gbc.gridy = 1;
 		add(monthSpinner, gbc);
-		gbc.gridx = 2;
+		gbc.gridy = 2;
 		add(yearSpinner, gbc);
 		
 	}
@@ -127,11 +113,12 @@ public class DateDisplay extends JPanel implements ChangeListener, ItemListener
 
 	@Override
 	public void stateChanged(ChangeEvent e)
-	{ // spinner
+	{
 		if (e.getSource() instanceof JSpinner)
 		{
 			if (refreshing) /* prevents recursive event firing */
 				return;
+			
 			JSpinner s = (JSpinner) e.getSource();
 			int value = ((Integer) s.getModel().getValue()).intValue();
 			if (s.getName().equals(daySpinner.getName()))
@@ -146,7 +133,7 @@ public class DateDisplay extends JPanel implements ChangeListener, ItemListener
 	
 	@Override
 	public void itemStateChanged(ItemEvent e)
-	{ // combobox
+	{
 		if (e.getSource() instanceof JComboBox)
 		{
 			JComboBox<?> c = (JComboBox<?>) e.getSource();
@@ -154,6 +141,7 @@ public class DateDisplay extends JPanel implements ChangeListener, ItemListener
 			{
 				if (refreshing) /* prevents recursive event firing */
 					return;
+				
 				if (c.getName().equals(dayDropDown.getName()))
 					date.setDay(dayDropDown.getSelectedIndex()+1);
 				else if (c.getName().equals(monthDropDown.getName()))
@@ -165,7 +153,7 @@ public class DateDisplay extends JPanel implements ChangeListener, ItemListener
 		}
 	}
 	
-	private boolean refreshing;
+	private boolean refreshing; /* prevents recursive event firing */
 	private JSpinner daySpinner, monthSpinner, yearSpinner;
 	private JComboBox<String> dayDropDown, monthDropDown, yearDropDown;
 	private DateContainer date;
@@ -191,5 +179,52 @@ public class DateDisplay extends JPanel implements ChangeListener, ItemListener
 		yearDropDown.setSelectedIndex(date.getYear()-date.firstYear());
 		
 		refreshing = false;
+	}
+	
+	private void initDropDownLists()
+	{
+		dayDropDown.setName("dayDropDown");
+		monthDropDown.setName("monthDropDown");
+		yearDropDown.setName("yearDropDown");
+		
+		initDays();
+		initMonths(Locale.getDefault());
+		initYears();
+	}
+	
+	private void initSpinners()
+	{
+		daySpinner.setName("daySpinner");
+		monthSpinner.setName("monthSpinner");
+		yearSpinner.setName("yearSpinner");
+		
+		Dimension d = new Dimension(150, 30);
+		daySpinner.setPreferredSize(d);
+		monthSpinner.setPreferredSize(d);
+		yearSpinner.setPreferredSize(d);
+		
+		daySpinner.setValue(date.getDay());
+		monthSpinner.setValue(date.getMonth());
+		yearSpinner.setValue(date.getYear());
+		
+		Border border = new EmptyBorder(0, 0, 0, 0);
+		dayDropDown.setBorder(border);
+		monthDropDown.setBorder(border);
+		yearDropDown.setBorder(border);
+		
+		daySpinner.setEditor(dayDropDown);
+		monthSpinner.setEditor(monthDropDown);
+		yearSpinner.setEditor(yearDropDown);
+	}
+	
+	private void addListeners()
+	{
+		daySpinner.addChangeListener(this);
+		yearSpinner.addChangeListener(this);
+		monthSpinner.addChangeListener(this);
+		
+		dayDropDown.addItemListener(this);
+		monthDropDown.addItemListener(this);
+		yearDropDown.addItemListener(this);
 	}
 }

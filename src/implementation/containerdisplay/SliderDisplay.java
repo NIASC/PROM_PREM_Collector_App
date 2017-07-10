@@ -116,10 +116,10 @@ public class SliderDisplay extends JPanel implements FormComponentDisplay, Chang
 	private JSlider slider;
 	
 	private static JTextArea AddTextArea(
-			String text, int row, int column)
+			String text, int rows, int columns)
 	{
 		return SwingComponents.makeTextArea(text, null, null, false,
-				null, null, null, null, null, false, row, column);
+				null, null, null, null, null, false, rows, columns);
 	}
 
 	private static JSlider makeSlider(

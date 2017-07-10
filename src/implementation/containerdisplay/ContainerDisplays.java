@@ -23,6 +23,7 @@ import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
 import core.containers.form.SingleOptionContainer;
 import core.containers.form.SliderContainer;
+import core.containers.form.TimePeriodContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
 
 /**
@@ -67,6 +68,8 @@ public abstract class ContainerDisplays
 			return new FieldDisplay((FieldContainer) fc);
 		else if (fc instanceof SliderContainer)
 			return new SliderDisplay((SliderContainer) fc);
+		else if (fc instanceof TimePeriodContainer)
+			return new TimePeriodDisplay((TimePeriodContainer) fc);
 		else
 		{
 			System.out.println("Unknown Form container");

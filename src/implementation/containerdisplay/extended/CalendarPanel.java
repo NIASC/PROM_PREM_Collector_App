@@ -1,3 +1,23 @@
+/** CalendarPanel.java
+ * 
+ * Copyright 2017 Marcus Malmquist
+ * 
+ * This file is part of PROM_PREM_Collector.
+ * 
+ * PROM_PREM_Collector is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ * 
+ * PROM_PREM_Collector is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with PROM_PREM_Collector.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package implementation.containerdisplay.extended;
 
 import java.awt.Dimension;
@@ -12,22 +32,53 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import implementation.SwingComponents;
+
+/**
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class CalendarPanel extends JPanel implements ChangeListener, ItemListener
 {
 	/* public */
 	
+	/**
+	 * Creates a panel that contains menus to select a date. The available
+	 * dates will range from {@code lower} to {@code upper} but the
+	 * displayed dates will range from the first day for the {@code lower}
+	 * year to the last day of the {@code upper} year, but if a date
+	 * outside the valid time period is selected it will automatically be
+	 * set to the relevant limit.<br>
+	 * If {@code lower} or {@code upper} is null the current date will be
+	 * chosen and if {@code lower} occurs after {@code upper} they will
+	 * automatically be switched.
+	 * 
+	 * @param lower The lower bound for the time period.
+	 * @param upper The upper bound for the time period.
+	 */
 	public CalendarPanel(Calendar lower, Calendar upper)
 	{
-		this.lower = lower != null ? lower : new GregorianCalendar();
-		this.upper = upper != null ? upper : new GregorianCalendar();
+		Calendar l = lower != null ? lower : new GregorianCalendar();
+		Calendar u = upper != null ? upper : new GregorianCalendar();
+		if (l.compareTo(u) > 0)
+		{
+			this.lower = u;
+			this.upper = l;
+		}
+		else
+		{
+			this.lower = l;
+			this.upper = u;
+		}
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -38,25 +89,31 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		date = new DateContainer(new GregorianCalendar(
 				Locale.getDefault()));
 		
-		dayDropDown = new JComboBox<String>();
-		monthDropDown = new JComboBox<String>();
-		yearDropDown = new JComboBox<String>();
-		initDropDownLists();
+		dayDropDown = AddComboBox(String.class, "dayDropDown", null);
+		monthDropDown = AddComboBox(String.class, "monthDropDown", null);
+		yearDropDown = AddComboBox(String.class, "yearDropDown", null);
+
+		initDays();
+		initMonths(Locale.getDefault());
+		initYears();
 		
-		daySpinner = new JSpinner();
-		monthSpinner = new JSpinner();
-		yearSpinner = new JSpinner();
-		initSpinners();
+		Dimension d = new Dimension(150, 30);
+		daySpinner = AddSpinner(
+				date.getDay(), "daySpinner", d, null, dayDropDown);
+		monthSpinner = AddSpinner(
+				date.getMonth(), "monthSpinner", d, null, monthDropDown);
+		yearSpinner = AddSpinner(
+				date.getYear(), "yearSpinner", d, null, yearDropDown);
 
 		addListeners();
 		
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		add(new JLabel("Day"), gbc);
+		add(AddLabel("Day"), gbc);
 		gbc.gridy = 1;
-		add(new JLabel("Month"), gbc);
+		add(AddLabel("Month"), gbc);
 		gbc.gridy = 2;
-		add(new JLabel("Year"), gbc);
+		add(AddLabel("Year"), gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -112,6 +169,11 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		}
 	}
 	
+	/**
+	 * Retrieves the selected date.
+	 * 
+	 * @return The selected date.
+	 */
 	public GregorianCalendar getDate()
 	{
 		return new GregorianCalendar(
@@ -130,7 +192,12 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 	
 	private static final long serialVersionUID = 3218284075407373771L;
 
-	
+	/**
+	 * Fills the month combobox with months names.
+	 * 
+	 * @param l The locale which determines how the month names will be
+	 * 		displayed.
+	 */
 	private void initMonths(Locale l)
 	{
 		String[] monthNames = (new DateFormatSymbols(l)).getMonths();
@@ -142,6 +209,10 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		monthDropDown.setSelectedIndex(date.getMonth());
 	}
 	
+	/**
+	 * Fills the year combobox with years rangin from the lower year limit
+	 * to the upper year limit.
+	 */
 	private void initYears()
 	{
 		yearDropDown.removeAllItems();
@@ -151,6 +222,13 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		yearDropDown.setSelectedIndex(date.getYear()-lower.get(Calendar.YEAR));
 	}
 	
+	/**
+	 * Fills the day combobox with day numbers 1-31* and selects the
+	 * current day.
+	 * 
+	 * <br><br>* If the current month does not have 31 day the values will
+	 * instead range from 1 to the highest day number.
+	 */
 	private void initDays()
 	{
 		int nDays = date.getDaysInMonth();
@@ -164,6 +242,15 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		dayDropDown.setSelectedIndex(date.getDay()-1);
 	}
 	
+	/**
+	 * Updates the date values of {@code date} and sets the appropriate
+	 * values/indices in the spinner and combobox components. This method
+	 * will set {@code refreshing} to {@code true} while it executes
+	 * because the implementation may fire events which in turn could call
+	 * this method. It is therefore recommended to check if this method is
+	 * running ({@code if (refreshing) return;}) in any listener methods
+	 * that call this method.
+	 */
 	private void update()
 	{
 		/* Setting values and indices triggers events.
@@ -185,42 +272,15 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		refreshing = false;
 	}
 	
-	private void initDropDownLists()
-	{
-		dayDropDown.setName("dayDropDown");
-		monthDropDown.setName("monthDropDown");
-		yearDropDown.setName("yearDropDown");
-		
-		initDays();
-		initMonths(Locale.getDefault());
-		initYears();
-	}
-	
-	private void initSpinners()
-	{
-		daySpinner.setName("daySpinner");
-		monthSpinner.setName("monthSpinner");
-		yearSpinner.setName("yearSpinner");
-		
-		Dimension d = new Dimension(150, 30);
-		daySpinner.setPreferredSize(d);
-		monthSpinner.setPreferredSize(d);
-		yearSpinner.setPreferredSize(d);
-		
-		daySpinner.setValue(date.getDay());
-		monthSpinner.setValue(date.getMonth());
-		yearSpinner.setValue(date.getYear());
-		
-		Border border = new EmptyBorder(0, 0, 0, 0);
-		dayDropDown.setBorder(border);
-		monthDropDown.setBorder(border);
-		yearDropDown.setBorder(border);
-		
-		daySpinner.setEditor(dayDropDown);
-		monthSpinner.setEditor(monthDropDown);
-		yearSpinner.setEditor(yearDropDown);
-	}
-	
+	/**
+	 * Adds ChangeListener to JSpinner and ItemListener to JComboBox.
+	 * 
+	 * Adding a listener may cause an event to fire, which could cause a
+	 * NullPointerException if some components are not initialized when the
+	 * listeners are added. It is therefore recommended to initialize the
+	 * components first and then add all of the listeners (using this
+	 * method).
+	 */
 	private void addListeners()
 	{
 		daySpinner.addChangeListener(this);
@@ -236,9 +296,10 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 	 * This method checks if the supplied date is within the upper and
 	 * lower bounds. This method is preferred over the methods in
 	 * {@code DateContainer} to modify the date.
-	 * @param year
-	 * @param month
-	 * @param day
+	 * 
+	 * @param year The year of the date to set.
+	 * @param month The month of the date to set.
+	 * @param day The day on the month of the date to set.
 	 */
 	private void setDate(int year, int month, int day)
 	{
@@ -261,6 +322,27 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		if (date.getDaysInMonth() < day && !setDay)
 			day = date.getDaysInMonth();
 		date.setDay(day);
+	}
+	
+	private static JLabel AddLabel(String labelText)
+	{
+		return SwingComponents.makeLabel(
+				labelText, null, null, false, null, null, null, null);
+	}
+
+	private static JSpinner AddSpinner(Object value, String name,
+			Dimension d, ChangeListener listener, JComponent editor)
+	{
+		return SwingComponents.makeSpinner(value, name, null, false,
+				null, null, null, d, listener, editor);
+	}
+
+	private static <T> JComboBox<T> AddComboBox(Class<T> c,
+			String name, ItemListener listener)
+	{
+		return SwingComponents.makeComboBox(c, name, null, false, null,
+				null, null, null, listener, false,
+				new EmptyBorder(0, 0, 0, 0));
 	}
 	
 	private class DateContainer

@@ -26,6 +26,7 @@ import core.containers.MessageContainer;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
 import core.containers.User;
+import core.containers.form.TimePeriodContainer;
 
 /**
  * This interface contains the methods required by the core part of
@@ -167,6 +168,21 @@ public interface Database
 	 * @see QuestionContainer
 	 */
 	public int loadQuestions(QuestionContainer qc);
+	
+	/**
+	 * Loads the dates at which questionnaires have been filled in for
+	 * {@code user}'s clinic.
+	 * 
+	 * @param user The user that requests statistics.
+	 * @param tpc The container for the dates.
+	 * 
+	 * @return {@code QUERY_SUCCESS} if the questions were successfully
+	 * 		loaded. {@code ERROR} if there was an error with the
+	 * 		database.
+	 * 
+	 * @see TimePeriodContainer
+	 */
+	public int loadQResultDates(User user, TimePeriodContainer tpc);
 	
 	/* Protected */
 	

@@ -1,4 +1,5 @@
-/**
+/** SwingComponents.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -26,13 +27,17 @@ import java.awt.event.ItemListener;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeListener;
 
@@ -85,6 +90,37 @@ public class SwingComponents
 				background, foreground, border, d);
 		label.setText(labelText);
 		return label;
+	}
+
+	public static JSpinner makeSpinner(Object value, String name,
+			String tooltip, boolean opaque, Color background,
+			Color foreground, Color border, Dimension d,
+			ChangeListener listener, JComponent editor)
+	{
+		JSpinner spinner = new JSpinner();
+		SwingComponents.modifyJComponent(spinner, name, tooltip, opaque,
+				background, foreground, border, d);
+		spinner.setValue(value);
+		spinner.setEditor(editor);
+		if (listener != null)
+			spinner.addChangeListener(listener);
+		return spinner;
+	}
+
+	public static <T> JComboBox<T> makeComboBox(Class<T> c,
+			String name, String tooltip, boolean opaque,
+			Color bgColor, Color fgColor, Color borderColor,
+			Dimension d, ItemListener listener, boolean editable,
+			Border border)
+	{
+		JComboBox<T> combobox = new JComboBox<T>();
+		SwingComponents.modifyJComponent(combobox, name, tooltip, opaque,
+				bgColor, fgColor, borderColor, d);
+		combobox.setEditable(editable);
+		combobox.setBorder(border);
+		if (listener != null)
+			combobox.addItemListener(listener);
+		return combobox;
 	}
 
 	public static JTextField makeTextField(String text, String name,

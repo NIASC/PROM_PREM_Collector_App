@@ -25,8 +25,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -36,6 +39,7 @@ import core.containers.MessageContainer;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
 import core.containers.User;
+import core.containers.form.TimePeriodContainer;
 import core.interfaces.Database;
 
 /**
@@ -234,6 +238,64 @@ public class MySQL_Database implements Database
 									rs.getString("option2")},
 							rs.getInt("optional") != 0,
 							rs.getInt("max_val"), rs.getInt("min_val"));
+				}
+				ret = QUERY_SUCCESS;
+			}
+		}
+		catch (SQLException e) { }
+		return ret;
+	}
+
+	@Override
+	public int loadQResultDates(User user, TimePeriodContainer tpc)
+	{
+		int ret = ERROR;
+		try (Connection conn = DriverManager.getConnection(
+				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		{
+			Statement s = conn.createStatement();
+			ResultSet rs = query(s, String.format(
+					"SELECT `date` FROM `questionnaire_answers` WHERE `clinic_id` = %d",
+					user.getClinicID()));
+			if (rs != null)
+			{
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				while (rs.next())
+				{
+					GregorianCalendar cal = new GregorianCalendar();
+					cal.setTime(sdf.parse(rs.getString("date")));
+					tpc.addDate(cal);
+				}
+				ret = QUERY_SUCCESS;
+			}
+		}
+		catch (SQLException e) { }
+		catch (ParseException e) { }
+		return ret;
+	}
+	
+	int loadQResults(User user, Calendar begin, Calendar end,
+			Object[] questions)
+	{
+		int ret = ERROR;
+		try (Connection conn = DriverManager.getConnection(
+				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		{
+			Statement s = conn.createStatement();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			// could use a string builder here to only get the questions we want
+			ResultSet rs = query(s, String.format(
+					"SELECT * FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'",
+					user.getClinicID(), sdf.format(begin.getTime()), sdf.format(end.getTime())));
+			if (rs != null)
+			{
+				while (rs.next())
+				{
+					// load question results into a container
+					// get question identifiers as string and add them to
+					// the container. when displaying the data load the
+					// questions and display the answer rather than the
+					// question identifier.
 				}
 				ret = QUERY_SUCCESS;
 			}

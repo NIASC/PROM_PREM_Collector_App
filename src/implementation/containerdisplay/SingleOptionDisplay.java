@@ -106,7 +106,7 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		this.soc = soc;
 		responseID = null;
 
-		JTextArea jta = AddTextArea(soc.getDescription());
+		JTextArea jta = AddTextArea(soc.getDescription(), 0, 35);
 		add(jta, BorderLayout.NORTH);
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
@@ -151,9 +151,9 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 				null, false, null, null, null, null, listener);
 	}
 	
-	private static JTextArea AddTextArea(String text)
+	private static JTextArea AddTextArea(String text, int rows, int columns)
 	{
 		return SwingComponents.makeTextArea(text, null, null, false,
-				null, null, null, null, null, false, 0, 0);
+				null, null, null, null, null, false, rows, columns);
 	}
 }

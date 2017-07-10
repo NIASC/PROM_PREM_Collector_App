@@ -81,7 +81,7 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	{
 		if (responseID == null)
 			return false;
-		return soc.setSelected(responseID);
+		return soc.setEntry(responseID);
 	}
 
 	@Override

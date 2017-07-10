@@ -19,6 +19,7 @@
  */
 package core;
 
+import core.containers.Form;
 import core.interfaces.Messages;
 import core.interfaces.UserInterface;
 
@@ -67,6 +68,10 @@ public class ViewData
 	/* Protected */
 	
 	/* Private */
+	private void queryTimePeriod()
+	{
+		Form form = new Form();
+	}
 	
 	private UserHandle userHandle;
 	private UserInterface userInterface;

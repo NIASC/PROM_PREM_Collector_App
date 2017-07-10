@@ -69,7 +69,7 @@ public class SliderContainer extends FormContainer
 	}
 
 	@Override
-	public FormContainer copy()
+	public SliderContainer copy()
 	{
 		SliderContainer sc = new SliderContainer(
 				allowEmpty, slider.statement, lower, upper);
@@ -84,17 +84,6 @@ public class SliderContainer extends FormContainer
 	}
 	
 	/**
-	 * Retrieves the statement (i.e. the statement that you request
-	 * the user to respond to)
-	 * 
-	 * @return This container's statement.
-	 */
-	public String getStatement()
-	{
-		return slider.statement;
-	}
-	
-	/**
 	 * Sets the entry (i.e. the user input in response to the field's
 	 * statement) of this container's field. Setting the entry to null
 	 * can be used to reset the field.
@@ -104,14 +93,29 @@ public class SliderContainer extends FormContainer
 	 * @return {@code true} if the value was set. {@code false} if
 	 * 		not.
 	 */
-	public boolean setEntry(int entry)
+	@Override
+	public <T extends Object> boolean setEntry(T entry)
 	{
-		if (withinBounds(entry))
+		if (!(entry instanceof Integer))
+			return false;
+		int e = ((Integer) entry).intValue();
+		if (withinBounds(e))
 		{
-			slider.value = entry;
+			slider.value = e;
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Retrieves the statement (i.e. the statement that you request
+	 * the user to respond to)
+	 * 
+	 * @return This container's statement.
+	 */
+	public String getStatement()
+	{
+		return slider.statement;
 	}
 	
 	/**

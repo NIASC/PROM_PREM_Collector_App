@@ -70,6 +70,8 @@ public abstract class FormContainer
 	 */
 	public abstract Object getEntry();
 	
+	public abstract <T extends Object> boolean setEntry(T entry);
+	
 	/**
 	 * Creates a displayable wrapper for this container and puts this
 	 * container inside it.

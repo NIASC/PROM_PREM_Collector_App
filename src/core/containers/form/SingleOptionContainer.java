@@ -84,7 +84,7 @@ public class SingleOptionContainer extends FormContainer
 	}
 
 	@Override
-	public FormContainer copy()
+	public SingleOptionContainer copy()
 	{
 		SingleOptionContainer soc = new SingleOptionContainer(allowEmpty, description);
 		for (Entry<Integer, SingleOption> e : options.entrySet())
@@ -96,6 +96,27 @@ public class SingleOptionContainer extends FormContainer
 	public Integer getEntry()
 	{
 		return getSelected();
+	}
+	
+	/**
+	 * Marks the option with the supplied ID as selected, if an option
+	 * with that ID exists in the list of options.
+	 * 
+	 * @param id The ID of the selected option.
+	 * @return True if an option with the supplied ID exists (and that
+	 * 		option was marked as selected).
+	 * 		False if not (and no option has been marked as selected).
+	 */
+	@Override
+	public <T extends Object> boolean setEntry(T id)
+	{
+		if (!(id instanceof Integer))
+			return false;
+		int selID = ((Integer) id).intValue();
+		if (options.get(selID) == null)
+			return false;
+		selectedID = selID;
+		return true;
 	}
 	
 	/**
@@ -125,23 +146,6 @@ public class SingleOptionContainer extends FormContainer
 		for (Entry<Integer, SingleOption> e : options.entrySet())
 			sopts.put(e.getKey(), e.getValue().text);
 		return sopts;
-	}
-	
-	/**
-	 * Marks the option with the supplied ID as selected, if an option
-	 * with that ID exists in the list of options.
-	 * 
-	 * @param id The ID of the selected option.
-	 * @return True if an option with the supplied ID exists (and that
-	 * 		option was marked as selected).
-	 * 		False if not (and no option has been marked as selected).
-	 */
-	public boolean setSelected(int id)
-	{
-		if (options.get(id) == null)
-			return false;
-		selectedID = id;
-		return true;
 	}
 	
 	/**

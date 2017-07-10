@@ -69,7 +69,7 @@ public class FieldContainer extends FormContainer
 	}
 
 	@Override
-	public FormContainer copy()
+	public FieldContainer copy()
 	{
 		FieldContainer fc = new FieldContainer(allowEmpty, secret, field.statement);
 		fc.setEntry(field.entry);
@@ -80,6 +80,31 @@ public class FieldContainer extends FormContainer
 	public String getEntry()
 	{
 		return field.entry;
+	}
+	
+	/**
+	 * Sets the entry (i.e. the user input in response to the field's
+	 * statement) of this container's field. Setting the entry to null
+	 * can be used to reset the field.
+	 * 
+	 * @param entry The user entry to set.
+	 * @return TODO
+	 */
+	@Override
+	public <T extends Object> boolean setEntry(T entry)
+	{
+		if (entry == null)
+			field.entry = null;
+		else if (!(entry instanceof String))
+			return false;
+		else
+		{
+			String str = (String) entry;
+			if (str.trim().isEmpty() && !allowEmpty)
+				return false;
+			field.entry = str.trim();
+		}
+		return true;
 	}
 	
 	/**
@@ -101,27 +126,6 @@ public class FieldContainer extends FormContainer
 	public boolean isSecret()
 	{
 		return secret;
-	}
-	
-	/**
-	 * Sets the entry (i.e. the user input in response to the field's
-	 * statement) of this container's field. Setting the entry to null
-	 * can be used to reset the field.
-	 * 
-	 * @param entry The user entry to set.
-	 * @return TODO
-	 */
-	public boolean setEntry(String entry)
-	{
-		if (entry == null)
-			field.entry = entry;
-		else
-		{
-			if (entry.trim().isEmpty() && !allowEmpty)
-				return false;
-			field.entry = entry.trim();
-		}
-		return true;
 	}
 	
 	/* Protected */

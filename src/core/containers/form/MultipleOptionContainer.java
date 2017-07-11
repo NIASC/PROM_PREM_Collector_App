@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -78,15 +79,15 @@ public class MultipleOptionContainer extends FormContainer
 	}
 	
 	@Override
-	public List<Integer> getEntry()
+	public Map<Integer, String> getEntry()
 	{
 		/* Since this container should not have many items (<10) this way
 		 * of retrieving the identifiers should be fast enough.
 		 */
-    	List<Integer> lint = new ArrayList<Integer>();
-    	for (Iterator<Option> itr = selected.values().iterator(); itr.hasNext();)
-    		lint.add(itr.next().identifier);
-		return Collections.unmodifiableList(lint);
+		HashMap<Integer, String> sopts = new HashMap<Integer, String>();
+		for (Entry<Integer, Option> e : selected.entrySet())
+			sopts.put(e.getKey(), e.getValue().text);
+		return Collections.unmodifiableMap(sopts);
 	}
 	
 	/**

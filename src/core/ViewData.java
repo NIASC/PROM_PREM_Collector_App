@@ -23,7 +23,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import core.containers.Form;
@@ -96,8 +98,8 @@ public class ViewData
 				new MultipleOptionContainer(false,
 						"Select which questions you would like to view");
 		
-		for (int i = 0; i < 6; ++i)
-			questionselect.addOption(i, "question" + i);
+		for (int i = 0; i < qc.getSize(); ++i)
+			questionselect.addOption(i, qc.getQuestion(i).getStatement());
 		form.insert(questionselect, Form.AT_END);
 
 		form.jumpTo(Form.AT_BEGIN);
@@ -124,7 +126,7 @@ public class ViewData
 		}
 		
 		// validate selected questions
-		List<Integer> selQuestions = questionselect.getEntry();
+		Map<Integer, String> selQuestions = questionselect.getEntry();
 		
 		System.out.printf("Number of entries for selected date: %d\n",
 				timeperiod.getDateCount());
@@ -135,8 +137,8 @@ public class ViewData
 				sdf.format(upper.getTime()));
 		
 		System.out.printf("Selected questions:\n");
-		for (Integer i : selQuestions)
-			System.out.printf("question%d\n", i);
+		for (Iterator<String> itr = selQuestions.values().iterator(); itr.hasNext();)
+			System.out.printf("%s\n", itr.next());
 		
 		
 		rfc.valid = true;

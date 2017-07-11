@@ -51,8 +51,7 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public SingleOptionContainer(boolean allowEmptyEntry, String statement)
 	{
-		super(allowEmptyEntry);
-		this.statement = statement;
+		super(allowEmptyEntry, statement);
 		
 		options = new HashMap<Integer, Option>();
 		nextOption = 0;
@@ -134,20 +133,10 @@ public class SingleOptionContainer extends FormContainer
 		return selected;
 	}
 	
-	/**
-	 * 
-	 * @return This container's statement.
-	 */
-	public String getStatement()
-	{
-		return statement;
-	}
-	
 	/* Protected */
 	
 	/* Private */
 	
-	private String statement;
 	private HashMap<Integer, Option> options;
 	private int nextOption;
 	

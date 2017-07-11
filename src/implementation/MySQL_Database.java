@@ -274,7 +274,7 @@ public class MySQL_Database implements Database
 		return ret;
 	}
 	
-	int loadQResults(User user, Calendar begin, Calendar end,
+	public int loadQResults(User user, Calendar begin, Calendar end,
 			Object[] questions)
 	{
 		int ret = ERROR;

@@ -108,6 +108,11 @@ public abstract class FormContainer
 		return allowEmpty;
 	}
 	
+	public String getStatement()
+	{
+		return statement;
+	}
+	
 	/**
 	 * Retrieves the next FormContainer.
 	 * 
@@ -184,6 +189,7 @@ public abstract class FormContainer
 	 * @see Form
 	 */
 	protected FormContainer prevFC;
+	
 	/**
 	 * if the {@code FormContainer} should allow empty entries (i.e.
 	 * the entry is optional) this should be {@code true}, else
@@ -192,15 +198,25 @@ public abstract class FormContainer
 	protected final boolean allowEmpty;
 	
 	/**
+	 * The statement that the user should respond to. The statement should
+	 * be relevant to the type of response requested from the user.
+	 */
+	protected final String statement;
+	
+	/**
 	 * Initializes this container as either optional (allows empty) or
 	 * mandatory (does not allow empty).
 	 * 
 	 * @param allowEmpty True if this container should allow empty
 	 * 		entries.
+	 * @param statement The statement that the user should respond to. The
+	 * 		statement should be relevant to the type of response requested
+	 * 		from the user.
 	 */
-	protected FormContainer(boolean allowEmpty)
+	protected FormContainer(boolean allowEmpty, String statement)
 	{
 		this.allowEmpty = allowEmpty;
+		this.statement = statement;
 		nextFC = prevFC = null;
 	}
 	

@@ -56,30 +56,29 @@ public class FieldContainer extends FormContainer
 	public FieldContainer(boolean allowEmptyEntries, boolean secretEntry,
 			String statement)
 	{
-		super(allowEmptyEntries);
-		field = new FieldEntry(statement);
+		super(allowEmptyEntries, statement);
 		secret = secretEntry;
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return field.entry != null
-				&& (allowEmpty || !field.entry.isEmpty());
+		return entry != null
+				&& (allowEmpty || !entry.isEmpty());
 	}
 
 	@Override
 	public FieldContainer copy()
 	{
-		FieldContainer fc = new FieldContainer(allowEmpty, secret, field.statement);
-		fc.setEntry(field.entry);
+		FieldContainer fc = new FieldContainer(allowEmpty, secret, statement);
+		fc.setEntry(entry);
 		return fc;
 	}
 	
 	@Override
 	public String getEntry()
 	{
-		return field.entry;
+		return entry;
 	}
 	
 	/**
@@ -88,30 +87,20 @@ public class FieldContainer extends FormContainer
 	 * can be used to reset the field.
 	 * 
 	 * @param entry The user entry to set.
-	 * @return TODO
+	 * 
+	 * @return True if the entry was set
 	 */
 	public boolean setEntry(String entry)
 	{
 		if (entry == null)
-			field.entry = null;
+			this.entry = null;
 		else
 		{
 			if (entry.trim().isEmpty() && !allowEmpty)
 				return false;
-			field.entry = entry.trim();
+			this.entry = entry.trim();
 		}
 		return true;
-	}
-	
-	/**
-	 * Retrieves the statement (i.e. the statement that you request
-	 * the user to respond to)
-	 * 
-	 * @return This container's statement.
-	 */
-	public String getStatement()
-	{
-		return field.statement;
 	}
 	
 	/**
@@ -128,43 +117,6 @@ public class FieldContainer extends FormContainer
 	
 	/* Private */
 
-	private FieldEntry field;
 	private final boolean secret;
-	
-	/**
-	 * This class is a data container for field entries. It is
-	 * designed with extensibility in mind and it should be possible
-	 * to modify FieldContainer to be able to container several field
-	 * entries using this class as a container for the entries.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
-	private final class FieldEntry
-	{
-		
-		/**
-		 * This field's statement that the user should respond to.
-		 */
-		final String statement;
-		
-		/**
-		 * This field's user entry/response.
-		 */
-		String entry;
-		
-		/**
-		 * Creates a field entry. The field is represented on the form
-		 * of a key and a value. The key is typically the description
-		 * of what you expect the value to be, e.g. in the form
-		 * 'Age: 30' the key is 'Age' and the value is '30'.
-		 * 
-		 * @param statement This field's key/description.
-		 */
-		FieldEntry(String statement)
-		{
-			this.statement = statement;
-			entry = null;
-		}
-	}
+	private String entry;
 }

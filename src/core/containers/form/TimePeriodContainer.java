@@ -48,8 +48,7 @@ public class TimePeriodContainer extends FormContainer
 	 */
 	public TimePeriodContainer(boolean allowEmpty, String statement)
 	{
-		super(allowEmpty);
-		this.statement = statement;
+		super(allowEmpty, statement);
 	}
 
 	@Override
@@ -69,9 +68,9 @@ public class TimePeriodContainer extends FormContainer
 	}
 
 	@Override
-	public GregorianCalendar[] getEntry()
+	public Calendar[] getEntry()
 	{
-		return new GregorianCalendar[]{lowerSelected, upperSelected};
+		return new Calendar[]{lowerSelected, upperSelected};
 	}
 	
 	/**
@@ -151,17 +150,6 @@ public class TimePeriodContainer extends FormContainer
 	}
 	
 	/**
-	 * Retrieves the statement that the use should respond to (i.e. pick a
-	 * date in response to the statement).
-	 * 
-	 * @return The statment for this container.
-	 */
-	public String getStatement()
-	{
-		return statement;
-	}
-	
-	/**
 	 * Retrieves the number of dates that have been added to this
 	 * container.
 	 * 
@@ -172,7 +160,6 @@ public class TimePeriodContainer extends FormContainer
 		return nDates;
 	}
 	
-	private String statement;
 	private int nDates;
-	private GregorianCalendar upperLimit, lowerLimit, upperSelected, lowerSelected;
+	private Calendar upperLimit, lowerLimit, upperSelected, lowerSelected;
 }

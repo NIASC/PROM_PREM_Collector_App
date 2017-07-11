@@ -20,17 +20,20 @@
 package core;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map.Entry;
 
 import core.containers.Form;
+import core.containers.QuestionContainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.MultipleOptionContainer;
 import core.containers.form.TimePeriodContainer;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
+import core.interfaces.Questions;
 import core.interfaces.UserInterface;
 import core.interfaces.UserInterface.RetFunContainer;
 
@@ -88,9 +91,11 @@ public class ViewData
 		form.insert(timeperiod, Form.AT_END);
 		
 		/* replace this with entries from database */
+		QuestionContainer qc = Questions.getQuestions().getContainer();
 		MultipleOptionContainer questionselect =
 				new MultipleOptionContainer(false,
 						"Select which questions you would like to view");
+		
 		for (int i = 0; i < 6; ++i)
 			questionselect.addOption(i, "question" + i);
 		form.insert(questionselect, Form.AT_END);
@@ -109,7 +114,7 @@ public class ViewData
 		MultipleOptionContainer questionselect = (MultipleOptionContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
 		
-		GregorianCalendar[] bounds = timeperiod.getEntry();
+		Calendar[] bounds = timeperiod.getEntry();
 		lower = bounds[0];
 		upper = bounds[1];
 		if (lower == null || upper == null)
@@ -145,5 +150,5 @@ public class ViewData
 	
 	private UserHandle userHandle;
 	private UserInterface userInterface;
-	private GregorianCalendar upper, lower;
+	private Calendar upper, lower;
 }

@@ -55,8 +55,7 @@ public class MultipleOptionContainer extends FormContainer
 	 */
 	public MultipleOptionContainer(boolean allowEmptyEntry, String statement)
 	{
-		super(allowEmptyEntry);
-		this.statement = statement;
+		super(allowEmptyEntry, statement);
 		
 		options = new HashMap<Integer, Option>();
 		selected = new HashMap<Integer, Option>();
@@ -158,20 +157,10 @@ public class MultipleOptionContainer extends FormContainer
 				new ArrayList<Integer>(selected.keySet()));
 	}
 	
-	/**
-	 * 
-	 * @return This container's statement.
-	 */
-	public String getStatement()
-	{
-		return statement;
-	}
-	
 	/* Protected */
 	
 	/* Private */
 	
-	private String statement;
 	private HashMap<Integer, Option> options, selected;
 	private int nextOption;
 	

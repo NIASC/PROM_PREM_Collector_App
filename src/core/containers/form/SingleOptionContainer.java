@@ -19,10 +19,7 @@
  */
 package core.containers.form;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
 
 /**
@@ -58,18 +55,14 @@ public class SingleOptionContainer extends FormContainer
 		this.statement = statement;
 		
 		options = new HashMap<Integer, Option>();
-		selected = new HashMap<Integer, Boolean>();
 		nextOption = 0;
-		
-		entries = new ArrayList<Integer>();
-		entriesID = new ArrayList<Integer>();
-		anySelected = false;
+		selected = null;
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return allowEmpty || anySelected;
+		return allowEmpty || selected != null;
 	}
 
 	@Override
@@ -84,7 +77,7 @@ public class SingleOptionContainer extends FormContainer
 	@Override
 	public Integer getEntry()
 	{
-		return anySelected ? entries.get(0) : null;
+		return selected != null ? options.get(selected).identifier : null;
 	}
 	
 	/**
@@ -115,9 +108,7 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public synchronized void addOption(int identifier, String text)
 	{
-		options.put(nextOption, new Option(identifier, text));
-		selected.put(nextOption, false);
-		nextOption++;
+		options.put(nextOption++, new Option(identifier, text));
 	}
 	
 	/**
@@ -140,7 +131,7 @@ public class SingleOptionContainer extends FormContainer
 	
 	public Integer getSelectedID()
 	{
-		return anySelected ? entriesID.get(0) : null;
+		return selected;
 	}
 	
 	/**
@@ -159,20 +150,15 @@ public class SingleOptionContainer extends FormContainer
 	private String statement;
 	private HashMap<Integer, Option> options;
 	private int nextOption;
-	private HashMap<Integer, Boolean> selected;
-	private boolean anySelected;
 	
-	private List<Integer> entries, entriesID;
+	private Integer selected;
 	
 	private boolean updateSelected(Integer id)
 	{
 		if (id == null || options.get(id) == null)
 			return false;
 
-		entries.add(0, new Integer(options.get(id).identifier));
-		entriesID.add(0, id);
-		selected.put(id, !selected.get(id));
-		anySelected = !entries.isEmpty();
+		selected = id;
 		return true;
 	}
 	

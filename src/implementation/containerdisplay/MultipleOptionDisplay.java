@@ -26,11 +26,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -40,6 +43,8 @@ import core.containers.form.MultipleOptionContainer;
 import core.containers.form.SingleOptionContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
+
+
 
 /**
  * This class is a displayable wrapper the for
@@ -53,17 +58,17 @@ import implementation.SwingComponents;
  * @see UserInterface
  *
  */
-public class SingleOptionDisplay extends JPanel implements FormComponentDisplay, ItemListener
+public class MultipleOptionDisplay extends JPanel implements FormComponentDisplay, ItemListener
 {
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
-		SingleOptionContainer moc = new SingleOptionContainer(false, "Select options");
+		MultipleOptionContainer moc = new MultipleOptionContainer(false, "Select options");
 		moc.addOption(0, "Option 0");
 		moc.addOption(1, "Option 1");
 		moc.addOption(2, "Option 2");
-		frame.setContentPane(new SingleOptionDisplay(moc));
+		frame.setContentPane(new MultipleOptionDisplay(moc));
 		frame.setVisible(true);
 		frame.pack();
 		
@@ -77,17 +82,18 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	}
 
 	@Override
-	public void itemStateChanged(ItemEvent ev)
+	public void itemStateChanged(ItemEvent e)
 	{
-		if (ev.getItemSelectable() instanceof AbstractButton)
+		if (e.getItemSelectable() instanceof AbstractButton)
 		{
-			AbstractButton button = (AbstractButton) ev.getItemSelectable();
-			boolean selected = (ev.getStateChange() == ItemEvent.SELECTED);
-			JRadioButton sel = options.get(button.getName());
-			if (sel == null)
+			AbstractButton button = (AbstractButton) e.getItemSelectable();
+			if (options.get(button.getName()) == null)
 				return;
-			if (selected)
-				responseID = Integer.parseInt(button.getName());
+			
+			if (e.getStateChange() == ItemEvent.SELECTED)
+				responseID.add(Integer.parseInt(button.getName()));
+			else if (e.getStateChange() == ItemEvent.DESELECTED)
+				responseID.remove(new Integer(button.getName()));
 		}
 	}
 
@@ -96,14 +102,14 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	{
 		if (responseID == null)
 			return false;
-		return soc.setEntry(responseID);
+		return moc.setEntry(responseID);
 	}
 
 	@Override
 	public boolean entryFilled() 
 	{
 		fillEntry();
-		return soc.hasEntry();
+		return moc.hasEntry();
 	}
 	
 	/* Protected */
@@ -111,17 +117,17 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	/**
 	 * Creates a displayable wrapper for {@code soc}.
 	 * 
-	 * @param soc The instance of the SingleOptionContainer that
+	 * @param moc The instance of the SingleOptionContainer that
 	 * 		the instance of this SingleOptionDisplay should act as
 	 * 		a wrapper for.
 	 */
-	protected SingleOptionDisplay(SingleOptionContainer soc)
+	protected MultipleOptionDisplay(MultipleOptionContainer moc)
 	{
 		setLayout(new BorderLayout());
-		this.soc = soc;
-		responseID = null;
+		this.moc = moc;
+		responseID = new ArrayList<Integer>();
 
-		JTextArea jta = AddTextArea(soc.getStatement(), 0, 35);
+		JTextArea jta = AddTextArea(moc.getStatement(), 0, 35);
 		add(jta, BorderLayout.NORTH);
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
@@ -131,20 +137,20 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		gbc.insets.bottom = gbc.insets.top = 1;
 		gbc.gridx = 0;
 
-		ButtonGroup group = new ButtonGroup();
-		HashMap<Integer, String> opt = soc.getOptions();
-		Integer selected = soc.getSelectedID();
-		options = new HashMap<String, JRadioButton>();
+		HashMap<Integer, String> opt = moc.getOptions();
+		
+		List<Integer> selected = moc.getSelectedIDs(); // should be multiple
+		
+		options = new HashMap<String, JCheckBox>();
 		int gridy = 0;
 		for (Entry<Integer, String> e : opt.entrySet())
 		{
 			gbc.gridy = gridy++;
 			String buttonName = Integer.toString(e.getKey());
-			JRadioButton btn = addToggleButton(
+			JCheckBox btn = addToggleButton(
 					e.getValue(), buttonName, this);
-			if (selected != null && selected == e.getKey())
+			if (selected.contains(e.getKey()))
 				btn.setSelected(true);
-			group.add(btn);
 			buttonPanel.add(btn, gbc);
 			options.put(buttonName, btn);
 		}
@@ -154,15 +160,15 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	/* Private */
 	
 	private static final long serialVersionUID = 7314170750059865699L;
-	private SingleOptionContainer soc;
-	private Integer responseID;
+	private MultipleOptionContainer moc;
+	private List<Integer> responseID;
 	
-	private HashMap<String, JRadioButton> options;
+	private HashMap<String, JCheckBox> options;
 	
-	private static JRadioButton addToggleButton(
+	private static JCheckBox addToggleButton(
 			String buttonText, String name, ItemListener listener)
 	{
-		return SwingComponents.addToggleButton(buttonText, name,
+		return SwingComponents.addToggleButton2(buttonText, name,
 				null, false, null, null, null, null, listener);
 	}
 	

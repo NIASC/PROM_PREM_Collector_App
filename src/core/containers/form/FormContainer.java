@@ -46,8 +46,10 @@ public abstract class FormContainer
 	/* Public */
 	
 	/**
-	 * Check if this {@code FormContainer} has been filled (i.e. an
-	 * option has been selected or the field has text in it etc.).
+	 * Check if this {@code FormContainer} has been filled (i.e. an option
+	 * has been selected or the field has text in it etc.).<br>
+	 * If this form allows empty entries ({@code allowsEmpty() == true})
+	 * then this method will always return true.
 	 * 
 	 * @return {@code true} if this form has entry/entries.
 	 * 		{@code false} if not.
@@ -64,12 +66,26 @@ public abstract class FormContainer
 	public abstract FormContainer copy();
 	
 	/**
-	 * Retrieves the entry/answer for this container.
+	 * Retrieves the entry/answer for this container.<br>
+	 * If this form allows empty entries ({@code allowsEmpty() == true})
+	 * then {@code hasEntry()} will always return {@code true}. A
+	 * consequence of that is that this method may return null if this form
+	 * has not entry.
 	 * 
 	 * @return This container's user entry.
+	 * 
+	 * @see #hasEntry()
 	 */
 	public abstract Object getEntry();
 	
+	/**
+	 * Sets/unsets/adds an entry for this form.
+	 * 
+	 * @param entry The entry object to set.
+	 * 
+	 * @return {@code true} if the entry was set to the new state.
+	 * 		{@code false} if not.
+	 */
 	public abstract <T extends Object> boolean setEntry(T entry);
 	
 	/**
@@ -195,6 +211,7 @@ public abstract class FormContainer
 	protected FormContainer(boolean allowEmpty)
 	{
 		this.allowEmpty = allowEmpty;
+		nextFC = prevFC = null;
 	}
 	
 	/* Private */

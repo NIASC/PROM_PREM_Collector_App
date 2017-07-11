@@ -27,6 +27,7 @@ import java.awt.event.ItemListener;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -74,6 +75,19 @@ public class SwingComponents
 			ItemListener listener)
 	{
 		JRadioButton button = new JRadioButton();
+		SwingComponents.modifyButton(button, buttonText, name, tooltip, opaque,
+				background, foreground, border, d);
+		if (listener != null)
+			button.addItemListener(listener);
+		return button;
+	}
+	
+	public static JCheckBox addToggleButton2(String buttonText, String name,
+			String tooltip, boolean opaque, Color background,
+			Color foreground, Color border, Dimension d,
+			ItemListener listener)
+	{
+		JCheckBox button = new JCheckBox();
 		SwingComponents.modifyButton(button, buttonText, name, tooltip, opaque,
 				background, foreground, border, d);
 		if (listener != null)

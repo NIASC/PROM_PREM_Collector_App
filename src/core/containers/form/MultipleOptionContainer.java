@@ -19,16 +19,19 @@
  */
 package core.containers.form;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 /**
- * This class handles single-option objects. It allows you to
+ * This class handles multiple-option objects. It allows you to
  * group several options with individual identifiers and text to form
  * a complete set of options to choose from as well as a way of
  * retrieving the selected option.
- * A single-option object consists of a statement and multiple options
- * to choose from and it only allows the user to choose one of the
+ * A multiple-option object consists of a statement and multiple options
+ * to choose from and it allows the user to choose any number of the
  * options.
  * 
  * @author Marcus Malmquist
@@ -36,12 +39,12 @@ import java.util.Map.Entry;
  * @see FormContainer
  *
  */
-public class SingleOptionContainer extends FormContainer
+public class MultipleOptionContainer extends FormContainer
 {
 	/* Public */
 	
 	/**
-	 * Creates a container for single-option objects.
+	 * Creates a container for multiple-option objects.
 	 * 
 	 * @param allowEmptyEntry {@code true} if this container allows
 	 * 		empty entry (answer/response). {@code false} if not.
@@ -49,37 +52,43 @@ public class SingleOptionContainer extends FormContainer
 	 * 		statement should be relevant to the options that are added
 	 * 		later.
 	 */
-	public SingleOptionContainer(boolean allowEmptyEntry, String statement)
+	public MultipleOptionContainer(boolean allowEmptyEntry, String statement)
 	{
 		super(allowEmptyEntry);
 		this.statement = statement;
 		
 		options = new HashMap<Integer, Option>();
+		selected = new HashMap<Integer, Boolean>();
 		nextOption = 0;
-		selectedID = null;
+		
+		entries = new ArrayList<Integer>();
+		entriesID = new ArrayList<Integer>();
+		anySelected = false;
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return allowEmpty || selectedID != null;
+		return allowEmpty || anySelected;
 	}
 
 	@Override
-	public SingleOptionContainer copy()
+	public MultipleOptionContainer copy()
 	{
-		SingleOptionContainer soc = new SingleOptionContainer(allowEmpty, statement);
+		MultipleOptionContainer moc = new MultipleOptionContainer(allowEmpty, statement);
 		for (Entry<Integer, Option> e : options.entrySet())
-			soc.addOption(e.getKey(), e.getValue().text);
-		return soc;
+		{
+			moc.addOption(e.getKey(), e.getValue().text);
+			for (Integer i : entriesID)
+				moc.setEntry(i);
+		}
+		return moc;
 	}
 	
 	@Override
-	public Integer getEntry()
+	public List<Integer> getEntry()
 	{
-		if (selectedID == null)
-			return null;
-		return options.get(selectedID).identifier;
+		return Collections.unmodifiableList(entries);
 	}
 	
 	/**
@@ -110,16 +119,20 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public synchronized void addOption(int identifier, String text)
 	{
-		options.put(nextOption++, new Option(identifier, text));
+		options.put(nextOption, new Option(identifier, text));
+		selected.put(nextOption, false);
+		nextOption++;
 	}
 	
 	/**
-	 * Puts the options in a map that contains the ID of the option
-	 * as well as the option's text. The ID should be used to mark
-	 * the selected option through the method setSelected.
+	 * Puts the options in a map that contains the ID of the option as well
+	 * as the option's text. The ID should be used to mark the selected
+	 * option through the method setSelected.<br>
 	 * The ID ranges from 0 <= ID < <no. entries>.
 	 * 
-	 * @return
+	 * @return A map of the options, the keys are the ID of the options
+	 * 		(the order at which they where added to this container,
+	 * 		starting from 0).
 	 */
 	public HashMap<Integer, String> getOptions()
 	{
@@ -129,9 +142,13 @@ public class SingleOptionContainer extends FormContainer
 		return sopts;
 	}
 	
-	public Integer getSelectedID()
+	/**
+	 * 
+	 * @return A list of the selected IDs
+	 */
+	public List<Integer> getSelectedIDs()
 	{
-		return selectedID;
+		return Collections.unmodifiableList(entriesID);
 	}
 	
 	/**
@@ -150,14 +167,28 @@ public class SingleOptionContainer extends FormContainer
 	private String statement;
 	private HashMap<Integer, Option> options;
 	private int nextOption;
-	private Integer selectedID;
+	private HashMap<Integer, Boolean> selected;
+	private boolean anySelected;
+	
+	private List<Integer> entries, entriesID;
 	
 	private boolean updateSelected(Integer id)
 	{
-		if (id == null || options.get(id) == null)
+		if (id == null || selected.get(id) == null)
 			return false;
 		
-		selectedID = id;
+		if (selected.get(id))
+		{ // this id is selected; deselect
+			entries.remove(new Integer(options.get(id).identifier));
+			entriesID.remove(id);
+		}
+		else
+		{ // this id is not selected; select
+			entries.add(new Integer(options.get(id).identifier));
+			entriesID.add(id);
+		}
+		selected.put(id, !selected.get(id));
+		anySelected = entries.size() > 0;
 		return true;
 	}
 	

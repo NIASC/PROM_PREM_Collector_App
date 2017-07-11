@@ -227,7 +227,7 @@ public class QuestionContainer
 				SingleOptionContainer soc =
 						new SingleOptionContainer(optional, question);
 				for (int i = 0; i < options.length; ++i)
-					soc.addSingleOption(i, options[i]);
+					soc.addOption(i, options[i]);
 				return soc;
 			}
 			else if (type.equalsIgnoreCase("Field"))

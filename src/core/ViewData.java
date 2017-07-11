@@ -114,7 +114,7 @@ public class ViewData
 		System.out.printf("Selected lower bound: %s\n",
 				sdf.format(lower.getTime()));
 		System.out.printf("Selected upper bound: %s\n",
-				sdf.format(lower.getTime()));
+				sdf.format(upper.getTime()));
 		rfc.valid = true;
 		return rfc;
 	}

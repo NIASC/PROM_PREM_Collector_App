@@ -77,11 +77,7 @@ public class MultipleOptionContainer extends FormContainer
 	{
 		MultipleOptionContainer moc = new MultipleOptionContainer(allowEmpty, statement);
 		for (Entry<Integer, Option> e : options.entrySet())
-		{
 			moc.addOption(e.getKey(), e.getValue().text);
-			for (Integer i : entriesID)
-				moc.setEntry(i);
-		}
 		return moc;
 	}
 	
@@ -188,7 +184,7 @@ public class MultipleOptionContainer extends FormContainer
 			entriesID.add(id);
 		}
 		selected.put(id, !selected.get(id));
-		anySelected = entries.size() > 0;
+		anySelected = !entries.isEmpty();
 		return true;
 	}
 	

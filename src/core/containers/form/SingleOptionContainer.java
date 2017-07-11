@@ -19,7 +19,10 @@
  */
 package core.containers.form;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 /**
@@ -55,14 +58,18 @@ public class SingleOptionContainer extends FormContainer
 		this.statement = statement;
 		
 		options = new HashMap<Integer, Option>();
+		selected = new HashMap<Integer, Boolean>();
 		nextOption = 0;
-		selectedID = null;
+		
+		entries = new ArrayList<Integer>();
+		entriesID = new ArrayList<Integer>();
+		anySelected = false;
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return allowEmpty || selectedID != null;
+		return allowEmpty || anySelected;
 	}
 
 	@Override
@@ -77,9 +84,7 @@ public class SingleOptionContainer extends FormContainer
 	@Override
 	public Integer getEntry()
 	{
-		if (selectedID == null)
-			return null;
-		return options.get(selectedID).identifier;
+		return anySelected ? entries.get(0) : null;
 	}
 	
 	/**
@@ -110,7 +115,9 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public synchronized void addOption(int identifier, String text)
 	{
-		options.put(nextOption++, new Option(identifier, text));
+		options.put(nextOption, new Option(identifier, text));
+		selected.put(nextOption, false);
+		nextOption++;
 	}
 	
 	/**
@@ -119,7 +126,9 @@ public class SingleOptionContainer extends FormContainer
 	 * the selected option through the method setSelected.
 	 * The ID ranges from 0 <= ID < <no. entries>.
 	 * 
-	 * @return
+	 * @return A map of the options, the keys are the ID of the options
+	 * 		(the order at which they where added to this container,
+	 * 		starting from 0).
 	 */
 	public HashMap<Integer, String> getOptions()
 	{
@@ -131,7 +140,7 @@ public class SingleOptionContainer extends FormContainer
 	
 	public Integer getSelectedID()
 	{
-		return selectedID;
+		return anySelected ? entriesID.get(0) : null;
 	}
 	
 	/**
@@ -150,14 +159,20 @@ public class SingleOptionContainer extends FormContainer
 	private String statement;
 	private HashMap<Integer, Option> options;
 	private int nextOption;
-	private Integer selectedID;
+	private HashMap<Integer, Boolean> selected;
+	private boolean anySelected;
+	
+	private List<Integer> entries, entriesID;
 	
 	private boolean updateSelected(Integer id)
 	{
 		if (id == null || options.get(id) == null)
 			return false;
-		
-		selectedID = id;
+
+		entries.add(0, new Integer(options.get(id).identifier));
+		entriesID.add(0, id);
+		selected.put(id, !selected.get(id));
+		anySelected = !entries.isEmpty();
 		return true;
 	}
 	

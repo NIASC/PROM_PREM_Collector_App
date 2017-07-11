@@ -91,7 +91,11 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public boolean setEntry(Integer id)
 	{
-		return updateSelected(id);
+		if (id == null || options.get(id) == null)
+			return false;
+
+		selected = id;
+		return true;
 	}
 	
 	/**
@@ -148,15 +152,6 @@ public class SingleOptionContainer extends FormContainer
 	private int nextOption;
 	
 	private Integer selected;
-	
-	private boolean updateSelected(Integer id)
-	{
-		if (id == null || options.get(id) == null)
-			return false;
-
-		selected = id;
-		return true;
-	}
 	
 	/**
 	 * This class is a data container for single-option form entries.

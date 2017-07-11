@@ -20,14 +20,11 @@
 package core.containers.form;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-
-import javax.lang.model.element.Element;
 
 /**
  * This class handles multiple-option objects. It allows you to
@@ -84,6 +81,9 @@ public class MultipleOptionContainer extends FormContainer
 	@Override
 	public List<Integer> getEntry()
 	{
+		/* Since this container should not have many items (<10) this way
+		 * of retrieving the identifiers should be fast enough.
+		 */
     	List<Integer> lint = new ArrayList<Integer>();
     	for (Iterator<Option> itr = selected.values().iterator(); itr.hasNext();)
     		lint.add(itr.next().identifier);
@@ -99,11 +99,15 @@ public class MultipleOptionContainer extends FormContainer
 	 * 		option was marked as selected).
 	 * 		False if not (and no option has been marked as selected).
 	 */
-	public <T extends Object> boolean setEntry(List<Integer> selectedIDs)
+	public boolean setEntry(List<Integer> selectedIDs)
 	{
 		if (selectedIDs == null)
 			return false;
 		
+		/* This may not be a very efficient way of replacing the old
+		 * selected items but this container should not contain thousands
+		 * of options so it should be fine.
+		 */
 		selected.clear();
 		for (Iterator<Integer> itr = selectedIDs.iterator(); itr.hasNext();)
 		{
@@ -170,7 +174,6 @@ public class MultipleOptionContainer extends FormContainer
 	private String statement;
 	private HashMap<Integer, Option> options, selected;
 	private int nextOption;
-	//private Selected selected;
 	
 	/**
 	 * This class is a data container for single-option form entries.

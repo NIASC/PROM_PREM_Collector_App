@@ -93,12 +93,10 @@ public class SliderContainer extends FormContainer
 	 * @return {@code true} if the value was set. {@code false} if
 	 * 		not.
 	 */
-	@Override
-	public <T extends Object> boolean setEntry(T entry)
+	public boolean setEntry(Integer entry)
 	{
-		if (!(entry instanceof Integer))
-			return false;
-		int e = ((Integer) entry).intValue();
+		/* check for null */
+		int e = entry.intValue();
 		if (withinBounds(e))
 		{
 			slider.value = e;

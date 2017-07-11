@@ -89,13 +89,9 @@ public class SingleOptionContainer extends FormContainer
 	 * 		option was marked as selected).
 	 * 		False if not (and no option has been marked as selected).
 	 */
-	@Override
-	public <T extends Object> boolean setEntry(T id)
+	public boolean setEntry(Integer id)
 	{
-		if (!(id instanceof Integer))
-			return false;
-		
-		return updateSelected((Integer) id);
+		return updateSelected(id);
 	}
 	
 	/**

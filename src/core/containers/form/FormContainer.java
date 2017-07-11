@@ -79,16 +79,6 @@ public abstract class FormContainer
 	public abstract Object getEntry();
 	
 	/**
-	 * Sets/unsets/adds an entry for this form.
-	 * 
-	 * @param entry The entry object to set.
-	 * 
-	 * @return {@code true} if the entry was set to the new state.
-	 * 		{@code false} if not.
-	 */
-	public abstract <T extends Object> boolean setEntry(T entry);
-	
-	/**
 	 * Creates a displayable wrapper for this container and puts this
 	 * container inside it.
 	 * 

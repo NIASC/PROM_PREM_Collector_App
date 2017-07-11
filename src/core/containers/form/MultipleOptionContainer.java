@@ -20,10 +20,14 @@
 package core.containers.form;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+
+import javax.lang.model.element.Element;
 
 /**
  * This class handles multiple-option objects. It allows you to
@@ -58,18 +62,14 @@ public class MultipleOptionContainer extends FormContainer
 		this.statement = statement;
 		
 		options = new HashMap<Integer, Option>();
-		selected = new HashMap<Integer, Boolean>();
+		selected = new HashMap<Integer, Option>();
 		nextOption = 0;
-		
-		entries = new ArrayList<Integer>();
-		entriesID = new ArrayList<Integer>();
-		anySelected = false;
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return allowEmpty || anySelected;
+		return allowEmpty || !selected.isEmpty();
 	}
 
 	@Override
@@ -84,25 +84,33 @@ public class MultipleOptionContainer extends FormContainer
 	@Override
 	public List<Integer> getEntry()
 	{
-		return Collections.unmodifiableList(entries);
+    	List<Integer> lint = new ArrayList<Integer>();
+    	for (Iterator<Option> itr = selected.values().iterator(); itr.hasNext();)
+    		lint.add(itr.next().identifier);
+		return Collections.unmodifiableList(lint);
 	}
 	
 	/**
 	 * Marks the option with the supplied ID as selected, if an option
 	 * with that ID exists in the list of options.
 	 * 
-	 * @param id The ID of the selected option.
+	 * @param selectedIDs The ID of the selected option.
 	 * @return True if an option with the supplied ID exists (and that
 	 * 		option was marked as selected).
 	 * 		False if not (and no option has been marked as selected).
 	 */
-	@Override
-	public <T extends Object> boolean setEntry(T id)
+	public <T extends Object> boolean setEntry(List<Integer> selectedIDs)
 	{
-		if (!(id instanceof Integer))
+		if (selectedIDs == null)
 			return false;
 		
-		return updateSelected((Integer) id);
+		selected.clear();
+		for (Iterator<Integer> itr = selectedIDs.iterator(); itr.hasNext();)
+		{
+			int i = itr.next();
+			selected.put(i, options.get(i));
+		}
+		return true;
 	}
 	
 	/**
@@ -115,9 +123,7 @@ public class MultipleOptionContainer extends FormContainer
 	 */
 	public synchronized void addOption(int identifier, String text)
 	{
-		options.put(nextOption, new Option(identifier, text));
-		selected.put(nextOption, false);
-		nextOption++;
+		options.put(nextOption++, new Option(identifier, text));
 	}
 	
 	/**
@@ -144,7 +150,8 @@ public class MultipleOptionContainer extends FormContainer
 	 */
 	public List<Integer> getSelectedIDs()
 	{
-		return Collections.unmodifiableList(entriesID);
+		return Collections.unmodifiableList(
+				new ArrayList<Integer>(selected.keySet()));
 	}
 	
 	/**
@@ -161,32 +168,9 @@ public class MultipleOptionContainer extends FormContainer
 	/* Private */
 	
 	private String statement;
-	private HashMap<Integer, Option> options;
+	private HashMap<Integer, Option> options, selected;
 	private int nextOption;
-	private HashMap<Integer, Boolean> selected;
-	private boolean anySelected;
-	
-	private List<Integer> entries, entriesID;
-	
-	private boolean updateSelected(Integer id)
-	{
-		if (id == null || selected.get(id) == null)
-			return false;
-		
-		if (selected.get(id))
-		{ // this id is selected; deselect
-			entries.remove(new Integer(options.get(id).identifier));
-			entriesID.remove(id);
-		}
-		else
-		{ // this id is not selected; select
-			entries.add(new Integer(options.get(id).identifier));
-			entriesID.add(id);
-		}
-		selected.put(id, !selected.get(id));
-		anySelected = !entries.isEmpty();
-		return true;
-	}
+	//private Selected selected;
 	
 	/**
 	 * This class is a data container for single-option form entries.

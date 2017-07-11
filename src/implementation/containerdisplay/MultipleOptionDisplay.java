@@ -20,8 +20,6 @@
 package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
@@ -32,11 +30,9 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
 import core.containers.form.MultipleOptionContainer;
@@ -100,8 +96,6 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 	@Override
 	public boolean fillEntry()
 	{
-		if (responseID == null)
-			return false;
 		return moc.setEntry(responseID);
 	}
 
@@ -139,7 +133,7 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 
 		HashMap<Integer, String> opt = moc.getOptions();
 		
-		List<Integer> selected = moc.getSelectedIDs(); // should be multiple
+		List<Integer> selected = moc.getSelectedIDs();
 		
 		options = new HashMap<String, JCheckBox>();
 		int gridy = 0;

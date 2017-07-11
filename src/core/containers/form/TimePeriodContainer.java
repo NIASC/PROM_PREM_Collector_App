@@ -74,25 +74,41 @@ public class TimePeriodContainer extends FormContainer
 		return new GregorianCalendar[]{lowerSelected, upperSelected};
 	}
 	
-	@Override
-	public <T> boolean setEntry(T entry)
+	/**
+	 * Sets the upper and lower bounds of the time period. The date that
+	 * occurs first will be set to the lower bound and the date that occurs
+	 * last will be set to the upper bound, even if {@code upper} occurs
+	 * before {@code upper}.
+	 * 
+	 * @param lower The lower bound for this time period.
+	 * @param upper The upper bound for this time period.
+	 * 
+	 * @return true if the bounds were set.
+	 */
+	public boolean setEntry(GregorianCalendar lower,
+			GregorianCalendar upper)
 	{
-		if (!(entry instanceof GregorianCalendar[]))
-			return false;
-		GregorianCalendar[] entries = (GregorianCalendar[]) entry;
-		if (entries.length < 2)
-			return false;
-		int cmp = entries[0].compareTo(entries[1]);
-		if (cmp > 0)
+		/* check for out of bounds */
+		if (lower.compareTo(lowerLimit) < 0)
+			lower = (GregorianCalendar) lowerLimit.clone();
+		else if (lower.compareTo(upperLimit) > 0)
+			lower = (GregorianCalendar) upperLimit.clone();
+
+		if (upper.compareTo(lowerLimit) < 0)
+			upper = (GregorianCalendar) lowerLimit.clone();
+		else if (upper.compareTo(upperLimit) > 0)
+			upper = (GregorianCalendar) upperLimit.clone();
+		
+		/* switch if wrong order */
+		if (lower.compareTo(upper) > 0)
 		{
-			lowerSelected = entries[1];
-			upperSelected = entries[0];
+			GregorianCalendar tmp = lower;
+			lower = upper;
+			upper = tmp;
 		}
-		else
-		{
-			lowerSelected = entries[0];
-			upperSelected = entries[1];
-		}
+		
+		lowerSelected = lower;
+		upperSelected = upper;
 		return true;
 	}
 	

@@ -90,19 +90,15 @@ public class FieldContainer extends FormContainer
 	 * @param entry The user entry to set.
 	 * @return TODO
 	 */
-	@Override
-	public <T extends Object> boolean setEntry(T entry)
+	public boolean setEntry(String entry)
 	{
 		if (entry == null)
 			field.entry = null;
-		else if (!(entry instanceof String))
-			return false;
 		else
 		{
-			String str = (String) entry;
-			if (str.trim().isEmpty() && !allowEmpty)
+			if (entry.trim().isEmpty() && !allowEmpty)
 				return false;
-			field.entry = str.trim();
+			field.entry = entry.trim();
 		}
 		return true;
 	}

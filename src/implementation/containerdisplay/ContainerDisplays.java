@@ -21,6 +21,7 @@ package implementation.containerdisplay;
 
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
+import core.containers.form.MultipleOptionContainer;
 import core.containers.form.SingleOptionContainer;
 import core.containers.form.SliderContainer;
 import core.containers.form.TimePeriodContainer;
@@ -64,6 +65,8 @@ public abstract class ContainerDisplays
 	{
 		if (fc instanceof SingleOptionContainer)
 			return new SingleOptionDisplay((SingleOptionContainer) fc);
+		else if (fc instanceof MultipleOptionContainer)
+			return new MultipleOptionDisplay((MultipleOptionContainer) fc);
 		else if (fc instanceof FieldContainer)
 			return new FieldDisplay((FieldContainer) fc);
 		else if (fc instanceof SliderContainer)

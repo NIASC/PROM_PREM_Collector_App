@@ -93,8 +93,7 @@ public class TimePeriodDisplay extends JPanel implements FormComponentDisplay
 	@Override
 	public boolean fillEntry()
 	{
-		return tpc.setEntry(new GregorianCalendar[]
-				{dpFrom.getDate(), dpTo.getDate()});
+		return tpc.setEntry(dpFrom.getDate(), dpTo.getDate());
 	}
 
 	@Override

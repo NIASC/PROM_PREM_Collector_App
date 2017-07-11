@@ -22,9 +22,12 @@ package core;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map.Entry;
 
 import core.containers.Form;
 import core.containers.form.FieldContainer;
+import core.containers.form.MultipleOptionContainer;
 import core.containers.form.TimePeriodContainer;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
@@ -83,7 +86,14 @@ public class ViewData
 				"Select which period you want to see statistics for.");
 		Implementations.Database().loadQResultDates(userHandle.getUser(), timeperiod);
 		form.insert(timeperiod, Form.AT_END);
-		// select which questions, should be multiple-choice
+		
+		/* replace this with entries from database */
+		MultipleOptionContainer questionselect =
+				new MultipleOptionContainer(false,
+						"Select which questions you would like to view");
+		for (int i = 0; i < 6; ++i)
+			questionselect.addOption(i, "question" + i);
+		form.insert(questionselect, Form.AT_END);
 
 		form.jumpTo(Form.AT_BEGIN);
 
@@ -96,7 +106,8 @@ public class ViewData
 		form.jumpTo(Form.AT_BEGIN);
 		TimePeriodContainer timeperiod = (TimePeriodContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
-		// get selected questions entry
+		MultipleOptionContainer questionselect = (MultipleOptionContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
 		
 		GregorianCalendar[] bounds = timeperiod.getEntry();
 		lower = bounds[0];
@@ -106,8 +117,10 @@ public class ViewData
 			rfc.message = "Invalid time period";
 			return rfc;
 		}
+		
 		// validate selected questions
-
+		List<Integer> selQuestions = questionselect.getEntry();
+		
 		System.out.printf("Number of entries for selected date: %d\n",
 				timeperiod.getDateCount());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -115,6 +128,12 @@ public class ViewData
 				sdf.format(lower.getTime()));
 		System.out.printf("Selected upper bound: %s\n",
 				sdf.format(upper.getTime()));
+		
+		System.out.printf("Selected questions:\n");
+		for (Integer i : selQuestions)
+			System.out.printf("question%d\n", i);
+		
+		
 		rfc.valid = true;
 		return rfc;
 	}

@@ -26,6 +26,7 @@ import java.util.List;
 import core.containers.MessageContainer;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
+import core.containers.StatisticsContainer;
 import core.containers.User;
 import core.containers.form.FormContainer;
 import core.containers.form.TimePeriodContainer;
@@ -190,7 +191,7 @@ public interface Database
 	public int loadQResultDates(User user, TimePeriodContainer tpc);
 
 	public int loadQResults(User user, Calendar begin, Calendar end,
-			List<Integer> questionIDs, Object container);
+			List<Integer> questionIDs, StatisticsContainer container);
 	
 	/* Protected */
 	

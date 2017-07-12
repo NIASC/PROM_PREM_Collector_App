@@ -19,6 +19,7 @@
  */
 package core.containers;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -160,6 +161,25 @@ public class QuestionContainer
 	 */
 	public final class Question
 	{
+		public int getID() { return id; }
+		public boolean isOptional() { return optional; }
+		public String getStatement() { return question; }
+		public String getDescription() { return description; }
+		public String getOptions(int id)
+		{
+			String optn = null;
+			try
+			{
+				optn = options.get(id);
+			}
+			catch (IndexOutOfBoundsException e) {
+				/* optn is already null */
+			}
+			return optn;
+		}
+		public int getUpper() { return upper; }
+		public int getLower() { return lower; }
+		
 		private int id;
 		
 		/**
@@ -198,7 +218,6 @@ public class QuestionContainer
 		private Integer lower;
 		
 		/**
------------------------------------------------------------------------_--------
 		 * Adds a {@code Questionnaire} entry to this container.
 		 * 
 		 * @param id The ID of the question (as it appears in the

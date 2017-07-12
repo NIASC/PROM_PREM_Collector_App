@@ -40,6 +40,8 @@ import core.Utilities;
 import core.containers.MessageContainer;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
+import core.containers.QuestionContainer.Question;
+import core.containers.StatisticsContainer;
 import core.containers.User;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
@@ -311,7 +313,7 @@ public class MySQL_Database implements Database
 	
 	@Override
 	public int loadQResults(User user, Calendar begin, Calendar end,
-			List<Integer> questionIDs, Object container)
+			List<Integer> questionIDs, StatisticsContainer container)
 	{
 		int ret = ERROR;
 		try (Connection conn = DriverManager.getConnection(
@@ -329,23 +331,27 @@ public class MySQL_Database implements Database
 					String.join(", ", lstr), user.getClinicID(),
 					sdf.format(begin.getTime()),
 					sdf.format(end.getTime())));
-			System.out.printf("SELECT %s FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'\n",
-					String.join(", ", lstr), user.getClinicID(),
-					sdf.format(begin.getTime()),
-					sdf.format(end.getTime()));
+			QuestionContainer qc = Questions.getQuestions().getContainer();
 			if (rs != null)
 			{
 				while (rs.next())
 				{
-					List<String>lstr2 = new ArrayList<String>();
 					for (Iterator<Integer> itr = questionIDs.iterator(); itr.hasNext();)
-						lstr2.add(rs.getString(String.format("question%d", itr.next())));
-					System.out.printf("%s\n", String.join(", ", lstr2));
-					// load question results into a container
-					// get question identifiers as string and add them to
-					// the container. when displaying the data load the
-					// questions and display the answer rather than the
-					// question identifier.
+					{
+						int qid = itr.next();
+						Question q1 = qc.getQuestion(qid);
+						String q = String.format("question%d", qid);
+						if (rs.getString(q).startsWith("option"))
+						{
+							int ansID = new Integer(rs.getString(q).substring("option".length()));
+							container.addResult(q1.getStatement(), q1.getOptions(ansID));
+						}
+						else
+							container.addResult(q1.getStatement(), rs.getString(q));
+					}
+					/* when displaying the data load the questions and display
+					 * the answer rather than the question identifier.
+					 */
 				}
 				ret = QUERY_SUCCESS;
 			}

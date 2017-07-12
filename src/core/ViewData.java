@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 
 import core.containers.Form;
 import core.containers.QuestionContainer;
+import core.containers.StatisticsContainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.MultipleOptionContainer;
 import core.containers.form.TimePeriodContainer;
@@ -126,6 +127,12 @@ public class ViewData
 			rfc.message = "Invalid time period";
 			return rfc;
 		}
+		if (timeperiod.getDateCount() < 5)
+		{
+			rfc.message = "For privacy reasons the selected period must "
+					+ "contain at leas 5 entries. Please extend the period.";
+			return rfc;
+		}
 		
 		// validate selected questions
 		Map<Integer, String> selQuestions = questionselect.getEntry();
@@ -138,12 +145,39 @@ public class ViewData
 		System.out.printf("Selected upper bound: %s\n",
 				sdf.format(upper.getTime()));
 		
+		StatisticsContainer sc = new StatisticsContainer();
 		System.out.printf("Selected questions:\n");
-		Implementations.Database().loadQResults(userHandle.getUser(), lower, upper, new ArrayList<Integer>(selQuestions.keySet()), null);
-		/*
-		for (Iterator<String> itr = selQuestions.values().iterator(); itr.hasNext();)
-			System.out.printf("%s\n", itr.next());
-		*/
+		Implementations.Database().loadQResults(userHandle.getUser(),
+				lower, upper, new ArrayList<Integer>(selQuestions.keySet()),
+				sc);
+		Map<String, Map<String, Integer>> res = sc.getStatistics();
+		for (Entry<String, Map<String, Integer>> q : res.entrySet())
+		{
+			List<String> lstr = new ArrayList<String>();
+			List<Integer> lint = new ArrayList<Integer>();
+			int tot = 0;
+			for (Entry<String, Integer> a : q.getValue().entrySet())
+			{
+				lstr.add(a.getKey());
+				lint.add(a.getValue());
+				tot += a.getValue();
+			}
+			StringBuilder sb = new StringBuilder();
+			sb.append(String.format("%s:\n", q.getKey()));
+			
+			Iterator<String> sitr;
+			Iterator<Integer> iitr;
+			for (sitr = lstr.iterator(), iitr = lint.iterator();
+					sitr.hasNext() && iitr.hasNext();)
+			{
+				Integer i = iitr.next();
+				sb.append(String.format("|- %4d (%3.0f %%) - %s\n",
+						i, 100.0 * i.doubleValue() / tot, sitr.next()));
+			}
+			sb.append("|- --------------\n");
+			sb.append(String.format("\\- %4d (%3.0f %%) - %s\n", tot, 100D, "Total"));
+			System.out.println(sb.toString());
+		}
 		
 		rfc.valid = true;
 		return rfc;

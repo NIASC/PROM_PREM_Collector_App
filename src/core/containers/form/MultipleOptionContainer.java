@@ -50,13 +50,16 @@ public class MultipleOptionContainer extends FormContainer
 	 * 
 	 * @param allowEmptyEntry {@code true} if this container allows
 	 * 		empty entry (answer/response). {@code false} if not.
-	 * @param statement The statement that the user should respond to. The
-	 * 		statement should be relevant to the options that are added
-	 * 		later.
+	 * @param statement The statement that the user should respond to.
+	 * 		The statement should be relevant to the options that are
+	 * 		added later.
+	 * @param description A more detailed description of the
+	 * 		{@code statement}.
 	 */
-	public MultipleOptionContainer(boolean allowEmptyEntry, String statement)
+	public MultipleOptionContainer(boolean allowEmptyEntry, String statement,
+			String description)
 	{
-		super(allowEmptyEntry, statement);
+		super(allowEmptyEntry, statement, description);
 		
 		options = new HashMap<Integer, Option>();
 		selected = new HashMap<Integer, Option>();
@@ -72,7 +75,8 @@ public class MultipleOptionContainer extends FormContainer
 	@Override
 	public MultipleOptionContainer copy()
 	{
-		MultipleOptionContainer moc = new MultipleOptionContainer(allowEmpty, statement);
+		MultipleOptionContainer moc = new MultipleOptionContainer(
+				allowEmpty, statement, description);
 		for (Entry<Integer, Option> e : options.entrySet())
 			moc.addOption(e.getKey(), e.getValue().text);
 		return moc;

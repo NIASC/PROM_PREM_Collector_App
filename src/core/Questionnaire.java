@@ -91,11 +91,11 @@ public class Questionnaire
 	private void createPatientRegistration()
 	{
 		Form form = new Form();
-		FieldContainer forename = new FieldContainer(false, false, "Patient forename");
+		FieldContainer forename = new FieldContainer(false, false, "Patient forename", null);
 		form.insert(forename, Form.AT_END);
-		FieldContainer lastname = new FieldContainer(false, false, "Patient surname");
+		FieldContainer lastname = new FieldContainer(false, false, "Patient surname", null);
 		form.insert(lastname, Form.AT_END);
-		FieldContainer pnr = new FieldContainer(false, false, "Patient Personal number");
+		FieldContainer pnr = new FieldContainer(false, false, "Patient Personal number", null);
 		if (patient != null)
 		{
 			forename.setEntry(patient.getForename());

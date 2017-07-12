@@ -56,19 +56,6 @@ import implementation.SwingComponents;
  */
 public class MultipleOptionDisplay extends JPanel implements FormComponentDisplay, ItemListener
 {
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		MultipleOptionContainer moc = new MultipleOptionContainer(false, "Select options");
-		moc.addOption(0, "Option 0");
-		moc.addOption(1, "Option 1");
-		moc.addOption(2, "Option 2");
-		frame.setContentPane(new MultipleOptionDisplay(moc));
-		frame.setVisible(true);
-		frame.pack();
-		
-	}
 	/* Public */
 	
 	@Override
@@ -121,7 +108,9 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 		this.moc = moc;
 		responseID = new ArrayList<Integer>();
 
-		JTextArea jta = AddTextArea(moc.getStatement(), 0, 35);
+		JTextArea jta = AddTextArea(moc.getStatement()
+				+ (moc.getDescription() != null ? "\n"+moc.getDescription() : ""),
+				0, 35);
 		add(jta, BorderLayout.NORTH);
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());

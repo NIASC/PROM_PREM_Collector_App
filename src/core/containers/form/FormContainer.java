@@ -113,6 +113,11 @@ public abstract class FormContainer
 		return statement;
 	}
 	
+	public String getDescription()
+	{
+		return description;
+	}
+	
 	/**
 	 * Retrieves the next FormContainer.
 	 * 
@@ -204,6 +209,11 @@ public abstract class FormContainer
 	protected final String statement;
 	
 	/**
+	 * A more detailed description of the {@code #statement}.
+	 */
+	protected final String description;
+	
+	/**
 	 * Initializes this container as either optional (allows empty) or
 	 * mandatory (does not allow empty).
 	 * 
@@ -212,11 +222,14 @@ public abstract class FormContainer
 	 * @param statement The statement that the user should respond to. The
 	 * 		statement should be relevant to the type of response requested
 	 * 		from the user.
+	 * @param description A more detailed description of the
+	 * 		{@code statement}.
 	 */
-	protected FormContainer(boolean allowEmpty, String statement)
+	protected FormContainer(boolean allowEmpty, String statement, String description)
 	{
 		this.allowEmpty = allowEmpty;
 		this.statement = statement;
+		this.description = description;
 		nextFC = prevFC = null;
 	}
 	

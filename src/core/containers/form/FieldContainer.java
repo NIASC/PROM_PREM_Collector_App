@@ -34,16 +34,6 @@ public class FieldContainer extends FormContainer
 {
 	
 	/**
-	 * Initializes a field container that does not allow empty entries and
-	 * does not have secret entries.
-	 * @param statement The statement to initialize this form with.
-	 */
-	public FieldContainer(String statement)
-	{
-		this(false, false, statement);
-	}
-	
-	/**
 	 * Initializes this container with form with the supplied
 	 * statement.
 	 * 
@@ -52,11 +42,13 @@ public class FieldContainer extends FormContainer
 	 * @param secretEntry True if the input should be hidden. Useful
 	 * 		for entering sensitive information such as passwords.
 	 * @param statement The statement to initialize this form with.
+	 * @param description A more detailed description of the
+	 * 		{@code statement}.
 	 */
 	public FieldContainer(boolean allowEmptyEntries, boolean secretEntry,
-			String statement)
+			String statement, String description)
 	{
-		super(allowEmptyEntries, statement);
+		super(allowEmptyEntries, statement, description);
 		secret = secretEntry;
 	}
 
@@ -70,7 +62,8 @@ public class FieldContainer extends FormContainer
 	@Override
 	public FieldContainer copy()
 	{
-		FieldContainer fc = new FieldContainer(allowEmpty, secret, statement);
+		FieldContainer fc = new FieldContainer(allowEmpty, secret,
+				statement, description);
 		fc.setEntry(entry);
 		return fc;
 	}

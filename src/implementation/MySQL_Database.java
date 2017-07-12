@@ -105,34 +105,33 @@ public class MySQL_Database implements Database
 		if (answers.size() != nQuestions)
 			return ERROR;
 		
-		StringBuilder values = new StringBuilder();
-		StringBuilder fields = new StringBuilder();
+		List<String> values = new ArrayList<String>();
+		List<String> fields = new ArrayList<String>();
 		int i = 0;
 		for (Iterator<FormContainer> itr = answers.iterator(); itr.hasNext(); ++i)
 		{
-			fields.append(String.format(", `question%d`", i));
-			values.append(", ");
+			fields.add(String.format("`question%d`", i));
 			FormContainer fc = itr.next();
 			if (fc.getEntry() == null)
 			{
-				values.append("''");
+				values.add("''");
 				continue;
 			}
 			if (fc instanceof SingleOptionContainer)
-				values.append(String.format("'option%s'", fc.getEntry().toString()));
+				values.add(String.format("'option%s'", fc.getEntry().toString()));
 			else if (fc instanceof SliderContainer)
-				values.append(String.format("'%s'", fc.getEntry().toString()));
+				values.add(String.format("'%s'", fc.getEntry().toString()));
 			else
-				values.append("''");
+				values.add("''");
 		}
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String qInsert0 = String.format("INSERT INTO `patients` (`clinic_id`, `pnr`, `forename`, `lastname`, `id`) VALUES ('%d', '%s', '%s', '%s', NULL)",
 				patient.getClinicID(), patient.getPersonalNumber(),
 				patient.getForename(), patient.getSurname());
-		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`%s) VALUES ('%d', '%s', '%s'%s)",
-				fields.toString(), patient.getClinicID(), patient.getPersonalNumber(),
-				sdf.format(new Date()), values.toString());
+		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, %s) VALUES ('%d', '%s', '%s', %s)",
+				String.join(", ", fields), patient.getClinicID(), patient.getPersonalNumber(),
+				sdf.format(new Date()), String.join(", ", values));
 		
 		int ret = QUERY_SUCCESS;
 		if (!patientInDatabase(patient.getPersonalNumber()))
@@ -272,8 +271,8 @@ public class MySQL_Database implements Database
 					if ((c = getContainerClass(rs.getString("type"))) == null)
 						continue;
 					qc.addQuestion(rs.getInt("id"), c, rs.getString("question"),
-							options, rs.getInt("optional") != 0,
-							rs.getInt("max_val"), rs.getInt("min_val"));
+							rs.getString("description"), options,
+							rs.getInt("optional") != 0, rs.getInt("max_val"), rs.getInt("min_val"));
 				}
 				ret = QUERY_SUCCESS;
 			}
@@ -310,8 +309,9 @@ public class MySQL_Database implements Database
 		return ret;
 	}
 	
+	@Override
 	public int loadQResults(User user, Calendar begin, Calendar end,
-			Object[] questions)
+			List<Integer> questionIDs, Object container)
 	{
 		int ret = ERROR;
 		try (Connection conn = DriverManager.getConnection(
@@ -319,14 +319,28 @@ public class MySQL_Database implements Database
 		{
 			Statement s = conn.createStatement();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			// could use a string builder here to only get the questions we want
+			
+			List<String> lstr = new ArrayList<String>();
+			for (Iterator<Integer> itr = questionIDs.iterator(); itr.hasNext();)
+				lstr.add(String.format("`question%d`", itr.next()));
+			
 			ResultSet rs = query(s, String.format(
-					"SELECT * FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'",
-					user.getClinicID(), sdf.format(begin.getTime()), sdf.format(end.getTime())));
+					"SELECT %s FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'",
+					String.join(", ", lstr), user.getClinicID(),
+					sdf.format(begin.getTime()),
+					sdf.format(end.getTime())));
+			System.out.printf("SELECT %s FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'\n",
+					String.join(", ", lstr), user.getClinicID(),
+					sdf.format(begin.getTime()),
+					sdf.format(end.getTime()));
 			if (rs != null)
 			{
 				while (rs.next())
 				{
+					List<String>lstr2 = new ArrayList<String>();
+					for (Iterator<Integer> itr = questionIDs.iterator(); itr.hasNext();)
+						lstr2.add(rs.getString(String.format("question%d", itr.next())));
+					System.out.printf("%s\n", String.join(", ", lstr2));
 					// load question results into a container
 					// get question identifiers as string and add them to
 					// the container. when displaying the data load the
@@ -336,7 +350,7 @@ public class MySQL_Database implements Database
 				ret = QUERY_SUCCESS;
 			}
 		}
-		catch (SQLException e) { }
+		catch (SQLException e) { e.printStackTrace(); }
 		return ret;
 	}
 	

@@ -45,13 +45,16 @@ public class SingleOptionContainer extends FormContainer
 	 * 
 	 * @param allowEmptyEntry {@code true} if this container allows
 	 * 		empty entry (answer/response). {@code false} if not.
-	 * @param statement The statement that the user should respond to. The
-	 * 		statement should be relevant to the options that are added
-	 * 		later.
+	 * @param statement The statement that the user should respond to.
+	 * 		The statement should be relevant to the options that are
+	 * 		added later.
+	 * @param description A more detailed description of the
+	 * 		{@code statement}.
 	 */
-	public SingleOptionContainer(boolean allowEmptyEntry, String statement)
+	public SingleOptionContainer(boolean allowEmptyEntry, String statement,
+			String description)
 	{
-		super(allowEmptyEntry, statement);
+		super(allowEmptyEntry, statement, description);
 		
 		options = new HashMap<Integer, Option>();
 		nextOption = 0;
@@ -67,7 +70,8 @@ public class SingleOptionContainer extends FormContainer
 	@Override
 	public SingleOptionContainer copy()
 	{
-		SingleOptionContainer soc = new SingleOptionContainer(allowEmpty, statement);
+		SingleOptionContainer soc = new SingleOptionContainer(
+				allowEmpty, statement, description);
 		for (Entry<Integer, Option> e : options.entrySet())
 			soc.addOption(e.getKey(), e.getValue().text);
 		return soc;

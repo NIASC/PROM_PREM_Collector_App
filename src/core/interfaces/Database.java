@@ -19,6 +19,7 @@
  */
 package core.interfaces;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -187,6 +188,9 @@ public interface Database
 	 * @see TimePeriodContainer
 	 */
 	public int loadQResultDates(User user, TimePeriodContainer tpc);
+
+	public int loadQResults(User user, Calendar begin, Calendar end,
+			List<Integer> questionIDs, Object container);
 	
 	/* Protected */
 	

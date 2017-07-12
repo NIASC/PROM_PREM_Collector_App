@@ -101,7 +101,9 @@ public class SliderDisplay extends JPanel implements FormComponentDisplay, Chang
 		this.sc = sc;
 		response = null;
 
-		JTextArea jtf = AddTextArea(sc.getStatement(), 0, 35);
+		JTextArea jtf = AddTextArea(sc.getStatement()
+				+ (sc.getDescription() != null ? "\n"+sc.getDescription() : ""),
+				0, 35);
 		add(jtf, BorderLayout.NORTH);
 		
 		slider = makeSlider(this, sc.getLowerBound(), sc.getUpperBound());

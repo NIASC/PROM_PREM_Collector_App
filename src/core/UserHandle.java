@@ -190,15 +190,15 @@ public class UserHandle
 		Form form = new Form();
 		form.insert(new FieldContainer(false, true,
 				Messages.getMessages().getInfo(
-						Messages.INFO_CURRENT_PASSWORD)),
+						Messages.INFO_CURRENT_PASSWORD), null),
 				Form.AT_END);
 		form.insert(new FieldContainer(false, true,
 				Messages.getMessages().getInfo(
-						Messages.INFO_NEW_PASSWORD)),
+						Messages.INFO_NEW_PASSWORD), null),
 				Form.AT_END);
 		form.insert(new FieldContainer(false, true,
 				Messages.getMessages().getInfo(
-						Messages.INFO_RE_NEW_PASSWORD)),
+						Messages.INFO_RE_NEW_PASSWORD), null),
 				Form.AT_END);
 		form.jumpTo(Form.AT_BEGIN);
 		

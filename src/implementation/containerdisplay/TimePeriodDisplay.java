@@ -65,24 +65,6 @@ import implementation.containerdisplay.extended.CalendarPanel;
 public class TimePeriodDisplay extends JPanel implements FormComponentDisplay
 {
 	/* public */
-
-	public static void main(String[] argv)
-	{
-		TimePeriodContainer tpc = new TimePeriodContainer(false, "Select dates");
-		tpc.addDate(new GregorianCalendar(1989, 5, 1));
-		tpc.addDate(new GregorianCalendar(1998, 1, 9));
-		tpc.addDate(new GregorianCalendar(2011, 9, 9));
-		tpc.addDate(new GregorianCalendar(1965, 12, 31)); /* lower */
-		tpc.addDate(new GregorianCalendar(2018, 1, 31)); /* upper */
-		
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.add(new TimePeriodDisplay(tpc));
-		frame.setSize(100, 100);
-		frame.pack();
-		frame.setVisible(true);
-	}
 	
 	@Override
 	public void requestFocus()
@@ -118,7 +100,9 @@ public class TimePeriodDisplay extends JPanel implements FormComponentDisplay
 		setLayout(new BorderLayout());
 		this.tpc = tpc;
 		
-		JTextArea jtf = AddTextArea(tpc.getStatement(), 0, 35);
+		JTextArea jtf = AddTextArea(tpc.getStatement()
+				+ (tpc.getDescription() != null ? "\n"+tpc.getDescription() : ""),
+				0, 35);
 		add(jtf, BorderLayout.NORTH);
 		try
 		{

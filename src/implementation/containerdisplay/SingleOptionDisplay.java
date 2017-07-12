@@ -55,19 +55,6 @@ import implementation.SwingComponents;
  */
 public class SingleOptionDisplay extends JPanel implements FormComponentDisplay, ItemListener
 {
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		SingleOptionContainer moc = new SingleOptionContainer(false, "Select options");
-		moc.addOption(0, "Option 0");
-		moc.addOption(1, "Option 1");
-		moc.addOption(2, "Option 2");
-		frame.setContentPane(new SingleOptionDisplay(moc));
-		frame.setVisible(true);
-		frame.pack();
-		
-	}
 	/* Public */
 	
 	@Override
@@ -121,7 +108,9 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		this.soc = soc;
 		responseID = null;
 
-		JTextArea jta = AddTextArea(soc.getStatement(), 0, 35);
+		JTextArea jta = AddTextArea(soc.getStatement()
+				+ (soc.getDescription() != null ? "\n"+soc.getDescription() : ""),
+				0, 35);
 		add(jta, BorderLayout.NORTH);
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());

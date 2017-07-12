@@ -44,17 +44,19 @@ public class SliderContainer extends FormContainer
 	 * @param statement The statement to initialize this form with.
 	 * 		The statement is used to explain what the slider value
 	 * 		means.
+	 * @param description A more detailed description of the
+	 * 		{@code statement}
 	 * @param min The upper bound of the slider.
 	 * @param max The lower bound of the slider.
-	 * 
 	 * @throws NullPointerException If {@code max} or {@code min} is
 	 * 		{@code null}.
 	 */
 	public SliderContainer(boolean allowEmptyEntries,
-			String statement, Integer min, Integer max)
+			String statement, String description,
+			Integer min, Integer max)
 					throws NullPointerException
 	{
-		super(allowEmptyEntries, statement);
+		super(allowEmptyEntries, statement, description);
 		if (min == null || max == null)
 			throw new NullPointerException();
 		value = null;
@@ -72,7 +74,7 @@ public class SliderContainer extends FormContainer
 	public SliderContainer copy()
 	{
 		SliderContainer sc = new SliderContainer(
-				allowEmpty, statement, lower, upper);
+				allowEmpty, statement, description, lower, upper);
 		sc.setEntry(value);
 		return sc;
 	}

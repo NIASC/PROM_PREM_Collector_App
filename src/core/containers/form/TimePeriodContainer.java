@@ -43,12 +43,14 @@ public class TimePeriodContainer extends FormContainer
 	 * @param allowEmpty Whether or not this container should require an
 	 * 		entry / user response.
 	 * @param statement The statement that the user should respond to.
-	 * 
+	 * @param description A more detailed description of the
+	 * 		{@code statement}
 	 * @see #addDate(int, int, int)
 	 */
-	public TimePeriodContainer(boolean allowEmpty, String statement)
+	public TimePeriodContainer(boolean allowEmpty, String statement,
+			String description)
 	{
-		super(allowEmpty, statement);
+		super(allowEmpty, statement, description);
 	}
 
 	@Override
@@ -61,7 +63,8 @@ public class TimePeriodContainer extends FormContainer
 	@Override
 	public TimePeriodContainer copy()
 	{
-		TimePeriodContainer tpc = new TimePeriodContainer(allowEmpty, statement);
+		TimePeriodContainer tpc = new TimePeriodContainer(
+				allowEmpty, statement, description);
 		tpc.addDate((GregorianCalendar) lowerLimit.clone());
 		tpc.addDate((GregorianCalendar) upperLimit.clone());
 		return tpc;

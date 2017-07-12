@@ -20,6 +20,8 @@
 package core;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -88,7 +90,7 @@ public class ViewData
 	{
 		Form form = new Form();
 		TimePeriodContainer timeperiod = new TimePeriodContainer(false,
-				"Select which period you want to see statistics for.");
+				"Select which period you want to see statistics for.", null);
 		Implementations.Database().loadQResultDates(userHandle.getUser(), timeperiod);
 		form.insert(timeperiod, Form.AT_END);
 		
@@ -96,7 +98,7 @@ public class ViewData
 		QuestionContainer qc = Questions.getQuestions().getContainer();
 		MultipleOptionContainer questionselect =
 				new MultipleOptionContainer(false,
-						"Select which questions you would like to view");
+						"Select which questions you would like to view", null);
 		
 		for (int i = 0; i < qc.getSize(); ++i)
 			questionselect.addOption(i, qc.getContainer(i).getStatement());
@@ -137,9 +139,11 @@ public class ViewData
 				sdf.format(upper.getTime()));
 		
 		System.out.printf("Selected questions:\n");
+		Implementations.Database().loadQResults(userHandle.getUser(), lower, upper, new ArrayList<Integer>(selQuestions.keySet()), null);
+		/*
 		for (Iterator<String> itr = selQuestions.values().iterator(); itr.hasNext();)
 			System.out.printf("%s\n", itr.next());
-		
+		*/
 		
 		rfc.valid = true;
 		return rfc;

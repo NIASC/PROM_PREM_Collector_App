@@ -64,6 +64,7 @@ public class QuestionContainer
 	 * 		etc.) as it appears in the database.
 	 * @param question The question/statement that the user should
 	 * 		respond to.
+	 * @param description TODO
 	 * @param options The available options to select in response to
 	 * 		the question/statement. If this entry type does not have
 	 * 		options this variable will be discarded can be set to
@@ -77,18 +78,18 @@ public class QuestionContainer
 	 * @param lower The lower limit for this entry. If this user is
 	 * 		supposed to enter a numerical value this should be the
 	 * 		lower limit for that value.
-	 * 
 	 * @see Questionnaire
 	 */
 	public synchronized void addQuestion(int id,
 			Class<? extends FormContainer> type, String question,
-			List<String> options, boolean optional, Integer upper,
-			Integer lower)
+			String description, List<String> options, boolean optional,
+			Integer upper, Integer lower)
 	{
 		if (questions.containsKey(id))
 			return;
 		Question q = new Question(
-				id, type, question, options, optional, upper, lower);
+				id, type, question, description, options, optional,
+				upper, lower);
 		questions.put(id, q);
 		indexToID.put(index++, id);
 	}
@@ -135,7 +136,8 @@ public class QuestionContainer
 			for (int i = 0; i < index; ++i)
 			{
 				Question q = questions.get(indexToID.get(i));
-				qc.addQuestion(indexToID.get(i), q.type, q.question,
+				qc.addQuestion(
+						indexToID.get(i), q.type, q.question, q.description,
 						q.options, q.optional, q.upper, q.lower);
 			}
 		}
@@ -174,6 +176,12 @@ public class QuestionContainer
 		 * The question/statement of this question.
 		 */
 		private String question;
+		
+		/**
+		 * A more detailed description of the {@link #question}.
+		 */
+		private String description;
+		
 		/**
 		 * The available options for this question.
 		 */
@@ -200,6 +208,7 @@ public class QuestionContainer
 		 * 		Slider, Field
 		 * @param question The question/statement that the user should
 		 * 		respond to.
+		 * @param description TODO
 		 * @param options The available options to select in response
 		 * 		to the question/statement. If this entry type does not
 		 * 		have options this variable will be discarded can be
@@ -215,12 +224,13 @@ public class QuestionContainer
 		 * 		the lower limit for that value.
 		 */
 		private Question(int id, Class<? extends FormContainer> type,
-				String question, List<String> options,
-				boolean optional, Integer upper, Integer lower)
+				String question, String description,
+				List<String> options, boolean optional, Integer upper, Integer lower)
 		{
 			this.id = id;
 			this.type = type;
 			this.question = question;
+			this.description = description;
 			this.options = options;
 			this.optional = optional;
 			this.upper = upper;
@@ -241,8 +251,8 @@ public class QuestionContainer
 				return null;
 			if (type.isAssignableFrom(SingleOptionContainer.class))
 			{
-				SingleOptionContainer soc =
-						new SingleOptionContainer(optional, question);
+				SingleOptionContainer soc = new SingleOptionContainer(
+						optional, question, description);
 				int i = 0;
 				for (Iterator<String> itr = options.iterator(); itr.hasNext(); ++i)
 					soc.addOption(i, itr.next());
@@ -250,18 +260,18 @@ public class QuestionContainer
 			}
 			else if (type.isAssignableFrom(MultipleOptionContainer.class))
 			{
-				MultipleOptionContainer moc =
-						new MultipleOptionContainer(optional, question);
+				MultipleOptionContainer moc = new MultipleOptionContainer(
+						optional, question, description);
 				int i = 0;
 				for (Iterator<String> itr = options.iterator(); itr.hasNext(); ++i)
 					moc.addOption(i, itr.next());
 				return moc;
 			}
 			else if (type.isAssignableFrom(FieldContainer.class))
-				return new FieldContainer(optional, false, question);
+				return new FieldContainer(optional, false, question, description);
 			else if (type.isAssignableFrom(SliderContainer.class))
 				return new SliderContainer(
-						optional, question, lower, upper);
+						optional, question, description, lower, upper);
 			else if (type.isAssignableFrom(TimePeriodContainer.class))
 				return null;
 			else

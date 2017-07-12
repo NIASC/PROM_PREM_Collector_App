@@ -26,6 +26,7 @@ import core.containers.MessageContainer;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
 import core.containers.User;
+import core.containers.form.FormContainer;
 import core.containers.form.TimePeriodContainer;
 
 /**
@@ -66,15 +67,18 @@ public interface Database
 			String password, String salt, int clinic, String email);
 	
 	/**
-	 * Adds a new patient to the database.
+	 * Adds a patient's answers to the database. If the patient does not
+	 * already exist in the database it will be added as well.
 	 * 
 	 * @param patient The patient to add
-	 * @param answers The questionnaire form.
+	 * @param answers The questionnaire form containers.  The containers
+	 * 		should be in the same order as the questions in the
+	 * 		questionnaire.
 	 * 
 	 * @return {@code QUERY_SUCCESS} on successful update,
 	 * 		{@code ERROR} on failure.
 	 */
-	public int addQuestionnaireAnswers(Patient patient, List<Object> answers);
+	public int addQuestionnaireAnswers(Patient patient, List<FormContainer> answers);
 
 	/**
 	 * Adds a new clinic to the database.

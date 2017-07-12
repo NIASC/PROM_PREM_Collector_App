@@ -27,10 +27,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -39,8 +41,14 @@ import core.containers.MessageContainer;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
 import core.containers.User;
+import core.containers.form.FieldContainer;
+import core.containers.form.FormContainer;
+import core.containers.form.SingleOptionContainer;
+import core.containers.form.SliderContainer;
 import core.containers.form.TimePeriodContainer;
 import core.interfaces.Database;
+import core.interfaces.Questions;
+import implementation.containerdisplay.SingleOptionDisplay;
 
 /**
  * This class is an example of an implementation of
@@ -91,28 +99,40 @@ public class MySQL_Database implements Database
 	}
 
 	@Override
-	public int addQuestionnaireAnswers(Patient patient, List<Object> answers)
+	public int addQuestionnaireAnswers(Patient patient, List<FormContainer> answers)
 	{
-		int nQuestions = 6;
-		if (answers.size() < nQuestions)
+		int nQuestions = Questions.getQuestions().getContainer().getSize();
+		if (answers.size() != nQuestions)
 			return ERROR;
-		String[] ans = new String[nQuestions];
-		for (int i = 0; i < ans.length; ++i)
+		
+		StringBuilder values = new StringBuilder();
+		StringBuilder fields = new StringBuilder();
+		int i = 0;
+		for (Iterator<FormContainer> itr = answers.iterator(); itr.hasNext(); ++i)
 		{
-			if (i < 5) // single option
-				ans[i] = "option" + answers.get(i).toString();
-			else if (i == 5) // slider
-				ans[i] = answers.get(i).toString();
+			fields.append(String.format(", `question%d`", i));
+			values.append(", ");
+			FormContainer fc = itr.next();
+			if (fc.getEntry() == null)
+			{
+				values.append("''");
+				continue;
+			}
+			if (fc instanceof SingleOptionContainer)
+				values.append(String.format("'option%s'", fc.getEntry().toString()));
+			else if (fc instanceof SliderContainer)
+				values.append(String.format("'%s'", fc.getEntry().toString()));
 			else
-				ans[i] = "";
+				values.append("''");
 		}
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String qInsert0 = String.format("INSERT INTO `patients` (`clinic_id`, `pnr`, `forename`, `lastname`, `id`) VALUES ('%d', '%s', '%s', '%s', NULL)",
-				patient.getClinicID(), patient.getPersonalNumber(), patient.getForename(), patient.getSurname());
-		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, `question0`, `question1`, `question2`, `question3`, `question4`, `question5`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
-				patient.getClinicID(), patient.getPersonalNumber(), sdf.format(new Date()),
-				ans[0], ans[1], ans[2], ans[3], ans[4], ans[5]);
+				patient.getClinicID(), patient.getPersonalNumber(),
+				patient.getForename(), patient.getSurname());
+		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`%s) VALUES ('%d', '%s', '%s'%s)",
+				fields.toString(), patient.getClinicID(), patient.getPersonalNumber(),
+				sdf.format(new Date()), values.toString());
 		
 		int ret = QUERY_SUCCESS;
 		if (!patientInDatabase(patient.getPersonalNumber()))
@@ -226,17 +246,33 @@ public class MySQL_Database implements Database
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
 			Statement s = conn.createStatement();
-			ResultSet rs = query(s, "SELECT `id`, `type`, `optional`, `question`, `option0`, `option1`, `option2`, `max_val`, `min_val` FROM `questionnaire`");
+			ResultSet rs = query(s, "SELECT * FROM `questionnaire`");
 			if (rs != null)
 			{
 				while (rs.next())
 				{
-					qc.addQuestion(rs.getInt("id"), rs.getString("type"),
-							rs.getString("question"), new String[]{
-									rs.getString("option0"),
-									rs.getString("option1"),
-									rs.getString("option2")},
-							rs.getInt("optional") != 0,
+					/* Allows for arbitrary number of options */
+					List<String> options = new ArrayList<String>();
+					for (int i = 0; ;++i)
+					{
+						try
+						{
+							String entry = rs.getString(String.format("option%d", i));
+							if (entry == null || (entry = entry.trim()).isEmpty())
+								break;
+							options.add(entry);
+						}
+						catch (SQLException e)
+						{
+							break;
+						}
+					}
+					
+					Class<? extends FormContainer> c;
+					if ((c = getContainerClass(rs.getString("type"))) == null)
+						continue;
+					qc.addQuestion(rs.getInt("id"), c, rs.getString("question"),
+							options, rs.getInt("optional") != 0,
 							rs.getInt("max_val"), rs.getInt("min_val"));
 				}
 				ret = QUERY_SUCCESS;
@@ -406,6 +442,34 @@ public class MySQL_Database implements Database
 		}
 		catch (SQLException e) { }
 		return ret;
+	}
+	
+	/**
+	 * This method converts a container type from the String
+	 * representation in the database to the appropriate class
+	 * representation in java.
+	 * 
+	 * @param type The type of container as it appears in the database
+	 * 		(SingleOption, Slider, Field etc.).
+	 * 
+	 * @return The class representation of the supplied {@code type}.
+	 * 		The classes can be acquired using isAssignableFrom.<Br>
+	 * 		Example:<br>
+	 * 		<code>if (getContainerClass("Slider").isAssignableFrom(SliderContainer.class))
+	 * 		new SliderContainer( ... );</code>
+	 * 
+	 * @see Class#isAssignableFrom
+	 */
+	private Class<? extends FormContainer> getContainerClass(String type)
+	{
+		if (type.equalsIgnoreCase("SingleOption"))
+			return SingleOptionContainer.class;
+		else if (type.equalsIgnoreCase("Field"))
+			return FieldContainer.class;
+		else if (type.equalsIgnoreCase("Slider"))
+			return SliderContainer.class;
+		else
+			return null;
 	}
 
 	/**

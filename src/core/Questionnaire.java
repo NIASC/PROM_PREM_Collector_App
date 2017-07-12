@@ -20,12 +20,14 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import core.containers.Form;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
 import core.containers.form.FieldContainer;
+import core.containers.form.FormContainer;
 import core.interfaces.Database;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
@@ -118,7 +120,7 @@ public class Questionnaire
 			return;
 		Form form = new Form();
 		for (int i = 0; i < questions.getSize(); ++i)
-			form.insert(questions.getQuestion(i), Form.AT_END);
+			form.insert(questions.getContainer(i), Form.AT_END);
 		form.jumpTo(Form.AT_BEGIN);
 		
 		ui.presentForm(form, this::saveQuestionaire, false);
@@ -175,14 +177,14 @@ public class Questionnaire
 	private RetFunContainer saveQuestionaire(Form form)
 	{
 		RetFunContainer rfc = new RetFunContainer(null);
-		List<Object> answers = new ArrayList<Object>();
+		List<FormContainer> answers = new ArrayList<FormContainer>();
 		form.jumpTo(Form.AT_BEGIN);
 		do
-			answers.add(form.currentEntry().getEntry());
+			answers.add(form.currentEntry());
 		while (form.nextEntry() != null);
 		
-		if (Implementations.Database().addQuestionnaireAnswers(
-				patient, answers) == Database.ERROR)
+		if (Implementations.Database().addQuestionnaireAnswers(patient,
+				Collections.unmodifiableList(answers)) == Database.ERROR)
 		{
 			rfc.message = Database.DATABASE_ERROR;
 			return rfc;

@@ -20,12 +20,16 @@
 package core.containers;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import core.Questionnaire;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
+import core.containers.form.MultipleOptionContainer;
 import core.containers.form.SingleOptionContainer;
 import core.containers.form.SliderContainer;
+import core.containers.form.TimePeriodContainer;
 
 /**
  * This class is a container for {@code Questionnaire} entries.
@@ -76,8 +80,10 @@ public class QuestionContainer
 	 * 
 	 * @see Questionnaire
 	 */
-	public synchronized void addQuestion(int id, String type, String question,
-			String[] options, boolean optional, Integer upper, Integer lower)
+	public synchronized void addQuestion(int id,
+			Class<? extends FormContainer> type, String question,
+			List<String> options, boolean optional, Integer upper,
+			Integer lower)
 	{
 		if (questions.containsKey(id))
 			return;
@@ -88,20 +94,26 @@ public class QuestionContainer
 	}
 	
 	/**
-	 * Retrieves the question labeled with {@code index} which
-	 * represents the order in which questions were added.
+	 * Retrieves the question labeled with {@code index} which represents
+	 * the order in which questions were added.
 	 * 
 	 * @param index The index for the question.
 	 * 
-	 * @return The container for the question labeled with
-	 * 		{@code index}.
+	 * @return The container for the question labeled with {@code index} if
+	 * 		that question exist. Else {@code null} is returned.
 	 */
-	public FormContainer getQuestion(int index)
+	public FormContainer getContainer(int index)
+	{
+		Question q = getQuestion(index);
+		return q != null ? q.getContainer() : null;
+	}
+	
+	public Question getQuestion(int index)
 	{
 		if (indexToID.containsKey(index)
 				&& questions.containsKey(indexToID.get(index)))
 		{
-			return questions.get(indexToID.get(index)).getContainer();
+			return questions.get(indexToID.get(index));
 		}
 		return null;
 	}
@@ -144,51 +156,54 @@ public class QuestionContainer
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private final class Question
+	public final class Question
 	{
-		int id;
+		private int id;
 		
 		/**
 		 * Whether or not it is not required to answer this question.
 		 */
-		boolean optional;
+		private boolean optional;
 		/**
-		 * The type of question (Slider, SelectOption, Field etc.)
+		 * The type of question (SliderContainer, SingleOptionContainer,
+		 * FieldContainer etc.)
 		 */
-		String type;
+		private Class<? extends FormContainer> type;
 		
 		/**
 		 * The question/statement of this question.
 		 */
-		String question;
+		private String question;
 		/**
 		 * The available options for this question.
 		 */
-		String[] options;
+		private List<String> options;
 		
 		/**
 		 * The upper limit for this entry.
 		 */
-		Integer upper;
+		private Integer upper;
 		
 		/**
 		 * The lower limit for this entry.
 		 */
-		Integer lower;
+		private Integer lower;
 		
 		/**
+-----------------------------------------------------------------------_--------
 		 * Adds a {@code Questionnaire} entry to this container.
 		 * 
 		 * @param id The ID of the question (as it appears in the
 		 * 		database).
-		 * @param type The type of question (Slider, SelectOption,
-		 * 		Field etc.) as it appears in the database.
+		 * @param type The type of question as it appears in the
+		 * 		database. Valid types are currently: SingleOption,
+		 * 		Slider, Field
 		 * @param question The question/statement that the user should
 		 * 		respond to.
 		 * @param options The available options to select in response
 		 * 		to the question/statement. If this entry type does not
 		 * 		have options this variable will be discarded can be
-		 * 		set to {@null}.
+		 * 		set to {@code null}.
 		 * @param optional If it is <i><b>not</b></i> required to
 		 * 		answer this question this should be set to
 		 * 		{@code true} else {@code false}.
@@ -199,9 +214,9 @@ public class QuestionContainer
 		 * 		is supposed to enter a numerical value this should be
 		 * 		the lower limit for that value.
 		 */
-		public Question(int id, String type, String question,
-				String[] options, boolean optional,
-				Integer upper, Integer lower)
+		private Question(int id, Class<? extends FormContainer> type,
+				String question, List<String> options,
+				boolean optional, Integer upper, Integer lower)
 		{
 			this.id = id;
 			this.type = type;
@@ -220,21 +235,35 @@ public class QuestionContainer
 		 * 
 		 * @see FormContainer
 		 */
-		public FormContainer getContainer()
+		private FormContainer getContainer()
 		{
-			if (type.equalsIgnoreCase("SingleOption"))
+			if (type == null)
+				return null;
+			if (type.isAssignableFrom(SingleOptionContainer.class))
 			{
 				SingleOptionContainer soc =
 						new SingleOptionContainer(optional, question);
-				for (int i = 0; i < options.length; ++i)
-					soc.addOption(i, options[i]);
+				int i = 0;
+				for (Iterator<String> itr = options.iterator(); itr.hasNext(); ++i)
+					soc.addOption(i, itr.next());
 				return soc;
 			}
-			else if (type.equalsIgnoreCase("Field"))
+			else if (type.isAssignableFrom(MultipleOptionContainer.class))
+			{
+				MultipleOptionContainer moc =
+						new MultipleOptionContainer(optional, question);
+				int i = 0;
+				for (Iterator<String> itr = options.iterator(); itr.hasNext(); ++i)
+					moc.addOption(i, itr.next());
+				return moc;
+			}
+			else if (type.isAssignableFrom(FieldContainer.class))
 				return new FieldContainer(optional, false, question);
-			else if (type.equalsIgnoreCase("Slider"))
+			else if (type.isAssignableFrom(SliderContainer.class))
 				return new SliderContainer(
 						optional, question, lower, upper);
+			else if (type.isAssignableFrom(TimePeriodContainer.class))
+				return null;
 			else
 				return null;
 		}

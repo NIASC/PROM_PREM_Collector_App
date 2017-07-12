@@ -99,7 +99,7 @@ public class ViewData
 						"Select which questions you would like to view");
 		
 		for (int i = 0; i < qc.getSize(); ++i)
-			questionselect.addOption(i, qc.getQuestion(i).getStatement());
+			questionselect.addOption(i, qc.getContainer(i).getStatement());
 		form.insert(questionselect, Form.AT_END);
 
 		form.jumpTo(Form.AT_BEGIN);

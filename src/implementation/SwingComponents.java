@@ -192,7 +192,7 @@ public class SwingComponents
 		SwingComponents.modifyJComponent(slider, name, tooltip, opaque,
 				background, foreground, border, d);
 		slider = new JSlider(JSlider.HORIZONTAL,
-				lowerBound, upperBound, (lowerBound + upperBound) / 2);
+				lowerBound, upperBound, lowerBound);
 		if (listener != null)
 			slider.addChangeListener(listener);
 		slider.setMajorTickSpacing((lowerBound + upperBound) / 2);

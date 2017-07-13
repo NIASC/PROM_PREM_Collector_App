@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * This class handles multiple-option objects. It allows you to
@@ -61,8 +62,8 @@ public class MultipleOptionContainer extends FormContainer
 	{
 		super(allowEmptyEntry, statement, description);
 		
-		options = new HashMap<Integer, Option>();
-		selected = new HashMap<Integer, Option>();
+		options = new TreeMap<Integer, Option>();
+		selected = new TreeMap<Integer, Option>();
 		nextOption = 0;
 	}
 
@@ -83,15 +84,9 @@ public class MultipleOptionContainer extends FormContainer
 	}
 	
 	@Override
-	public Map<Integer, String> getEntry()
+	public List<Integer> getEntry()
 	{
-		/* Since this container should not have many items (<10) this way
-		 * of retrieving the identifiers should be fast enough.
-		 */
-		HashMap<Integer, String> sopts = new HashMap<Integer, String>();
-		for (Entry<Integer, Option> e : selected.entrySet())
-			sopts.put(e.getKey(), e.getValue().text);
-		return Collections.unmodifiableMap(sopts);
+		return Collections.unmodifiableList(new ArrayList<Integer>(selected.keySet()));
 	}
 	
 	/**
@@ -144,9 +139,9 @@ public class MultipleOptionContainer extends FormContainer
 	 * 		(the order at which they where added to this container,
 	 * 		starting from 0).
 	 */
-	public HashMap<Integer, String> getOptions()
+	public Map<Integer, String> getOptions()
 	{
-		HashMap<Integer, String> sopts = new HashMap<Integer, String>();
+		Map<Integer, String> sopts = new TreeMap<Integer, String>();
 		for (Entry<Integer, Option> e : options.entrySet())
 			sopts.put(e.getKey(), e.getValue().text);
 		return sopts;
@@ -166,7 +161,7 @@ public class MultipleOptionContainer extends FormContainer
 	
 	/* Private */
 	
-	private HashMap<Integer, Option> options, selected;
+	private Map<Integer, Option> options, selected;
 	private int nextOption;
 	
 	/**

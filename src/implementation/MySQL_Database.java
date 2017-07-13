@@ -29,12 +29,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import core.Utilities;
 import core.containers.MessageContainer;
@@ -45,6 +48,7 @@ import core.containers.StatisticsContainer;
 import core.containers.User;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
+import core.containers.form.MultipleOptionContainer;
 import core.containers.form.SingleOptionContainer;
 import core.containers.form.SliderContainer;
 import core.containers.form.TimePeriodContainer;
@@ -110,21 +114,10 @@ public class MySQL_Database implements Database
 		List<String> values = new ArrayList<String>();
 		List<String> fields = new ArrayList<String>();
 		int i = 0;
-		for (Iterator<FormContainer> itr = answers.iterator(); itr.hasNext(); ++i)
+		for (Iterator<FormContainer> itr = answers.iterator(); itr.hasNext();)
 		{
-			fields.add(String.format("`question%d`", i));
-			FormContainer fc = itr.next();
-			if (fc.getEntry() == null)
-			{
-				values.add("''");
-				continue;
-			}
-			if (fc instanceof SingleOptionContainer)
-				values.add(String.format("'option%s'", fc.getEntry().toString()));
-			else if (fc instanceof SliderContainer)
-				values.add(String.format("'%s'", fc.getEntry().toString()));
-			else
-				values.add("''");
+			fields.add(String.format("`question%d`", i++));
+			values.add(QDBFormat.getDBFormat(itr.next()));
 		}
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -341,13 +334,7 @@ public class MySQL_Database implements Database
 						int qid = itr.next();
 						Question q1 = qc.getQuestion(qid);
 						String q = String.format("question%d", qid);
-						if (rs.getString(q).startsWith("option"))
-						{
-							int ansID = new Integer(rs.getString(q).substring("option".length()));
-							container.addResult(q1.getStatement(), q1.getOptions(ansID));
-						}
-						else
-							container.addResult(q1.getStatement(), rs.getString(q));
+						container.addResult(q1, QDBFormat.getQFormat(rs.getString(q)));
 					}
 					/* when displaying the data load the questions and display
 					 * the answer rather than the question identifier.
@@ -366,6 +353,7 @@ public class MySQL_Database implements Database
 
 	private static MySQL_Database database;
 	private DatabaseConfig dbConfig;
+	private QDBFormat fmtConv;
 	
 	/**
 	 * Initializes variables and loads the database configuration.
@@ -490,6 +478,65 @@ public class MySQL_Database implements Database
 			return SliderContainer.class;
 		else
 			return null;
+	}
+	
+	private static class QDBFormat
+	{
+		static String getDBFormat(FormContainer fc)
+		{
+			if (fc.getEntry() == null)
+				return "''";
+			
+			if (fc instanceof SingleOptionContainer)
+			{
+				SingleOptionContainer soc = (SingleOptionContainer) fc;
+				return String.format("'option%d'", soc.getEntry());
+			}
+			else if (fc instanceof MultipleOptionContainer)
+			{
+				MultipleOptionContainer moc = (MultipleOptionContainer) fc;
+				List<String> lstr = new ArrayList<String>();
+				List<Integer> lint = new ArrayList<Integer>(moc.getEntry());
+				Collections.sort(lint);
+				for (Iterator<Integer> itr = lint.iterator(); itr.hasNext();)
+					lstr.add(String.format("option%d", itr.next()));
+				return String.format("[%s]", String.join(",", lstr));
+			}
+			else if (fc instanceof SliderContainer)
+			{
+				SliderContainer sc = (SliderContainer) fc;
+				return String.format("'slider%d'", sc.getEntry());
+			}
+			else
+				return "''";
+		}
+		
+		static Object getQFormat(String dbEntry)
+		{
+			if (dbEntry == null || dbEntry.isEmpty())
+				return null;
+			
+			if (dbEntry.startsWith("option"))
+			{ /* single option */
+				return new Integer(dbEntry.substring("option".length()));
+			}
+			else if (dbEntry.startsWith("slider"))
+			{ /* slider */
+				return new Integer(dbEntry.substring("slider".length()));
+			}
+			else if (dbEntry.startsWith("[") &&  dbEntry.endsWith("]"))
+			{ /* multiple answers */
+				String[] entries = dbEntry.split(",");
+				if (entries[0].startsWith("option"))
+				{ /* multiple option */
+					List<Integer> lint = new ArrayList<Integer>();
+					for (String s : dbEntry.split(","))
+						lint.add(new Integer(s.substring("option".length())));
+					return lint.toArray(new Integer[0]);
+				}
+			}
+			return null;
+		}
 	}
 
 	/**

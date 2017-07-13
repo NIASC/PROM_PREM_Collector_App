@@ -20,8 +20,12 @@
  */
 package core.containers.form;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class contains data for selecting a time period. It contains an
@@ -51,13 +55,14 @@ public class TimePeriodContainer extends FormContainer
 			String description)
 	{
 		super(allowEmpty, statement, description);
+		entries = new ArrayList<Calendar>();
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
 		return allowEmpty
-				|| (upperSelected != null && lowerSelected != null);
+				|| (upperSel != null && lowerSel != null);
 	}
 
 	@Override
@@ -65,15 +70,15 @@ public class TimePeriodContainer extends FormContainer
 	{
 		TimePeriodContainer tpc = new TimePeriodContainer(
 				allowEmpty, statement, description);
-		tpc.addDate((GregorianCalendar) lowerLimit.clone());
-		tpc.addDate((GregorianCalendar) upperLimit.clone());
+		tpc.addDate((GregorianCalendar) lowerLim.clone());
+		tpc.addDate((GregorianCalendar) upperLim.clone());
 		return tpc;
 	}
 
 	@Override
 	public Calendar[] getEntry()
 	{
-		return new Calendar[]{lowerSelected, upperSelected};
+		return new Calendar[]{lowerSel, upperSel};
 	}
 	
 	/**
@@ -91,15 +96,15 @@ public class TimePeriodContainer extends FormContainer
 			GregorianCalendar upper)
 	{
 		/* check for out of bounds */
-		if (lower.compareTo(lowerLimit) < 0)
-			lower = (GregorianCalendar) lowerLimit.clone();
-		else if (lower.compareTo(upperLimit) > 0)
-			lower = (GregorianCalendar) upperLimit.clone();
+		if (lower.compareTo(lowerLim) < 0)
+			lower = (GregorianCalendar) lowerLim.clone();
+		else if (lower.compareTo(upperLim) > 0)
+			lower = (GregorianCalendar) upperLim.clone();
 
-		if (upper.compareTo(lowerLimit) < 0)
-			upper = (GregorianCalendar) lowerLimit.clone();
-		else if (upper.compareTo(upperLimit) > 0)
-			upper = (GregorianCalendar) upperLimit.clone();
+		if (upper.compareTo(lowerLim) < 0)
+			upper = (GregorianCalendar) lowerLim.clone();
+		else if (upper.compareTo(upperLim) > 0)
+			upper = (GregorianCalendar) upperLim.clone();
 		
 		/* switch if wrong order */
 		if (lower.compareTo(upper) > 0)
@@ -109,8 +114,15 @@ public class TimePeriodContainer extends FormContainer
 			upper = tmp;
 		}
 		
-		lowerSelected = lower;
-		upperSelected = upper;
+		lowerSel = lower;
+		upperSel = upper;
+		nSelDates = 0;
+		for (Iterator<Calendar> itr = entries.iterator(); itr.hasNext();)
+		{
+			Calendar cal = itr.next();
+			if (cal.compareTo(lowerSel) >= 0 && cal.compareTo(upperSel) <= 0)
+				nSelDates++;
+		}
 		return true;
 	}
 	
@@ -125,11 +137,12 @@ public class TimePeriodContainer extends FormContainer
 	{
 		if (cal == null)
 			return;
-		if (lowerLimit == null || lowerLimit.compareTo(cal) > 0)
-			lowerLimit = (GregorianCalendar) cal.clone();
-		if (upperLimit == null || upperLimit.compareTo(cal) < 0)
-			upperLimit = (GregorianCalendar) cal.clone();
-		nDates++;
+		if (lowerLim == null || lowerLim.compareTo(cal) > 0)
+			lowerLim = (GregorianCalendar) cal.clone();
+		if (upperLim == null || upperLim.compareTo(cal) < 0)
+			upperLim = (GregorianCalendar) cal.clone();
+		entries.add(cal);
+		Collections.sort(entries);
 	}
 	
 	/**
@@ -139,7 +152,7 @@ public class TimePeriodContainer extends FormContainer
 	 */
 	public GregorianCalendar getLowerLimit()
 	{
-		return (GregorianCalendar) lowerLimit.clone();
+		return (GregorianCalendar) lowerLim.clone();
 	}
 	
 	/**
@@ -149,7 +162,7 @@ public class TimePeriodContainer extends FormContainer
 	 */
 	public GregorianCalendar getUpperLimit()
 	{
-		return (GregorianCalendar) upperLimit.clone();
+		return (GregorianCalendar) upperLim.clone();
 	}
 	
 	/**
@@ -160,9 +173,15 @@ public class TimePeriodContainer extends FormContainer
 	 */
 	public int getDateCount()
 	{
-		return nDates;
+		return entries.size();
 	}
 	
-	private int nDates;
-	private Calendar upperLimit, lowerLimit, upperSelected, lowerSelected;
+	public int getPeriodEntries()
+	{
+		return nSelDates;
+	}
+	
+	private Calendar upperLim, lowerLim, upperSel, lowerSel;
+	private List<Calendar> entries;
+	private int nSelDates;
 }

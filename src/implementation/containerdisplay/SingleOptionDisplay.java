@@ -27,7 +27,9 @@ import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -121,9 +123,9 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		gbc.gridx = 0;
 
 		ButtonGroup group = new ButtonGroup();
-		HashMap<Integer, String> opt = soc.getOptions();
+		Map<Integer, String> opt = soc.getOptions();
 		Integer selected = soc.getSelectedID();
-		options = new HashMap<String, JRadioButton>();
+		options = new TreeMap<String, JRadioButton>();
 		int gridy = 0;
 		for (Entry<Integer, String> e : opt.entrySet())
 		{
@@ -146,7 +148,7 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	private SingleOptionContainer soc;
 	private Integer responseID;
 	
-	private HashMap<String, JRadioButton> options;
+	private Map<String, JRadioButton> options;
 	
 	private static JRadioButton addToggleButton(
 			String buttonText, String name, ItemListener listener)

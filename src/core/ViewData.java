@@ -33,8 +33,11 @@ import java.util.Map.Entry;
 import core.containers.Form;
 import core.containers.QuestionContainer;
 import core.containers.StatisticsContainer;
+import core.containers.StatisticsContainer.Statistics;
 import core.containers.form.FieldContainer;
 import core.containers.form.MultipleOptionContainer;
+import core.containers.form.SingleOptionContainer;
+import core.containers.form.SliderContainer;
 import core.containers.form.TimePeriodContainer;
 import core.interfaces.Implementations;
 import core.interfaces.Messages;
@@ -95,7 +98,6 @@ public class ViewData
 		Implementations.Database().loadQResultDates(userHandle.getUser(), timeperiod);
 		form.insert(timeperiod, Form.AT_END);
 		
-		/* replace this with entries from database */
 		QuestionContainer qc = Questions.getQuestions().getContainer();
 		MultipleOptionContainer questionselect =
 				new MultipleOptionContainer(false,
@@ -127,7 +129,7 @@ public class ViewData
 			rfc.message = "Invalid time period";
 			return rfc;
 		}
-		if (timeperiod.getDateCount() < 5)
+		if (timeperiod.getPeriodEntries() < 5)
 		{
 			rfc.message = "For privacy reasons the selected period must "
 					+ "contain at leas 5 entries. Please extend the period.";
@@ -135,46 +137,65 @@ public class ViewData
 		}
 		
 		// validate selected questions
-		Map<Integer, String> selQuestions = questionselect.getEntry();
+		List<Integer> selQuestions = questionselect.getEntry();
 		
-		System.out.printf("Number of entries for selected date: %d\n",
-				timeperiod.getDateCount());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		System.out.printf("Selected lower bound: %s\n",
-				sdf.format(lower.getTime()));
-		System.out.printf("Selected upper bound: %s\n",
+		System.out.printf("Displaying statistics for %d entries for period [%s -- %s]\n",
+				timeperiod.getPeriodEntries(), sdf.format(lower.getTime()),
 				sdf.format(upper.getTime()));
 		
 		StatisticsContainer sc = new StatisticsContainer();
-		System.out.printf("Selected questions:\n");
+		System.out.printf("\n");
 		Implementations.Database().loadQResults(userHandle.getUser(),
-				lower, upper, new ArrayList<Integer>(selQuestions.keySet()),
-				sc);
-		Map<String, Map<String, Integer>> res = sc.getStatistics();
-		for (Entry<String, Map<String, Integer>> q : res.entrySet())
+				lower, upper, selQuestions, sc);
+		List<Statistics> res = sc.getStatistics();
+		for (Statistics s : res)
 		{
-			List<String> lstr = new ArrayList<String>();
+			List<Object> lstr = new ArrayList<Object>();
 			List<Integer> lint = new ArrayList<Integer>();
 			int tot = 0;
-			for (Entry<String, Integer> a : q.getValue().entrySet())
+			
+			Class<?> c = s.getQuestionClass();
+			if (c.isAssignableFrom(SingleOptionContainer.class))
 			{
-				lstr.add(a.getKey());
-				lint.add(a.getValue());
-				tot += a.getValue();
+				Map<Object, Integer> ans = s.getAnswerCounts();
+				String statement;
+				Integer count;
+				for (Iterator<String> itr = s.getOptions().iterator(); itr.hasNext();)
+				{
+					statement = itr.next();
+					count = ans.get(statement);
+					lint.add(count);
+					lstr.add(statement);
+					tot += count;
+				}
+			}
+			else if (c.isAssignableFrom(SliderContainer.class))
+			{
+				Map<Object, Integer> ans = s.getAnswerCounts();
+				Integer count;
+				for (int i = s.getLowerBound(); i <= s.getUpperBound(); ++i)
+				{
+					if ((count = ans.get(i)) == null)
+						continue;
+					lint.add(count);
+					lstr.add(i);
+					tot += count;
+				}
 			}
 			StringBuilder sb = new StringBuilder();
-			sb.append(String.format("%s:\n", q.getKey()));
+			sb.append(String.format("%s:\n", s.getStatement()));
 			
-			Iterator<String> sitr;
+			Iterator<Object> sitr;
 			Iterator<Integer> iitr;
 			for (sitr = lstr.iterator(), iitr = lint.iterator();
 					sitr.hasNext() && iitr.hasNext();)
 			{
 				Integer i = iitr.next();
-				sb.append(String.format("|- %4d (%3.0f %%) - %s\n",
+				sb.append(String.format("|- %4d (%3.0f%%) - %s\n",
 						i, 100.0 * i.doubleValue() / tot, sitr.next()));
 			}
-			sb.append("|- --------------\n");
+			sb.append("|- ------------ -\n");
 			sb.append(String.format("\\- %4d (%3.0f %%) - %s\n", tot, 100D, "Total"));
 			System.out.println(sb.toString());
 		}

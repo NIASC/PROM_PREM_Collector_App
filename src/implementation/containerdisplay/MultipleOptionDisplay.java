@@ -27,7 +27,9 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
@@ -120,11 +122,11 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 		gbc.insets.bottom = gbc.insets.top = 1;
 		gbc.gridx = 0;
 
-		HashMap<Integer, String> opt = moc.getOptions();
+		Map<Integer, String> opt = moc.getOptions();
 		
 		List<Integer> selected = moc.getSelectedIDs();
 		
-		options = new HashMap<String, JCheckBox>();
+		options = new TreeMap<String, JCheckBox>();
 		int gridy = 0;
 		for (Entry<Integer, String> e : opt.entrySet())
 		{
@@ -146,7 +148,7 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 	private MultipleOptionContainer moc;
 	private List<Integer> responseID;
 	
-	private HashMap<String, JCheckBox> options;
+	private Map<String, JCheckBox> options;
 	
 	private static JCheckBox addToggleButton(
 			String buttonText, String name, ItemListener listener)

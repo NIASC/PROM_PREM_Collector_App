@@ -162,10 +162,11 @@ public class QuestionContainer
 	public final class Question
 	{
 		public int getID() { return id; }
+		public Class<?> getContainerClass() { return type; }
 		public boolean isOptional() { return optional; }
 		public String getStatement() { return question; }
 		public String getDescription() { return description; }
-		public String getOptions(int id)
+		public String getOption(int id)
 		{
 			String optn = null;
 			try
@@ -176,6 +177,10 @@ public class QuestionContainer
 				/* optn is already null */
 			}
 			return optn;
+		}
+		public List<String> getOptions()
+		{
+			return Collections.unmodifiableList(options);
 		}
 		public int getUpper() { return upper; }
 		public int getLower() { return lower; }

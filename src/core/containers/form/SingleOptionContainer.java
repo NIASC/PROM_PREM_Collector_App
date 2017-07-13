@@ -20,7 +20,9 @@
 package core.containers.form;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * This class handles single-option objects. It allows you to
@@ -56,7 +58,7 @@ public class SingleOptionContainer extends FormContainer
 	{
 		super(allowEmptyEntry, statement, description);
 		
-		options = new HashMap<Integer, Option>();
+		options = new TreeMap<Integer, Option>();
 		nextOption = 0;
 		selected = null;
 	}
@@ -124,9 +126,9 @@ public class SingleOptionContainer extends FormContainer
 	 * 		(the order at which they where added to this container,
 	 * 		starting from 0).
 	 */
-	public HashMap<Integer, String> getOptions()
+	public Map<Integer, String> getOptions()
 	{
-		HashMap<Integer, String> sopts = new HashMap<Integer, String>();
+		Map<Integer, String> sopts = new TreeMap<Integer, String>();
 		for (Entry<Integer, Option> e : options.entrySet())
 			sopts.put(e.getKey(), e.getValue().text);
 		return sopts;
@@ -141,7 +143,7 @@ public class SingleOptionContainer extends FormContainer
 	
 	/* Private */
 	
-	private HashMap<Integer, Option> options;
+	private Map<Integer, Option> options;
 	private int nextOption;
 	
 	private Integer selected;

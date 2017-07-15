@@ -30,7 +30,11 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JApplet;
@@ -509,15 +513,20 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		@Override
 		public void requestFocus()
 		{
-			Component[] c = null;
+			List<Component> lcomp = new ArrayList<Component>();
 			synchronized(getTreeLock())
 			{
-				c = getComponents();
+				lcomp.addAll(Arrays.asList(getComponents()));
 			}
-			if (c != null)
-				for (Component comp : c)
-					if (comp != null && comp == (Component) components.get(cIdx))
-						comp.requestFocus();
+			for (Iterator<Component> itr = lcomp.iterator(); itr.hasNext();)
+			{
+				Component c = itr.next();
+				if (c == (Component) components.get(cIdx))
+				{
+					c.requestFocus();
+					break;
+				}
+			}
 		}
 		
 		@Override

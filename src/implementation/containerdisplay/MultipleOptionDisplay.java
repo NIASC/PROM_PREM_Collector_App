@@ -37,6 +37,7 @@ import javax.swing.JTextArea;
 
 import core.containers.form.MultipleOptionContainer;
 import core.containers.form.SingleOptionContainer;
+import core.interfaces.Messages;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
 
@@ -108,10 +109,12 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 		responseID = new ArrayList<Integer>();
 
 		String description = "";
+		String optional = Messages.getMessages().getInfo(
+				Messages.INFO_UI_FORM_OPTIONAL);
 		if (moc.getDescription() != null && !moc.getDescription().isEmpty())
 			description = "\n\n"+moc.getDescription();
 		JTextArea jta = AddTextArea(
-				(moc.allowsEmpty() ? "(Optional) " : "") + moc.getStatement()
+				(moc.allowsEmpty() ? "("+optional+") " : "") + moc.getStatement()
 				+ description + "\n", 0, 35);
 		add(jta, BorderLayout.NORTH);
 		

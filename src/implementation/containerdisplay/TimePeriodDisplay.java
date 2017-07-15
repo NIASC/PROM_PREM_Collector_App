@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import core.containers.form.TimePeriodContainer;
+import core.interfaces.Messages;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
 import implementation.containerdisplay.extended.CalendarPanel;
@@ -100,14 +101,16 @@ public class TimePeriodDisplay extends JPanel implements FormComponentDisplay
 			dpTo = new CalendarPanel(
 					new GregorianCalendar(), new GregorianCalendar());
 		}
-		
+		Messages msg = Messages.getMessages();
 		JPanel from = new JPanel(new BorderLayout());
 		from.add(dpFrom, BorderLayout.CENTER);
-		from.add(AddLabel("From"), BorderLayout.NORTH);
+		from.add(AddLabel(msg.getInfo(Messages.INFO_VD_DATE_FROM)),
+				BorderLayout.NORTH);
 
 		JPanel to = new JPanel(new BorderLayout());
 		to.add(dpTo, BorderLayout.CENTER);
-		to.add(AddLabel("To"), BorderLayout.NORTH);
+		to.add(AddLabel(msg.getInfo(Messages.INFO_VD_DATE_TO)),
+				BorderLayout.NORTH);
 
 		add(from, BorderLayout.WEST);
 		add(to, BorderLayout.EAST);

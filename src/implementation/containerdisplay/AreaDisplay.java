@@ -29,6 +29,7 @@ import javax.swing.ScrollPaneConstants;
 
 import core.containers.form.AreaContainer;
 import core.containers.form.FieldContainer;
+import core.interfaces.Messages;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
 
@@ -82,10 +83,12 @@ public class AreaDisplay extends JPanel implements FormComponentDisplay
 		this.ac = ac;
 
 		String description = "";
+		String optional = Messages.getMessages().getInfo(
+				Messages.INFO_UI_FORM_OPTIONAL);
 		if (ac.getDescription() != null && !ac.getDescription().isEmpty())
 			description = "\n\n"+ac.getDescription();
 		JTextArea jta = AddTextArea(
-				(ac.allowsEmpty() ? "(Optional) " : "") + ac.getStatement()
+				(ac.allowsEmpty() ? "("+optional+") " : "") + ac.getStatement()
 				+ description + "\n", 0, 35, false, false);
 		add(jta, BorderLayout.NORTH);
 

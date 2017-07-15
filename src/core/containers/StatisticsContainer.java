@@ -134,9 +134,13 @@ public class StatisticsContainer
 		
 		void addAnswer(Object answer)
 		{
-			if (answer instanceof Object[])
+			if (answer instanceof List)
 			{
-				List<Object> lobj = Arrays.asList((Object[]) answer);
+				/* All 'List' objects are actually
+				 * 'List<? extends Object>' */
+				@SuppressWarnings("unchecked")
+				List<Object> lobj = (List<Object>) answer;
+				
 				for (Iterator<Object> itr = lobj.iterator(); itr.hasNext();)
 				{
 					Object o = itr.next();

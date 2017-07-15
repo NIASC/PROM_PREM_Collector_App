@@ -28,6 +28,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import core.containers.form.SliderContainer;
+import core.interfaces.Messages;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
 
@@ -96,10 +97,12 @@ ChangeListener
 		response = sc.getLowerBound();
 
 		String description = "";
+		String optional = Messages.getMessages().getInfo(
+				Messages.INFO_UI_FORM_OPTIONAL);
 		if (sc.getDescription() != null && !sc.getDescription().isEmpty())
 			description = "\n\n"+sc.getDescription();
 		JTextArea jtf = AddTextArea(
-				(sc.allowsEmpty() ? "(Optional) " : "") + sc.getStatement()
+				(sc.allowsEmpty() ? "("+optional+") " : "") + sc.getStatement()
 				+ description + "\n", 0, 35);
 		add(jtf, BorderLayout.NORTH);
 		

@@ -35,6 +35,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
 import core.containers.form.SingleOptionContainer;
+import core.interfaces.Messages;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
 
@@ -103,10 +104,12 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		responseID = null;
 
 		String description = "";
+		String optional = Messages.getMessages().getInfo(
+				Messages.INFO_UI_FORM_OPTIONAL);
 		if (soc.getDescription() != null && !soc.getDescription().isEmpty())
 			description = "\n\n"+soc.getDescription();
 		JTextArea jta = AddTextArea(
-				(soc.allowsEmpty() ? "(Optional) " : "") + soc.getStatement()
+				(soc.allowsEmpty() ? "("+optional+") " : "") + soc.getStatement()
 				+ description + "\n", 0, 35);
 		add(jta, BorderLayout.NORTH);
 		

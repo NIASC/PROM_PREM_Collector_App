@@ -27,8 +27,11 @@ import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DateFormatSymbols;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 import javax.swing.JComboBox;
@@ -71,13 +74,13 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 			throw new NullPointerException("Null bound(s)!");
 		if (lower.compareTo(upper) > 0)
 		{
-			this.lower = upper;
-			this.upper = lower;
+			this.lower = (Calendar) upper.clone();
+			this.upper = (Calendar) lower.clone();
 		}
 		else
 		{
-			this.lower = lower;
-			this.upper = upper;
+			this.lower = (Calendar) lower.clone();
+			this.upper = (Calendar) upper.clone();
 		}
 		
 		setLayout(new GridBagLayout());
@@ -86,7 +89,7 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(1, 1, 1, 1);
 		
-		date = new DateContainer(this.upper);
+		date = new DateContainer((Calendar) this.upper.clone());
 		
 		dayDropDown = AddComboBox(String.class, "dayDropDown", null);
 		monthDropDown = AddComboBox(String.class, "monthDropDown", null);
@@ -199,11 +202,11 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 	 */
 	private void initMonths(Locale l)
 	{
-		String[] monthNames = (new DateFormatSymbols(l)).getMonths();
+		List<String> monthName = Arrays.asList((new DateFormatSymbols(l)).getMonths());
 
 		monthDropDown.removeAllItems();
-		for (int i = 0; i <= date.getMaxMonthInYear(); i++)
-			monthDropDown.addItem(monthNames[i]);
+		for (Iterator<String> itr = monthName.iterator(); itr.hasNext();)
+			monthDropDown.addItem(itr.next());
 
 		monthDropDown.setSelectedIndex(date.getMonth());
 	}

@@ -21,6 +21,7 @@
 package core.containers.form;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
@@ -74,9 +75,9 @@ public class TimePeriodContainer extends FormContainer
 	}
 
 	@Override
-	public Calendar[] getEntry()
+	public List<Calendar> getEntry()
 	{
-		return new Calendar[]{lowerSel, upperSel};
+		return Collections.unmodifiableList(Arrays.asList(lowerSel, upperSel));
 	}
 	
 	/**

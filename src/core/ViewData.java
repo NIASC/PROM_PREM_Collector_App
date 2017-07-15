@@ -21,10 +21,7 @@ package core;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +32,6 @@ import core.containers.QuestionContainer;
 import core.containers.StatisticsContainer;
 import core.containers.StatisticsContainer.Statistics;
 import core.containers.form.AreaContainer;
-import core.containers.form.FieldContainer;
 import core.containers.form.MultipleOptionContainer;
 import core.containers.form.SingleOptionContainer;
 import core.containers.form.SliderContainer;
@@ -93,21 +89,23 @@ public class ViewData
 	/* Private */
 	private void queryTimePeriod()
 	{
+		Messages msg = Messages.getMessages();
 		Form form = new Form();
-		TimePeriodContainer timeperiod = new TimePeriodContainer(false,
-				"Select which period you want to see statistics for.", null);
-		Implementations.Database().loadQResultDates(userHandle.getUser(), timeperiod);
-		form.insert(timeperiod, Form.AT_END);
-		
 		QuestionContainer qc = Questions.getQuestions().getContainer();
 		MultipleOptionContainer questionselect =
-				new MultipleOptionContainer(false,
-						"Select which questions you would like to view", null);
+				new MultipleOptionContainer(false, msg.getInfo(
+						Messages.INFO_VD_SELECT_PREIOD), null);
 		
 		for (int i = 0; i < qc.getSize(); ++i)
 			questionselect.addOption(i, qc.getContainer(i).getStatement());
 		form.insert(questionselect, Form.AT_END);
 
+		TimePeriodContainer timeperiod =
+				new TimePeriodContainer(false, msg.getInfo(
+						Messages.INFO_VD_SELECT_QUESTIONS), null);
+		Implementations.Database().loadQResultDates(userHandle.getUser(), timeperiod);
+		form.insert(timeperiod, Form.AT_END);
+		
 		form.jumpTo(Form.AT_BEGIN);
 
 		userInterface.presentForm(form, this::validateSelection, false);
@@ -115,34 +113,46 @@ public class ViewData
 	
 	private RetFunContainer validateSelection(Form form)
 	{
+		Messages msg = Messages.getMessages();
 		RetFunContainer rfc = new RetFunContainer(this::displayStatistics);
 		form.jumpTo(Form.AT_BEGIN);
-		TimePeriodContainer timeperiod = (TimePeriodContainer) form.currentEntry();
-		form.jumpTo(Form.AT_NEXT);
 		MultipleOptionContainer questionselect = (MultipleOptionContainer) form.currentEntry();
 		form.jumpTo(Form.AT_NEXT);
+		TimePeriodContainer timeperiod = (TimePeriodContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
 		
-		Calendar[] bounds = timeperiod.getEntry();
-		lower = bounds[0];
-		upper = bounds[1];
+		List<Calendar> bounds = timeperiod.getEntry();
+		lower = bounds.get(0);
+		upper = bounds.get(1);
 		if (lower == null || upper == null)
 		{
-			rfc.message = "Invalid time period";
+			rfc.message = msg.getError(
+					Messages.ERROR_VD_INVALID_PERIOD);
 			return rfc;
 		}
 		if (timeperiod.getPeriodEntries() < 5)
 		{
-			rfc.message = "For privacy reasons the selected period must "
-					+ "contain at leas 5 entries. Please extend the period.";
+			rfc.message = msg.getError(
+					Messages.ERROR_VD_FEW_ENTRIES);
 			return rfc;
 		}
+		nEntries = timeperiod.getPeriodEntries();
 		
 		// validate selected questions
-		List<Integer> selQuestions = questionselect.getEntry();
+		selQuestions = questionselect.getEntry();
 		
+		rfc.valid = true;
+		return rfc;
+	}
+	
+	/**
+	 * REPLACE ME.
+	 */
+	private void displayStatistics()
+	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		System.out.printf("Displaying statistics for %d entries for period [%s -- %s]\n",
-				timeperiod.getPeriodEntries(), sdf.format(lower.getTime()),
+				nEntries, sdf.format(lower.getTime()),
 				sdf.format(upper.getTime()));
 		
 		StatisticsContainer sc = new StatisticsContainer();
@@ -165,7 +175,8 @@ public class ViewData
 				for (Iterator<String> itr = s.getOptions().iterator(); itr.hasNext();)
 				{
 					statement = itr.next();
-					count = ans.get(statement);
+					if ((count = ans.get(statement)) == null)
+						continue;
 					lint.add(count);
 					lstr.add(statement);
 					tot += count;
@@ -209,17 +220,11 @@ public class ViewData
 			sb.append(String.format("\\- %4d (%3.0f %%) - %s\n", tot, 100D, "Total"));
 			System.out.println(sb.toString());
 		}
-		
-		rfc.valid = true;
-		return rfc;
-	}
-	
-	private void displayStatistics()
-	{
-		
 	}
 	
 	private UserHandle userHandle;
 	private UserInterface userInterface;
 	private Calendar upper, lower;
+	private int nEntries;
+	private List<Integer> selQuestions;
 }

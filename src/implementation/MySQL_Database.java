@@ -28,6 +28,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -540,13 +541,13 @@ public class MySQL_Database implements Database
 			}
 			else if (dbEntry.startsWith("[") &&  dbEntry.endsWith("]"))
 			{ /* multiple answers */
-				String[] entries = dbEntry.split(",");
-				if (entries[0].startsWith("option"))
+				List<String> entries = Arrays.asList(dbEntry.split(","));
+				if (entries.get(0).startsWith("option"))
 				{ /* multiple option */
 					List<Integer> lint = new ArrayList<Integer>();
-					for (String s : dbEntry.split(","))
-						lint.add(new Integer(s.substring("option".length())));
-					return lint.toArray(new Integer[0]);
+					for (Iterator<String> itr = entries.iterator(); itr.hasNext();)
+						lint.add(new Integer(itr.next().substring("option".length())));
+					return lint;
 				}
 			}
 			else

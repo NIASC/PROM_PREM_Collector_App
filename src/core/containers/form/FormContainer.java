@@ -47,12 +47,16 @@ public abstract class FormContainer
 	
 	/**
 	 * Check if this {@code FormContainer} has been filled (i.e. an option
-	 * has been selected or the field has text in it etc.).<br>
+	 * has been selected or the field has text in it etc.).<br><br>
 	 * If this form allows empty entries ({@code allowsEmpty() == true})
-	 * then this method will always return true.
+	 * then this method should return {@code true} if an (empty) entry has
+	 * been set, but still be able to return {@code false} if an entry has
+	 * not been set. This can be facilitated using {@code entrySet}.
 	 * 
 	 * @return {@code true} if this form has entry/entries.
 	 * 		{@code false} if not.
+	 * 
+	 * @see #entrySet
 	 */
 	public abstract boolean hasEntry();
 	
@@ -194,6 +198,22 @@ public abstract class FormContainer
 	 * @see Form
 	 */
 	protected FormContainer prevFC;
+	
+	/**
+	 * This flag can be used in conjunction with setting the entry for
+	 * this container. The flag is can be used to prevent optional
+	 * containers from getting overlooked when someone searches for empty
+	 * containers while it should not prevent the form from being flagged
+	 * as fully answered if the entry was skipped on purpose.<br><br>
+	 * 
+	 * The intended use for this flag is to set it to true when the entry
+	 * is successfully filled (determined by the container itself), and
+	 * then used in {@code hasEntry()} something like this:<br>
+	 * {@code return entrySet && (allowEmpty || <conditions>)}<br>
+	 * 
+	 * @see #hasEntry()
+	 */
+	protected boolean entrySet;
 	
 	/**
 	 * if the {@code FormContainer} should allow empty entries (i.e.

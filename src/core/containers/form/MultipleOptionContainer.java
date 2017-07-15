@@ -21,7 +21,6 @@ package core.containers.form;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +69,7 @@ public class MultipleOptionContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return allowEmpty || !selected.isEmpty();
+		return entrySet && (allowEmpty || !selected.isEmpty());
 	}
 
 	@Override
@@ -100,6 +99,7 @@ public class MultipleOptionContainer extends FormContainer
 	 */
 	public boolean setEntry(List<Integer> selectedIDs)
 	{
+		entrySet = true;
 		if (selectedIDs == null)
 			return false;
 		

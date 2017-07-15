@@ -19,7 +19,6 @@
  */
 package core.containers.form;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -66,7 +65,7 @@ public class SingleOptionContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return allowEmpty || selected != null;
+		return entrySet && (allowEmpty || selected != null);
 	}
 
 	@Override
@@ -96,6 +95,7 @@ public class SingleOptionContainer extends FormContainer
 	 */
 	public boolean setEntry(Integer id)
 	{
+		entrySet = true;
 		if (id == null || options.get(id) == null)
 			return false;
 

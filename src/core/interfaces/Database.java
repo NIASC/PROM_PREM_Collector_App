@@ -20,8 +20,8 @@
 package core.interfaces;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import core.containers.MessageContainer;
 import core.containers.Patient;
@@ -93,12 +93,12 @@ public interface Database
 	public int addClinic(String clinicName);
 	
 	/**
-	 * Collects the clinic names and id and places them in a HashMap.
+	 * Collects the clinic names and id and places them in a Map.
 	 * 
-	 * @return A HashMap containing clinic id as keys and clinic names
+	 * @return A Map containing clinic id as keys and clinic names
 	 * 		as values.
 	 */
-	public HashMap<Integer, String> getClinics();
+	public Map<Integer, String> getClinics();
 	
 	/**
 	 * Collects the information about the user from the database.

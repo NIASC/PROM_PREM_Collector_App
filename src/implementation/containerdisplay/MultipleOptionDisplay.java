@@ -25,7 +25,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,7 +32,6 @@ import java.util.TreeMap;
 
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -91,7 +89,6 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 	@Override
 	public boolean entryFilled() 
 	{
-		fillEntry();
 		return moc.hasEntry();
 	}
 	
@@ -110,9 +107,12 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 		this.moc = moc;
 		responseID = new ArrayList<Integer>();
 
-		JTextArea jta = AddTextArea(moc.getStatement()
-				+ (moc.getDescription() != null ? "\n"+moc.getDescription() : ""),
-				0, 35);
+		String description = "";
+		if (moc.getDescription() != null && !moc.getDescription().isEmpty())
+			description = "\n\n"+moc.getDescription();
+		JTextArea jta = AddTextArea(
+				(moc.allowsEmpty() ? "(Optional) " : "") + moc.getStatement()
+				+ description + "\n", 0, 35);
 		add(jta, BorderLayout.NORTH);
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());

@@ -20,11 +20,13 @@
 package core.containers;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import core.Questionnaire;
+import core.containers.form.AreaContainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
 import core.containers.form.MultipleOptionContainer;
@@ -51,8 +53,8 @@ public class QuestionContainer
 	 */
 	public QuestionContainer()
 	{
-		questions = new HashMap<Integer, Question>();
-		indexToID = new HashMap<Integer, Integer>();
+		questions = new TreeMap<Integer, Question>();
+		indexToID = new TreeMap<Integer, Integer>();
 		index = 0;
 	}
 	
@@ -149,8 +151,8 @@ public class QuestionContainer
 	
 	/* private */
 
-	private HashMap<Integer, Question> questions;
-	private HashMap<Integer, Integer> indexToID;
+	private Map<Integer, Question> questions;
+	private Map<Integer, Integer> indexToID;
 	private int index;
 	
 	/**
@@ -273,7 +275,8 @@ public class QuestionContainer
 		{
 			if (type == null)
 				return null;
-			if (type.isAssignableFrom(SingleOptionContainer.class))
+			
+			if (SingleOptionContainer.class.isAssignableFrom(type))
 			{
 				SingleOptionContainer soc = new SingleOptionContainer(
 						optional, question, description);
@@ -282,7 +285,7 @@ public class QuestionContainer
 					soc.addOption(i, itr.next());
 				return soc;
 			}
-			else if (type.isAssignableFrom(MultipleOptionContainer.class))
+			else if (MultipleOptionContainer.class.isAssignableFrom(type))
 			{
 				MultipleOptionContainer moc = new MultipleOptionContainer(
 						optional, question, description);
@@ -291,12 +294,16 @@ public class QuestionContainer
 					moc.addOption(i, itr.next());
 				return moc;
 			}
-			else if (type.isAssignableFrom(FieldContainer.class))
-				return new FieldContainer(optional, false, question, description);
-			else if (type.isAssignableFrom(SliderContainer.class))
+			else if (AreaContainer.class.isAssignableFrom(type))
+			{
+				if (FieldContainer.class.isAssignableFrom(type))
+					return new FieldContainer(optional, false, question, description);
+				return new AreaContainer(optional, question, description);
+			}
+			else if (SliderContainer.class.isAssignableFrom(type))
 				return new SliderContainer(
 						optional, question, description, lower, upper);
-			else if (type.isAssignableFrom(TimePeriodContainer.class))
+			else if (TimePeriodContainer.class.isAssignableFrom(type))
 				return null;
 			else
 				return null;

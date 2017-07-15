@@ -34,6 +34,7 @@ import core.containers.Form;
 import core.containers.QuestionContainer;
 import core.containers.StatisticsContainer;
 import core.containers.StatisticsContainer.Statistics;
+import core.containers.form.AreaContainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.MultipleOptionContainer;
 import core.containers.form.SingleOptionContainer;
@@ -156,11 +157,11 @@ public class ViewData
 			int tot = 0;
 			
 			Class<?> c = s.getQuestionClass();
-			if (c.isAssignableFrom(SingleOptionContainer.class))
+			Map<Object, Integer> ans = s.getAnswerCounts();
+			Integer count;
+			if (SingleOptionContainer.class.isAssignableFrom(c))
 			{
-				Map<Object, Integer> ans = s.getAnswerCounts();
 				String statement;
-				Integer count;
 				for (Iterator<String> itr = s.getOptions().iterator(); itr.hasNext();)
 				{
 					statement = itr.next();
@@ -170,16 +171,24 @@ public class ViewData
 					tot += count;
 				}
 			}
-			else if (c.isAssignableFrom(SliderContainer.class))
+			else if (SliderContainer.class.isAssignableFrom(c))
 			{
-				Map<Object, Integer> ans = s.getAnswerCounts();
-				Integer count;
 				for (int i = s.getLowerBound(); i <= s.getUpperBound(); ++i)
 				{
 					if ((count = ans.get(i)) == null)
 						continue;
 					lint.add(count);
 					lstr.add(i);
+					tot += count;
+				}
+			}
+			else if (AreaContainer.class.isAssignableFrom(c))
+			{
+				for (Entry<Object, Integer> e : ans.entrySet())
+				{
+					count = e.getValue();
+					lint.add(count);
+					lstr.add(e.getKey().toString());
 					tot += count;
 				}
 			}
@@ -192,8 +201,9 @@ public class ViewData
 					sitr.hasNext() && iitr.hasNext();)
 			{
 				Integer i = iitr.next();
-				sb.append(String.format("|- %4d (%3.0f%%) - %s\n",
-						i, 100.0 * i.doubleValue() / tot, sitr.next()));
+				sb.append(String.format("|- %4d (%3d%%) - %s\n",
+						i, Math.round(100.0 * i.doubleValue() / tot),
+						sitr.next()));
 			}
 			sb.append("|- ------------ -\n");
 			sb.append(String.format("\\- %4d (%3.0f %%) - %s\n", tot, 100D, "Total"));

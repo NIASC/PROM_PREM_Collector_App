@@ -20,25 +20,20 @@
 package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
-import core.containers.form.MultipleOptionContainer;
 import core.containers.form.SingleOptionContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
@@ -83,15 +78,12 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 	@Override
 	public boolean fillEntry()
 	{
-		if (responseID == null)
-			return false;
 		return soc.setEntry(responseID);
 	}
 
 	@Override
 	public boolean entryFilled() 
 	{
-		fillEntry();
 		return soc.hasEntry();
 	}
 	
@@ -110,9 +102,12 @@ public class SingleOptionDisplay extends JPanel implements FormComponentDisplay,
 		this.soc = soc;
 		responseID = null;
 
-		JTextArea jta = AddTextArea(soc.getStatement()
-				+ (soc.getDescription() != null ? "\n"+soc.getDescription() : ""),
-				0, 35);
+		String description = "";
+		if (soc.getDescription() != null && !soc.getDescription().isEmpty())
+			description = "\n\n"+soc.getDescription();
+		JTextArea jta = AddTextArea(
+				(soc.allowsEmpty() ? "(Optional) " : "") + soc.getStatement()
+				+ description + "\n", 0, 35);
 		add(jta, BorderLayout.NORTH);
 		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());

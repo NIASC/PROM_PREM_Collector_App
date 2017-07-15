@@ -19,6 +19,7 @@
  */
 package implementation.containerdisplay;
 
+import core.containers.form.AreaContainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
 import core.containers.form.MultipleOptionContainer;
@@ -67,8 +68,12 @@ public abstract class ContainerDisplays
 			return new SingleOptionDisplay((SingleOptionContainer) fc);
 		else if (fc instanceof MultipleOptionContainer)
 			return new MultipleOptionDisplay((MultipleOptionContainer) fc);
-		else if (fc instanceof FieldContainer)
-			return new FieldDisplay((FieldContainer) fc);
+		else if (fc instanceof AreaContainer)
+		{
+			if (fc instanceof FieldContainer)
+				return new FieldDisplay((FieldContainer) fc);
+			return new AreaDisplay((AreaContainer) fc);
+		}
 		else if (fc instanceof SliderContainer)
 			return new SliderDisplay((SliderContainer) fc);
 		else if (fc instanceof TimePeriodContainer)

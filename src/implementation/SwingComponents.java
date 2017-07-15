@@ -38,7 +38,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeListener;
 
@@ -186,7 +185,8 @@ public class SwingComponents
 	public static JSlider makeSlider(String text, String name,
 			String tooltip, boolean opaque, Color background,
 			Color foreground, Color border, Dimension d,
-			ChangeListener listener, int lowerBound, int upperBound)
+			ChangeListener listener, int lowerBound, int upperBound,
+			int initialValue)
 	{
 		JSlider slider = new JSlider();
 		SwingComponents.modifyJComponent(slider, name, tooltip, opaque,
@@ -197,9 +197,10 @@ public class SwingComponents
 			slider.addChangeListener(listener);
 		slider.setMajorTickSpacing((lowerBound + upperBound) / 2);
 		slider.setMinorTickSpacing((lowerBound + upperBound) / 10);
+		slider.setValue(initialValue);
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(true);
-		slider.setSnapToTicks(true);
+		slider.setSnapToTicks(false);
 		return slider;
 	}
 

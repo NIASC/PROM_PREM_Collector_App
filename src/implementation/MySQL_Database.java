@@ -46,6 +46,7 @@ import core.containers.QuestionContainer;
 import core.containers.QuestionContainer.Question;
 import core.containers.StatisticsContainer;
 import core.containers.User;
+import core.containers.form.AreaContainer;
 import core.containers.form.FieldContainer;
 import core.containers.form.FormContainer;
 import core.containers.form.MultipleOptionContainer;
@@ -54,7 +55,6 @@ import core.containers.form.SliderContainer;
 import core.containers.form.TimePeriodContainer;
 import core.interfaces.Database;
 import core.interfaces.Questions;
-import implementation.containerdisplay.SingleOptionDisplay;
 
 /**
  * This class is an example of an implementation of
@@ -133,7 +133,7 @@ public class MySQL_Database implements Database
 			ret = queryUpdate(qInsert0);
 		
 		if (ret == QUERY_SUCCESS && queryUpdate(qInsert1) == ret)
-			return ret;
+			return QUERY_SUCCESS;
 		else
 			return ERROR;
 	}
@@ -147,9 +147,9 @@ public class MySQL_Database implements Database
 	}
 	
 	@Override
-	public HashMap<Integer, String> getClinics()
+	public Map<Integer, String> getClinics()
 	{
-		HashMap<Integer, String> ret = new HashMap<Integer, String>();
+		Map<Integer, String> ret = new TreeMap<Integer, String>();
 		try (Connection conn = DriverManager.getConnection(
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
@@ -258,6 +258,11 @@ public class MySQL_Database implements Database
 						}
 						catch (SQLException e)
 						{
+							/* getString throws SQLException if the column does
+							 * not exist, so this seems like the only way to
+							 * find out how many options that is stored in the
+							 * database.
+							 */
 							break;
 						}
 					}
@@ -292,7 +297,7 @@ public class MySQL_Database implements Database
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				while (rs.next())
 				{
-					GregorianCalendar cal = new GregorianCalendar();
+					Calendar cal = new GregorianCalendar();
 					cal.setTime(sdf.parse(rs.getString("date")));
 					tpc.addDate(cal);
 				}
@@ -353,7 +358,6 @@ public class MySQL_Database implements Database
 
 	private static MySQL_Database database;
 	private DatabaseConfig dbConfig;
-	private QDBFormat fmtConv;
 	
 	/**
 	 * Initializes variables and loads the database configuration.
@@ -441,7 +445,7 @@ public class MySQL_Database implements Database
 			{
 				while (rs.next())
 				{
-					HashMap<String, String> msg = new HashMap<String, String>();
+					Map<String, String> msg = new HashMap<String, String>();
 					msg.put(rs.getString("locale"), rs.getString("message"));
 					mc.addMessage(rs.getInt("code"), rs.getString("name"), msg);
 				}
@@ -463,7 +467,8 @@ public class MySQL_Database implements Database
 	 * @return The class representation of the supplied {@code type}.
 	 * 		The classes can be acquired using isAssignableFrom.<Br>
 	 * 		Example:<br>
-	 * 		<code>if (getContainerClass("Slider").isAssignableFrom(SliderContainer.class))
+	 * 		<code>
+	 * 		if (SliderContainer.class.isAssignableFrom(getContainerClass("Slider")))
 	 * 		new SliderContainer( ... );</code>
 	 * 
 	 * @see Class#isAssignableFrom
@@ -472,10 +477,14 @@ public class MySQL_Database implements Database
 	{
 		if (type.equalsIgnoreCase("SingleOption"))
 			return SingleOptionContainer.class;
+		else if (type.equalsIgnoreCase("MultipleOption"))
+			return MultipleOptionContainer.class;
 		else if (type.equalsIgnoreCase("Field"))
 			return FieldContainer.class;
 		else if (type.equalsIgnoreCase("Slider"))
 			return SliderContainer.class;
+		else if (type.equalsIgnoreCase("Area"))
+			return AreaContainer.class;
 		else
 			return null;
 	}
@@ -507,13 +516,18 @@ public class MySQL_Database implements Database
 				SliderContainer sc = (SliderContainer) fc;
 				return String.format("'slider%d'", sc.getEntry());
 			}
+			else if (fc instanceof AreaContainer)
+			{
+				AreaContainer ac = (AreaContainer) fc;
+				return String.format("'%s'", ac.getEntry());
+			}
 			else
 				return "''";
 		}
 		
 		static Object getQFormat(String dbEntry)
 		{
-			if (dbEntry == null || dbEntry.isEmpty())
+			if (dbEntry == null || dbEntry.trim().isEmpty())
 				return null;
 			
 			if (dbEntry.startsWith("option"))
@@ -534,6 +548,10 @@ public class MySQL_Database implements Database
 						lint.add(new Integer(s.substring("option".length())));
 					return lint.toArray(new Integer[0]);
 				}
+			}
+			else
+			{ /* must be plain text entry */
+				return dbEntry;
 			}
 			return null;
 		}

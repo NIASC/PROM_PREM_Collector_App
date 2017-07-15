@@ -20,6 +20,7 @@
 package core;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class keeps track of which users are online and how many users
@@ -102,7 +103,7 @@ public class UserManager
 	
 	private static UserManager manager;
 	private static final int MAX_USERS;
-	private HashMap<String, UserHandle> userHandle;
+	private Map<String, UserHandle> userHandle;
 
 	/**
 	 * Singleton class

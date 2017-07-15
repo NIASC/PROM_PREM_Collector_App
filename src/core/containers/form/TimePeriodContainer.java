@@ -23,7 +23,6 @@ package core.containers.form;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -61,8 +60,7 @@ public class TimePeriodContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return allowEmpty
-				|| (upperSel != null && lowerSel != null);
+		return upperSel != null && lowerSel != null;
 	}
 
 	@Override
@@ -70,8 +68,8 @@ public class TimePeriodContainer extends FormContainer
 	{
 		TimePeriodContainer tpc = new TimePeriodContainer(
 				allowEmpty, statement, description);
-		tpc.addDate((GregorianCalendar) lowerLim.clone());
-		tpc.addDate((GregorianCalendar) upperLim.clone());
+		tpc.addDate((Calendar) lowerLim.clone());
+		tpc.addDate((Calendar) upperLim.clone());
 		return tpc;
 	}
 
@@ -92,24 +90,25 @@ public class TimePeriodContainer extends FormContainer
 	 * 
 	 * @return true if the bounds were set.
 	 */
-	public boolean setEntry(GregorianCalendar lower,
-			GregorianCalendar upper)
+	public boolean setEntry(Calendar lower,
+			Calendar upper)
 	{
+		entrySet = true;
 		/* check for out of bounds */
 		if (lower.compareTo(lowerLim) < 0)
-			lower = (GregorianCalendar) lowerLim.clone();
+			lower = (Calendar) lowerLim.clone();
 		else if (lower.compareTo(upperLim) > 0)
-			lower = (GregorianCalendar) upperLim.clone();
+			lower = (Calendar) upperLim.clone();
 
 		if (upper.compareTo(lowerLim) < 0)
-			upper = (GregorianCalendar) lowerLim.clone();
+			upper = (Calendar) lowerLim.clone();
 		else if (upper.compareTo(upperLim) > 0)
-			upper = (GregorianCalendar) upperLim.clone();
+			upper = (Calendar) upperLim.clone();
 		
 		/* switch if wrong order */
 		if (lower.compareTo(upper) > 0)
 		{
-			GregorianCalendar tmp = lower;
+			Calendar tmp = lower;
 			lower = upper;
 			upper = tmp;
 		}
@@ -133,14 +132,14 @@ public class TimePeriodContainer extends FormContainer
 	 * 
 	 * @param cal A calendar which contains the dates to add.
 	 */
-	public synchronized void addDate(GregorianCalendar cal)
+	public synchronized void addDate(Calendar cal)
 	{
 		if (cal == null)
 			return;
 		if (lowerLim == null || lowerLim.compareTo(cal) > 0)
-			lowerLim = (GregorianCalendar) cal.clone();
+			lowerLim = (Calendar) cal.clone();
 		if (upperLim == null || upperLim.compareTo(cal) < 0)
-			upperLim = (GregorianCalendar) cal.clone();
+			upperLim = (Calendar) cal.clone();
 		entries.add(cal);
 		Collections.sort(entries);
 	}
@@ -150,9 +149,9 @@ public class TimePeriodContainer extends FormContainer
 	 * 
 	 * @return The earliest date that have been added to this container.
 	 */
-	public GregorianCalendar getLowerLimit()
+	public Calendar getLowerLimit()
 	{
-		return (GregorianCalendar) lowerLim.clone();
+		return (Calendar) lowerLim.clone();
 	}
 	
 	/**
@@ -160,9 +159,9 @@ public class TimePeriodContainer extends FormContainer
 	 * 
 	 * @return The latest date that have been added to this container.
 	 */
-	public GregorianCalendar getUpperLimit()
+	public Calendar getUpperLimit()
 	{
-		return (GregorianCalendar) upperLim.clone();
+		return (Calendar) upperLim.clone();
 	}
 	
 	/**

@@ -121,10 +121,8 @@ public interface UserInterface
 		public boolean fillEntry();
 		
 		/**
-		 * Checks if the entry has been filled. It is recommended that
-		 * this function also calls {@code fillEntry()} in case the
-		 * entry have been filled without {@code fillEntry()} have
-		 * been called.
+		 * Checks if the entry has been filled. The entry should be
+		 * filled by calling {@code fillEntry()}.
 		 * 
 		 * @return {@code true} if the entry has been filled.
 		 * 		{@code false} it not.

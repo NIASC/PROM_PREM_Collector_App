@@ -3,15 +3,12 @@ package core.containers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import core.containers.QuestionContainer.Question;
-import core.containers.form.FormContainer;
 
 public class StatisticsContainer
 {

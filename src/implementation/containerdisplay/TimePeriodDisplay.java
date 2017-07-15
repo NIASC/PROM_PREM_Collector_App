@@ -21,31 +21,12 @@
 package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.text.DateFormatSymbols;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JTextArea;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import core.containers.form.SliderContainer;
 import core.containers.form.TimePeriodContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
@@ -81,7 +62,6 @@ public class TimePeriodDisplay extends JPanel implements FormComponentDisplay
 	@Override
 	public boolean entryFilled()
 	{
-		fillEntry();
 		return tpc.hasEntry();
 	}
 	
@@ -99,15 +79,20 @@ public class TimePeriodDisplay extends JPanel implements FormComponentDisplay
 	{
 		setLayout(new BorderLayout());
 		this.tpc = tpc;
-		
-		JTextArea jtf = AddTextArea(tpc.getStatement()
-				+ (tpc.getDescription() != null ? "\n"+tpc.getDescription() : ""),
-				0, 35);
-		add(jtf, BorderLayout.NORTH);
+
+		String description = "";
+		if (tpc.getDescription() != null && !tpc.getDescription().isEmpty())
+			description = "\n\n"+tpc.getDescription();
+		JTextArea jta = AddTextArea(
+				(tpc.allowsEmpty() ? "(Optional) " : "") + tpc.getStatement()
+				+ description + "\n", 0, 35);
+		add(jta, BorderLayout.NORTH);
 		try
 		{
-			dpFrom = new CalendarPanel(tpc.getLowerLimit(), tpc.getUpperLimit());
-			dpTo = new CalendarPanel(tpc.getLowerLimit(), tpc.getUpperLimit());
+			dpFrom = new CalendarPanel(
+					tpc.getLowerLimit(), tpc.getUpperLimit());
+			dpTo = new CalendarPanel(
+					tpc.getLowerLimit(), tpc.getUpperLimit());
 		} catch (NullPointerException npe)
 		{
 			dpFrom = new CalendarPanel(

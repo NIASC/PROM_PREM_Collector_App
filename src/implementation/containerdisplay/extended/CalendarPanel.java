@@ -67,17 +67,17 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 	 */
 	public CalendarPanel(Calendar lower, Calendar upper)
 	{
-		Calendar l = lower != null ? lower : new GregorianCalendar();
-		Calendar u = upper != null ? upper : new GregorianCalendar();
-		if (l.compareTo(u) > 0)
+		if (lower == null || upper == null)
+			throw new NullPointerException("Null bound(s)!");
+		if (lower.compareTo(upper) > 0)
 		{
-			this.lower = u;
-			this.upper = l;
+			this.lower = upper;
+			this.upper = lower;
 		}
 		else
 		{
-			this.lower = l;
-			this.upper = u;
+			this.lower = lower;
+			this.upper = upper;
 		}
 		
 		setLayout(new GridBagLayout());
@@ -86,8 +86,7 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		gbc.anchor = GridBagConstraints.EAST;
 		gbc.insets = new Insets(1, 1, 1, 1);
 		
-		date = new DateContainer(new GregorianCalendar(
-				Locale.getDefault()));
+		date = new DateContainer(this.upper);
 		
 		dayDropDown = AddComboBox(String.class, "dayDropDown", null);
 		monthDropDown = AddComboBox(String.class, "monthDropDown", null);
@@ -174,7 +173,7 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 	 * 
 	 * @return The selected date.
 	 */
-	public GregorianCalendar getDate()
+	public Calendar getDate()
 	{
 		return new GregorianCalendar(
 				date.getYear(), date.getMonth(), date.getDay());
@@ -347,17 +346,12 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 	
 	private class DateContainer
 	{
-		DateContainer(GregorianCalendar c)
+		DateContainer(Calendar c)
 		{
-			if (c.isLenient())
-				calendar = c;
-			else
-			{
-				calendar = new GregorianCalendar(Locale.getDefault());
-				calendar.set(c.get(Calendar.YEAR),
-						c.get(Calendar.MONTH),
-						c.get(Calendar.DAY_OF_MONTH));
-			}
+			calendar = (c.isLenient() ? c : new GregorianCalendar(
+					c.get(Calendar.YEAR),
+					c.get(Calendar.MONTH),
+					c.get(Calendar.DAY_OF_MONTH)));
 			refresh();
 		}
 		
@@ -413,7 +407,7 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		}
 		
 		int day, month, year;
-		GregorianCalendar calendar;
+		Calendar calendar;
 
 		/**
 		 * If current day of month does not exist in new month
@@ -424,7 +418,7 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 		 * 
 		 * @return the corrected day.
 		 */
-		int correctDay(GregorianCalendar gc)
+		int correctDay(Calendar gc)
 		{
 			int daysInMonth = gc.getActualMaximum(Calendar.DAY_OF_MONTH);
 			return daysInMonth < day ? daysInMonth : day;

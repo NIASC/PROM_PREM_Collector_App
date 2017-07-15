@@ -20,10 +20,9 @@
 package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,7 +30,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import core.containers.form.FieldContainer;
-import core.containers.form.SliderContainer;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
 
@@ -46,9 +44,22 @@ import implementation.SwingComponents;
  * @see UserInterface
  *
  */
-public class FieldDisplay extends JPanel implements FormComponentDisplay
+public class FieldDisplay extends JPanel implements FormComponentDisplay,
+FocusListener
 {
 	/* Public */
+
+	@Override
+	public void focusGained(FocusEvent e)
+	{
+		;
+	}
+
+	@Override
+	public void focusLost(FocusEvent e)
+	{
+		fillEntry();
+	}
 	
 	@Override
 	public void requestFocus()
@@ -65,7 +76,6 @@ public class FieldDisplay extends JPanel implements FormComponentDisplay
 	@Override
 	public boolean entryFilled()
 	{
-		fillEntry();
 		return fc.hasEntry();
 	}
 	
@@ -93,6 +103,7 @@ public class FieldDisplay extends JPanel implements FormComponentDisplay
 			field = AddSecretTextField(fc.getEntry(), d);
 		else
 			field = AddTextField(fc.getEntry(), d);
+		field.addFocusListener(this);
 		add(field, BorderLayout.CENTER);
 	}
 	

@@ -19,8 +19,28 @@
  */
 package core;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import core.containers.Form;
+import core.containers.QuestionContainer;
+import core.containers.StatisticsContainer;
+import core.containers.StatisticsContainer.Statistics;
+import core.containers.form.AreaContainer;
+import core.containers.form.MultipleOptionContainer;
+import core.containers.form.SingleOptionContainer;
+import core.containers.form.SliderContainer;
+import core.containers.form.TimePeriodContainer;
+import core.interfaces.Implementations;
 import core.interfaces.Messages;
+import core.interfaces.Questions;
 import core.interfaces.UserInterface;
+import core.interfaces.UserInterface.RetFunContainer;
 
 /**
  * This class is the central point for the data viewing part of the
@@ -61,13 +81,150 @@ public class ViewData
 					Messages.ERROR_NOT_LOGGED_IN), false);
 			return;
 		}
-		System.out.printf("%s\n", "Viewing data");
+		queryTimePeriod();
 	}
 	
 	/* Protected */
 	
 	/* Private */
+	private void queryTimePeriod()
+	{
+		Messages msg = Messages.getMessages();
+		Form form = new Form();
+		QuestionContainer qc = Questions.getQuestions().getContainer();
+		MultipleOptionContainer questionselect =
+				new MultipleOptionContainer(false, msg.getInfo(
+						Messages.INFO_VD_SELECT_PREIOD), null);
+		
+		for (int i = 0; i < qc.getSize(); ++i)
+			questionselect.addOption(i, qc.getContainer(i).getStatement());
+		form.insert(questionselect, Form.AT_END);
+
+		TimePeriodContainer timeperiod =
+				new TimePeriodContainer(false, msg.getInfo(
+						Messages.INFO_VD_SELECT_QUESTIONS), null);
+		Implementations.Database().loadQResultDates(userHandle.getUser(), timeperiod);
+		form.insert(timeperiod, Form.AT_END);
+		
+		form.jumpTo(Form.AT_BEGIN);
+
+		userInterface.presentForm(form, this::validateSelection, false);
+	}
+	
+	private RetFunContainer validateSelection(Form form)
+	{
+		Messages msg = Messages.getMessages();
+		RetFunContainer rfc = new RetFunContainer(this::displayStatistics);
+		form.jumpTo(Form.AT_BEGIN);
+		MultipleOptionContainer questionselect = (MultipleOptionContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
+		TimePeriodContainer timeperiod = (TimePeriodContainer) form.currentEntry();
+		form.jumpTo(Form.AT_NEXT);
+		
+		List<Calendar> bounds = timeperiod.getEntry();
+		lower = bounds.get(0);
+		upper = bounds.get(1);
+		if (lower == null || upper == null)
+		{
+			rfc.message = msg.getError(
+					Messages.ERROR_VD_INVALID_PERIOD);
+			return rfc;
+		}
+		if (timeperiod.getPeriodEntries() < 5)
+		{
+			rfc.message = msg.getError(
+					Messages.ERROR_VD_FEW_ENTRIES);
+			return rfc;
+		}
+		nEntries = timeperiod.getPeriodEntries();
+		
+		// validate selected questions
+		selQuestions = questionselect.getEntry();
+		
+		rfc.valid = true;
+		return rfc;
+	}
+	
+	/**
+	 * REPLACE ME.
+	 */
+	private void displayStatistics()
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		System.out.printf("Displaying statistics for %d entries for period [%s -- %s]\n",
+				nEntries, sdf.format(lower.getTime()),
+				sdf.format(upper.getTime()));
+		
+		StatisticsContainer sc = new StatisticsContainer();
+		System.out.printf("\n");
+		Implementations.Database().loadQResults(userHandle.getUser(),
+				lower, upper, selQuestions, sc);
+		List<Statistics> res = sc.getStatistics();
+		for (Statistics s : res)
+		{
+			List<Object> lstr = new ArrayList<Object>();
+			List<Integer> lint = new ArrayList<Integer>();
+			int tot = 0;
+			
+			Class<?> c = s.getQuestionClass();
+			Map<Object, Integer> ans = s.getAnswerCounts();
+			Integer count;
+			if (SingleOptionContainer.class.isAssignableFrom(c))
+			{
+				String statement;
+				for (Iterator<String> itr = s.getOptions().iterator(); itr.hasNext();)
+				{
+					statement = itr.next();
+					if ((count = ans.get(statement)) == null)
+						continue;
+					lint.add(count);
+					lstr.add(statement);
+					tot += count;
+				}
+			}
+			else if (SliderContainer.class.isAssignableFrom(c))
+			{
+				for (int i = s.getLowerBound(); i <= s.getUpperBound(); ++i)
+				{
+					if ((count = ans.get(i)) == null)
+						continue;
+					lint.add(count);
+					lstr.add(i);
+					tot += count;
+				}
+			}
+			else if (AreaContainer.class.isAssignableFrom(c))
+			{
+				for (Entry<Object, Integer> e : ans.entrySet())
+				{
+					count = e.getValue();
+					lint.add(count);
+					lstr.add(e.getKey().toString());
+					tot += count;
+				}
+			}
+			StringBuilder sb = new StringBuilder();
+			sb.append(String.format("%s:\n", s.getStatement()));
+			
+			Iterator<Object> sitr;
+			Iterator<Integer> iitr;
+			for (sitr = lstr.iterator(), iitr = lint.iterator();
+					sitr.hasNext() && iitr.hasNext();)
+			{
+				Integer i = iitr.next();
+				sb.append(String.format("|- %4d (%3d%%) - %s\n",
+						i, Math.round(100.0 * i.doubleValue() / tot),
+						sitr.next()));
+			}
+			sb.append("|- ------------ -\n");
+			sb.append(String.format("\\- %4d (%3.0f %%) - %s\n", tot, 100D, "Total"));
+			System.out.println(sb.toString());
+		}
+	}
 	
 	private UserHandle userHandle;
 	private UserInterface userInterface;
+	private Calendar upper, lower;
+	private int nEntries;
+	private List<Integer> selQuestions;
 }

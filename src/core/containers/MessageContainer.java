@@ -20,7 +20,9 @@
 package core.containers;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import core.interfaces.Messages;
 
@@ -44,7 +46,7 @@ public class MessageContainer
 	public MessageContainer()
 	{
 		messages = new HashMap<String, Message>();
-		codeToName = new HashMap<Integer, String>();
+		codeToName = new TreeMap<Integer, String>();
 	}
 	
 	/**
@@ -58,7 +60,7 @@ public class MessageContainer
 	 * 		format should be <locale, message> e.g <"en", "Hello">,
 	 * 		<"fr", "Bonjour"> etc.
 	 */
-	public synchronized void addMessage(int code, String name, HashMap<String, String> text)
+	public synchronized void addMessage(int code, String name, Map<String, String> text)
 	{
 		Message message = new Message(code, name, text);
 		if (!messages.containsKey(name))
@@ -128,11 +130,11 @@ public class MessageContainer
 	/**
 	 * format: <locale, message>
 	 */
-	private HashMap<String, Message> messages;
+	private Map<String, Message> messages;
 	/**
 	 * format: <id, locale>
 	 */
-	private HashMap<Integer, String> codeToName;
+	private Map<Integer, String> codeToName;
 	
 	/**
 	 * This class is a data container for Messages. A message is a
@@ -152,7 +154,7 @@ public class MessageContainer
 		/**
 		 * format: <locale, message>
 		 */
-		HashMap<String, String> messages;
+		Map<String, String> messages;
 		
 		/**
 		 * Creates a {@code Message} that has a code, name and a list
@@ -165,7 +167,7 @@ public class MessageContainer
 		 * 		The format should be <locale, message> e.g
 		 * 		<"en", "Hello"> or <"fr", "Bonjour">.
 		 */
-		Message(int code, String name, HashMap<String, String> message)
+		Message(int code, String name, Map<String, String> message)
 		{
 			this.code = code;
 			this.name = name;
@@ -193,9 +195,9 @@ public class MessageContainer
 		 * 
 		 * @return A map that contains the locales and messages.
 		 */
-		HashMap<String, String> getMessages()
+		Map<String, String> getMessages()
 		{
-			HashMap<String, String> tmp = new HashMap<String, String>();
+			Map<String, String> tmp = new HashMap<String, String>();
 			tmp.putAll(messages);
 			return tmp;
 		}
@@ -211,7 +213,7 @@ public class MessageContainer
 		 */
 		void merge(final Message message)
 		{
-			HashMap<String, String> msgMap = message.getMessages();
+			Map<String, String> msgMap = message.getMessages();
 			for (Entry<String, String> e: msgMap.entrySet())
 			{
 				addMessage(e.getValue(), e.getKey(), false);

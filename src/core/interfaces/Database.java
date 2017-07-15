@@ -19,13 +19,17 @@
  */
 package core.interfaces;
 
-import java.util.HashMap;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import core.containers.MessageContainer;
 import core.containers.Patient;
 import core.containers.QuestionContainer;
+import core.containers.StatisticsContainer;
 import core.containers.User;
+import core.containers.form.FormContainer;
+import core.containers.form.TimePeriodContainer;
 
 /**
  * This interface contains the methods required by the core part of
@@ -65,15 +69,18 @@ public interface Database
 			String password, String salt, int clinic, String email);
 	
 	/**
-	 * Adds a new patient to the database.
+	 * Adds a patient's answers to the database. If the patient does not
+	 * already exist in the database it will be added as well.
 	 * 
 	 * @param patient The patient to add
-	 * @param answers The questionnaire form.
+	 * @param answers The questionnaire form containers.  The containers
+	 * 		should be in the same order as the questions in the
+	 * 		questionnaire.
 	 * 
 	 * @return {@code QUERY_SUCCESS} on successful update,
 	 * 		{@code ERROR} on failure.
 	 */
-	public int addQuestionnaireAnswers(Patient patient, List<Object> answers);
+	public int addQuestionnaireAnswers(Patient patient, List<FormContainer> answers);
 
 	/**
 	 * Adds a new clinic to the database.
@@ -86,12 +93,12 @@ public interface Database
 	public int addClinic(String clinicName);
 	
 	/**
-	 * Collects the clinic names and id and places them in a HashMap.
+	 * Collects the clinic names and id and places them in a Map.
 	 * 
-	 * @return A HashMap containing clinic id as keys and clinic names
+	 * @return A Map containing clinic id as keys and clinic names
 	 * 		as values.
 	 */
-	public HashMap<Integer, String> getClinics();
+	public Map<Integer, String> getClinics();
 	
 	/**
 	 * Collects the information about the user from the database.
@@ -167,6 +174,24 @@ public interface Database
 	 * @see QuestionContainer
 	 */
 	public int loadQuestions(QuestionContainer qc);
+	
+	/**
+	 * Loads the dates at which questionnaires have been filled in for
+	 * {@code user}'s clinic.
+	 * 
+	 * @param user The user that requests statistics.
+	 * @param tpc The container for the dates.
+	 * 
+	 * @return {@code QUERY_SUCCESS} if the questions were successfully
+	 * 		loaded. {@code ERROR} if there was an error with the
+	 * 		database.
+	 * 
+	 * @see TimePeriodContainer
+	 */
+	public int loadQResultDates(User user, TimePeriodContainer tpc);
+
+	public int loadQResults(User user, Calendar begin, Calendar end,
+			List<Integer> questionIDs, StatisticsContainer container);
 	
 	/* Protected */
 	

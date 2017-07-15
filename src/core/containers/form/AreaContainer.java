@@ -30,7 +30,7 @@ package core.containers.form;
  * @see FormContainer
  *
  */
-public class FieldContainer extends AreaContainer
+public class AreaContainer extends FormContainer
 {
 	
 	/**
@@ -39,39 +39,37 @@ public class FieldContainer extends AreaContainer
 	 * 
 	 * @param allowEmptyEntries True if this container allows empty
 	 * 		entry (answer/response).
-	 * @param secretEntry True if the input should be hidden. Useful
-	 * 		for entering sensitive information such as passwords.
 	 * @param statement The statement to initialize this form with.
 	 * @param description A more detailed description of the
 	 * 		{@code statement}.
 	 */
-	public FieldContainer(boolean allowEmptyEntries, boolean secretEntry,
-			String statement, String description)
+	public AreaContainer(boolean allowEmptyEntries, String statement,
+			String description)
 	{
 		super(allowEmptyEntries, statement, description);
-		secret = secretEntry;
+		entrySet = false;
 	}
-	/*
+
 	@Override
 	public boolean hasEntry()
 	{
-		return entry != null && !entry.isEmpty();
-	}*/
+		return entrySet && (allowEmpty || (entry != null && !entry.isEmpty()));
+	}
 
 	@Override
-	public FieldContainer copy()
+	public AreaContainer copy()
 	{
-		FieldContainer fc = new FieldContainer(allowEmpty, secret,
-				statement, description);
+		AreaContainer fc = new AreaContainer(allowEmpty, statement,
+				description);
 		fc.setEntry(entry);
 		return fc;
 	}
-	/*
+	
 	@Override
 	public String getEntry()
 	{
 		return entry;
-	}*/
+	}
 	
 	/**
 	 * Sets the entry (i.e. the user input in response to the field's
@@ -82,9 +80,9 @@ public class FieldContainer extends AreaContainer
 	 * 
 	 * @return True if the entry was set
 	 */
-	/*
 	public boolean setEntry(String entry)
 	{
+		entrySet = true;
 		if (entry == null)
 			this.entry = null;
 		else
@@ -94,22 +92,10 @@ public class FieldContainer extends AreaContainer
 			this.entry = entry.trim();
 		}
 		return true;
-	}*/
-	
-	/**
-	 * 
-	 * @return {@code true} if this form's entry should be hidden.
-	 * 		{@code false} if it should be displayed in plain text.
-	 */
-	public boolean isSecret()
-	{
-		return secret;
 	}
 	
 	/* Protected */
+	protected String entry;
 	
 	/* Private */
-
-	private final boolean secret;
-	//private String entry;
 }

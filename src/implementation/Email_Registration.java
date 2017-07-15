@@ -67,11 +67,11 @@ public class Email_Registration implements Registration
 	public void registrationProcess()
 	{
 		Form f = new Form();
-		FieldContainer name = new FieldContainer(false, false, NAME_STR);
+		FieldContainer name = new FieldContainer(false, false, NAME_STR, null);
 		f.insert(name, Form.AT_END);
-		FieldContainer email = new FieldContainer(false, false, EMAIL_STR);
+		FieldContainer email = new FieldContainer(false, false, EMAIL_STR, null);
 		f.insert(email, Form.AT_END);
-		FieldContainer clinic = new FieldContainer(false, false, CLINIC_STR);
+		FieldContainer clinic = new FieldContainer(false, false, CLINIC_STR, null);
 		f.insert(clinic, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
 		

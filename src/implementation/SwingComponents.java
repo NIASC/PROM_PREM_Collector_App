@@ -1,4 +1,5 @@
-/**
+/** SwingComponents.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -26,13 +27,17 @@ import java.awt.event.ItemListener;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeListener;
 
@@ -75,6 +80,19 @@ public class SwingComponents
 			button.addItemListener(listener);
 		return button;
 	}
+	
+	public static JCheckBox addToggleButton2(String buttonText, String name,
+			String tooltip, boolean opaque, Color background,
+			Color foreground, Color border, Dimension d,
+			ItemListener listener)
+	{
+		JCheckBox button = new JCheckBox();
+		SwingComponents.modifyButton(button, buttonText, name, tooltip, opaque,
+				background, foreground, border, d);
+		if (listener != null)
+			button.addItemListener(listener);
+		return button;
+	}
 
 	public static JLabel makeLabel(String labelText, String name,
 			String tooltip, boolean opaque, Color background,
@@ -85,6 +103,37 @@ public class SwingComponents
 				background, foreground, border, d);
 		label.setText(labelText);
 		return label;
+	}
+
+	public static JSpinner makeSpinner(Object value, String name,
+			String tooltip, boolean opaque, Color background,
+			Color foreground, Color border, Dimension d,
+			ChangeListener listener, JComponent editor)
+	{
+		JSpinner spinner = new JSpinner();
+		SwingComponents.modifyJComponent(spinner, name, tooltip, opaque,
+				background, foreground, border, d);
+		spinner.setValue(value);
+		spinner.setEditor(editor);
+		if (listener != null)
+			spinner.addChangeListener(listener);
+		return spinner;
+	}
+
+	public static <T> JComboBox<T> makeComboBox(Class<T> c,
+			String name, String tooltip, boolean opaque,
+			Color bgColor, Color fgColor, Color borderColor,
+			Dimension d, ItemListener listener, boolean editable,
+			Border border)
+	{
+		JComboBox<T> combobox = new JComboBox<T>();
+		SwingComponents.modifyJComponent(combobox, name, tooltip, opaque,
+				bgColor, fgColor, borderColor, d);
+		combobox.setEditable(editable);
+		combobox.setBorder(border);
+		if (listener != null)
+			combobox.addItemListener(listener);
+		return combobox;
 	}
 
 	public static JTextField makeTextField(String text, String name,
@@ -136,20 +185,22 @@ public class SwingComponents
 	public static JSlider makeSlider(String text, String name,
 			String tooltip, boolean opaque, Color background,
 			Color foreground, Color border, Dimension d,
-			ChangeListener listener, int lowerBound, int upperBound)
+			ChangeListener listener, int lowerBound, int upperBound,
+			int initialValue)
 	{
 		JSlider slider = new JSlider();
 		SwingComponents.modifyJComponent(slider, name, tooltip, opaque,
 				background, foreground, border, d);
 		slider = new JSlider(JSlider.HORIZONTAL,
-				lowerBound, upperBound, (lowerBound + upperBound) / 2);
+				lowerBound, upperBound, lowerBound);
 		if (listener != null)
 			slider.addChangeListener(listener);
 		slider.setMajorTickSpacing((lowerBound + upperBound) / 2);
 		slider.setMinorTickSpacing((lowerBound + upperBound) / 10);
+		slider.setValue(initialValue);
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(true);
-		slider.setSnapToTicks(true);
+		slider.setSnapToTicks(false);
 		return slider;
 	}
 

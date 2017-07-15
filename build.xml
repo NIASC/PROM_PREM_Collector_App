@@ -44,7 +44,7 @@
   -->
   <target name="build" depends="init">
     <echo message="${ant.project.name}: ${ant.file}"/>
-    <javac debug="true" destdir="${build}" includeantruntime="false">
+    <javac debug="true" destdir="${build}" includeantruntime="false"  target="1.8">
       <src path="${src}"/>
       <classpath refid="PROM_PREM_Collector.classpath"/>
     </javac>

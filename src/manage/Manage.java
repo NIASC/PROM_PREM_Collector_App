@@ -19,7 +19,7 @@
  */
 package manage;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -110,7 +110,7 @@ public class Manage
 	 */
 	private void addClinic()
 	{
-		HashMap<Integer, String> clinics = db.getClinics();
+		Map<Integer, String> clinics = db.getClinics();
 		System.out.printf("Existing clinics:\n");
 		for (Entry<Integer, String> e : clinics.entrySet())
 			System.out.printf("%4d: %s\n", e.getKey(), e.getValue());
@@ -159,7 +159,7 @@ public class Manage
 			return;
 		}
 
-		HashMap<Integer, String> clinics = db.getClinics();
+		Map<Integer, String> clinics = db.getClinics();
 		if (clinics.size() == 0)
 		{
 			System.out.printf("There are no clinics in the database.\n\n");

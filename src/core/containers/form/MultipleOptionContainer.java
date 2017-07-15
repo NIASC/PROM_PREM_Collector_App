@@ -19,17 +19,21 @@
  */
 package core.containers.form;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
- * This class handles single-option objects. It allows you to
+ * This class handles multiple-option objects. It allows you to
  * group several options with individual identifiers and text to form
  * a complete set of options to choose from as well as a way of
  * retrieving the selected option.
- * A single-option object consists of a statement and multiple options
- * to choose from and it only allows the user to choose one of the
+ * A multiple-option object consists of a statement and multiple options
+ * to choose from and it allows the user to choose any number of the
  * options.
  * 
  * @author Marcus Malmquist
@@ -37,12 +41,12 @@ import java.util.TreeMap;
  * @see FormContainer
  *
  */
-public class SingleOptionContainer extends FormContainer
+public class MultipleOptionContainer extends FormContainer
 {
 	/* Public */
 	
 	/**
-	 * Creates a container for single-option objects.
+	 * Creates a container for multiple-option objects.
 	 * 
 	 * @param allowEmptyEntry {@code true} if this container allows
 	 * 		empty entry (answer/response). {@code false} if not.
@@ -52,54 +56,63 @@ public class SingleOptionContainer extends FormContainer
 	 * @param description A more detailed description of the
 	 * 		{@code statement}.
 	 */
-	public SingleOptionContainer(boolean allowEmptyEntry, String statement,
+	public MultipleOptionContainer(boolean allowEmptyEntry, String statement,
 			String description)
 	{
 		super(allowEmptyEntry, statement, description);
 		
 		options = new TreeMap<Integer, Option>();
+		selected = new TreeMap<Integer, Option>();
 		nextOption = 0;
-		selected = null;
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return entrySet && (allowEmpty || selected != null);
+		return entrySet && (allowEmpty || !selected.isEmpty());
 	}
 
 	@Override
-	public SingleOptionContainer copy()
+	public MultipleOptionContainer copy()
 	{
-		SingleOptionContainer soc = new SingleOptionContainer(
+		MultipleOptionContainer moc = new MultipleOptionContainer(
 				allowEmpty, statement, description);
 		for (Entry<Integer, Option> e : options.entrySet())
-			soc.addOption(e.getKey(), e.getValue().text);
-		return soc;
+			moc.addOption(e.getKey(), e.getValue().text);
+		return moc;
 	}
 	
 	@Override
-	public Integer getEntry()
+	public List<Integer> getEntry()
 	{
-		return selected != null ? options.get(selected).identifier : null;
+		return Collections.unmodifiableList(new ArrayList<Integer>(selected.keySet()));
 	}
 	
 	/**
 	 * Marks the option with the supplied ID as selected, if an option
 	 * with that ID exists in the list of options.
 	 * 
-	 * @param id The ID of the selected option.
+	 * @param selectedIDs The ID of the selected option.
 	 * @return True if an option with the supplied ID exists (and that
 	 * 		option was marked as selected).
 	 * 		False if not (and no option has been marked as selected).
 	 */
-	public boolean setEntry(Integer id)
+	public boolean setEntry(List<Integer> selectedIDs)
 	{
 		entrySet = true;
-		if (id == null || options.get(id) == null)
+		if (selectedIDs == null)
 			return false;
-
-		selected = id;
+		
+		/* This may not be a very efficient way of replacing the old
+		 * selected items but this container should not contain thousands
+		 * of options so it should be fine.
+		 */
+		selected.clear();
+		for (Iterator<Integer> itr = selectedIDs.iterator(); itr.hasNext();)
+		{
+			int i = itr.next();
+			selected.put(i, options.get(i));
+		}
 		return true;
 	}
 	
@@ -117,9 +130,9 @@ public class SingleOptionContainer extends FormContainer
 	}
 	
 	/**
-	 * Puts the options in a map that contains the ID of the option
-	 * as well as the option's text. The ID should be used to mark
-	 * the selected option through the method setSelected.
+	 * Puts the options in a map that contains the ID of the option as well
+	 * as the option's text. The ID should be used to mark the selected
+	 * option through the method setSelected.<br>
 	 * The ID ranges from 0 <= ID < <no. entries>.
 	 * 
 	 * @return A map of the options, the keys are the ID of the options
@@ -134,19 +147,22 @@ public class SingleOptionContainer extends FormContainer
 		return sopts;
 	}
 	
-	public Integer getSelectedID()
+	/**
+	 * 
+	 * @return A list of the selected IDs
+	 */
+	public List<Integer> getSelectedIDs()
 	{
-		return selected;
+		return Collections.unmodifiableList(
+				new ArrayList<Integer>(selected.keySet()));
 	}
 	
 	/* Protected */
 	
 	/* Private */
 	
-	private Map<Integer, Option> options;
+	private Map<Integer, Option> options, selected;
 	private int nextOption;
-	
-	private Integer selected;
 	
 	/**
 	 * This class is a data container for single-option form entries.

@@ -30,19 +30,20 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JApplet;
 import javax.swing.JButton;
-import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -60,7 +61,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 {
 	/* Public */
 	
-	public static final Font FONT = new Font("Helvetica", Font.PLAIN, 16);
+	public static final Font FONT = new Font(Font.SERIF, Font.PLAIN, 16);
 	
 	public GUI_UserInterface(boolean embedded)
 	{
@@ -512,15 +513,20 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		@Override
 		public void requestFocus()
 		{
-			Component[] c = null;
+			List<Component> lcomp = new ArrayList<Component>();
 			synchronized(getTreeLock())
 			{
-				c = getComponents();
+				lcomp.addAll(Arrays.asList(getComponents()));
 			}
-			if (c != null)
-				for (Component comp : c)
-					if (comp != null && comp == (Component) components.get(cIdx))
-						comp.requestFocus();
+			for (Iterator<Component> itr = lcomp.iterator(); itr.hasNext();)
+			{
+				Component c = itr.next();
+				if (c == (Component) components.get(cIdx))
+				{
+					c.requestFocus();
+					break;
+				}
+			}
 		}
 		
 		@Override
@@ -557,11 +563,13 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 					}
 					else if (b.getName().equals(fc_previous.getName()))
 					{
+						components.get(cIdx).fillEntry();
 						cIdx = getNextEntry(cIdx, nEntries, -1, false);
 						setFormContent();
 					}
 					else if (b.getName().equals(fc_next.getName()))
 					{
+						components.get(cIdx).fillEntry();
 						cIdx = getNextEntry(cIdx, nEntries, 1, false);
 						setFormContent();
 					}
@@ -569,6 +577,21 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 					{
 						setContent(retpan);
 					}
+					if (cIdx == getNextEntry(cIdx, nEntries, 1, false))
+						fc_next.setEnabled(false);
+					else
+						fc_next.setEnabled(true);
+					
+					if (cIdx == getNextEntry(cIdx, nEntries, -1, false))
+						fc_previous.setEnabled(false);
+					else
+						fc_previous.setEnabled(true);
+					if (getNextUnfilledEntry(cIdx, components) == cIdx)
+						fc_continue.setText(msg.getInfo(
+								Messages.INFO_UI_FORM_FINISH));
+					else
+						fc_continue.setText(msg.getInfo(
+								Messages.INFO_UI_FORM_CONTINUE));
 				} // end synchronized block
 			}
 		}
@@ -583,7 +606,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		JButton fc_continue, fc_previous, fc_next, fc_back;
 		GridBagConstraints gbc;
 		
-		final HashMap<Integer, FormComponentDisplay> components;
+		final Map<Integer, FormComponentDisplay> components;
 		final Form form;
 		final ReturnFunction function;
 		final Container retpan;
@@ -629,9 +652,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		 * 		supplied form. The keys are the ID (i.e. order of
 		 * 		appearance) and the values are the displayable objects.
 		 */
-		HashMap<Integer, FormComponentDisplay> fillContents(Form form)
+		Map<Integer, FormComponentDisplay> fillContents(Form form)
 		{
-			HashMap<Integer, FormComponentDisplay> contents =
+			Map<Integer, FormComponentDisplay> contents =
 					new HashMap<Integer, FormComponentDisplay>();
 			int id = 0;
 			form.jumpTo(Form.AT_BEGIN);
@@ -692,7 +715,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		 * 		and not found an unfilled entry.
 		 */
 		int getNextUnfilledEntry(int currentIdx,
-				HashMap<Integer, FormComponentDisplay> form)
+				Map<Integer, FormComponentDisplay> form)
 		{
 			int entries = form.size();
 			int i = getNextEntry(currentIdx, entries, 1, true);
@@ -737,6 +760,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 					"fc_continue", null, false, null, null, null, null, this);
 			fc_previous = SwingComponents.makeButton(msg.getInfo(Messages.INFO_UI_FORM_PREVIOUS),
 					"fc_previous", null, false, null, null, null, null, this);
+			if (cIdx == getNextEntry(cIdx, nEntries, -1, false))
+				fc_previous.setEnabled(false);
+			
 			fc_next = SwingComponents.makeButton(msg.getInfo(Messages.INFO_UI_FORM_NEXT),
 					"fc_next", null, false, null, null, null, null, this);
 			fc_back = SwingComponents.makeButton(msg.getInfo(Messages.INFO_UI_FORM_BACK),

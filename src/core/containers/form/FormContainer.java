@@ -46,11 +46,17 @@ public abstract class FormContainer
 	/* Public */
 	
 	/**
-	 * Check if this {@code FormContainer} has been filled (i.e. an
-	 * option has been selected or the field has text in it etc.).
+	 * Check if this {@code FormContainer} has been filled (i.e. an option
+	 * has been selected or the field has text in it etc.).<br><br>
+	 * If this form allows empty entries ({@code allowsEmpty() == true})
+	 * then this method should return {@code true} if an (empty) entry has
+	 * been set, but still be able to return {@code false} if an entry has
+	 * not been set. This can be facilitated using {@code entrySet}.
 	 * 
 	 * @return {@code true} if this form has entry/entries.
 	 * 		{@code false} if not.
+	 * 
+	 * @see #entrySet
 	 */
 	public abstract boolean hasEntry();
 	
@@ -64,9 +70,15 @@ public abstract class FormContainer
 	public abstract FormContainer copy();
 	
 	/**
-	 * Retrieves the entry/answer for this container.
+	 * Retrieves the entry/answer for this container.<br>
+	 * If this form allows empty entries ({@code allowsEmpty() == true})
+	 * then {@code hasEntry()} will always return {@code true}. A
+	 * consequence of that is that this method may return null if this form
+	 * has not entry.
 	 * 
 	 * @return This container's user entry.
+	 * 
+	 * @see #hasEntry()
 	 */
 	public abstract Object getEntry();
 	
@@ -98,6 +110,16 @@ public abstract class FormContainer
 	public boolean allowsEmpty()
 	{
 		return allowEmpty;
+	}
+	
+	public String getStatement()
+	{
+		return statement;
+	}
+	
+	public String getDescription()
+	{
+		return description;
 	}
 	
 	/**
@@ -176,6 +198,23 @@ public abstract class FormContainer
 	 * @see Form
 	 */
 	protected FormContainer prevFC;
+	
+	/**
+	 * This flag can be used in conjunction with setting the entry for
+	 * this container. The flag is can be used to prevent optional
+	 * containers from getting overlooked when someone searches for empty
+	 * containers while it should not prevent the form from being flagged
+	 * as fully answered if the entry was skipped on purpose.<br><br>
+	 * 
+	 * The intended use for this flag is to set it to true when the entry
+	 * is successfully filled (determined by the container itself), and
+	 * then used in {@code hasEntry()} something like this:<br>
+	 * {@code return entrySet && (allowEmpty || <conditions>)}<br>
+	 * 
+	 * @see #hasEntry()
+	 */
+	protected boolean entrySet;
+	
 	/**
 	 * if the {@code FormContainer} should allow empty entries (i.e.
 	 * the entry is optional) this should be {@code true}, else
@@ -184,15 +223,34 @@ public abstract class FormContainer
 	protected final boolean allowEmpty;
 	
 	/**
+	 * The statement that the user should respond to. The statement should
+	 * be relevant to the type of response requested from the user.
+	 */
+	protected final String statement;
+	
+	/**
+	 * A more detailed description of the {@code #statement}.
+	 */
+	protected final String description;
+	
+	/**
 	 * Initializes this container as either optional (allows empty) or
 	 * mandatory (does not allow empty).
 	 * 
 	 * @param allowEmpty True if this container should allow empty
 	 * 		entries.
+	 * @param statement The statement that the user should respond to. The
+	 * 		statement should be relevant to the type of response requested
+	 * 		from the user.
+	 * @param description A more detailed description of the
+	 * 		{@code statement}.
 	 */
-	protected FormContainer(boolean allowEmpty)
+	protected FormContainer(boolean allowEmpty, String statement, String description)
 	{
 		this.allowEmpty = allowEmpty;
+		this.statement = statement;
+		this.description = description;
+		nextFC = prevFC = null;
 	}
 	
 	/* Private */

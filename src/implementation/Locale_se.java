@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import core.interfaces.Locale;
-import core.interfaces.Messages;
 
 /**
  * This class is an implementation of locale-related methods.

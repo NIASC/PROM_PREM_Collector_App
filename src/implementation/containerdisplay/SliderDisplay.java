@@ -20,18 +20,15 @@
 package implementation.containerdisplay;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import core.containers.form.FieldContainer;
 import core.containers.form.SliderContainer;
+import core.interfaces.Messages;
 import core.interfaces.UserInterface.FormComponentDisplay;
 import implementation.SwingComponents;
 
@@ -46,7 +43,8 @@ import implementation.SwingComponents;
  * @see UserInterface
  * 
  */
-public class SliderDisplay extends JPanel implements FormComponentDisplay, ChangeListener
+public class SliderDisplay extends JPanel implements FormComponentDisplay,
+ChangeListener
 {
 	/* Public */
 	
@@ -72,15 +70,12 @@ public class SliderDisplay extends JPanel implements FormComponentDisplay, Chang
 	@Override
 	public boolean fillEntry()
 	{
-		if (response == null)
-			return false;
-		return sc.setEntry(response);
+		return sc.setEntry(response.intValue());
 	}
 
 	@Override
 	public boolean entryFilled()
 	{
-		fillEntry();
 		return sc.hasEntry();
 	}
 	
@@ -99,12 +94,20 @@ public class SliderDisplay extends JPanel implements FormComponentDisplay, Chang
 	{
 		setLayout(new BorderLayout());
 		this.sc = sc;
-		response = null;
+		response = sc.getLowerBound();
 
-		JTextArea jtf = AddTextArea(sc.getStatement(), 0, 35);
+		String description = "";
+		String optional = Messages.getMessages().getInfo(
+				Messages.INFO_UI_FORM_OPTIONAL);
+		if (sc.getDescription() != null && !sc.getDescription().isEmpty())
+			description = "\n\n"+sc.getDescription();
+		JTextArea jtf = AddTextArea(
+				(sc.allowsEmpty() ? "("+optional+") " : "") + sc.getStatement()
+				+ description + "\n", 0, 35);
 		add(jtf, BorderLayout.NORTH);
 		
-		slider = makeSlider(this, sc.getLowerBound(), sc.getUpperBound());
+		slider = makeSlider(this, sc.getLowerBound(), sc.getUpperBound(),
+				sc.getLowerBound());
 		add(slider, BorderLayout.CENTER);
 	}
 	
@@ -116,16 +119,22 @@ public class SliderDisplay extends JPanel implements FormComponentDisplay, Chang
 	private JSlider slider;
 	
 	private static JTextArea AddTextArea(
-			String text, int row, int column)
+			String text, int rows, int columns)
 	{
 		return SwingComponents.makeTextArea(text, null, null, false,
-				null, null, null, null, null, false, row, column);
+				null, null, null, null, null, false, rows, columns);
 	}
 
 	private static JSlider makeSlider(
-			ChangeListener listener, int lowerBound, int upperBound)
+			ChangeListener listener, int lowerBound, int upperBound,
+			int initialValue)
 	{
+		if (initialValue < lowerBound)
+			initialValue = lowerBound;
+		if (initialValue > upperBound)
+			initialValue = lowerBound;
 		return SwingComponents.makeSlider(null, null, null, false, null,
-				null, null, null, listener, lowerBound, upperBound);
+				null, null, null, listener, lowerBound, upperBound,
+				initialValue);
 	}
 }

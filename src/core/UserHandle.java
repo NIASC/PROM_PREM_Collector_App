@@ -20,6 +20,7 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -190,15 +191,15 @@ public class UserHandle
 		Form form = new Form();
 		form.insert(new FieldContainer(false, true,
 				Messages.getMessages().getInfo(
-						Messages.INFO_CURRENT_PASSWORD)),
+						Messages.INFO_CURRENT_PASSWORD), null),
 				Form.AT_END);
 		form.insert(new FieldContainer(false, true,
 				Messages.getMessages().getInfo(
-						Messages.INFO_NEW_PASSWORD)),
+						Messages.INFO_NEW_PASSWORD), null),
 				Form.AT_END);
 		form.insert(new FieldContainer(false, true,
 				Messages.getMessages().getInfo(
-						Messages.INFO_RE_NEW_PASSWORD)),
+						Messages.INFO_RE_NEW_PASSWORD), null),
 				Form.AT_END);
 		form.jumpTo(Form.AT_BEGIN);
 		
@@ -361,24 +362,24 @@ public class UserHandle
 	{
 		if (password.length() < 6 || password.length() > 32)
 			return -1;
-		Pattern[] pattern = new Pattern[]{
+		List<Pattern> pattern = Arrays.asList(
 				Pattern.compile("\\p{Lower}"), /* lowercase */
 				Pattern.compile("\\p{Upper}"), /* uppercase */
 				Pattern.compile("\\p{Digit}"), /* digits */
 				Pattern.compile("[\\p{Punct} ]") /* punctuation and space */
-		};
+		);
 		if (Pattern.compile("[^\\p{Print}]").matcher(password).find())
 		{ // expression contains non-ascii or non-printable characters
 			return 0;
 		}
 		int points = 0;
-		if (pattern[0].matcher(password).find())
+		if (pattern.get(0).matcher(password).find())
 			++points;
-		if (pattern[1].matcher(password).find())
+		if (pattern.get(1).matcher(password).find())
 			++points;
-		if (pattern[2].matcher(password).find())
+		if (pattern.get(2).matcher(password).find())
 			++points;
-		if (pattern[3].matcher(password).find())
+		if (pattern.get(3).matcher(password).find())
 			++points;
 		return points - 1;
 	}

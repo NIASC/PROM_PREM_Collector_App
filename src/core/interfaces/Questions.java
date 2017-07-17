@@ -49,7 +49,7 @@ public final class Questions
 		if (qEntries == null && !loadQuestionnaire())
 			return null;
 		QuestionContainer qc = null;
-		qc = qEntries.copy();
+		qc = (QuestionContainer) qEntries.clone();
 		return qc;
 	}
 	

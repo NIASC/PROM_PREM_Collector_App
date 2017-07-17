@@ -58,6 +58,23 @@ public class QuestionContainer
 		index = 0;
 	}
 	
+	@Override
+	public Object clone()
+	{
+		QuestionContainer qc = new QuestionContainer();
+		synchronized (this)
+		{
+			for (int i = 0; i < index; ++i)
+			{
+				Question q = questions.get(indexToID.get(i));
+				qc.addQuestion(
+						indexToID.get(i), q.type, q.question, q.description,
+						q.options, q.optional, q.upper, q.lower);
+			}
+		}
+		return qc;
+	}
+	
 	/**
 	 * Adds a {@code Questionnaire} entry to this container.
 	 * 
@@ -129,22 +146,6 @@ public class QuestionContainer
 	public int getSize()
 	{
 		return index;
-	}
-	
-	public QuestionContainer copy()
-	{
-		QuestionContainer qc = new QuestionContainer();
-		synchronized (this)
-		{
-			for (int i = 0; i < index; ++i)
-			{
-				Question q = questions.get(indexToID.get(i));
-				qc.addQuestion(
-						indexToID.get(i), q.type, q.question, q.description,
-						q.options, q.optional, q.upper, q.lower);
-			}
-		}
-		return qc;
 	}
 	
 	/* protected */

@@ -58,6 +58,13 @@ public class User
 		crypto = Implementations.Encryption();
 	}
 	
+	@Override
+	public Object clone()
+	{
+		return new User(clinicID, username, password,
+				email, salt, updatePass);
+	}
+	
 	/**
 	 * 
 	 * @return The user's username.
@@ -108,12 +115,6 @@ public class User
 	public boolean passwordMatch(String unhashedPass)
 	{
 		return crypto.hashString(unhashedPass, salt).equals(password);
-	}
-	
-	public User copy()
-	{
-		return new User(clinicID, username, password,
-				email, salt, updatePass);
 	}
 	
 	/* Protected */

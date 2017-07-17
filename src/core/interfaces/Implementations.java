@@ -20,7 +20,7 @@
 package core.interfaces;
 
 import implementation.MySQL_Database;
-import implementation.No_Encryption;
+import implementation.SHA_Encryption;
 import implementation.Email_Registration;
 import implementation.Locale_se;
 
@@ -60,7 +60,7 @@ public abstract class Implementations
 	 */
 	public static Encryption Encryption()
 	{
-		return new No_Encryption();
+		return new SHA_Encryption();
 	}
 	
 	/**

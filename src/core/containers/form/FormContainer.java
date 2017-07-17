@@ -67,7 +67,8 @@ public abstract class FormContainer
 	 * 
 	 * @return A copy of this container.
 	 */
-	public abstract FormContainer copy();
+	@Override
+	public abstract Object clone();
 	
 	/**
 	 * Retrieves the entry/answer for this container.<br>

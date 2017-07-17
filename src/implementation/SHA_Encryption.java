@@ -19,6 +19,12 @@
  */
 package implementation;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.Security;
+
 import core.interfaces.Encryption;
 
 /**
@@ -28,31 +34,55 @@ import core.interfaces.Encryption;
  * @author Marcus Malmquist
  *
  */
-public class No_Encryption implements Encryption
+public class SHA_Encryption implements Encryption
 {
 	/* Public */
 	
 	/**
 	 * Initializes variables.
 	 */
-	public No_Encryption()
+	public SHA_Encryption() throws NullPointerException
 	{
-		
+		try
+		{
+			sr = SecureRandom.getInstance("SHA1PRNG");
+			md = MessageDigest.getInstance("SHA-256");
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			throw new NullPointerException(String.format(
+					"WARNING: Hashing algorithms %s and/or %s is not "
+					+ "available. You should not add sensitive information "
+					+ "to the database.", "SHA1PRNG", "SHA-256"));
+		}
 	}
 
 	@Override
 	public String hashString(String s, String salt)
 	{
-		return s + salt;
+		return encryptMessage("", s, salt);
 	}
 
 	@Override
 	public String getNewSalt()
 	{
-		return "";
+    	byte[] salt = new byte[8];
+    	sr.nextBytes(salt);
+		return String.format("%016x", new BigInteger(1, salt));
+	}
+	
+	@Override
+	public String encryptMessage(
+			String prepend, String message, String append)
+	{
+		String messageDigest = prepend + message + append;
+		return String.format("%064x", new BigInteger(1,
+				md.digest(messageDigest.getBytes())));
 	}
 	
 	/* Protected */
 	
 	/* Private */
+	private SecureRandom sr;
+	private MessageDigest md;
 }

@@ -48,6 +48,18 @@ public interface Encryption
 	 */
 	public String getNewSalt();
 	
+	/**
+	 * Generates a hashed version of {@code message} using
+	 * {@code prepend} and {@code append} as salt.
+	 * @param prepend the salt to prepend.
+	 * @param message The message to hash.
+	 * @param append The salt to append.
+	 * 
+	 * @return
+	 */
+	public String encryptMessage(
+			String prepend, String message, String append);
+	
 	/* Protected */
 	
 	/* Private */

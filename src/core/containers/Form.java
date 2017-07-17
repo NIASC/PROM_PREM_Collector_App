@@ -71,7 +71,7 @@ public class Form
 			return;
 		}
 		if (duplicateEntry(fc))
-			fc = fc.copy(); // duplicates causes errors.
+			fc = (FormContainer) fc.clone(); // duplicates causes errors.
 		
 		final FormContainer tmp = currentFC;
 		switch(location)

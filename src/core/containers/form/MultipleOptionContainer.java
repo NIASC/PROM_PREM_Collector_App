@@ -73,7 +73,7 @@ public class MultipleOptionContainer extends FormContainer
 	}
 
 	@Override
-	public MultipleOptionContainer copy()
+	public Object clone()
 	{
 		MultipleOptionContainer moc = new MultipleOptionContainer(
 				allowEmpty, statement, description);

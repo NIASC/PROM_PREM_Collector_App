@@ -55,6 +55,8 @@ import core.containers.form.SingleOptionContainer;
 import core.containers.form.SliderContainer;
 import core.containers.form.TimePeriodContainer;
 import core.interfaces.Database;
+import core.interfaces.Encryption;
+import core.interfaces.Implementations;
 import core.interfaces.Questions;
 
 /**
@@ -121,19 +123,23 @@ public class MySQL_Database implements Database
 			values.add(QDBFormat.getDBFormat(itr.next()));
 		}
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String qInsert0 = String.format("INSERT INTO `patients` (`clinic_id`, `pnr`, `forename`, `lastname`, `id`) VALUES ('%d', '%s', '%s', '%s', NULL)",
-				patient.getClinicID(), patient.getPersonalNumber(),
-				patient.getForename(), patient.getSurname());
-		String qInsert1 = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_pnr`, `date`, %s) VALUES ('%d', '%s', '%s', %s)",
-				String.join(", ", fields), patient.getClinicID(), patient.getPersonalNumber(),
-				sdf.format(new Date()), String.join(", ", values));
+		String identifier = crypto.encryptMessage(
+				patient.getForename(), patient.getPersonalNumber(),
+				patient.getSurname());
+		
+		String patientInsert = String.format("INSERT INTO `patients` (`clinic_id`, `identifier`, `id`) VALUES ('%d', '%s', NULL)",
+				patient.getClinicID(), identifier);
+
+		String resultInsert = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_identifier`, `date`, %s) VALUES ('%d', '%s', '%s', %s)",
+				String.join(", ", fields), patient.getClinicID(), identifier,
+				(new SimpleDateFormat("yyyy-MM-dd")).format(new Date()),
+				String.join(", ", values));
 		
 		int ret = QUERY_SUCCESS;
-		if (!patientInDatabase(patient.getPersonalNumber()))
-			ret = queryUpdate(qInsert0);
+		if (!patientInDatabase(identifier))
+			ret = queryUpdate(patientInsert);
 		
-		if (ret == QUERY_SUCCESS && queryUpdate(qInsert1) == ret)
+		if (ret == QUERY_SUCCESS && queryUpdate(resultInsert) == ret)
 			return QUERY_SUCCESS;
 		else
 			return ERROR;
@@ -187,18 +193,18 @@ public class MySQL_Database implements Database
 	}
 	
 	@Override
-	public boolean patientInDatabase(String pnr)
+	public boolean patientInDatabase(String identifier)
 	{
 		try (Connection conn = DriverManager.getConnection(
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
 			Statement s = conn.createStatement();
-			ResultSet rs = query(s, "SELECT `pnr` FROM `patients`");
+			ResultSet rs = query(s, "SELECT `identifier` FROM `patients`");
 			if (rs == null)
 				return false;
 
 			while (rs.next())
-				if (rs.getString("pnr").equals(pnr))
+				if (rs.getString("identifier").equals(identifier))
 					return true;
 		}
 		catch (SQLException se) { }
@@ -359,6 +365,7 @@ public class MySQL_Database implements Database
 
 	private static MySQL_Database database;
 	private DatabaseConfig dbConfig;
+	private Encryption crypto;
 	
 	/**
 	 * Initializes variables and loads the database configuration.
@@ -366,6 +373,7 @@ public class MySQL_Database implements Database
 	 */
 	private MySQL_Database()
 	{
+		crypto = Implementations.Encryption();
 		try
 		{
 			dbConfig = new DatabaseConfig();

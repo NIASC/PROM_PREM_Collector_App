@@ -21,7 +21,7 @@ package core.containers.form;
 
 
 /**
- * This class handles entry field object. It allows you to present a
+ * This class handles entry area object. It allows you to present a
  * statement or a question that you want the user to respond to. The
  * response can then be stored in this container and retrieved later.
  * 
@@ -34,8 +34,7 @@ public class AreaContainer extends FormContainer
 {
 	
 	/**
-	 * Initializes this container with form with the supplied
-	 * statement.
+	 * Initializes this container with the supplied statement.
 	 * 
 	 * @param allowEmptyEntries True if this container allows empty
 	 * 		entry (answer/response).
@@ -57,7 +56,7 @@ public class AreaContainer extends FormContainer
 	}
 
 	@Override
-	public AreaContainer copy()
+	public Object clone()
 	{
 		AreaContainer fc = new AreaContainer(allowEmpty, statement,
 				description);

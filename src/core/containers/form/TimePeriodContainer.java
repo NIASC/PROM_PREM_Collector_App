@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -56,6 +57,8 @@ public class TimePeriodContainer extends FormContainer
 	{
 		super(allowEmpty, statement, description);
 		entries = new ArrayList<Calendar>();
+		upperLim = new GregorianCalendar();
+		lowerLim = (GregorianCalendar) upperLim.clone();
 	}
 
 	@Override
@@ -65,7 +68,7 @@ public class TimePeriodContainer extends FormContainer
 	}
 
 	@Override
-	public TimePeriodContainer copy()
+	public Object clone()
 	{
 		TimePeriodContainer tpc = new TimePeriodContainer(
 				allowEmpty, statement, description);

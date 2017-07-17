@@ -71,7 +71,7 @@ public class SliderContainer extends FormContainer
 	}
 
 	@Override
-	public SliderContainer copy()
+	public Object clone()
 	{
 		SliderContainer sc = new SliderContainer(
 				allowEmpty, statement, description, lower, upper);

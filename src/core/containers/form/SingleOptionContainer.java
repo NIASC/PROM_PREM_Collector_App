@@ -69,7 +69,7 @@ public class SingleOptionContainer extends FormContainer
 	}
 
 	@Override
-	public SingleOptionContainer copy()
+	public Object clone()
 	{
 		SingleOptionContainer soc = new SingleOptionContainer(
 				allowEmpty, statement, description);

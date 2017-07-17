@@ -113,12 +113,12 @@ public interface Database
 	/**
 	 * Collects the information about the patient from the database.
 	 * 
-	 * @param pnr The personal number of the patient to look for.
+	 * @param identifier The identifier of the patient to look for.
 	 * 
 	 * @return If the patient was found the instance of the patient is
 	 * 		returned else {@code null}.
 	 */
-	public boolean patientInDatabase(String pnr);
+	public boolean patientInDatabase(String identifier);
 
 	/**
 	 * Updates the user's password and salt to newPass and newSalt if

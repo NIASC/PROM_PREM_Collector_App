@@ -242,7 +242,7 @@ public class UserHandle
 	 */
 	protected User getUser()
 	{
-		return user.copy();
+		return (User) user.clone();
 	}
 	
 	/* Private */

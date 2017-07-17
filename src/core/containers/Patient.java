@@ -44,8 +44,8 @@ public class Patient
 	{
 		if (user == null)
 			throw new NullPointerException();
-		this.forename = forename;
-		this.surname = surname;
+		this.forename = forename.trim().toLowerCase();
+		this.surname = surname.trim().toLowerCase();
 		this.pnr = pnr;
 		this.user = user;
 		this.clinicID = user.getClinicID();

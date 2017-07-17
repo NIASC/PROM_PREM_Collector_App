@@ -51,50 +51,15 @@ public class FieldContainer extends AreaContainer
 		super(allowEmptyEntries, statement, description);
 		secret = secretEntry;
 	}
-	/*
-	@Override
-	public boolean hasEntry()
-	{
-		return entry != null && !entry.isEmpty();
-	}*/
 
 	@Override
-	public FieldContainer copy()
+	public Object clone()
 	{
 		FieldContainer fc = new FieldContainer(allowEmpty, secret,
 				statement, description);
 		fc.setEntry(entry);
 		return fc;
 	}
-	/*
-	@Override
-	public String getEntry()
-	{
-		return entry;
-	}*/
-	
-	/**
-	 * Sets the entry (i.e. the user input in response to the field's
-	 * statement) of this container's field. Setting the entry to null
-	 * can be used to reset the field.
-	 * 
-	 * @param entry The user entry to set.
-	 * 
-	 * @return True if the entry was set
-	 */
-	/*
-	public boolean setEntry(String entry)
-	{
-		if (entry == null)
-			this.entry = null;
-		else
-		{
-			if (entry.trim().isEmpty() && !allowEmpty)
-				return false;
-			this.entry = entry.trim();
-		}
-		return true;
-	}*/
 	
 	/**
 	 * 
@@ -111,5 +76,4 @@ public class FieldContainer extends AreaContainer
 	/* Private */
 
 	private final boolean secret;
-	//private String entry;
 }

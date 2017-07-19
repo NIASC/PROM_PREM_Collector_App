@@ -46,9 +46,14 @@ import javax.swing.event.ChangeListener;
 import implementation.SwingComponents;
 
 /**
+ * A panel that displays date using a spinner for day, month, year
+ * and combo box (i.e. drop-down menu) for day and month. The this
+ * class is a swing implementation for the {@code Calendar} object
+ * which is uses as a backend.
  * 
  * @author Marcus Malmquist
  *
+ * @see Calendar
  */
 public class CalendarPanel extends JPanel implements ChangeListener, ItemListener
 {

@@ -524,8 +524,27 @@ public class MySQL_Database implements Database
 			return null;
 	}
 	
+	/**
+	 * This class handles converting question answer formats
+	 * between its database representation and its java
+	 * representation.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	private static class QDBFormat
 	{
+		/**
+		 * Converts the answer stored in {@code fc} to the
+		 * format used in the database.
+		 * 
+		 * @param fc The container for the question which have
+		 * 		been answered and should have the answer stored
+		 * 		in the database.
+		 * 
+		 * @return The database representation for the answer
+		 * 		in {@code fc}.
+		 */
 		static String getDBFormat(FormContainer fc)
 		{
 			if (fc.getEntry() == null)
@@ -560,6 +579,18 @@ public class MySQL_Database implements Database
 				return "''";
 		}
 		
+		/**
+		 * Converts the answer {@code dbEntry} from its database
+		 * representation to its java representation. The return
+		 * type is {@code Object} to keep the formats general. The
+		 * returned objects are in the format they need to be in
+		 * order to represent the answer in its java format.
+		 * 
+		 * @param dbEntry The database entry that is to be converted
+		 * 		to a java entry.
+		 * 
+ 		 * @return The {@code Object} representation of the answer.
+		 */
 		static Object getQFormat(String dbEntry)
 		{
 			if (dbEntry == null || dbEntry.trim().isEmpty())
@@ -573,7 +604,7 @@ public class MySQL_Database implements Database
 			{ /* slider */
 				return new Integer(dbEntry.substring("slider".length()));
 			}
-			else if (dbEntry.startsWith("[") &&  dbEntry.endsWith("]"))
+			else if (dbEntry.startsWith("[") && dbEntry.endsWith("]"))
 			{ /* multiple answers */
 				List<String> entries = Arrays.asList(dbEntry.split(","));
 				if (entries.get(0).startsWith("option"))

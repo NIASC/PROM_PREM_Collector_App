@@ -24,7 +24,6 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JViewport;
 import javax.swing.ScrollPaneConstants;
 
 import core.containers.form.AreaContainer;

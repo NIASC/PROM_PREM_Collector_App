@@ -87,6 +87,11 @@ public class ViewData
 	/* Protected */
 	
 	/* Private */
+	
+	/**
+	 * Create a form that lets the user pick which questions to view and
+	 * what time period to view them for.
+	 */
 	private void queryTimePeriod()
 	{
 		Messages msg = Messages.getMessages();
@@ -111,6 +116,16 @@ public class ViewData
 		userInterface.presentForm(form, this::validateSelection, false);
 	}
 	
+	/**
+	 * Validates the user entry.
+	 * 
+	 * @param form The form that has been filled in by the user.
+	 * 
+	 * @return The {@code RetFunContainer} that contains information
+	 * 		about the validation process.
+	 * 
+	 * @see RetFunContainer
+	 */
 	private RetFunContainer validateSelection(Form form)
 	{
 		Messages msg = Messages.getMessages();
@@ -146,7 +161,9 @@ public class ViewData
 	}
 	
 	/**
-	 * REPLACE ME.
+	 * Prints the statistics to the standard output. This method
+	 * should be replaced by a method to properly display statistics
+	 * to the user.
 	 */
 	private void displayStatistics()
 	{

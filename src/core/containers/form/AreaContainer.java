@@ -41,7 +41,9 @@ public class AreaContainer extends FormContainer
 	 * @param statement The statement to initialize this form with.
 	 * @param description A more detailed description of the
 	 * 		{@code statement}.
-	 * @param capacity TODO
+	 * @param capacity The maximum length of the entry that this
+	 * 		container's entry is allowed to hold. This attribute
+	 * 		is used to avoid overflow issues.
 	 */
 	public AreaContainer(boolean allowEmptyEntries, String statement,
 			String description, int capacity)
@@ -97,6 +99,13 @@ public class AreaContainer extends FormContainer
 		return true;
 	}
 	
+	/**
+	 * Retrieves the capacity that this container has. The capacity
+	 * is the number of characters that the entry can hold (in order
+	 * to not cause any overflow issues).
+	 * 
+	 * @return The maximum capacity for the entry.
+	 */
 	public int getCapacity()
 	{
 		return capacity;

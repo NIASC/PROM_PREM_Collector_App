@@ -51,6 +51,7 @@ public interface Encryption
 	/**
 	 * Generates a hashed version of {@code message} using
 	 * {@code prepend} and {@code append} as salt.
+	 * 
 	 * @param prepend the salt to prepend.
 	 * @param message The message to hash.
 	 * @param append The salt to append.

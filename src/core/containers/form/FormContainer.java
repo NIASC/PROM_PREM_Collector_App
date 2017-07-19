@@ -46,6 +46,16 @@ public abstract class FormContainer
 	/* Public */
 	
 	/**
+	 * Creates a copy of this container. It is implementation
+	 * dependent whether or not the references to the next and
+	 * previous containers.
+	 * 
+	 * @return A copy of this container.
+	 */
+	@Override
+	public abstract Object clone();
+	
+	/**
 	 * Check if this {@code FormContainer} has been filled (i.e. an option
 	 * has been selected or the field has text in it etc.).<br><br>
 	 * If this form allows empty entries ({@code allowsEmpty() == true})
@@ -59,16 +69,6 @@ public abstract class FormContainer
 	 * @see #entrySet
 	 */
 	public abstract boolean hasEntry();
-	
-	/**
-	 * Creates a copy of this container. It is implementation
-	 * dependent whether or not the references to the next and
-	 * previous containers.
-	 * 
-	 * @return A copy of this container.
-	 */
-	@Override
-	public abstract Object clone();
 	
 	/**
 	 * Retrieves the entry/answer for this container.<br>

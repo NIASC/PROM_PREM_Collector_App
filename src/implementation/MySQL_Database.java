@@ -348,9 +348,6 @@ public class MySQL_Database implements Database
 						String q = String.format("question%d", qid);
 						container.addResult(q1, QDBFormat.getQFormat(rs.getString(q)));
 					}
-					/* when displaying the data load the questions and display
-					 * the answer rather than the question identifier.
-					 */
 				}
 				ret = QUERY_SUCCESS;
 			}
@@ -377,10 +374,7 @@ public class MySQL_Database implements Database
 		try
 		{
 			dbConfig = new DatabaseConfig();
-		} catch (IOException e)
-		{
-			// e.printStackTrace();
-		}
+		} catch (IOException e) { }
 	}
 	
 	/**

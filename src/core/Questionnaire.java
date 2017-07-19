@@ -183,8 +183,8 @@ public class Questionnaire
 			answers.add(form.currentEntry());
 		while (form.nextEntry() != null);
 		
-		if (Implementations.Database().addQuestionnaireAnswers(patient,
-				Collections.unmodifiableList(answers)) == Database.ERROR)
+		if (!Implementations.Database().addQuestionnaireAnswers(patient,
+				Collections.unmodifiableList(answers)))
 		{
 			rfc.message = Database.DATABASE_ERROR;
 			return rfc;

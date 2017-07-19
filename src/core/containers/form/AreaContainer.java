@@ -41,12 +41,14 @@ public class AreaContainer extends FormContainer
 	 * @param statement The statement to initialize this form with.
 	 * @param description A more detailed description of the
 	 * 		{@code statement}.
+	 * @param capacity TODO
 	 */
 	public AreaContainer(boolean allowEmptyEntries, String statement,
-			String description)
+			String description, int capacity)
 	{
 		super(allowEmptyEntries, statement, description);
 		entrySet = false;
+		this.capacity = capacity;
 	}
 
 	@Override
@@ -59,7 +61,7 @@ public class AreaContainer extends FormContainer
 	public Object clone()
 	{
 		AreaContainer fc = new AreaContainer(allowEmpty, statement,
-				description);
+				description, capacity);
 		fc.setEntry(entry);
 		return fc;
 	}
@@ -86,15 +88,23 @@ public class AreaContainer extends FormContainer
 			this.entry = null;
 		else
 		{
-			if (entry.trim().isEmpty() && !allowEmpty)
+			entry = entry.trim();
+			if (entry.isEmpty() && !allowEmpty)
 				return false;
-			this.entry = entry.trim();
+			this.entry = entry.substring(0,
+					entry.length() > capacity ? capacity : entry.length());
 		}
 		return true;
 	}
 	
+	public int getCapacity()
+	{
+		return capacity;
+	}
+	
 	/* Protected */
 	protected String entry;
+	protected final int capacity;
 	
 	/* Private */
 }

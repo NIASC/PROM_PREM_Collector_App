@@ -44,8 +44,6 @@ public interface Database
 {
 	/* Public */
 	
-	public static final int ERROR = -1;
-	public static final int QUERY_SUCCESS = 1;
 	/**
 	 * If the messages was not retrieved from the database this
 	 * message (in English) should be used to notify the caller that
@@ -62,10 +60,10 @@ public interface Database
 	 * @param clinic The clinic ID that the new user belongs to.
 	 * @param email The email of the new user.
 	 * 
-	 * @return {@code QUERY_SUCCESS} on successful update,
-	 *		{@code ERROR} on failure.
+	 * @return {@code true} on successful update,
+	 *		{@code false} on failure.
 	 */
-	public int addUser(String username,
+	public boolean addUser(String username,
 			String password, String salt, int clinic, String email);
 	
 	/**
@@ -77,20 +75,20 @@ public interface Database
 	 * 		should be in the same order as the questions in the
 	 * 		questionnaire.
 	 * 
-	 * @return {@code QUERY_SUCCESS} on successful update,
-	 * 		{@code ERROR} on failure.
+	 * @return {@code true} on successful update,
+	 *		{@code false} on failure.
 	 */
-	public int addQuestionnaireAnswers(Patient patient, List<FormContainer> answers);
+	public boolean addQuestionnaireAnswers(Patient patient, List<FormContainer> answers);
 
 	/**
 	 * Adds a new clinic to the database.
 	 * 
 	 * @param clinicName The name of the clinic.
 	 * 
-	 * @return {@code QUERY_SUCCESS} on successful update,
-	 * 		{@code ERROR} on failure.
+	 * @return {@code true} on successful update,
+	 *		{@code false} on failure.
 	 */
-	public int addClinic(String clinicName);
+	public boolean addClinic(String clinicName);
 	
 	/**
 	 * Collects the clinic names and id and places them in a Map.
@@ -142,11 +140,11 @@ public interface Database
 	 * 
 	 * @param mc The (empty) message container to put error messages in.
 	 * 
-	 * @return {@code QUERY_SUCCESS} if the error messages were
-	 * 		successfully loaded. {@code ERROR} if there was an error
+	 * @return {@code true} if the error messages were
+	 * 		successfully loaded. {@code false} if there was an error
 	 * 		with the database.
 	 */
-	public int getErrorMessages(MessageContainer mc);
+	public boolean getErrorMessages(MessageContainer mc);
 	
 	/**
 	 * Loads info messages from the database and puts them in a
@@ -154,11 +152,11 @@ public interface Database
 	 * 
 	 * @param mc The (empty) message container to put info messages in.
 	 * 
-	 * @return {@code QUERY_SUCCESS} if the info messages were
-	 * 		successfully loaded. {@code ERROR} if there was an error
+	 * @return {@code true} if the info messages were
+	 * 		successfully loaded. {@code false} if there was an error
 	 * 		with the database.
 	 */
-	public int getInfoMessages(MessageContainer mc);
+	public boolean getInfoMessages(MessageContainer mc);
 	
 	/**
 	 * Loads questions from the database and stores them in a list
@@ -167,13 +165,13 @@ public interface Database
 	 * @param qc The {@code QuestionContainer} to put the questions
 	 * 		in.
 	 * 
-	 * @return {@code QUERY_SUCCESS} if the questions were successfully
-	 * 		loaded. {@code ERROR} if there was an error with the
+	 * @return {@code true} if the questions were successfully
+	 * 		loaded. {@code false} if there was an error with the
 	 * 		database.
 	 * 
 	 * @see QuestionContainer
 	 */
-	public int loadQuestions(QuestionContainer qc);
+	public boolean loadQuestions(QuestionContainer qc);
 	
 	/**
 	 * Loads the dates at which questionnaires have been filled in for
@@ -182,15 +180,30 @@ public interface Database
 	 * @param user The user that requests statistics.
 	 * @param tpc The container for the dates.
 	 * 
-	 * @return {@code QUERY_SUCCESS} if the questions were successfully
-	 * 		loaded. {@code ERROR} if there was an error with the
+	 * @return {@code true} if the questions were successfully
+	 * 		loaded. {@code false} if there was an error with the
 	 * 		database.
 	 * 
 	 * @see TimePeriodContainer
 	 */
-	public int loadQResultDates(User user, TimePeriodContainer tpc);
+	public boolean loadQResultDates(User user, TimePeriodContainer tpc);
 
-	public int loadQResults(User user, Calendar begin, Calendar end,
+	/**
+	 * Loads questionnaire results for the questions contained in
+	 * {@code questionIDs} and during the time period specified by
+	 * {@code begin} and {@code end}.
+	 * Only the results associated with the same clinic as {@code user} will
+	 * be loaded.
+	 * 
+	 * @param user The user that is requesting the data.
+	 * @param begin The (inclusive) start date.
+	 * @param end The (inclusive) end date.
+	 * @param questionIDs a list of question IDs for the requested questions.
+	 * @param container The container to put the results in.
+	 * 
+	 * @return {@code true} if the results were loaded. {@code false} if not.
+	 */
+	public boolean loadQResults(User user, Calendar begin, Calendar end,
 			List<Integer> questionIDs, StatisticsContainer container);
 	
 	/* Protected */

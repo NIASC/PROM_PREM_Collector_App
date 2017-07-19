@@ -35,8 +35,7 @@ public final class Questions
 	public synchronized final boolean loadQuestionnaire()
 	{
 		qEntries = new QuestionContainer();
-		return Implementations.Database().loadQuestions(qEntries)
-				== Database.QUERY_SUCCESS;
+		return Implementations.Database().loadQuestions(qEntries);
 	}
 	
 	/**

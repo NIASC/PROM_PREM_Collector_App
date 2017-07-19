@@ -298,8 +298,9 @@ public class QuestionContainer
 			else if (AreaContainer.class.isAssignableFrom(type))
 			{
 				if (FieldContainer.class.isAssignableFrom(type))
-					return new FieldContainer(optional, false, question, description);
-				return new AreaContainer(optional, question, description);
+					return new FieldContainer(
+							optional, false, question, description);
+				return new AreaContainer(optional, question, description, 512);
 			}
 			else if (SliderContainer.class.isAssignableFrom(type))
 				return new SliderContainer(

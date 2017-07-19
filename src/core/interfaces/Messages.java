@@ -139,14 +139,10 @@ public final class Messages
 	public synchronized final boolean loadMessages()
 	{
 		Database db = Implementations.Database();
-		
 		error = new MessageContainer();
 		info = new MessageContainer();
-		int errMsgLoadCode = db.getErrorMessages(error);
-		int infoMsgLoadCode = db.getInfoMessages(info);
-		
-		return errMsgLoadCode == Database.QUERY_SUCCESS
-				&& infoMsgLoadCode == Database.QUERY_SUCCESS;
+		return db.getErrorMessages(error)
+				&& db.getInfoMessages(info);
 	}
 	
 	/**

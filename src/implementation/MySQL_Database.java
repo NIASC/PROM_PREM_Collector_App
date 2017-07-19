@@ -58,6 +58,8 @@ import core.interfaces.Database;
 import core.interfaces.Encryption;
 import core.interfaces.Implementations;
 import core.interfaces.Questions;
+import implementation.exceptions.DBReadException;
+import implementation.exceptions.DBWriteException;
 
 /**
  * This class is an example of an implementation of
@@ -96,7 +98,7 @@ public class MySQL_Database implements Database
 	 */
 
 	@Override
-	public int addUser(String username, String password,
+	public boolean addUser(String username, String password,
 			String salt, int clinic, String email)
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -104,15 +106,21 @@ public class MySQL_Database implements Database
 				"INSERT INTO `users` (`clinic_id`, `name`, `password`, `email`, `registered`, `salt`, `update_password`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%d')",
 				clinic, username, password, email,
 				sdf.format(new Date()), salt, 1);
-		return queryUpdate(qInsert);
+		try {
+			queryUpdate(qInsert);
+		}
+		catch (DBWriteException dbw) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
-	public int addQuestionnaireAnswers(Patient patient, List<FormContainer> answers)
+	public boolean addQuestionnaireAnswers(Patient patient, List<FormContainer> answers)
 	{
 		int nQuestions = Questions.getQuestions().getContainer().getSize();
 		if (answers.size() != nQuestions)
-			return ERROR;
+			return false;
 		
 		List<String> values = new ArrayList<String>();
 		List<String> fields = new ArrayList<String>();
@@ -134,23 +142,29 @@ public class MySQL_Database implements Database
 				String.join(", ", fields), patient.getClinicID(), identifier,
 				(new SimpleDateFormat("yyyy-MM-dd")).format(new Date()),
 				String.join(", ", values));
-		
-		int ret = QUERY_SUCCESS;
-		if (!patientInDatabase(identifier))
-			ret = queryUpdate(patientInsert);
-		
-		if (ret == QUERY_SUCCESS && queryUpdate(resultInsert) == ret)
-			return QUERY_SUCCESS;
-		else
-			return ERROR;
+		try {
+			if (!patientInDatabase(identifier))
+				queryUpdate(patientInsert);
+			queryUpdate(resultInsert);
+		}
+		catch (DBWriteException dbw) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
-	public int addClinic(String clinicName)
+	public boolean addClinic(String clinicName)
 	{
 		String qInsert = String.format(
-				"INSERT INTO `clinics` (`id`, `name`) VALUES (NULL, '%s')", clinicName);
-		return queryUpdate(qInsert);
+				"INSERT INTO `clinics` (`id`, `name`) VALUES (NULL, '%s')",
+				clinicName);
+		try {
+			queryUpdate(qInsert);
+		} catch (DBWriteException dbw) {
+			return false;
+		}
+		return true;
 	}
 	
 	@Override
@@ -165,7 +179,9 @@ public class MySQL_Database implements Database
 			if (rs != null)
 				while (rs.next())
 					ret.put(rs.getInt("id"), rs.getString("name"));
-		} catch (SQLException e) { }
+		}
+		catch (DBReadException dbr) { }
+		catch (SQLException e) { }
 		return ret;
 	}
 
@@ -188,6 +204,7 @@ public class MySQL_Database implements Database
 							rs.getString("email"), rs.getString("salt"),
 							rs.getInt("update_password") != 0);
 		}
+		catch (DBReadException dbr) { }
 		catch (SQLException se) { }
 		return user;
 	}
@@ -207,6 +224,7 @@ public class MySQL_Database implements Database
 				if (rs.getString("identifier").equals(identifier))
 					return true;
 		}
+		catch (DBReadException dbr) { }
 		catch (SQLException se) { }
 		return false;
 	}
@@ -220,29 +238,34 @@ public class MySQL_Database implements Database
 		String qInsert = String.format(
 				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
 				newPass, newSalt, 0, user.getUsername());
-		return queryUpdate(qInsert) == QUERY_SUCCESS ? getUser(user.getUsername()) : null;
+		try {
+			queryUpdate(qInsert);
+		} catch (DBWriteException dbw) {
+			return null;
+		}
+		return getUser(user.getUsername());
 	}
 
 	@Override
-	public int getErrorMessages(MessageContainer mc)
+	public boolean getErrorMessages(MessageContainer mc)
 	{
 		if (mc == null)
-			return ERROR;
+			return false;
 		return getMessages("error_messages", mc);
 	}
 
 	@Override
-	public int getInfoMessages(MessageContainer mc)
+	public boolean getInfoMessages(MessageContainer mc)
 	{
 		if (mc == null)
-			return ERROR;
+			return false;
 		return getMessages("info_messages", mc);
 	}
 	
 	@Override
-	public int loadQuestions(QuestionContainer qc)
+	public boolean loadQuestions(QuestionContainer qc)
 	{
-		int ret = ERROR;
+		boolean ret = false;
 		try (Connection conn = DriverManager.getConnection(
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
@@ -281,17 +304,18 @@ public class MySQL_Database implements Database
 							rs.getString("description"), options,
 							rs.getInt("optional") != 0, rs.getInt("max_val"), rs.getInt("min_val"));
 				}
-				ret = QUERY_SUCCESS;
+				ret = true;
 			}
 		}
+		catch (DBReadException dbr) { }
 		catch (SQLException e) { }
 		return ret;
 	}
 
 	@Override
-	public int loadQResultDates(User user, TimePeriodContainer tpc)
+	public boolean loadQResultDates(User user, TimePeriodContainer tpc)
 	{
-		int ret = ERROR;
+		boolean ret = false;
 		try (Connection conn = DriverManager.getConnection(
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
@@ -308,19 +332,20 @@ public class MySQL_Database implements Database
 					cal.setTime(sdf.parse(rs.getString("date")));
 					tpc.addDate(cal);
 				}
-				ret = QUERY_SUCCESS;
+				ret = true;
 			}
 		}
+		catch (DBReadException dbr) { }
 		catch (SQLException e) { }
 		catch (ParseException e) { }
 		return ret;
 	}
 	
 	@Override
-	public int loadQResults(User user, Calendar begin, Calendar end,
+	public boolean loadQResults(User user, Calendar begin, Calendar end,
 			List<Integer> questionIDs, StatisticsContainer container)
 	{
-		int ret = ERROR;
+		boolean ret = false;
 		try (Connection conn = DriverManager.getConnection(
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
@@ -349,10 +374,11 @@ public class MySQL_Database implements Database
 						container.addResult(q1, QDBFormat.getQFormat(rs.getString(q)));
 					}
 				}
-				ret = QUERY_SUCCESS;
+				ret = true;
 			}
 		}
-		catch (SQLException e) { e.printStackTrace(); }
+		catch (DBReadException dbr) { }
+		catch (SQLException e) { }
 		return ret;
 	}
 	
@@ -386,17 +412,18 @@ public class MySQL_Database implements Database
 	 * 
 	 * @return QUERY_SUCCESS on successful query, ERROR on failure.
 	 */
-	private int queryUpdate(String message)
+	private void queryUpdate(String message) throws DBWriteException
 	{
-		int ret = ERROR;
 		try (Connection c = DriverManager.getConnection(dbConfig.getURL(),
 				dbConfig.getUser(), dbConfig.getPassword()))
 		{
 			c.createStatement().executeUpdate(message);
-			ret = QUERY_SUCCESS;
 		}
-		catch (SQLException se) { }
-		return ret;
+		catch (SQLException se) {
+			throw new DBWriteException(String.format(
+					"Database could not process request: '%s'. Check your arguments.",
+					message));
+		}
 	}
 	
 	/**
@@ -414,14 +441,18 @@ public class MySQL_Database implements Database
 	 * 		is not initialized or a query error occurs then null is
 	 * 		returned.
 	 */
-	private ResultSet query(Statement s, String message)
+	private ResultSet query(Statement s, String message) throws DBReadException
 	{
 		ResultSet rs = null;
 		try
 		{
 			rs = s.executeQuery(message);
 		}
-		catch (SQLException se) { }
+		catch (SQLException se) {
+			throw new DBReadException(String.format(
+					"Database could not process request: '%s'. Check your arguments.",
+					message));
+		}
 		return rs;
 	}
 
@@ -434,9 +465,9 @@ public class MySQL_Database implements Database
 	 * @param mc
 	 * @return
 	 */
-	private int getMessages(String tableName, MessageContainer mc)
+	private boolean getMessages(String tableName, MessageContainer mc)
 	{
-		int ret = ERROR;
+		boolean ret = false;
 		try (Connection conn = DriverManager.getConnection(
 				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
 		{
@@ -452,9 +483,10 @@ public class MySQL_Database implements Database
 					msg.put(rs.getString("locale"), rs.getString("message"));
 					mc.addMessage(rs.getInt("code"), rs.getString("name"), msg);
 				}
-				ret = QUERY_SUCCESS;
+				ret = true;
 			}
 		}
+		catch (DBReadException dbr) { }
 		catch (SQLException e) { }
 		return ret;
 	}

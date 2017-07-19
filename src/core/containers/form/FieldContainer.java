@@ -48,7 +48,7 @@ public class FieldContainer extends AreaContainer
 	public FieldContainer(boolean allowEmptyEntries, boolean secretEntry,
 			String statement, String description)
 	{
-		super(allowEmptyEntries, statement, description);
+		super(allowEmptyEntries, statement, description, 64);
 		secret = secretEntry;
 	}
 

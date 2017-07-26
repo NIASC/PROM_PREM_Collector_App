@@ -19,18 +19,44 @@
  */
 package Testing;
 
-import java.awt.GraphicsEnvironment;
+
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
 import core.interfaces.Database;
 import core.interfaces.Messages;
 import core.interfaces.Questions;
 import implementation.GUI_UserInterface;
 
-public class Main
+public class Main extends HttpServlet
 {
+	private static final long serialVersionUID = -2340346250534805168L;
+	private String message;
+
+	public void init() throws ServletException {
+		// Do required initialization
+		message = "Hello World";
+	}
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		// Set response content type
+		response.setContentType("text/html");
+
+		// Actual logic goes here.
+		PrintWriter out = response.getWriter();
+		out.println("<h1>" + message + "</h1>");
+	}
+
+	public void destroy() {
+		// do nothing.
+	}
+
 	public static void main(String[] args)
 	{
-		//printFonts();
+		Servlet s = (Servlet) new Main();
 		if (!Messages.getMessages().loadMessages()
 				|| !Questions.getQuestions().loadQuestionnaire())
 		{
@@ -39,16 +65,5 @@ public class Main
 		}
 		GUI_UserInterface qf1 = new GUI_UserInterface(false);
 		qf1.start();
-	}
-	
-	public static void printFonts()
-	{
-		String fonts[] = 
-				GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-
-		for ( int i = 0; i < fonts.length; i++ )
-		{
-			System.out.println(fonts[i]);
-		}
 	}
 }

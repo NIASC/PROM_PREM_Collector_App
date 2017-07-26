@@ -3,11 +3,6 @@ bin/
 build/
 .classpath
 .project
+build.properties
 *~
 PROM_PREM_Collector*.jar
-flowchart/**/*.aux
-flowchart/**/*.log
-flowchart/**/*.out
-flowchart/**/*.pdf
-flowchart/**/*.tex
-flowchart/**/*.txt

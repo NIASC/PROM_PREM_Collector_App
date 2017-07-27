@@ -17,21 +17,12 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package servlet;
+package servlet.core;
 
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,19 +30,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import applet.core.interfaces.Database;
-import applet.core.interfaces.Implementations;
 import applet.core.interfaces.Messages;
 import applet.core.interfaces.Questions;
-import applet.implementation.GUI_UserInterface;
-import applet.implementation.MySQL_Database;
-import applet.implementation.exceptions.DBReadException;
 
 public class Main extends HttpServlet
 {
 	private static final long serialVersionUID = -2340346250534805168L;
 	private String message;
 	
-	private DataSource dataSource = null;
 
 	public void init() throws ServletException
 	{

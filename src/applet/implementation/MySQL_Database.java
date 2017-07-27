@@ -63,8 +63,8 @@ import applet.core.interfaces.Database;
 import applet.core.interfaces.Encryption;
 import applet.core.interfaces.Implementations;
 import applet.core.interfaces.Questions;
-import applet.implementation.exceptions.DBReadException;
-import applet.implementation.exceptions.DBWriteException;
+import servlet.implementation.exceptions.DBReadException;
+import servlet.implementation.exceptions.DBWriteException;
 
 /**
  * This class is an example of an implementation of

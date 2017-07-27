@@ -1,5 +1,4 @@
-/** CalendarPanel.java
- * 
+/**
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -18,30 +17,37 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package applet.implementation.exceptions;
+package servlet.core.interfaces;
 
-import java.util.Calendar;
+import servlet.implementation.MySQL_Database;
 
 /**
- * This class is an exception that should be thrown if an attempt to
- * write to the database fails.
+ * This class acts as an interface between the implementation of the
+ * interfaces and the core program itself. It contains constructor calls
+ * to the classes that implements the interfaces.
+ * There is no method for calling the constructor for the UserInterface
+ * implementation because the program is started by the UserInterface
+ * and should only use that instance.
  * 
  * @author Marcus Malmquist
  *
- * @see Calendar
  */
-public class DBWriteException extends RuntimeException {
-
-	public DBWriteException()
+public abstract class Implementations
+{
+	/**
+	 * Constructor for the implementation of {@code Database}.
+	 * 
+	 * @return A new/running instance of the current implementation of
+	 * 		{@code Database}.
+	 * 
+	 * @see Database
+	 */
+	public static Database Database()
 	{
-		super();
+		return MySQL_Database.getDatabase();
 	}
 	
-	public DBWriteException(String message)
-	{
-		super(message);
-	}
+	/* Protected */
 	
-	private static final long serialVersionUID = -7992403920499044994L;
-
+	/* Private */
 }

@@ -18,7 +18,7 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package applet.implementation.exceptions;
+package servlet.implementation.exceptions;
 
 /**
  * This class is an exception that should be thrown if an attempt to

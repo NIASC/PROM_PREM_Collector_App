@@ -4,5 +4,6 @@ build/
 .classpath
 .project
 build.properties
+web/META-INF/context.xml
 *~
 PROM_PREM_Collector*.jar

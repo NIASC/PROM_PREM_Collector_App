@@ -20,23 +20,50 @@
 package Testing;
 
 
-import java.io.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import core.interfaces.Database;
+import core.interfaces.Implementations;
 import core.interfaces.Messages;
 import core.interfaces.Questions;
 import implementation.GUI_UserInterface;
+import implementation.MySQL_Database;
+import implementation.exceptions.DBReadException;
 
 public class Main extends HttpServlet
 {
 	private static final long serialVersionUID = -2340346250534805168L;
 	private String message;
+	
+	private DataSource dataSource = null;
 
-	public void init() throws ServletException {
+	public void init() throws ServletException
+	{
 		// Do required initialization
-		message = "Hello World";
+		message = "PROM/PREM Collector";
+
+		if (!Messages.getMessages().loadMessages()
+				|| !Questions.getQuestions().loadQuestionnaire())
+		{
+			System.out.printf("%s\n", Database.DATABASE_ERROR);
+			System.exit(1);
+		}
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -48,22 +75,13 @@ public class Main extends HttpServlet
 		// Actual logic goes here.
 		PrintWriter out = response.getWriter();
 		out.println("<h1>" + message + "</h1>");
+		
+		out.println(String.format("If this message does not display null, "
+				+ "then database was successfully loaded:<br>%s",
+				Messages.getMessages().getInfo(Messages.INFO_REG_BODY_DESCRIPTION)));
 	}
 
 	public void destroy() {
 		// do nothing.
-	}
-
-	public static void main(String[] args)
-	{
-		Servlet s = (Servlet) new Main();
-		if (!Messages.getMessages().loadMessages()
-				|| !Questions.getQuestions().loadQuestionnaire())
-		{
-			System.out.printf("%s\n", Database.DATABASE_ERROR);
-			System.exit(1);
-		}
-		GUI_UserInterface qf1 = new GUI_UserInterface(false);
-		qf1.start();
 	}
 }

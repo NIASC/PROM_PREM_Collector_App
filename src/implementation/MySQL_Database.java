@@ -40,6 +40,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import core.Utilities;
 import core.containers.MessageContainer;
 import core.containers.Patient;
@@ -171,8 +176,7 @@ public class MySQL_Database implements Database
 	public Map<Integer, String> getClinics()
 	{
 		Map<Integer, String> ret = new TreeMap<Integer, String>();
-		try (Connection conn = DriverManager.getConnection(
-				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, "SELECT `id`, `name` FROM `clinics`");
@@ -189,8 +193,7 @@ public class MySQL_Database implements Database
 	public User getUser(String username)
 	{
 		User user = null;
-		try (Connection conn = DriverManager.getConnection(
-				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, "SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
@@ -212,8 +215,7 @@ public class MySQL_Database implements Database
 	@Override
 	public boolean patientInDatabase(String identifier)
 	{
-		try (Connection conn = DriverManager.getConnection(
-				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, "SELECT `identifier` FROM `patients`");
@@ -266,8 +268,7 @@ public class MySQL_Database implements Database
 	public boolean loadQuestions(QuestionContainer qc)
 	{
 		boolean ret = false;
-		try (Connection conn = DriverManager.getConnection(
-				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, "SELECT * FROM `questionnaire`");
@@ -316,8 +317,7 @@ public class MySQL_Database implements Database
 	public boolean loadQResultDates(User user, TimePeriodContainer tpc)
 	{
 		boolean ret = false;
-		try (Connection conn = DriverManager.getConnection(
-				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, String.format(
@@ -346,8 +346,7 @@ public class MySQL_Database implements Database
 			List<Integer> questionIDs, StatisticsContainer container)
 	{
 		boolean ret = false;
-		try (Connection conn = DriverManager.getConnection(
-				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -387,7 +386,10 @@ public class MySQL_Database implements Database
 	/* Private */
 
 	private static MySQL_Database database;
-	private DatabaseConfig dbConfig;
+	/**
+	 * Handles connection with the database.
+	 */
+	private DataSource dataSource;
 	private Encryption crypto;
 	
 	/**
@@ -399,8 +401,12 @@ public class MySQL_Database implements Database
 		crypto = Implementations.Encryption();
 		try
 		{
-			dbConfig = new DatabaseConfig();
-		} catch (IOException e) { }
+			Context initContext = new InitialContext();
+			Context envContext = (Context) initContext.lookup("java:comp/env");
+			dataSource = (DataSource) envContext.lookup("jdbc/prom_prem_db");
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -414,8 +420,7 @@ public class MySQL_Database implements Database
 	 */
 	private void queryUpdate(String message) throws DBWriteException
 	{
-		try (Connection c = DriverManager.getConnection(dbConfig.getURL(),
-				dbConfig.getUser(), dbConfig.getPassword()))
+		try (Connection c = dataSource.getConnection())
 		{
 			c.createStatement().executeUpdate(message);
 		}
@@ -468,8 +473,7 @@ public class MySQL_Database implements Database
 	private boolean getMessages(String tableName, MessageContainer mc)
 	{
 		boolean ret = false;
-		try (Connection conn = DriverManager.getConnection(
-				dbConfig.getURL(), dbConfig.getUser(), dbConfig.getPassword()))
+		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, String.format(
@@ -620,83 +624,6 @@ public class MySQL_Database implements Database
 				return dbEntry;
 			}
 			return null;
-		}
-	}
-
-	/**
-	 * Contains the database configuration.
-	 * The configuration provides a link between the Java code and
-	 * the database, and contains necessary information to log in to
-	 * the database and get as well as put data in it.
-	 * 
-	 * The path to the configuration file is hard-coded.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
-	private final class DatabaseConfig
-	{
-		private final String cfgFile = "implementation/settings.ini";
-		// JDBC driver name and database URL
-		private String jdbcDriver, dbURL;
-		//  Database credentials
-		private String username, password;
-		
-		/**
-		 * Loads the settings from implementation/settings.ini.
-		 * 
-		 * @throws IOException
-		 */
-		private DatabaseConfig() throws IOException
-		{
-			Properties props = new Properties();
-			props.load(Utilities.getResourceStream(getClass(), cfgFile));
-			jdbcDriver = props.getProperty("jdbc_driver");
-			dbURL = props.getProperty("url");
-			username = props.getProperty("db_login");
-			password = props.getProperty("db_password");
-			props.clear();
-			try
-			{ // Register JDBC driver
-				Class.forName(jdbcDriver);
-			} catch (ClassNotFoundException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		public Object clone()
-				throws CloneNotSupportedException
-		{
-			throw new CloneNotSupportedException();
-		}
-		
-		/**
-		 * 
-		 * @return The URL of the database.
-		 */
-		public String getURL()
-		{
-			return dbURL;
-		}
-		
-		/**
-		 * 
-		 * @return The login name to the database.
-		 */
-		public String getUser()
-		{
-			return username;
-		}
-		
-		/**
-		 * 
-		 * @return The password to the database in plain text.
-		 */
-		public String getPassword()
-		{
-			return password;
 		}
 	}
 }

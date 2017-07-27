@@ -25,13 +25,9 @@
 
     <!-- General description of your web application -->
 
-    <display-name>My Web Application</display-name>
+    <display-name>PROM/PREM Collector</display-name>
     <description>
-      This is version X.X of an application to perform
-      a wild and wonderful task, based on servlets and
-      JSP pages.  It was written by Dave Developer
-      (dave@mycompany.com), who should be contacted for
-      more information.
+      This is an application that is designed to collect PROM/PREM data.
     </description>
 
 
@@ -54,7 +50,7 @@
 
     <context-param>
       <param-name>webmaster</param-name>
-      <param-value>myaddress@mycompany.com</param-value>
+      <param-value>marcus.malmquist@ki.se</param-value>
       <description>
         The EMAIL address of the administrator to whom questions
         and comments about this application should be addressed.
@@ -86,46 +82,14 @@
 
          You can define any number of servlets, including zero.
     -->
-
-    <servlet>
-      <servlet-name>controller</servlet-name>
-      <description>
-        This servlet plays the "controller" role in the MVC architecture
-        used in this application.  It is generally mapped to the ".do"
-        filename extension with a servlet-mapping element, and all form
-        submits in the app will be submitted to a request URI like
-        "saveCustomer.do", which will therefore be mapped to this servlet.
-
-        The initialization parameter names for this servlet are the
-        "servlet path" that will be received by this servlet (after the
-        filename extension is removed).  The corresponding value is the
-        name of the action class that will be used to process this request.
-      </description>
-      <servlet-class>com.mycompany.mypackage.ControllerServlet</servlet-class>
-      <init-param>
-        <param-name>listOrders</param-name>
-        <param-value>com.mycompany.myactions.ListOrdersAction</param-value>
-      </init-param>
-      <init-param>
-        <param-name>saveCustomer</param-name>
-        <param-value>com.mycompany.myactions.SaveCustomerAction</param-value>
-      </init-param>
-      <!-- Load this servlet at server startup time -->
-      <load-on-startup>5</load-on-startup>
-    </servlet>
-
-    <servlet>
-      <servlet-name>graph</servlet-name>
-      <description>
-        This servlet produces GIF images that are dynamically generated
-        graphs, based on the input parameters included on the request.
-        It is generally mapped to a specific request URI like "/graph".
-      </description>
-    </servlet>
     
     <servlet>
       <servlet-name>main</servlet-name>
+      <description>
+	Starts the server-side version of the collector.
+      </description>
       <servlet-class>Testing.Main</servlet-class>
+      <!-- <load-on-startup>5</load-on-startup> --> <!-- Load this servlet at server startup time -->
     </servlet>
 
 
@@ -148,16 +112,6 @@
     -->
 
     <servlet-mapping>
-      <servlet-name>controller</servlet-name>
-      <url-pattern>*.do</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-      <servlet-name>graph</servlet-name>
-      <url-pattern>/graph</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
       <servlet-name>main</servlet-name>
       <url-pattern>/main</url-pattern>
     </servlet-mapping>
@@ -171,6 +125,12 @@
     <session-config>
       <session-timeout>30</session-timeout>    <!-- 30 minutes -->
     </session-config>
-
+    
+    <resource-ref>
+      <description>DB Connection</description>
+      <res-ref-name>jdbc/prom_prem_db</res-ref-name>
+      <res-type>javax.sql.DataSource</res-type>
+      <res-auth>Container</res-auth>
+    </resource-ref>
 
 </web-app>

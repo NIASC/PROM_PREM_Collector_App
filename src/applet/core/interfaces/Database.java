@@ -107,16 +107,6 @@ public interface Database
 	 * 		returned else {@code null}.
 	 */
 	public User getUser(String username);
-	
-	/**
-	 * Collects the information about the patient from the database.
-	 * 
-	 * @param identifier The identifier of the patient to look for.
-	 * 
-	 * @return If the patient was found the instance of the patient is
-	 * 		returned else {@code null}.
-	 */
-	public boolean patientInDatabase(String identifier);
 
 	/**
 	 * Updates the user's password and salt to newPass and newSalt if

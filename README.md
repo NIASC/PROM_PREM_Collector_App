@@ -14,3 +14,11 @@ The required libraries should be put in $CATALINA_HOME/lib.
 + GNU JavaMail
 + GNU JAF
 + GNU inetlib
+
+# Setup
+
+start mariadb with `sudo systemctl start mariadb.service`
+start tomcat with `sudo /usr/share/tomcat8/bin/startup.sh`
+
+stop tomcat with `sudo /usr/share/tomcat8/bin/shutdown.sh`
+stop mariadb with `sudo systemctl stop mariadb.service`

@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -83,19 +86,22 @@ public class MySQL_Database implements Database
 	@Override
 	public String addUser(JSONObject obj)
 	{
+		Map<String, String> omap = (Map<String, String>) obj;
+		
 		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String qInsert = String.format(
 				"INSERT INTO `users` (`clinic_id`, `name`, `password`, `email`, `registered`, `salt`, `update_password`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%d')",
-				Integer.parseInt((String) obj.get("clinic_id")),
-				obj.get("name"), obj.get("password"), obj.get("email"),
-				sdf.format(new Date()), obj.get("salt"), 1);
+				Integer.parseInt(omap.get("clinic_id")),
+				omap.get("name"), omap.get("password"), omap.get("email"),
+				sdf.format(new Date()), omap.get("salt"), 1);
 		try {
 			queryUpdate(qInsert);
-			ret.put(INSERT_RESULT, INSERT_SUCCESS);
+			rmap.put(INSERT_RESULT, INSERT_SUCCESS);
 		}
 		catch (DBWriteException dbw) {
-			ret.put(INSERT_RESULT, INSERT_FAIL);
+			rmap.put(INSERT_RESULT, INSERT_FAIL);
 		}
 		return ret.toString();
 	}
@@ -103,22 +109,37 @@ public class MySQL_Database implements Database
 	@Override
 	public String addQuestionnaireAnswers(JSONObject obj)
 	{
+		Map<String, String> omap = (Map<String, String>) obj;
+		
 		JSONObject ret = new JSONObject();
-		String patientInsert = String.format("INSERT INTO `patients` (`clinic_id`, `identifier`, `id`) VALUES ('%d', '%s', NULL)",
-				obj.get("clinic_id"), obj.get("identifier"));
+		Map<String, String> rmap = (Map<String, String>) ret;
+		int clinic_id = Integer.parseInt(omap.get("clinic_id"));
+		String identifier = omap.get("identifier");
+		String patientInsert = String.format(
+				"INSERT INTO `patients` (`clinic_id`, `identifier`, `id`) VALUES ('%d', '%s', NULL)",
+				clinic_id, identifier);
+		
+		Map<String, String> m = (Map<String, String>) getJSONObject(omap.get("questions"));
+		List<String> question_ids = new ArrayList<String>();
+		List<String> question_answers = new ArrayList<String>();
+		for (Entry<String, String> e : m.entrySet())
+		{
+			question_ids.add((String) e.getKey());
+			question_answers.add((String) e.getValue());
+		}
 
 		String resultInsert = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_identifier`, `date`, %s) VALUES ('%d', '%s', '%s', %s)",
-				obj.get("question_ids"), obj.get("clinic_id"), obj.get("identifier"),
+				String.join(", ", question_ids), clinic_id, identifier,
 				(new SimpleDateFormat("yyyy-MM-dd")).format(new Date()),
-				obj.get("question_answers"));
+				String.join(", ", question_answers));
 		try {
-			if (!patientInDatabase((String) obj.get("identifier")))
+			if (!patientInDatabase(identifier))
 				queryUpdate(patientInsert);
 			queryUpdate(resultInsert);
-			ret.put(INSERT_RESULT, INSERT_SUCCESS);
+			rmap.put(INSERT_RESULT, INSERT_SUCCESS);
 		}
 		catch (DBWriteException dbw) {
-			ret.put(INSERT_RESULT, INSERT_FAIL);
+			rmap.put(INSERT_RESULT, INSERT_FAIL);
 		}
 		return ret.toString();
 	}
@@ -126,16 +147,19 @@ public class MySQL_Database implements Database
 	@Override
 	public String addClinic(JSONObject obj)
 	{
+		Map<String, String> omap = (Map<String, String>) obj;
+		
 		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
 		String qInsert = String.format(
 				"INSERT INTO `clinics` (`id`, `name`) VALUES (NULL, '%s')",
-				obj.get("name"));
+				omap.get("name"));
 		try {
 			queryUpdate(qInsert);
-			ret.put(INSERT_RESULT, INSERT_SUCCESS);
+			rmap.put(INSERT_RESULT, INSERT_SUCCESS);
 		}
 		catch (DBWriteException dbw) {
-			ret.put(INSERT_RESULT, INSERT_FAIL);
+			rmap.put(INSERT_RESULT, INSERT_FAIL);
 		}
 		return ret.toString();
 	}
@@ -144,7 +168,8 @@ public class MySQL_Database implements Database
 	public String getClinics(JSONObject obj)
 	{
 		JSONObject ret = new JSONObject();
-		ret.put("command", "get_clinics");
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "get_clinics");
 		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
@@ -152,9 +177,11 @@ public class MySQL_Database implements Database
 			if (rs != null)
 			{
 				JSONObject clinics = new JSONObject();
+				Map<String, String> cmap = (Map<String, String>) clinics;
 				while (rs.next())
-					clinics.put(rs.getInt("id"), rs.getString("name"));
-				ret.put("clinics", clinics.toString());
+					cmap.put(Integer.toString(rs.getInt("id")),
+							rs.getString("name"));
+				rmap.put("clinics", clinics.toString());
 			}
 		}
 		catch (DBReadException dbr) { }
@@ -165,8 +192,12 @@ public class MySQL_Database implements Database
 	@Override
 	public String getUser(JSONObject obj)
 	{
+		Map<String, String> omap = (Map<String, String>) obj;
+		
 		JSONObject ret = new JSONObject();
-		ret.put("command", "get_user");
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "get_user");
+		
 		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
@@ -174,27 +205,23 @@ public class MySQL_Database implements Database
 			if (rs == null)
 				return null;
 
-			String username = (String) obj.get("name");
+			String username = omap.get("name");
+			JSONObject user = new JSONObject();
+			Map<String, String> umap = (Map<String, String>) user;
 			while (rs.next())
 			{
 				if (rs.getString("name").equals(username))
 				{
-					String clinic_id = Integer.toString(rs.getInt("clinic_id"));
-					String name = rs.getString("name");
-					String password = rs.getString("password");
-					String email = rs.getString("email");
-					String salt = rs.getString("salt");
-					String update_password = Integer.toString(rs.getInt("update_password"));
-					
-					ret.put("clinic_id", clinic_id);
-					ret.put("name", name);
-					ret.put("password", password);
-					ret.put("email", email);
-					ret.put("salt", salt);
-					ret.put("update_password", update_password);
+					umap.put("clinic_id", Integer.toString(rs.getInt("clinic_id")));
+					umap.put("name", rs.getString("name"));
+					umap.put("password", rs.getString("password"));
+					umap.put("email", rs.getString("email"));
+					umap.put("salt", rs.getString("salt"));
+					umap.put("update_password", Integer.toString(rs.getInt("update_password")));
 					break;
 				}
 			}
+			rmap.put("user", user.toString());
 		}
 		catch (DBReadException dbr) { }
 		catch (SQLException se) { }
@@ -204,13 +231,15 @@ public class MySQL_Database implements Database
 	@Override
 	public String setPassword(JSONObject obj)
 	{
-		User user = getUser((String) obj.get("name"));
+		Map<String, String> omap = (Map<String, String>) obj;
+		
+		User user = getUser(omap.get("name"));
 		if (user == null)
 			return null;
 		
-		String oldPass = (String) obj.get("old_password");
-		String newPass = (String) obj.get("new_password");
-		String newSalt = (String) obj.get("new_salt");
+		String oldPass = omap.get("old_password");
+		String newPass = omap.get("new_password");
+		String newSalt = omap.get("new_salt");
 		
 		if (!user.passwordMatch(oldPass))
 			return null;
@@ -223,18 +252,20 @@ public class MySQL_Database implements Database
 			return null;
 		}
 
-		JSONObject getuser = new JSONObject();
-		getuser.put("command", "get_user");
-		getuser.put("name", obj.get("name"));
-		return getUser(getuser);
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "get_user");
+		rmap.put("name", omap.get("name"));
+		return getUser(ret);
 	}
 
 	@Override
 	public String getErrorMessages(JSONObject obj)
 	{
 		JSONObject ret = new JSONObject();
-		ret.put("command", "get_error_messages");
-		getMessages("error_messages", ret);
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "get_error_messages");
+		getMessages("error_messages", rmap);
 		return ret.toString();
 	}
 
@@ -242,8 +273,9 @@ public class MySQL_Database implements Database
 	public String getInfoMessages(JSONObject obj)
 	{
 		JSONObject ret = new JSONObject();
-		ret.put("command", "get_info_messages");
-		getMessages("info_messages", ret);
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "get_info_messages");
+		getMessages("info_messages", rmap);
 		return ret.toString();
 	}
 	
@@ -251,7 +283,8 @@ public class MySQL_Database implements Database
 	public String loadQuestions(JSONObject obj)
 	{
 		JSONObject ret = new JSONObject();
-		ret.put("command", "load_questions");
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "load_questions");
 		
 		try (Connection conn = dataSource.getConnection())
 		{
@@ -260,9 +293,11 @@ public class MySQL_Database implements Database
 			if (rs != null)
 			{
 				JSONObject questions = new JSONObject();
+				Map<String, String> qmap = (Map<String, String>) questions;
 				while (rs.next())
 				{
 					JSONObject question = new JSONObject();
+					Map<String, String> questionmap = (Map<String, String>) question;
 					for (int i = 0; ; ++i)
 					{
 						try
@@ -271,24 +306,25 @@ public class MySQL_Database implements Database
 							String entry = rs.getString(tbl_name);
 							if (entry == null || (entry = entry.trim()).isEmpty())
 								break;
-							question.put(tbl_name, entry);
+							questionmap.put(tbl_name, entry);
 						}
 						catch (SQLException e)
 						{ /* no more options */
 							break;
 						}
 					}
-					question.put("type", rs.getString("type"));
-					question.put("id", Integer.toString(rs.getInt("id")));
-					question.put("question", rs.getString("question"));
-					question.put("description", rs.getString("description"));
-					question.put("optional", Integer.toString(rs.getInt("optional")));
-					question.put("max_val", Integer.toString(rs.getInt("max_val")));
-					question.put("min_val", Integer.toString(rs.getInt("min_val")));
+					String id = Integer.toString(rs.getInt("id"));
+					questionmap.put("type", rs.getString("type"));
+					questionmap.put("id", id);
+					questionmap.put("question", rs.getString("question"));
+					questionmap.put("description", rs.getString("description"));
+					questionmap.put("optional", Integer.toString(rs.getInt("optional")));
+					questionmap.put("max_val", Integer.toString(rs.getInt("max_val")));
+					questionmap.put("min_val", Integer.toString(rs.getInt("min_val")));
 					
-					questions.put("id", question.toString());
+					qmap.put(id, question.toString());
 				}
-				ret.put("questions", questions.toString());
+				rmap.put("questions", questions.toString());
 			}
 		}
 		catch (DBReadException dbr) { }
@@ -299,9 +335,13 @@ public class MySQL_Database implements Database
 	@Override
 	public String loadQResultDates(JSONObject obj)
 	{
+		Map<String, String> omap = (Map<String, String>) obj;
+		
 		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "load_q_result_dates");
 
-		User user = getUser((String) obj.get("name"));
+		User user = getUser((String) omap.get("name"));
 		if (user == null)
 			return null;
 		
@@ -314,9 +354,10 @@ public class MySQL_Database implements Database
 			if (rs != null)
 			{
 				JSONArray dates = new JSONArray();
+				List<String> dlist = (List<String>) dates;
 				while (rs.next())
-					dates.add(rs.getString("date"));
-				ret.put("dates", dates.toString());
+					dlist.add(rs.getString("date"));
+				rmap.put("dates", dates.toString());
 			}
 		}
 		catch (DBReadException dbr) { }
@@ -327,10 +368,13 @@ public class MySQL_Database implements Database
 	@Override
 	public String loadQResults(JSONObject obj)
 	{
-		// Calendar begin, Calendar end, List<Integer> questionIDs, StatisticsContainer container
+		Map<String, String> omap = (Map<String, String>) obj;
+		
 		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "load_q_results");
 
-		User user = getUser((String) obj.get("name"));
+		User user = getUser(omap.get("name"));
 		if (user == null)
 			return null;
 		
@@ -341,12 +385,13 @@ public class MySQL_Database implements Database
 			JSONParser parser = new JSONParser();
 			JSONArray questions = null;
 			try{
-				questions = (JSONArray) parser.parse((String) obj.get("questions"));
+				questions = (JSONArray) parser.parse(omap.get("questions"));
 			} catch (org.json.simple.parser.ParseException pe) {
 				return null;
 			}
 			if (questions == null)
 				return null;
+			List<String> qlist = (List<String>) questions;
 			
 			List<String> lstr = new ArrayList<String>();
 			for (Iterator<?> itr = questions.iterator(); itr.hasNext();)
@@ -355,21 +400,24 @@ public class MySQL_Database implements Database
 			ResultSet rs = query(s, String.format(
 					"SELECT %s FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'",
 					String.join(", ", lstr), user.getClinicID(),
-					obj.get("begin"), obj.get("end")));
+					omap.get("begin"), omap.get("end")));
 			
 			if (rs != null)
 			{
 				JSONArray results = new JSONArray();
+				List<String> rlist = (List<String>) results;
 				while (rs.next())
 				{
 					JSONObject answers = new JSONObject();
-					for (Iterator<?> itr = questions.iterator(); itr.hasNext();)
+					Map<String, String> amap = (Map<String, String>) ret;
+					for (Iterator<String> itr = qlist.iterator(); itr.hasNext();)
 					{
-						String q = (String) itr.next();
-						answers.put(q, rs.getString(q));
+						String q = itr.next();
+						amap.put(q, rs.getString(q));
 					}
+					rlist.add(answers.toString());
 				}
-				ret.put("results", results);
+				rmap.put("results", results.toString());
 			}
 		}
 		catch (DBReadException dbr) { }
@@ -513,7 +561,7 @@ public class MySQL_Database implements Database
 	 * @param mc
 	 * @return
 	 */
-	private boolean getMessages(String tableName, JSONObject retobj)
+	private boolean getMessages(String tableName, Map<String, String> retobj)
 	{
 		boolean ret = false;
 		try (Connection conn = dataSource.getConnection())
@@ -525,17 +573,20 @@ public class MySQL_Database implements Database
 			if (rs != null)
 			{
 				JSONObject messages = new JSONObject();
+				Map<String, String> mmap = (Map<String, String>) messages;
 				while (rs.next())
 				{
 					JSONObject msg = new JSONObject();
-					msg.put(rs.getString("locale"), rs.getString("message"));
+					Map<String, String> msgmap = (Map<String, String>) messages;
+					msgmap.put(rs.getString("locale"), rs.getString("message"));
 					
 					JSONObject message = new JSONObject();
-					message.put("name", rs.getString("name"));
-					message.put("code", rs.getString("code"));
-					message.put("message", msg.toString());
+					Map<String, String> messagemap = (Map<String, String>) messages;
+					messagemap.put("name", rs.getString("name"));
+					messagemap.put("code", rs.getString("code"));
+					messagemap.put("message", msg.toString());
 					
-					messages.put("name", message.toString());
+					mmap.put("name", message.toString());
 				}
 				retobj.put(tableName, messages.toString());
 				ret = true;
@@ -544,5 +595,29 @@ public class MySQL_Database implements Database
 		catch (DBReadException dbr) { }
 		catch (SQLException e) { }
 		return ret;
+	}
+	
+	private JSONObject getJSONObject(String str)
+	{
+		JSONParser parser = new JSONParser();
+		JSONObject userobj = null;
+		try{
+			userobj = (JSONObject) parser.parse(str);
+		} catch (org.json.simple.parser.ParseException pe) {
+			return null;
+		}
+		return userobj;
+	}
+	
+	private JSONArray getJSONArray(String str)
+	{
+		JSONParser parser = new JSONParser();
+		JSONArray userarr = null;
+		try{
+			userarr = (JSONArray) parser.parse(str);
+		} catch (org.json.simple.parser.ParseException pe) {
+			return null;
+		}
+		return userarr;
 	}
 }

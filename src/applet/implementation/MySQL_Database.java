@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeMap;
 
@@ -44,6 +45,10 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import applet.core.Utilities;
 import applet.core.containers.MessageContainer;
@@ -106,146 +111,141 @@ public class MySQL_Database implements Database
 	public boolean addUser(String username, String password,
 			String salt, int clinic, String email)
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String qInsert = String.format(
-				"INSERT INTO `users` (`clinic_id`, `name`, `password`, `email`, `registered`, `salt`, `update_password`) VALUES ('%d', '%s', '%s', '%s', '%s', '%s', '%d')",
-				clinic, username, password, email,
-				sdf.format(new Date()), salt, 1);
-		try {
-			queryUpdate(qInsert);
-		}
-		catch (DBWriteException dbw) {
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "add_user");
+		rmap.put("clinic_id", Integer.toString(clinic));
+		rmap.put("name", username);
+		rmap.put("password", password);
+		rmap.put("email", email);
+		rmap.put("salt", salt);
+		
+		JSONObject ans = sendMessage(ret.toString());
+		if (ans == null)
 			return false;
-		}
-		return true;
+		String insert = (String) ans.get("insert_result");
+		return (insert != null && insert.equals("insert_success"));
 	}
 
 	@Override
 	public boolean addQuestionnaireAnswers(Patient patient, List<FormContainer> answers)
 	{
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "add_questionnaire_answers");
+		
 		int nQuestions = Questions.getQuestions().getContainer().getSize();
 		if (answers.size() != nQuestions)
 			return false;
-		
-		List<String> values = new ArrayList<String>();
-		List<String> fields = new ArrayList<String>();
+
+		JSONObject questions = new JSONObject();
+		Map<String, String> qmap = (Map<String, String>) questions;
 		int i = 0;
 		for (Iterator<FormContainer> itr = answers.iterator(); itr.hasNext();)
 		{
-			fields.add(String.format("`question%d`", i++));
-			values.add(QDBFormat.getDBFormat(itr.next()));
+			qmap.put(String.format("`question%d`", i++),
+					QDBFormat.getDBFormat(itr.next()));
 		}
 		
 		String identifier = crypto.encryptMessage(
 				patient.getForename(), patient.getPersonalNumber(),
 				patient.getSurname());
 		
-		String patientInsert = String.format("INSERT INTO `patients` (`clinic_id`, `identifier`, `id`) VALUES ('%d', '%s', NULL)",
-				patient.getClinicID(), identifier);
+		rmap.put("clinic_id", Integer.toString(patient.getClinicID()));
+		rmap.put("identifier", identifier);
+		rmap.put("questions", questions.toString());
 
-		String resultInsert = String.format("INSERT INTO `questionnaire_answers` (`clinic_id`, `patient_identifier`, `date`, %s) VALUES ('%d', '%s', '%s', %s)",
-				String.join(", ", fields), patient.getClinicID(), identifier,
-				(new SimpleDateFormat("yyyy-MM-dd")).format(new Date()),
-				String.join(", ", values));
-		try {
-			if (!patientInDatabase(identifier))
-				queryUpdate(patientInsert);
-			queryUpdate(resultInsert);
-		}
-		catch (DBWriteException dbw) {
+		JSONObject ans = sendMessage(ret.toString());
+		if (ans == null)
 			return false;
-		}
-		return true;
+		String insert = (String) ans.get("insert_result");
+		return (insert != null && insert.equals("insert_success"));
 	}
 
 	@Override
 	public boolean addClinic(String clinicName)
 	{
-		String qInsert = String.format(
-				"INSERT INTO `clinics` (`id`, `name`) VALUES (NULL, '%s')",
-				clinicName);
-		try {
-			queryUpdate(qInsert);
-		} catch (DBWriteException dbw) {
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "add_clinic");
+		rmap.put("name", clinicName);
+		
+		JSONObject ans = sendMessage(ret.toString());
+		if (ans == null)
 			return false;
-		}
-		return true;
+		Map<String, String> amap = (Map<String, String>) ans;
+		String insert = amap.get("insert_result");
+		return (insert != null && insert.equals("insert_success"));
 	}
 	
 	@Override
 	public Map<Integer, String> getClinics()
 	{
-		Map<Integer, String> ret = new TreeMap<Integer, String>();
-		try (Connection conn = dataSource.getConnection())
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "get_clinics");
+		
+		JSONObject ans = sendMessage(ret.toString());
+		JSONObject clinics = getJSONObject((String) ans.get("clinics"));
+		Map<String, String> cmap = (Map<String, String>) clinics;
+		
+		Map<Integer, String> clinic = new TreeMap<Integer, String>();
+		for (Entry<String, String> e : cmap.entrySet())
 		{
-			Statement s = conn.createStatement();
-			ResultSet rs = query(s, "SELECT `id`, `name` FROM `clinics`");
-			if (rs != null)
-				while (rs.next())
-					ret.put(rs.getInt("id"), rs.getString("name"));
+			clinic.put(Integer.parseInt(e.getKey()),
+					e.getValue());
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
-		return ret;
+		return clinic;
 	}
 
 	@Override
 	public User getUser(String username)
 	{
-		User user = null;
-		try (Connection conn = dataSource.getConnection())
-		{
-			Statement s = conn.createStatement();
-			ResultSet rs = query(s, "SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
-			if (rs == null)
-				return null;
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "get_user");
+		rmap.put("name", username);
 
-			while (rs.next() && user == null)
-				if (rs.getString("name").equals(username))
-					user = new User(rs.getInt("clinic_id"),
-							rs.getString("name"), rs.getString("password"),
-							rs.getString("email"), rs.getString("salt"),
-							rs.getInt("update_password") != 0);
-		}
-		catch (DBReadException dbr) { }
-		catch (SQLException se) { }
-		return user;
-	}
-	
-	@Override
-	public boolean patientInDatabase(String identifier)
-	{
-		try (Connection conn = dataSource.getConnection())
-		{
-			Statement s = conn.createStatement();
-			ResultSet rs = query(s, "SELECT `identifier` FROM `patients`");
-			if (rs == null)
-				return false;
-
-			while (rs.next())
-				if (rs.getString("identifier").equals(identifier))
-					return true;
-		}
-		catch (DBReadException dbr) { }
-		catch (SQLException se) { }
-		return false;
+		JSONObject ans = sendMessage(ret.toString());
+		JSONObject user = getJSONObject((String) ans.get("user"));
+		Map<String, String> umap = (Map<String, String>) user;
+		User usr = null;
+		try {
+			usr = new User(Integer.parseInt(umap.get("clinic_id")),
+					umap.get("name"),
+					umap.get("password"),
+					umap.get("email"),
+					umap.get("salt"),
+					Integer.parseInt(umap.get("update_password")) != 0);
+		} catch (NullPointerException _e) {}
+		return usr;
 	}
 
 	@Override
-	public User setPassword(User user, String oldPass, String newPass,
+	public User setPassword(User currentUser, String oldPass, String newPass,
 			String newSalt)
 	{
-		if (!user.passwordMatch(oldPass))
-			return null;
-		String qInsert = String.format(
-				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
-				newPass, newSalt, 0, user.getUsername());
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "set_password");
+		rmap.put("name", currentUser.getUsername());
+		rmap.put("old_password", oldPass);
+		rmap.put("new_password", newPass);
+		rmap.put("new_salt", newSalt);
+
+		JSONObject ans = sendMessage(ret.toString());
+		JSONObject user = getJSONObject((String) ans.get("user"));
+		Map<String, String> umap = (Map<String, String>) user;
+		User usr = null;
 		try {
-			queryUpdate(qInsert);
-		} catch (DBWriteException dbw) {
-			return null;
-		}
-		return getUser(user.getUsername());
+			usr = new User(Integer.parseInt(umap.get("clinic_id")),
+					umap.get("name"),
+					umap.get("password"),
+					umap.get("email"),
+					umap.get("salt"),
+					Integer.parseInt(umap.get("update_password")) != 0);
+		} catch (NullPointerException _e) {}
+		return usr;
 	}
 
 	@Override
@@ -253,7 +253,7 @@ public class MySQL_Database implements Database
 	{
 		if (mc == null)
 			return false;
-		return getMessages("error_messages", mc);
+		return getMessages("get_error_messages", mc);
 	}
 
 	@Override
@@ -261,124 +261,101 @@ public class MySQL_Database implements Database
 	{
 		if (mc == null)
 			return false;
-		return getMessages("info_messages", mc);
+		return getMessages("get_info_messages", mc);
 	}
 	
 	@Override
 	public boolean loadQuestions(QuestionContainer qc)
 	{
-		boolean ret = false;
-		try (Connection conn = dataSource.getConnection())
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "load_questions");
+		
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		Map<String, String> qmap = (Map<String, String>) getJSONObject(amap.get("questions"));
+		for (Entry<String, String> e : qmap.entrySet())
 		{
-			Statement s = conn.createStatement();
-			ResultSet rs = query(s, "SELECT * FROM `questionnaire`");
-			if (rs != null)
+			Map<String, String> qtnmap = (Map<String, String>) getJSONObject(e.getValue());
+			List<String> options = new ArrayList<String>();
+			for (int i = 0; ; ++i)
 			{
-				while (rs.next())
-				{
-					/* Allows for arbitrary number of options */
-					List<String> options = new ArrayList<String>();
-					for (int i = 0; ;++i)
-					{
-						try
-						{
-							String entry = rs.getString(String.format("option%d", i));
-							if (entry == null || (entry = entry.trim()).isEmpty())
-								break;
-							options.add(entry);
-						}
-						catch (SQLException e)
-						{
-							/* getString throws SQLException if the column does
-							 * not exist, so this seems like the only way to
-							 * find out how many options that is stored in the
-							 * database.
-							 */
-							break;
-						}
-					}
-					
-					Class<? extends FormContainer> c;
-					if ((c = getContainerClass(rs.getString("type"))) == null)
-						continue;
-					qc.addQuestion(rs.getInt("id"), c, rs.getString("question"),
-							rs.getString("description"), options,
-							rs.getInt("optional") != 0, rs.getInt("max_val"), rs.getInt("min_val"));
-				}
-				ret = true;
+				String entry = qtnmap.get(String.format("option%d", i));
+				if (entry == null)
+					break;
+				options.add(entry);
 			}
+			Class<? extends FormContainer> c;
+			if ((c = getContainerClass(qtnmap.get("type"))) == null)
+				continue;
+			qc.addQuestion(Integer.parseInt(qtnmap.get("id")), c,
+					qtnmap.get("question"), qtnmap.get("description"),
+					options, Integer.parseInt(qtnmap.get("optional")) != 0,
+					Integer.parseInt(qtnmap.get("max_val")),
+					Integer.parseInt(qtnmap.get("min_val")));
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
-		return ret;
+		return true;
 	}
 
 	@Override
 	public boolean loadQResultDates(User user, TimePeriodContainer tpc)
 	{
-		boolean ret = false;
-		try (Connection conn = dataSource.getConnection())
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "load_q_result_dates");
+		rmap.put("name", user.getUsername());
+
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		List<String> dlist = (List<String>) getJSONArray(amap.get("dates"));
+		try
 		{
-			Statement s = conn.createStatement();
-			ResultSet rs = query(s, String.format(
-					"SELECT `date` FROM `questionnaire_answers` WHERE `clinic_id` = %d",
-					user.getClinicID()));
-			if (rs != null)
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			for (Iterator<String> itr = dlist.iterator(); itr.hasNext();)
 			{
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				while (rs.next())
-				{
-					Calendar cal = new GregorianCalendar();
-					cal.setTime(sdf.parse(rs.getString("date")));
-					tpc.addDate(cal);
-				}
-				ret = true;
+				Calendar cal = new GregorianCalendar();
+				cal.setTime(sdf.parse(itr.next()));
+				tpc.addDate(cal);
 			}
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
-		catch (ParseException e) { }
-		return ret;
+		catch (ParseException _e)
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	@Override
 	public boolean loadQResults(User user, Calendar begin, Calendar end,
 			List<Integer> questionIDs, StatisticsContainer container)
 	{
-		boolean ret = false;
-		try (Connection conn = dataSource.getConnection())
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "load_q_results");
+
+		JSONArray questions = new JSONArray();
+		List<String> qlist = (List<String>) questions;
+		for (Iterator<Integer> itr = questionIDs.iterator(); itr.hasNext();)
+			qlist.add(String.format("`question%d`", itr.next()));
+		rmap.put("questions", questions.toString());
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		rmap.put("begin", sdf.format(begin.getTime()));
+		rmap.put("end", sdf.format(end.getTime()));
+		
+		
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		List<String> rlist = (List<String>) getJSONArray(amap.get("results"));
+		for (Iterator<String> itr = rlist.iterator(); itr.hasNext();)
 		{
-			Statement s = conn.createStatement();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			
-			List<String> lstr = new ArrayList<String>();
-			for (Iterator<Integer> itr = questionIDs.iterator(); itr.hasNext();)
-				lstr.add(String.format("`question%d`", itr.next()));
-			
-			ResultSet rs = query(s, String.format(
-					"SELECT %s FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'",
-					String.join(", ", lstr), user.getClinicID(),
-					sdf.format(begin.getTime()),
-					sdf.format(end.getTime())));
+			Map<String, String> ansmap = (Map<String, String>) getJSONObject(itr.next());
 			QuestionContainer qc = Questions.getQuestions().getContainer();
-			if (rs != null)
+			for (Entry<String, String> e : ansmap.entrySet())
 			{
-				while (rs.next())
-				{
-					for (Iterator<Integer> itr = questionIDs.iterator(); itr.hasNext();)
-					{
-						int qid = itr.next();
-						Question q1 = qc.getQuestion(qid);
-						String q = String.format("question%d", qid);
-						container.addResult(q1, QDBFormat.getQFormat(rs.getString(q)));
-					}
-				}
-				ret = true;
+				int qid = Integer.parseInt(e.getKey().substring("question".length()));
+				Question q1 = qc.getQuestion(qid);
+				container.addResult(q1, QDBFormat.getQFormat(e.getValue()));
 			}
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
-		return ret;
+		return true;
 	}
 	
 	/* Protected */
@@ -407,6 +384,39 @@ public class MySQL_Database implements Database
 		} catch (NamingException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private JSONObject sendMessage(String obj)
+	{
+		/* send message */
+		
+		/* receive message */
+		String ans = null; // receive msg from servlet
+		return getJSONObject(ans);
+	}
+	
+	private JSONObject getJSONObject(String str)
+	{
+		JSONParser parser = new JSONParser();
+		JSONObject userobj = null;
+		try{
+			userobj = (JSONObject) parser.parse(str);
+		} catch (org.json.simple.parser.ParseException pe) {
+			return null;
+		}
+		return userobj;
+	}
+	
+	private JSONArray getJSONArray(String str)
+	{
+		JSONParser parser = new JSONParser();
+		JSONArray userarr = null;
+		try{
+			userarr = (JSONArray) parser.parse(str);
+		} catch (org.json.simple.parser.ParseException pe) {
+			return null;
+		}
+		return userarr;
 	}
 	
 	/**
@@ -465,34 +475,32 @@ public class MySQL_Database implements Database
 	 * Retrieves messages from the database and places them in a
 	 * MessageContainer.
 	 * 
-	 * @param tableName The name of the (message) table to retrieve
+	 * @param commandName The name of the (message) table to retrieve
 	 * 		messages from.
 	 * @param mc
 	 * @return
 	 */
-	private boolean getMessages(String tableName, MessageContainer mc)
+	private boolean getMessages(String commandName, MessageContainer mc)
 	{
-		boolean ret = false;
-		try (Connection conn = dataSource.getConnection())
-		{
-			Statement s = conn.createStatement();
-			ResultSet rs = query(s, String.format(
-					"SELECT `code`, `name`, `locale`, `message` FROM `%s`",
-					tableName));
-			if (rs != null)
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", commandName);
+		
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		Map<String, String> mmap = (Map<String, String>) getJSONObject(amap.get(commandName));
+		try {
+			for (Entry<String, String> e : mmap.entrySet())
 			{
-				while (rs.next())
-				{
-					Map<String, String> msg = new HashMap<String, String>();
-					msg.put(rs.getString("locale"), rs.getString("message"));
-					mc.addMessage(rs.getInt("code"), rs.getString("name"), msg);
-				}
-				ret = true;
+				Map<String, String> messagemap = (Map<String, String>) getJSONObject(e.getValue());
+				Map<String, String> msgmap = (Map<String, String>) getJSONObject(messagemap.get("message"));
+				mc.addMessage(Integer.parseInt(messagemap.get("code")),
+						messagemap.get("name"), msgmap);
 			}
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
-		return ret;
+		catch (NullPointerException _e) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**

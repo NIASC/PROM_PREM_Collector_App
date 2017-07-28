@@ -3,6 +3,7 @@ package testing.json;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -20,18 +21,19 @@ public class jsontest
 	public static String testwrite()
 	{
 		JSONObject obj = new JSONObject();
+		Map<String, String> moo = (Map<String, String>) obj;
 		
-		obj.put("command", "get_user");
-		obj.put("id", "1");
-		obj.put("type", "SingleOptions");
-		obj.put("optional", "0");
-		obj.put("question", "What is your name");
-		obj.put("description", "Your name");
-		obj.put("option0", "foo");
-		obj.put("option1", "bar");
-		obj.put("option2", null);
-		obj.put("min_val", null);
-		obj.put("max_val", null);
+		moo.put("command", "get_user");
+		moo.put("id", "1");
+		moo.put("type", "SingleOptions");
+		moo.put("optional", "0");
+		moo.put("question", "What is your name");
+		moo.put("description", "Your name");
+		moo.put("option0", "foo");
+		moo.put("option1", "bar");
+		moo.put("option2", null);
+		moo.put("min_val", null);
+		moo.put("max_val", null);
 		
 		return obj.toString();
 	}

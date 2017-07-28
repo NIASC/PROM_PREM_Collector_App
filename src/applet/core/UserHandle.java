@@ -224,9 +224,11 @@ public class UserHandle
 	 */
 	protected boolean validateDetails(String username, String password)
 	{
+		System.out.printf("username: %s\npassword: %s\n", username, password);
 		User tmp = db.getUser(username);
 		if (tmp == null)
 			return false;
+		System.out.println(tmp.hashWithSalt(password));
 		if (!tmp.passwordMatch(password))
 			return false;
 		user = tmp;
@@ -283,7 +285,7 @@ public class UserHandle
 		Encryption crypto = Implementations.Encryption();
 		String newSalt = crypto.getNewSalt();
 		User tmpUser;
-		tmpUser = db.setPassword(user, current,
+		tmpUser = db.setPassword(user, user.hashWithSalt(current),
 				crypto.hashString(new1, newSalt), newSalt);
 		if (tmpUser == null)
 		{

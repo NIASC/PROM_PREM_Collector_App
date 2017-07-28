@@ -19,10 +19,6 @@
  */
 package servlet.core.interfaces;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-
 import org.json.simple.JSONObject;
 
 
@@ -38,17 +34,6 @@ import org.json.simple.JSONObject;
 public interface Database
 {
 	/* Public */
-	
-	/**
-	 * If the messages was not retrieved from the database this
-	 * message (in English) should be used to notify the caller that
-	 * there was a database error.
-	 */
-	public static final String DATABASE_ERROR = "Database error.";
-	
-	public static final String INSERT_RESULT = "insert_result";
-	public static final String INSERT_SUCCESS = "1";
-	public static final String INSERT_FAIL = "0";
 	
 	public String addUser					(JSONObject obj);
 	public String addQuestionnaireAnswers	(JSONObject obj);

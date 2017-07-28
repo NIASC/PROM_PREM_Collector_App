@@ -15,12 +15,12 @@
     <!-- Application Resources -->
     <j2se version="1.8+"
           href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="DynamicTreeDemo.jar" main="true" />
+    <jar href="MyFrame.jar" main="true" />
     
   </resources>
   <application-desc
       name="PROM/PREM Collector"
-      main-class="webstartComponentArch.DynamicTreeApplication">
+      main-class="applets.MyFrame">
   </application-desc>
   <update check="background"/>
 </jnlp>

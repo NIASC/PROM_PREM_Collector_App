@@ -43,6 +43,7 @@ import org.json.simple.parser.JSONParser;
 import servlet.core.interfaces.Database;
 import servlet.implementation.exceptions.DBReadException;
 import servlet.implementation.exceptions.DBWriteException;
+import common.implementation.Constants;
 
 /**
  * This class is an example of an implementation of
@@ -96,10 +97,10 @@ public class MySQL_Database implements Database
 				sdf.format(new Date()), omap.get("salt"), 1);
 		try {
 			queryUpdate(qInsert);
-			rmap.put(INSERT_RESULT, INSERT_SUCCESS);
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_SUCCESS);
 		}
 		catch (DBWriteException dbw) {
-			rmap.put(INSERT_RESULT, INSERT_FAIL);
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
 		}
 		return ret.toString();
 	}
@@ -134,10 +135,10 @@ public class MySQL_Database implements Database
 			if (!patientInDatabase(identifier))
 				queryUpdate(patientInsert);
 			queryUpdate(resultInsert);
-			rmap.put(INSERT_RESULT, INSERT_SUCCESS);
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_SUCCESS);
 		}
 		catch (DBWriteException dbw) {
-			rmap.put(INSERT_RESULT, INSERT_FAIL);
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
 		}
 		return ret.toString();
 	}
@@ -154,10 +155,10 @@ public class MySQL_Database implements Database
 				omap.get("name"));
 		try {
 			queryUpdate(qInsert);
-			rmap.put(INSERT_RESULT, INSERT_SUCCESS);
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_SUCCESS);
 		}
 		catch (DBWriteException dbw) {
-			rmap.put(INSERT_RESULT, INSERT_FAIL);
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
 		}
 		return ret.toString();
 	}
@@ -201,7 +202,7 @@ public class MySQL_Database implements Database
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, "SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
 			if (rs == null)
-				return null;
+				return ret.toString();
 
 			String username = omap.get("name");
 			JSONObject user = new JSONObject();
@@ -230,16 +231,19 @@ public class MySQL_Database implements Database
 	public String setPassword(JSONObject obj)
 	{
 		Map<String, String> omap = (Map<String, String>) obj;
-		Map<String, String> user = getUser(omap.get("name"));
-		if (user == null)
+		
+		Map<String, String> userobj = getUser(omap.get("name"));
+		if (userobj == null)
 			return null;
+		Map<String, String> user = (Map<String, String>) getJSONObject(userobj.get("user"));
 		
 		String oldPass = omap.get("old_password");
 		String newPass = omap.get("new_password");
 		String newSalt = omap.get("new_salt");
-		
+
 		if (!user.get("password").equals(oldPass))
 			return null;
+		
 		String qInsert = String.format(
 				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
 				newPass, newSalt, 0, user.get("name"));
@@ -565,18 +569,19 @@ public class MySQL_Database implements Database
 				while (rs.next())
 				{
 					JSONObject msg = new JSONObject();
-					Map<String, String> msgmap = (Map<String, String>) messages;
+					Map<String, String> msgmap = (Map<String, String>) msg;
 					msgmap.put(rs.getString("locale"), rs.getString("message"));
 					
 					JSONObject message = new JSONObject();
-					Map<String, String> messagemap = (Map<String, String>) messages;
-					messagemap.put("name", rs.getString("name"));
+					Map<String, String> messagemap = (Map<String, String>) message;
+					String name = rs.getString("name");
+					messagemap.put("name", name);
 					messagemap.put("code", rs.getString("code"));
 					messagemap.put("message", msg.toString());
 					
-					mmap.put("name", message.toString());
+					mmap.put(name, message.toString());
 				}
-				retobj.put(tableName, messages.toString());
+				retobj.put("messages", messages.toString());
 				ret = true;
 			}
 		}

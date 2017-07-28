@@ -59,42 +59,11 @@ public class Main extends HttpServlet
 		// Actual logic goes here.
 		PrintWriter out = response.getWriter();
 		out.println("<h1>" + message + "</h1>");
-		
-		out.println("<APPLET codebase='classes' code='applet/implementation/GUI_UserInterface.class' width=800 height=650 archive='activation-1.1.1.jar,gnumail-providers-1.1.2.jar,json-simple-1.1.1.jar,gnumail-1.1.2.jar,inetlib-1.1.2.jar'></APPLET>");
-		out.println("<a href='./WEB-INF/classes'>Link to this folder</a>");
-
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "load_questions");
-
-		URL url;
-		HttpURLConnection connection;
-		try {
-			url = new URL("http://localhost:8080/PROM_PREM_Collector/main");
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setUseCaches(false);
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-			//Send request
-			OutputStream os = connection.getOutputStream();
-			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-			out.println(ret.toString());
-			osw.write(ret.toString());
-			osw.flush();
-			osw.close();
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				out.println("Ok response");
-			} else {
-				out.println("Bad response");
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
 		try{
 			StringBuilder sb = new StringBuilder();
@@ -103,9 +72,10 @@ public class Main extends HttpServlet
 			while ((str = br.readLine()) != null) {
 				sb.append(str);
 			}
-			out.println(str);
 			String response_str = JSONRead.handleRequest(sb.toString());
-			out.println(response_str);
+			out.print(response_str);
+			out.flush();
+			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -19,6 +19,8 @@
  */
 package applet.implementation;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -58,6 +60,7 @@ import applet.core.interfaces.Database;
 import applet.core.interfaces.Encryption;
 import applet.core.interfaces.Implementations;
 import applet.core.interfaces.Questions;
+import common.implementation.Constants;
 
 /**
  * This class is an example of an implementation of
@@ -112,8 +115,8 @@ public class MySQL_Database implements Database
 		JSONObject ans = sendMessage(ret.toString());
 		if (ans == null)
 			return false;
-		String insert = (String) ans.get("insert_result");
-		return (insert != null && insert.equals("insert_success"));
+		String insert = (String) ans.get(Constants.INSERT_RESULT);
+		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
 
 	@Override
@@ -147,8 +150,8 @@ public class MySQL_Database implements Database
 		JSONObject ans = sendMessage(ret.toString());
 		if (ans == null)
 			return false;
-		String insert = (String) ans.get("insert_result");
-		return (insert != null && insert.equals("insert_success"));
+		String insert = (String) ans.get(Constants.INSERT_RESULT);
+		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
 
 	@Override
@@ -163,8 +166,8 @@ public class MySQL_Database implements Database
 		if (ans == null)
 			return false;
 		Map<String, String> amap = (Map<String, String>) ans;
-		String insert = amap.get("insert_result");
-		return (insert != null && insert.equals("insert_success"));
+		String insert = amap.get(Constants.INSERT_RESULT);
+		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
 	
 	@Override
@@ -206,7 +209,9 @@ public class MySQL_Database implements Database
 					umap.get("email"),
 					umap.get("salt"),
 					Integer.parseInt(umap.get("update_password")) != 0);
-		} catch (NullPointerException _e) {}
+		}
+		catch (NullPointerException _e) {}
+		catch (NumberFormatException _e) {}
 		return usr;
 	}
 
@@ -214,17 +219,19 @@ public class MySQL_Database implements Database
 	public User setPassword(User currentUser, String oldPass, String newPass,
 			String newSalt)
 	{
+		System.out.printf("%s, %s, %s, %s", currentUser.getUsername(),
+				oldPass, newPass, newSalt);
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", "set_password");
 		rmap.put("name", currentUser.getUsername());
-		rmap.put("old_password", currentUser.hashWithSalt(oldPass));
-		rmap.put("new_password", crypto.hashString(newPass, newSalt));
+		rmap.put("old_password", oldPass);
+		rmap.put("new_password", newPass);
 		rmap.put("new_salt", newSalt);
 
-		JSONObject ans = sendMessage(ret.toString());
-		JSONObject user = getJSONObject((String) ans.get("user"));
-		Map<String, String> umap = (Map<String, String>) user;
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		System.out.println(((JSONObject) amap).toString());
+		Map<String, String> umap = (Map<String, String>) getJSONObject(amap.get("user"));
 		User usr = null;
 		try {
 			usr = new User(Integer.parseInt(umap.get("clinic_id")),
@@ -388,13 +395,21 @@ public class MySQL_Database implements Database
 			} else {
 				System.out.println("Bad response");
 			}
+
+			/* receive message */
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					connection.getInputStream(), "UTF-8"));
+			StringBuilder sb = new StringBuilder();
+			String inputLine;
+			while ((inputLine = in.readLine()) != null) 
+				sb.append(inputLine);
+			in.close();
+			System.out.printf(">>%s<<\n", sb.toString());
+			return getJSONObject(sb.toString());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
-		/* receive message */
-		String ans = null; // receive msg from servlet
-		return getJSONObject(ans);
+		return null;
 	}
 	
 	private JSONObject getJSONObject(String str)
@@ -437,10 +452,11 @@ public class MySQL_Database implements Database
 		rmap.put("command", commandName);
 		
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
-		Map<String, String> mmap = (Map<String, String>) getJSONObject(amap.get(commandName));
+		Map<String, String> mmap = (Map<String, String>) getJSONObject(amap.get("messages"));
 		try {
 			for (Entry<String, String> e : mmap.entrySet())
 			{
+				System.out.printf("%s: %s", e.getKey(), e.getValue());
 				Map<String, String> messagemap = (Map<String, String>) getJSONObject(e.getValue());
 				Map<String, String> msgmap = (Map<String, String>) getJSONObject(messagemap.get("message"));
 				mc.addMessage(Integer.parseInt(messagemap.get("code")),

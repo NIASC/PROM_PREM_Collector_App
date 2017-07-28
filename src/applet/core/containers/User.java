@@ -117,6 +117,18 @@ public class User
 		return crypto.hashString(unhashedPass, salt).equals(password);
 	}
 	
+	/**
+	 * Hashes {@code unhashedPass} with the users salt.
+	 * 
+	 * @param unhashedPass The string to hash.
+	 * 
+	 * @return The hashed version of the string.
+	 */
+	public String hashWithSalt(String unhashedPass)
+	{
+		return crypto.hashString(unhashedPass, salt);
+	}
+	
 	/* Protected */
 	
 	/* Private */

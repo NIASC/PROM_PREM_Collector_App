@@ -20,6 +20,7 @@
 package servlet.core;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -27,11 +28,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
-import applet.core.interfaces.Database;
-import applet.core.interfaces.Messages;
-import applet.core.interfaces.Questions;
+import servlet.implementation.JSONRead;
 
 public class Main extends HttpServlet
 {
@@ -43,13 +41,6 @@ public class Main extends HttpServlet
 	{
 		// Do required initialization
 		message = "PROM/PREM Collector";
-
-		if (!Messages.getMessages().loadMessages()
-				|| !Questions.getQuestions().loadQuestionnaire())
-		{
-			System.out.printf("%s\n", Database.DATABASE_ERROR);
-			System.exit(1);
-		}
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -61,10 +52,23 @@ public class Main extends HttpServlet
 		// Actual logic goes here.
 		PrintWriter out = response.getWriter();
 		out.println("<h1>" + message + "</h1>");
-		
-		out.println(String.format("If this message does not display null, "
-				+ "then database was successfully loaded:<br>%s",
-				Messages.getMessages().getInfo(Messages.INFO_REG_BODY_DESCRIPTION)));
+	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try{
+			StringBuilder sb = new StringBuilder();
+			BufferedReader br = request.getReader();
+			String str = null;
+			while ((str = br.readLine()) != null) {
+				sb.append(str);
+			}
+			System.out.println(str);
+			String response_str = JSONRead.handleRequest(sb.toString());
+			PrintWriter out = response.getWriter();
+			out.println(response_str);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void destroy() {

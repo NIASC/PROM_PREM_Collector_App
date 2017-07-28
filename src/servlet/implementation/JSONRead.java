@@ -9,7 +9,7 @@ import servlet.core.interfaces.Database.DatabaseFunction;
 
 public class JSONRead
 {
-	public String handleRequest(String message)
+	public static String handleRequest(String message)
 	{
 		JSONParser parser = new JSONParser();
 		JSONObject obj = null;
@@ -27,7 +27,7 @@ public class JSONRead
 		return dbf.dbfunc(obj);
 	}
 	
-	private DatabaseFunction getDBMethod(String command)
+	private static DatabaseFunction getDBMethod(String command)
 	{
 		if (command == null)
 			return null;

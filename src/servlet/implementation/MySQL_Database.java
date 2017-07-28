@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -41,7 +40,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import applet.core.containers.User;
 import servlet.core.interfaces.Database;
 import servlet.implementation.exceptions.DBReadException;
 import servlet.implementation.exceptions.DBWriteException;
@@ -232,8 +230,7 @@ public class MySQL_Database implements Database
 	public String setPassword(JSONObject obj)
 	{
 		Map<String, String> omap = (Map<String, String>) obj;
-		
-		User user = getUser(omap.get("name"));
+		Map<String, String> user = getUser(omap.get("name"));
 		if (user == null)
 			return null;
 		
@@ -241,11 +238,11 @@ public class MySQL_Database implements Database
 		String newPass = omap.get("new_password");
 		String newSalt = omap.get("new_salt");
 		
-		if (!user.passwordMatch(oldPass))
+		if (!user.get("password").equals(oldPass))
 			return null;
 		String qInsert = String.format(
 				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
-				newPass, newSalt, 0, user.getUsername());
+				newPass, newSalt, 0, user.get("name"));
 		try {
 			queryUpdate(qInsert);
 		} catch (DBWriteException dbw) {
@@ -341,7 +338,7 @@ public class MySQL_Database implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", "load_q_result_dates");
 
-		User user = getUser((String) omap.get("name"));
+		Map<String, String> user = getUser(omap.get("name"));
 		if (user == null)
 			return null;
 		
@@ -350,7 +347,7 @@ public class MySQL_Database implements Database
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, String.format(
 					"SELECT `date` FROM `questionnaire_answers` WHERE `clinic_id` = %d",
-					user.getClinicID()));
+					Integer.parseInt(user.get("clinic_id"))));
 			if (rs != null)
 			{
 				JSONArray dates = new JSONArray();
@@ -374,7 +371,7 @@ public class MySQL_Database implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", "load_q_results");
 
-		User user = getUser(omap.get("name"));
+		Map<String, String> user = getUser(omap.get("name"));
 		if (user == null)
 			return null;
 		
@@ -399,7 +396,7 @@ public class MySQL_Database implements Database
 			
 			ResultSet rs = query(s, String.format(
 					"SELECT %s FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'",
-					String.join(", ", lstr), user.getClinicID(),
+					String.join(", ", lstr), Integer.parseInt(user.get("clinic_id")),
 					omap.get("begin"), omap.get("end")));
 			
 			if (rs != null)
@@ -477,27 +474,18 @@ public class MySQL_Database implements Database
 		return false;
 	}
 	
-	private User getUser(String username)
+	private Map<String, String> getUser(String username)
 	{
 		JSONObject getuser = new JSONObject();
 		getuser.put("command", "get_user");
 		getuser.put("name", username);
 		JSONParser parser = new JSONParser();
-		JSONObject userobj = null;
 		try{
-			userobj = (JSONObject) parser.parse(getUser(getuser));
+			JSONObject json = (JSONObject) parser.parse(getUser(getuser));
+			return (Map<String, String>) json;
 		} catch (org.json.simple.parser.ParseException pe) {
 			return null;
 		}
-		if (userobj == null)
-			return null;
-		
-		return new User(Integer.parseInt((String) userobj.get("clinic_id")),
-				(String) userobj.get("name"),
-				(String) userobj.get("password"),
-				(String) userobj.get("email"),
-				(String) userobj.get("salt"),
-				Integer.parseInt((String) userobj.get("update_password")) != 0);
 	}
 	
 	/**

@@ -19,38 +19,28 @@
  */
 package applet.implementation;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.TreeMap;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import applet.core.Utilities;
 import applet.core.containers.MessageContainer;
 import applet.core.containers.Patient;
 import applet.core.containers.QuestionContainer;
@@ -68,8 +58,6 @@ import applet.core.interfaces.Database;
 import applet.core.interfaces.Encryption;
 import applet.core.interfaces.Implementations;
 import applet.core.interfaces.Questions;
-import servlet.implementation.exceptions.DBReadException;
-import servlet.implementation.exceptions.DBWriteException;
 
 /**
  * This class is an example of an implementation of
@@ -81,6 +69,7 @@ import servlet.implementation.exceptions.DBWriteException;
  * @author Marcus Malmquist
  *
  */
+@SuppressWarnings("unchecked")
 public class MySQL_Database implements Database
 {
 	/* Public */
@@ -229,8 +218,8 @@ public class MySQL_Database implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", "set_password");
 		rmap.put("name", currentUser.getUsername());
-		rmap.put("old_password", oldPass);
-		rmap.put("new_password", newPass);
+		rmap.put("old_password", currentUser.hashWithSalt(oldPass));
+		rmap.put("new_password", crypto.hashString(newPass, newSalt));
 		rmap.put("new_salt", newSalt);
 
 		JSONObject ans = sendMessage(ret.toString());
@@ -363,10 +352,6 @@ public class MySQL_Database implements Database
 	/* Private */
 
 	private static MySQL_Database database;
-	/**
-	 * Handles connection with the database.
-	 */
-	private DataSource dataSource;
 	private Encryption crypto;
 	
 	/**
@@ -376,19 +361,36 @@ public class MySQL_Database implements Database
 	private MySQL_Database()
 	{
 		crypto = Implementations.Encryption();
-		try
-		{
-			Context initContext = new InitialContext();
-			Context envContext = (Context) initContext.lookup("java:comp/env");
-			dataSource = (DataSource) envContext.lookup("jdbc/prom_prem_db");
-		} catch (NamingException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	private JSONObject sendMessage(String obj)
 	{
 		/* send message */
+		URL url;
+		HttpURLConnection connection;
+		try {
+			url = new URL("http://localhost:8080/PROM_PREM_Collector/main");
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setUseCaches(false);
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			//Send request
+			OutputStream os = connection.getOutputStream();
+			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+			System.out.println(obj);
+			osw.write(obj);
+			osw.flush();
+			osw.close();
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				System.out.println("Ok response");
+			} else {
+				System.out.println("Bad response");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		
 		/* receive message */
 		String ans = null; // receive msg from servlet
@@ -417,58 +419,6 @@ public class MySQL_Database implements Database
 			return null;
 		}
 		return userarr;
-	}
-	
-	/**
-	 * Query the database to update an entry i.e. modify an existing
-	 * database entry.
-	 * 
-	 * @param message The command (specified by the SQL language)
-	 * 		to send to the database.
-	 * 
-	 * @return QUERY_SUCCESS on successful query, ERROR on failure.
-	 */
-	private void queryUpdate(String message) throws DBWriteException
-	{
-		try (Connection c = dataSource.getConnection())
-		{
-			c.createStatement().executeUpdate(message);
-		}
-		catch (SQLException se) {
-			throw new DBWriteException(String.format(
-					"Database could not process request: '%s'. Check your arguments.",
-					message));
-		}
-	}
-	
-	/**
-	 * Query the database, typically for data (i.e. request data from
-	 * the database).
-	 * 
-	 * @param s The statement that executes the query. The statement
-	 * 		can be acquired by calling
-	 * 		Connection c = DriverManager.getConnection(...)
-	 * 		Statement s = c.createStatement()
-	 * @param message The command (specified by the SQL language)
-	 * 		to send to the database.
-	 * 
-	 * @return The the ResultSet from the database. If the statement
-	 * 		is not initialized or a query error occurs then null is
-	 * 		returned.
-	 */
-	private ResultSet query(Statement s, String message) throws DBReadException
-	{
-		ResultSet rs = null;
-		try
-		{
-			rs = s.executeQuery(message);
-		}
-		catch (SQLException se) {
-			throw new DBReadException(String.format(
-					"Database could not process request: '%s'. Check your arguments.",
-					message));
-		}
-		return rs;
 	}
 
 	/**

@@ -56,6 +56,8 @@ import applet.core.containers.form.FormContainer;
 import applet.core.interfaces.Messages;
 import applet.core.interfaces.UserInterface;
 import applet.implementation.containerdisplay.ContainerDisplays;
+import applet.core.interfaces.Database;
+import applet.core.interfaces.Questions;
 
 public class GUI_UserInterface extends JApplet implements ActionListener, UserInterface
 {
@@ -156,6 +158,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	public void init()
 	{
 		/* when the webpage is initialized */
+		if (!Messages.getMessages().loadMessages()
+				|| !Questions.getQuestions().loadQuestionnaire())
+		{
+			System.out.printf("%s\n", Database.DATABASE_ERROR);
+			/* should exit the app */
+		}
 	}
 	
 	@Override

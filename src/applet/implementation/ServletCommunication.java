@@ -268,7 +268,6 @@ public class ServletCommunication implements Database
 		rmap.put("command", "load_questions");
 		
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
-		System.out.println(amap.get("questions"));
 		Map<String, String> qmap = (Map<String, String>) getJSONObject(amap.get("questions"));
 		for (Entry<String, String> e : qmap.entrySet())
 		{
@@ -404,7 +403,7 @@ public class ServletCommunication implements Database
 			//Send request
 			OutputStream os = connection.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-			System.out.println(obj);
+			// System.out.println(obj);
 			osw.write(obj);
 			osw.flush();
 			osw.close();
@@ -422,7 +421,7 @@ public class ServletCommunication implements Database
 			while ((inputLine = in.readLine()) != null) 
 				sb.append(inputLine);
 			in.close();
-			System.out.printf(">>%s<<\n", sb.toString());
+			// System.out.printf(">>%s<<\n", sb.toString());
 			return getJSONObject(sb.toString());
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -437,8 +436,6 @@ public class ServletCommunication implements Database
 		try{
 			userobj = (JSONObject) parser.parse(str);
 		} catch (org.json.simple.parser.ParseException pe) {
-			System.out.println(str);
-			pe.printStackTrace();
 			return null;
 		}
 		return userobj;
@@ -476,7 +473,6 @@ public class ServletCommunication implements Database
 		try {
 			for (Entry<String, String> e : mmap.entrySet())
 			{
-				System.out.printf("%s: %s", e.getKey(), e.getValue());
 				Map<String, String> messagemap = (Map<String, String>) getJSONObject(e.getValue());
 				Map<String, String> msgmap = (Map<String, String>) getJSONObject(messagemap.get("message"));
 				mc.addMessage(Integer.parseInt(messagemap.get("code")),

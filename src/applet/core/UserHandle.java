@@ -224,11 +224,9 @@ public class UserHandle
 	 */
 	protected boolean validateDetails(String username, String password)
 	{
-		System.out.printf("username: %s\npassword: %s\n", username, password);
 		User tmp = db.getUser(username);
 		if (tmp == null)
 			return false;
-		System.out.println(tmp.hashWithSalt(password));
 		if (!tmp.passwordMatch(password))
 			return false;
 		user = tmp;

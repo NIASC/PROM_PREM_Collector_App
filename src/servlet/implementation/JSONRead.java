@@ -20,7 +20,7 @@ public class JSONRead
 		}
 		if (obj == null)
 			return null;
-		
+
 		DatabaseFunction dbf = getDBMethod((String) obj.get("command"));
 		if (dbf == null)
 			return null;
@@ -29,6 +29,7 @@ public class JSONRead
 	
 	private static DatabaseFunction getDBMethod(String command)
 	{
+		
 		if (command == null)
 			return null;
 		
@@ -55,6 +56,8 @@ public class JSONRead
 			return db::loadQResultDates;
 		else if (command.equalsIgnoreCase("load_q_results"))
 			return db::loadQResults;
+		else if (command.equalsIgnoreCase("request_registration"))
+			return db::requestRegistration;
 		else
 			return null;
 	}

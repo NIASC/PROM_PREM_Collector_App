@@ -21,7 +21,7 @@ package applet.core.interfaces;
 
 import applet.implementation.Email_Registration;
 import applet.implementation.Locale_se;
-import applet.implementation.MySQL_Database;
+import applet.implementation.ServletCommunication;
 import applet.implementation.SHA_Encryption;
 
 /**
@@ -47,7 +47,7 @@ public abstract class Implementations
 	 */
 	public static Database Database()
 	{
-		return MySQL_Database.getDatabase();
+		return ServletCommunication.getDatabase();
 	}
 	
 	/**

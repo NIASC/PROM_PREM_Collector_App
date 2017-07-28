@@ -72,8 +72,8 @@ public class Main extends HttpServlet
 			while ((str = br.readLine()) != null) {
 				sb.append(str);
 			}
-			String response_str = JSONRead.handleRequest(sb.toString());
-			out.print(response_str);
+			
+			out.print(JSONRead.handleRequest(sb.toString()));
 			out.flush();
 			out.close();
 		} catch (Exception e) {

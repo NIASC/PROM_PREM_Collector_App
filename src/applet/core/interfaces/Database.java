@@ -195,6 +195,18 @@ public interface Database
 	 */
 	public boolean loadQResults(User user, Calendar begin, Calendar end,
 			List<Integer> questionIDs, StatisticsContainer container);
+
+	/**
+	 * Sends a registration request to the servlet.
+	 * 
+	 * @param name The name of the person that wishes to register (not the username).
+	 * @param email The email of the person that wishes to register.
+	 * @param clinic The clinic that the person who wishes to register belongs to.
+	 * 
+	 * @return True if the registration was successful.
+	 */
+	public boolean requestRegistration(
+			String name, String email, String clinic);
 	
 	/* Protected */
 	

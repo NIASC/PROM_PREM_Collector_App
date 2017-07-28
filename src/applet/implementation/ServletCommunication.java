@@ -73,7 +73,7 @@ import common.implementation.Constants;
  *
  */
 @SuppressWarnings("unchecked")
-public class MySQL_Database implements Database
+public class ServletCommunication implements Database
 {
 	/* Public */
 	
@@ -81,10 +81,10 @@ public class MySQL_Database implements Database
 	 * 
 	 * @return The active instance of this class.
 	 */
-	public static synchronized MySQL_Database getDatabase()
+	public static synchronized ServletCommunication getDatabase()
 	{
 		if (database == null)
-			database = new MySQL_Database();
+			database = new ServletCommunication();
 		return database;
 	}
 
@@ -268,6 +268,7 @@ public class MySQL_Database implements Database
 		rmap.put("command", "load_questions");
 		
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		System.out.println(amap.get("questions"));
 		Map<String, String> qmap = (Map<String, String>) getJSONObject(amap.get("questions"));
 		for (Entry<String, String> e : qmap.entrySet())
 		{
@@ -354,18 +355,35 @@ public class MySQL_Database implements Database
 		return true;
 	}
 	
+	public boolean requestRegistration(
+			String name, String email, String clinic)
+	{
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "request_registration");
+		rmap.put("name", name);
+		rmap.put("email", email);
+		rmap.put("clinic", clinic);
+		
+		JSONObject ans = sendMessage(ret.toString());
+		if (ans == null)
+			return false;
+		String insert = (String) ans.get(Constants.INSERT_RESULT);
+		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
+	}
+	
 	/* Protected */
 	
 	/* Private */
 
-	private static MySQL_Database database;
+	private static ServletCommunication database;
 	private Encryption crypto;
 	
 	/**
 	 * Initializes variables and loads the database configuration.
 	 * This class is a singleton and should only be instantiated once.
 	 */
-	private MySQL_Database()
+	private ServletCommunication()
 	{
 		crypto = Implementations.Encryption();
 	}
@@ -419,6 +437,8 @@ public class MySQL_Database implements Database
 		try{
 			userobj = (JSONObject) parser.parse(str);
 		} catch (org.json.simple.parser.ParseException pe) {
+			System.out.println(str);
+			pe.printStackTrace();
 			return null;
 		}
 		return userobj;

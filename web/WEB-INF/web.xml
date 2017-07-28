@@ -48,6 +48,7 @@
          parameters, including zero.
     -->
 
+    <!--
     <context-param>
       <param-name>webmaster</param-name>
       <param-value>marcus.malmquist@ki.se</param-value>
@@ -55,7 +56,8 @@
         The EMAIL address of the administrator to whom questions
         and comments about this application should be addressed.
       </description>
-    </context-param>
+      </context-param>
+    -->
 
 
     <!-- Servlet definitions for the servlets that make up
@@ -88,7 +90,7 @@
       <description>
 	Starts the server-side version of the collector.
       </description>
-      <servlet-class>Testing.Main</servlet-class>
+      <servlet-class>servlet.core.Main</servlet-class>
       <!-- <load-on-startup>5</load-on-startup> --> <!-- Load this servlet at server startup time -->
     </servlet>
 

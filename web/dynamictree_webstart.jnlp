@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+/*
+ */ 
+-->
+
+<jnlp spec="1.0+"
+      codebase="http://localhost:8080/PROM_PREM_Collector"
+      href="dynamictree_webstart.jnlp">
+  <information>
+    <title>PROM/PREM Collector</title>
+    <vendor>NIASC</vendor>
+  </information>
+  <resources>
+    <!-- Application Resources -->
+    <j2se version="1.8+"
+          href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="DynamicTreeDemo.jar" main="true" />
+    
+  </resources>
+  <application-desc
+      name="PROM/PREM Collector"
+      main-class="webstartComponentArch.DynamicTreeApplication">
+  </application-desc>
+  <update check="background"/>
+</jnlp>

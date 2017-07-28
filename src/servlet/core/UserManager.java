@@ -17,10 +17,14 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package applet.core;
+package servlet.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import common.implementation.Constants;
 
 /**
  * This class keeps track of which users are online and how many users
@@ -54,9 +58,6 @@ public class UserManager
 	}
 	
 	/* Protected */
-
-	protected static final int ERROR = -1, SUCCESS = 0,
-			SERVER_FULL = 2, ALREADY_ONLINE = 4;
 	
 	/**
 	 * Adds {@code uh} to the list of online users if they exist.
@@ -68,16 +69,16 @@ public class UserManager
 	 * 
 	 * @see UserHandle
 	 */
-	protected synchronized int addUser(UserHandle uh)
+	public synchronized String addUser(String username)
 	{
-		if (uh == null || uh.getUser() == null)
-			return ERROR;
-		if (userHandle.size() >= MAX_USERS)
-			return SERVER_FULL;
-		if (userHandle.containsKey(uh.getUser().getUsername()))
-			return ALREADY_ONLINE;
-		userHandle.put(uh.getUser().getUsername(), uh);
-		return SUCCESS;
+		if (username == null || username.isEmpty())
+			return Constants.ERROR_STR;
+		if (users.size() >= MAX_USERS)
+			return Constants.SERVER_FULL_STR;
+		if (users.contains(username))
+			return Constants.ALREADY_ONLINE_STR;
+		users.add(username);
+		return Constants.SUCCESS_STR;
 	}
 	
 	/**
@@ -90,12 +91,11 @@ public class UserManager
 	 * 
 	 * @see UserHandle
 	 */
-	protected synchronized boolean delUser(UserHandle uh)
+	public synchronized boolean delUser(String username)
 	{
-		if (uh == null || uh.getUser() == null
-				|| !userHandle.containsKey(uh.getUser().getUsername()))
+		if (username == null || username.isEmpty() || !users.contains(username))
 			return false;
-		userHandle.remove(uh.getUser().getUsername());
+		users.remove(username);
 		return true;
 	}
 	
@@ -103,14 +103,14 @@ public class UserManager
 	
 	private static UserManager manager;
 	private static final int MAX_USERS;
-	private Map<String, UserHandle> userHandle;
+	private List<String> users;
 
 	/**
 	 * Singleton class
 	 */
 	private UserManager()
 	{
-		userHandle = new HashMap<String, UserHandle>();
+		users = new ArrayList<String>();
 	}
 	
 	static

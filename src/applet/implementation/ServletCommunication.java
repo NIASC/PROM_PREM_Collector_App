@@ -371,6 +371,39 @@ public class ServletCommunication implements Database
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
 	
+	public int requestLogin(String username, String password)
+	{
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "request_login");
+
+		User user = getUser(username);
+		if (user == null)
+			return Constants.INVALID_DETAILS;
+		rmap.put("name", username);
+		rmap.put("password", user.hashWithSalt(password));
+		
+		JSONObject ans = sendMessage(ret.toString());
+		if (ans == null)
+			return Constants.ERROR;
+		Map<String, String> amap = (Map<String, String>) ans;
+		return Integer.parseInt(amap.get(Constants.LOGIN_REPONSE));
+	}
+	
+	public boolean requestLogout(String username)
+	{
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "request_logout");
+		rmap.put("name", username);
+		
+		JSONObject ans = sendMessage(ret.toString());
+		if (ans == null)
+			return false;
+		Map<String, String> amap = (Map<String, String>) ans;
+		return Integer.parseInt(amap.get(Constants.LOGOUT_REPONSE)) == Constants.SUCCESS;
+	}
+	
 	/* Protected */
 	
 	/* Private */

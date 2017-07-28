@@ -48,8 +48,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import applet.core.Utilities;
 import applet.core.interfaces.Messages;
+import servlet.core.UserManager;
+import servlet.core.Utilities;
 import servlet.core.interfaces.Database;
 import servlet.implementation.exceptions.DBReadException;
 import servlet.implementation.exceptions.DBWriteException;
@@ -470,6 +471,47 @@ public class MySQL_Database implements Database
 			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_SUCCESS);
 		else
 			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
+		return ret.toString();
+	}
+	
+	public String requestLogin(JSONObject obj)
+	{
+		Map<String, String> omap = (Map<String, String>) obj;
+		
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "request_login");
+
+		Map<String, String> userobj = getUser(omap.get("name"));
+		if (userobj == null)
+		{
+			rmap.put(Constants.LOGIN_REPONSE, Constants.INVALID_DETAILS_STR);
+			return ret.toString();
+		}
+		Map<String, String> user = (Map<String, String>) getJSONObject(userobj.get("user"));
+
+		if (!user.get("password").equals(omap.get("password")))
+		{
+			rmap.put(Constants.LOGIN_REPONSE, Constants.INVALID_DETAILS_STR);
+			return ret.toString();
+		}
+		
+		UserManager um = UserManager.getUserManager();
+		rmap.put(Constants.LOGIN_REPONSE, um.addUser(user.get("name")));
+		return ret.toString();
+	}
+	
+	public String requestLogout(JSONObject obj)
+	{
+		Map<String, String> omap = (Map<String, String>) obj;
+		
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", "request_logout");
+
+		UserManager um = UserManager.getUserManager();
+		String response = um.delUser(omap.get("name")) ? Constants.SUCCESS_STR : Constants.ERROR_STR;
+		rmap.put(Constants.LOGOUT_REPONSE, response);
 		return ret.toString();
 	}
 	

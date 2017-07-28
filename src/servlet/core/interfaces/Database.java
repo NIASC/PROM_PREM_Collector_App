@@ -47,6 +47,8 @@ public interface Database
 	public String loadQResultDates			(JSONObject obj);
 	public String loadQResults				(JSONObject obj);
 	public String requestRegistration		(JSONObject obj);
+	public String requestLogin				(JSONObject obj);
+	public String requestLogout				(JSONObject obj);
 
 	@FunctionalInterface
 	public interface DatabaseFunction

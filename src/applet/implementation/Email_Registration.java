@@ -31,7 +31,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import applet.core.Utilities;
 import applet.core.containers.Form;
 import applet.core.containers.form.FieldContainer;
 import applet.core.interfaces.Database;
@@ -40,6 +39,7 @@ import applet.core.interfaces.Messages;
 import applet.core.interfaces.Registration;
 import applet.core.interfaces.UserInterface;
 import applet.core.interfaces.UserInterface.RetFunContainer;
+import servlet.core.Utilities;
 
 /**
  * This class is an example of an implementation of

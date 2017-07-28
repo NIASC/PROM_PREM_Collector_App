@@ -58,6 +58,10 @@ public class JSONRead
 			return db::loadQResults;
 		else if (command.equalsIgnoreCase("request_registration"))
 			return db::requestRegistration;
+		else if (command.equalsIgnoreCase("request_login"))
+			return db::requestLogin;
+		else if (command.equalsIgnoreCase("request_logout"))
+			return db::requestLogout;
 		else
 			return null;
 	}

@@ -34,6 +34,7 @@ import applet.core.interfaces.Messages;
 import applet.core.interfaces.Registration;
 import applet.core.interfaces.UserInterface;
 import applet.core.interfaces.UserInterface.RetFunContainer;
+import common.implementation.Constants;
 
 /**
  * This class handles the user. This mostly means handling the login,
@@ -75,25 +76,23 @@ public class UserHandle
 	 */
 	public void login(String username, String password)
 	{
-		if (!validateDetails(username, password))
+		switch(db.requestLogin(username, password))
 		{
-			ui.displayError(Messages.getMessages().getError(
-					Messages.ERROR_UH_INVALID_LOGIN), false);
-			// TODO: add functionality for resetting password.
-			return;
-		}
-		switch(UserManager.getUserManager().addUser(this))
-		{
-		case UserManager.SUCCESS:
+		case Constants.SUCCESS:
+			user = db.getUser(username);
 			initLoginVars();
 			break;
-		case UserManager.ALREADY_ONLINE:
+		case Constants.ALREADY_ONLINE:
 			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_ALREADY_ONLINE), false);
 			break;
-		case UserManager.SERVER_FULL:
+		case Constants.SERVER_FULL:
 			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_UH_SERVER_FULL), false);
+			break;
+		case Constants.INVALID_DETAILS:
+			ui.displayError(Messages.getMessages().getError(
+					Messages.ERROR_UH_INVALID_LOGIN), false);
 			break;
 		default:
 			ui.displayError(Messages.getMessages().getError(
@@ -123,7 +122,7 @@ public class UserHandle
 	{
 		if (!loggedIn)
 			return;
-		UserManager.getUserManager().delUser(this);
+		db.requestLogout(user.getUsername());
 		resetLoginVars();
 	}
 	
@@ -209,29 +208,6 @@ public class UserHandle
 	}
 	
 	/* Protected */
-	
-	/**
-	 * Attempts to match the supplied username and password with users
-	 * that are already in the database. If the username and password
-	 * matches the user information will be placed in the local user
-	 * object.
-	 * 
-	 * @param username The name of the user to look for.
-	 * @param password The password of the user to look for.
-	 * 
-	 * @return {@code true} if the user was found and the details
-	 * 		matched. {@code false} if not.
-	 */
-	protected boolean validateDetails(String username, String password)
-	{
-		User tmp = db.getUser(username);
-		if (tmp == null)
-			return false;
-		if (!tmp.passwordMatch(password))
-			return false;
-		user = tmp;
-		return true;
-	}
 	
 	/**
 	 * 

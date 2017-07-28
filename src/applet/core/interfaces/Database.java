@@ -207,6 +207,21 @@ public interface Database
 	 */
 	public boolean requestRegistration(
 			String name, String email, String clinic);
+
+	/**
+	 * 
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	public int requestLogin(String username, String password);
+
+	/**
+	 * 
+	 * @param username
+	 * @return
+	 */
+	public boolean requestLogout(String username);
 	
 	/* Protected */
 	

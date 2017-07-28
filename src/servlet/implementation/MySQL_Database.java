@@ -362,10 +362,11 @@ public class MySQL_Database implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", "load_q_result_dates");
 
-		Map<String, String> user = getUser(omap.get("name"));
-		if (user == null)
+		Map<String, String> userobj = getUser(omap.get("name"));
+		if (userobj == null)
 			return null;
-		
+		Map<String, String> user = (Map<String, String>) getJSONObject(userobj.get("user"));
+
 		try (Connection conn = dataSource.getConnection())
 		{
 			Statement s = conn.createStatement();
@@ -395,9 +396,10 @@ public class MySQL_Database implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", "load_q_results");
 
-		Map<String, String> user = getUser(omap.get("name"));
-		if (user == null)
+		Map<String, String> userobj = getUser(omap.get("name"));
+		if (userobj == null)
 			return null;
+		Map<String, String> user = (Map<String, String>) getJSONObject(userobj.get("user"));
 		
 		try (Connection conn = dataSource.getConnection())
 		{
@@ -415,8 +417,8 @@ public class MySQL_Database implements Database
 			List<String> qlist = (List<String>) questions;
 			
 			List<String> lstr = new ArrayList<String>();
-			for (Iterator<?> itr = questions.iterator(); itr.hasNext();)
-				lstr.add((String) itr.next());
+			for (Iterator<String> itr = qlist.iterator(); itr.hasNext();)
+				lstr.add("`" + itr.next() + "`");
 			
 			ResultSet rs = query(s, String.format(
 					"SELECT %s FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'",
@@ -430,7 +432,7 @@ public class MySQL_Database implements Database
 				while (rs.next())
 				{
 					JSONObject answers = new JSONObject();
-					Map<String, String> amap = (Map<String, String>) ret;
+					Map<String, String> amap = (Map<String, String>) answers;
 					for (Iterator<String> itr = qlist.iterator(); itr.hasNext();)
 					{
 						String q = itr.next();

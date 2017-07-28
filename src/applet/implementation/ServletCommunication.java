@@ -330,8 +330,10 @@ public class ServletCommunication implements Database
 		JSONArray questions = new JSONArray();
 		List<String> qlist = (List<String>) questions;
 		for (Iterator<Integer> itr = questionIDs.iterator(); itr.hasNext();)
-			qlist.add(String.format("`question%d`", itr.next()));
+			qlist.add(String.format("question%d", itr.next()));
 		rmap.put("questions", questions.toString());
+
+		rmap.put("name", user.getUsername());
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		rmap.put("begin", sdf.format(begin.getTime()));

@@ -48,7 +48,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import applet.core.interfaces.Messages;
 import servlet.core.UserManager;
 import servlet.core.Utilities;
 import servlet.core.interfaces.Database;
@@ -100,7 +99,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "add_user");
+		rmap.put("command", Constants.CMD_ADD_USER);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String qInsert = String.format(
@@ -125,7 +124,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "add_questionnaire_answers");
+		rmap.put("command", Constants.CMD_ADD_QANS);
 		
 		int clinic_id = Integer.parseInt(omap.get("clinic_id"));
 		String identifier = omap.get("identifier");
@@ -165,7 +164,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "add_clinic");
+		rmap.put("command", Constants.CMD_ADD_CLINIC);
 		
 		String qInsert = String.format(
 				"INSERT INTO `clinics` (`id`, `name`) VALUES (NULL, '%s')",
@@ -185,7 +184,7 @@ public class MySQL_Database implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "get_clinics");
+		rmap.put("command", Constants.CMD_GET_CLINICS);
 		
 		try (Connection conn = dataSource.getConnection())
 		{
@@ -213,7 +212,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "get_user");
+		rmap.put("command", Constants.CMD_GET_USER);
 		
 		try (Connection conn = dataSource.getConnection())
 		{
@@ -283,7 +282,7 @@ public class MySQL_Database implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "get_error_messages");
+		rmap.put("command", Constants.CMD_GET_ERR_MSG);
 		
 		getMessages("error_messages", rmap);
 		return ret.toString();
@@ -294,7 +293,7 @@ public class MySQL_Database implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "get_info_messages");
+		rmap.put("command", Constants.CMD_GET_INFO_MSG);
 		
 		getMessages("info_messages", rmap);
 		return ret.toString();
@@ -305,7 +304,7 @@ public class MySQL_Database implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "load_questions");
+		rmap.put("command", Constants.CMD_LOAD_Q);
 		
 		try (Connection conn = dataSource.getConnection())
 		{
@@ -360,7 +359,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "load_q_result_dates");
+		rmap.put("command", Constants.CMD_LOAD_QR_DATE);
 
 		Map<String, String> userobj = getUser(omap.get("name"));
 		if (userobj == null)
@@ -394,7 +393,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "load_q_results");
+		rmap.put("command", Constants.CMD_LOAD_QR);
 
 		Map<String, String> userobj = getUser(omap.get("name"));
 		if (userobj == null)
@@ -455,7 +454,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "request_registration");
+		rmap.put("command", Constants.CMD_REQ_REGISTR);
 		
 		String name = omap.get("name");
 		String email = omap.get("email");
@@ -482,7 +481,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "request_login");
+		rmap.put("command", Constants.CMD_REQ_LOGIN);
 
 		Map<String, String> userobj = getUser(omap.get("name"));
 		if (userobj == null)
@@ -509,7 +508,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "request_logout");
+		rmap.put("command", Constants.CMD_REQ_LOGOUT);
 
 		UserManager um = UserManager.getUserManager();
 		String response = um.delUser(omap.get("name")) ? Constants.SUCCESS_STR : Constants.ERROR_STR;

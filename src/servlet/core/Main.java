@@ -19,7 +19,6 @@
  */
 package servlet.core;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,8 +50,8 @@ public class Main extends HttpServlet
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
+			throws ServletException, IOException
+	{
 		// Set response content type
 		response.setContentType("text/html");
 

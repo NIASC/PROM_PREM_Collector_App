@@ -65,6 +65,13 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	
 	public static final Font FONT = new Font(Font.SERIF, Font.PLAIN, 16);
 	
+	public static void main(String[] args)
+	{
+		GUI_UserInterface gui = new GUI_UserInterface(false);
+		gui.init();
+		gui.start();
+	}
+	
 	public GUI_UserInterface()
 	{
 		this(true);

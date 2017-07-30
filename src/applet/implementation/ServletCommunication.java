@@ -21,7 +21,6 @@ package applet.implementation;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -105,7 +104,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "add_user");
+		rmap.put("command", Constants.CMD_ADD_USER);
 		rmap.put("clinic_id", Integer.toString(clinic));
 		rmap.put("name", username);
 		rmap.put("password", password);
@@ -124,7 +123,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "add_questionnaire_answers");
+		rmap.put("command", Constants.CMD_ADD_QANS);
 		
 		int nQuestions = Questions.getQuestions().getContainer().getSize();
 		if (answers.size() != nQuestions)
@@ -159,7 +158,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "add_clinic");
+		rmap.put("command", Constants.CMD_ADD_CLINIC);
 		rmap.put("name", clinicName);
 		
 		JSONObject ans = sendMessage(ret.toString());
@@ -175,7 +174,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "get_clinics");
+		rmap.put("command", Constants.CMD_GET_CLINICS);
 		
 		JSONObject ans = sendMessage(ret.toString());
 		JSONObject clinics = getJSONObject((String) ans.get("clinics"));
@@ -195,7 +194,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "get_user");
+		rmap.put("command", Constants.CMD_GET_USER);
 		rmap.put("name", username);
 
 		JSONObject ans = sendMessage(ret.toString());
@@ -219,18 +218,15 @@ public class ServletCommunication implements Database
 	public User setPassword(User currentUser, String oldPass, String newPass,
 			String newSalt)
 	{
-		System.out.printf("%s, %s, %s, %s", currentUser.getUsername(),
-				oldPass, newPass, newSalt);
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "set_password");
+		rmap.put("command", Constants.CMD_SET_PASSWORD);
 		rmap.put("name", currentUser.getUsername());
 		rmap.put("old_password", oldPass);
 		rmap.put("new_password", newPass);
 		rmap.put("new_salt", newSalt);
 
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
-		System.out.println(((JSONObject) amap).toString());
 		Map<String, String> umap = (Map<String, String>) getJSONObject(amap.get("user"));
 		User usr = null;
 		try {
@@ -249,7 +245,7 @@ public class ServletCommunication implements Database
 	{
 		if (mc == null)
 			return false;
-		return getMessages("get_error_messages", mc);
+		return getMessages(Constants.CMD_GET_ERR_MSG, mc);
 	}
 
 	@Override
@@ -257,7 +253,7 @@ public class ServletCommunication implements Database
 	{
 		if (mc == null)
 			return false;
-		return getMessages("get_info_messages", mc);
+		return getMessages(Constants.CMD_GET_INFO_MSG, mc);
 	}
 	
 	@Override
@@ -265,7 +261,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "load_questions");
+		rmap.put("command", Constants.CMD_LOAD_Q);
 		
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
 		Map<String, String> qmap = (Map<String, String>) getJSONObject(amap.get("questions"));
@@ -297,7 +293,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "load_q_result_dates");
+		rmap.put("command", Constants.CMD_LOAD_QR_DATE);
 		rmap.put("name", user.getUsername());
 
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
@@ -325,7 +321,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "load_q_results");
+		rmap.put("command", Constants.CMD_LOAD_QR);
 
 		JSONArray questions = new JSONArray();
 		List<String> qlist = (List<String>) questions;
@@ -361,7 +357,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "request_registration");
+		rmap.put("command", Constants.CMD_REQ_REGISTR);
 		rmap.put("name", name);
 		rmap.put("email", email);
 		rmap.put("clinic", clinic);
@@ -377,7 +373,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "request_login");
+		rmap.put("command", Constants.CMD_REQ_LOGIN);
 
 		User user = getUser(username);
 		if (user == null)
@@ -396,7 +392,7 @@ public class ServletCommunication implements Database
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", "request_logout");
+		rmap.put("command", Constants.CMD_REQ_LOGOUT);
 		rmap.put("name", username);
 		
 		JSONObject ans = sendMessage(ret.toString());
@@ -443,9 +439,9 @@ public class ServletCommunication implements Database
 			osw.flush();
 			osw.close();
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				System.out.println("Ok response");
+				// System.out.println("Ok response");
 			} else {
-				System.out.println("Bad response");
+				// System.out.println("Bad response");
 			}
 
 			/* receive message */
@@ -453,7 +449,7 @@ public class ServletCommunication implements Database
 					connection.getInputStream(), "UTF-8"));
 			StringBuilder sb = new StringBuilder();
 			String inputLine;
-			while ((inputLine = in.readLine()) != null) 
+			while ((inputLine = in.readLine()) != null)
 				sb.append(inputLine);
 			in.close();
 			// System.out.printf(">>%s<<\n", sb.toString());

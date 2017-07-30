@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+/*
+ */ 
+-->
+
+<jnlp spec="1.0+"
+      codebase="http://localhost:8080/PROM_PREM_Collector"
+      href="prom_prem_collector.jnlp">
+  <information>
+    <title>PROM/PREM Collector</title>
+    <vendor>NIASC</vendor>
+    <homepage>http://nordicehealth.se</homepage>
+  </information>
+  <resources>
+    <!-- Application Resources -->
+    <j2se version="1.8+"
+          href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="prom_prem_collector.jar" main="true" />
+    
+  </resources>
+  <application-desc
+      name="PROM/PREM Collector"
+      main-class="applet.implementation.GUI_UserInterface">
+  </application-desc>
+  <update check="background"/>
+</jnlp>

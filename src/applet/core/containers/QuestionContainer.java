@@ -19,6 +19,8 @@
  */
 package applet.core.containers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -131,13 +133,11 @@ public class QuestionContainer
 	
 	public Question getQuestion(int index)
 	{
-		if (index >= 0 && index < questions.size())
+		try
 		{
-			int i = 0;
-			for (Entry<Integer, Question> e : questions.entrySet())
-				if (i++ == index)
-					return e.getValue();
+			return (new ArrayList<Question>(questions.values())).get(index);
 		}
+		catch (Exception e) { }
 		return null;
 	}
 	

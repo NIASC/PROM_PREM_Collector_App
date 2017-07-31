@@ -30,6 +30,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,6 +54,7 @@ import javax.swing.ScrollPaneConstants;
 
 import applet.core.UserHandle;
 import applet.core.containers.Form;
+import applet.core.containers.ViewDataContainer;
 import applet.core.containers.form.FormContainer;
 import applet.core.interfaces.Messages;
 import applet.core.interfaces.UserInterface;
@@ -98,10 +101,6 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 						setContent(new WelcomeScreen());
 					else
 						setContent(new LoginScreen());
-				}
-				else if (b.getName().equals(menuButton1.getName()))
-				{
-					// unused
 				}
 				else if (b.getName().equals(logoutButton.getName()))
 				{
@@ -156,6 +155,13 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 	
 	@Override
+	public boolean presentViewData(ViewDataContainer vdc)
+	{
+		setContent(new ViewDataDisplay(vdc));
+		return true;
+	}
+	
+	@Override
 	public FormComponentDisplay getContainerDisplay(FormContainer fc)
 	{
 		return ContainerDisplays.getDisplay(fc);
@@ -177,6 +183,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	public void destroy()
 	{
 		/* when the webpage is destroyed */
+		uh.logout();
 		if (!embedded && frame != null)
 			frame.dispose();
 	}
@@ -301,6 +308,23 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		{
 			frame = new JFrame("PROM/PREM Collector GUI");
 			frame.setContentPane(this);
+			frame.addWindowListener(new WindowListener() {
+				@Override
+				public void windowClosing(WindowEvent e) { uh.logout(); }
+				@Override
+				public void windowClosed(WindowEvent e) { uh.logout(); }
+				@Override
+				public void windowDeactivated(WindowEvent e) { }
+				@Override
+				public void windowActivated(WindowEvent e) { }
+				@Override
+				public void windowOpened(WindowEvent e) { }
+				@Override
+				public void windowIconified(WindowEvent e) { }
+				@Override
+				public void windowDeiconified(WindowEvent e) { }
+				
+			});
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setResizable(false);
 		}
@@ -319,14 +343,11 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		JPanel bPanel = new JPanel(new GridLayout(1, 4));
 		mainmenuButton = SwingComponents.makeButton("Main menu", "mainmenuButton",
 				"Return to main menu.", false, null, null, null, dim, this);
-		menuButton1 = SwingComponents.makeButton("Dummy1", "menuButton1",
-				"Unused.", false, null, null, null, dim, this);
 		logoutButton = SwingComponents.makeButton("Logout", "logoutButton",
 				"Log out.", false, null, null, null, dim, this);
 		exitButton = SwingComponents.makeButton("Exit", "exit",
 				"Exit.", false, null, null, null, dim, this);
 		bPanel.add(mainmenuButton);
-		bPanel.add(menuButton1);
 		bPanel.add(logoutButton);
 		bPanel.add(exitButton);
 		return bPanel;
@@ -796,6 +817,33 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			}
 			panel.add(fc_back);
 			return panel;
+		}
+	}
+	
+	public class ViewDataDisplay extends JPanel
+	{
+		
+		public ViewDataDisplay(ViewDataContainer vdc)
+		{
+			this.vdc = vdc;
+			setLayout(new BorderLayout());
+			title = AddTextArea(vdc.getTitle(), 0, 35, false, false);
+			results = AddTextArea(vdc.getResults(), 0, 35, false, false);
+			
+			add(title, BorderLayout.NORTH);
+			add(results, BorderLayout.CENTER);
+		}
+
+		private static final long serialVersionUID = -5340643717796983977L;
+		
+		private ViewDataContainer vdc;
+		private JTextArea title, results;
+		
+		private JTextArea AddTextArea(String text, int rows, int columns,
+				boolean opaque, boolean editable)
+		{
+			return SwingComponents.makeTextArea(text, null, null, opaque,
+					null, null, null, null, null, editable, rows, columns);
 		}
 	}
 }

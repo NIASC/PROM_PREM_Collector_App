@@ -20,10 +20,14 @@
 package applet.core.containers;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import applet.core.Questionnaire;
 import applet.core.containers.form.AreaContainer;
@@ -54,8 +58,6 @@ public class QuestionContainer
 	public QuestionContainer()
 	{
 		questions = new TreeMap<Integer, Question>();
-		indexToID = new TreeMap<Integer, Integer>();
-		index = 0;
 	}
 	
 	@Override
@@ -64,11 +66,10 @@ public class QuestionContainer
 		QuestionContainer qc = new QuestionContainer();
 		synchronized (this)
 		{
-			for (int i = 0; i < index; ++i)
+			for (Iterator<Question> itr = questions.values().iterator(); itr.hasNext();)
 			{
-				Question q = questions.get(indexToID.get(i));
-				qc.addQuestion(
-						indexToID.get(i), q.type, q.question, q.description,
+				Question q = itr.next();
+				qc.addQuestion(q.id, q.type, q.question, q.description,
 						q.options, q.optional, q.upper, q.lower);
 			}
 		}
@@ -111,7 +112,6 @@ public class QuestionContainer
 				id, type, question, description, options, optional,
 				upper, lower);
 		questions.put(id, q);
-		indexToID.put(index++, id);
 	}
 	
 	/**
@@ -131,10 +131,12 @@ public class QuestionContainer
 	
 	public Question getQuestion(int index)
 	{
-		if (indexToID.containsKey(index)
-				&& questions.containsKey(indexToID.get(index)))
+		if (index >= 0 && index < questions.size())
 		{
-			return questions.get(indexToID.get(index));
+			int i = 0;
+			for (Entry<Integer, Question> e : questions.entrySet())
+				if (i++ == index)
+					return e.getValue();
 		}
 		return null;
 	}
@@ -145,7 +147,7 @@ public class QuestionContainer
 	 */
 	public int getSize()
 	{
-		return index;
+		return questions.size();
 	}
 	
 	/* protected */
@@ -153,8 +155,6 @@ public class QuestionContainer
 	/* private */
 
 	private Map<Integer, Question> questions;
-	private Map<Integer, Integer> indexToID;
-	private int index;
 	
 	/**
 	 * This class contains questionnaire questions.

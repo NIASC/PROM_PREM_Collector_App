@@ -120,7 +120,10 @@ public class Questionnaire
 			return;
 		Form form = new Form();
 		for (int i = 0; i < questions.getSize(); ++i)
+		{
+			System.out.println(questions.getContainer(i).getStatement());
 			form.insert(questions.getContainer(i), Form.AT_END);
+		}
 		form.jumpTo(Form.AT_BEGIN);
 		
 		ui.presentForm(form, this::saveQuestionaire, false);

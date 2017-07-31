@@ -20,6 +20,7 @@
 package applet.core.interfaces;
 
 import applet.core.containers.Form;
+import applet.core.containers.ViewDataContainer;
 import applet.core.containers.form.FormContainer;
 
 /**
@@ -85,6 +86,15 @@ public interface UserInterface
 	 */
 	public boolean presentForm(Form form, ReturnFunction retfun,
 			boolean multiple);
+
+	/**
+	 * Presents the statistical data contained in {@code vdc}.
+	 * 
+	 * @param vdc The object which contains statistical data.
+	 * 
+	 * @return {@code true} if the content was displayed.
+	 */
+	public boolean presentViewData(ViewDataContainer vdc);
 	
 	/**
 	 * Creates an object that can store a form container.

@@ -31,6 +31,7 @@ import applet.core.containers.Form;
 import applet.core.containers.QuestionContainer;
 import applet.core.containers.StatisticsContainer;
 import applet.core.containers.StatisticsContainer.Statistics;
+import applet.core.containers.ViewDataContainer;
 import applet.core.containers.form.AreaContainer;
 import applet.core.containers.form.MultipleOptionContainer;
 import applet.core.containers.form.SingleOptionContainer;
@@ -155,6 +156,12 @@ public class ViewData
 		
 		// validate selected questions
 		selQuestions = questionselect.getEntry();
+
+		StatisticsContainer sc = new StatisticsContainer();
+		Implementations.Database().loadQResults(userHandle.getUser(),
+				lower, upper, selQuestions, sc);
+		vdc = new ViewDataContainer(userInterface, sc.getStatistics(),
+				upper, lower, nEntries);
 		
 		rfc.valid = true;
 		return rfc;
@@ -167,76 +174,7 @@ public class ViewData
 	 */
 	private void displayStatistics()
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		System.out.printf("Displaying statistics for %d entries for period [%s -- %s]\n",
-				nEntries, sdf.format(lower.getTime()),
-				sdf.format(upper.getTime()));
-		
-		StatisticsContainer sc = new StatisticsContainer();
-		System.out.printf("\n");
-		Implementations.Database().loadQResults(userHandle.getUser(),
-				lower, upper, selQuestions, sc);
-		List<Statistics> res = sc.getStatistics();
-		for (Statistics s : res)
-		{
-			List<Object> lstr = new ArrayList<Object>();
-			List<Integer> lint = new ArrayList<Integer>();
-			int tot = 0;
-			
-			Class<?> c = s.getQuestionClass();
-			Map<Object, Integer> ans = s.getAnswerCounts();
-			Integer count;
-			if (SingleOptionContainer.class.isAssignableFrom(c))
-			{
-				String statement;
-				for (Iterator<String> itr = s.getOptions().iterator(); itr.hasNext();)
-				{
-					statement = itr.next();
-					if ((count = ans.get(statement)) == null)
-						continue;
-					lint.add(count);
-					lstr.add(statement);
-					tot += count;
-				}
-			}
-			else if (SliderContainer.class.isAssignableFrom(c))
-			{
-				for (int i = s.getLowerBound(); i <= s.getUpperBound(); ++i)
-				{
-					if ((count = ans.get(i)) == null)
-						continue;
-					lint.add(count);
-					lstr.add(i);
-					tot += count;
-				}
-			}
-			else if (AreaContainer.class.isAssignableFrom(c))
-			{
-				for (Entry<Object, Integer> e : ans.entrySet())
-				{
-					count = e.getValue();
-					lint.add(count);
-					lstr.add(e.getKey().toString());
-					tot += count;
-				}
-			}
-			StringBuilder sb = new StringBuilder();
-			sb.append(String.format("%s:\n", s.getStatement()));
-			
-			Iterator<Object> sitr;
-			Iterator<Integer> iitr;
-			for (sitr = lstr.iterator(), iitr = lint.iterator();
-					sitr.hasNext() && iitr.hasNext();)
-			{
-				Integer i = iitr.next();
-				sb.append(String.format("|- %4d (%3d%%) - %s\n",
-						i, Math.round(100.0 * i.doubleValue() / tot),
-						sitr.next()));
-			}
-			sb.append("|- ------------ -\n");
-			sb.append(String.format("\\- %4d (%3.0f %%) - %s\n", tot, 100D, "Total"));
-			System.out.println(sb.toString());
-		}
+		userInterface.presentViewData(vdc);
 	}
 	
 	private UserHandle userHandle;
@@ -244,4 +182,5 @@ public class ViewData
 	private Calendar upper, lower;
 	private int nEntries;
 	private List<Integer> selQuestions;
+	private ViewDataContainer vdc;
 }

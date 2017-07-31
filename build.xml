@@ -45,7 +45,7 @@
      set to the current working directory.
 -->
 
-<project name="My Project" default="compile" basedir=".">
+<project name="PROM/PREM Collector" default="compile" basedir=".">
 
 
 
@@ -124,7 +124,7 @@
 
 -->
 
-  <property name="app.name"      value="myapp"/>
+  <property name="app.name"      value="prom_prem_collector"/>
   <property name="app.path"      value="/${app.name}"/>
   <property name="app.version"   value="0.1-dev"/>
   <property name="build.home"    value="${basedir}/build"/>
@@ -504,5 +504,29 @@
 
   </target>
 
+<!-- ==================== Jar client ===================== -->
+  
+<!--
+
+  The "jarfile" target packages the client files and appropriate dependencies
+  into a runnable jar file.
+
+-->
+
+  <target name="jar"
+	  description="Package client files into a jar file."
+	  depends="compile">
+    <jar basedir="${build.home}/WEB-INF/classes" destfile="${build.home}/${app.name}.jar">
+      <zipgroupfileset dir="libs" includes="json-simple-1.1.1.jar" />
+      <manifest>
+        <attribute name="Codebase" value="http://localhost:8080/PROM_PREM_Collector"/>
+	<attribute name="Application-Name" value="PROM/PREM Collector"/>
+        <attribute name="Created-By" value="${ant.java.version}"/>
+        <attribute name="Permissions" value="sandbox"/>
+	<attribute name="Main-Class" value="applet.implementation.GUI_UserInterface"/>
+
+      </manifest>
+    </jar>
+  </target>
 
 </project>

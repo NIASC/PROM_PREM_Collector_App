@@ -6,12 +6,19 @@
 
 <jnlp spec="1.0+"
       codebase="http://localhost:8080/PROM_PREM_Collector"
+      application-title="PROM/PREM Collector"
       href="prom_prem_collector.jnlp">
   <information>
     <title>PROM/PREM Collector</title>
     <vendor>NIASC</vendor>
-    <homepage>http://nordicehealth.se</homepage>
+    <homepage href="http://www.nordicehealth.se"/>
+    <icon kind="splash" href="http://localhost:8080/PROM_PREM_Collector/images/NIASC_black.jpg"/>
   </information>
+
+  <security>
+    <sandbox/>
+  </security>
+  
   <resources>
     <!-- Application Resources -->
     <j2se version="1.8+"

@@ -1,4 +1,5 @@
-/**
+/** Email_Registration.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -43,7 +44,8 @@ public class Email_Registration implements Registration
 	/* Public */
 	
 	/**
-	 * Initializes Mailer class and loads configuration.
+	 * 
+	 * @param ui The user user interface instance.
 	 */
 	public Email_Registration(UserInterface ui)
 	{

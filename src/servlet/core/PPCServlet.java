@@ -1,4 +1,5 @@
-/**
+/** PPCServlet.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -30,18 +31,27 @@ import javax.servlet.http.HttpServletResponse;
 
 import servlet.implementation.JSONRead;
 
-public class Main extends HttpServlet
+/**
+ * This class is the PROM/PREM Collector servlet. It serves the applet with
+ * information from the database and keeps track of which users that are
+ * online.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
+public class PPCServlet extends HttpServlet
 {
 	private static final long serialVersionUID = -2340346250534805168L;
 	private String message;
 	
-
+	@Override
 	public void init() throws ServletException
 	{
 		// Do required initialization
 		message = "PROM/PREM Collector";
 	}
 
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException
 	{
@@ -53,7 +63,10 @@ public class Main extends HttpServlet
 		out.println("<h1>" + message + "</h1>");
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException
+	{
 		response.setCharacterEncoding("UTF-8");
 		request.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
@@ -73,6 +86,7 @@ public class Main extends HttpServlet
 		}
 	}
 
+	@Override
 	public void destroy() {
 		// do nothing.
 	}

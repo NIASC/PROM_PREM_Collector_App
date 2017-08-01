@@ -1,4 +1,5 @@
-/**
+/** SHA_Encryption.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.

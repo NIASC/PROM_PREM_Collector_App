@@ -1,4 +1,5 @@
-/**
+/** ViewData.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -19,23 +20,14 @@
  */
 package applet.core;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import applet.core.containers.Form;
 import applet.core.containers.QuestionContainer;
 import applet.core.containers.StatisticsContainer;
-import applet.core.containers.StatisticsContainer.Statistics;
 import applet.core.containers.ViewDataContainer;
-import applet.core.containers.form.AreaContainer;
 import applet.core.containers.form.MultipleOptionContainer;
-import applet.core.containers.form.SingleOptionContainer;
-import applet.core.containers.form.SliderContainer;
 import applet.core.containers.form.TimePeriodContainer;
 import applet.core.interfaces.Implementations;
 import applet.core.interfaces.Messages;
@@ -45,8 +37,8 @@ import applet.core.interfaces.UserInterface.RetFunContainer;
 
 /**
  * This class is the central point for the data viewing part of the
- * program. This is where you can choose what type of data you want to
- * display and how you want to display it.
+ * program. This is where the users can choose what type of data they
+ * want to display.
  * 
  * @author Marcus Malmquist
  *
@@ -66,19 +58,19 @@ public class ViewData
 	 */
 	protected ViewData(UserInterface ui, UserHandle uh)
 	{
-		userInterface = ui;
-		userHandle = uh;
+		this.ui = ui;
+		this.uh = uh;
 	}
 	
 	/**
-	 * Starts the data viewing loop, where the user can decide what
-	 * to view and how to present the data.
+	 * Starts the data viewing where the user can decide what data
+	 * to view.
 	 */
 	public void start()
 	{
-		if (!userHandle.isLoggedIn())
+		if (!uh.isLoggedIn())
 		{
-			userInterface.displayError(Messages.getMessages().getError(
+			ui.displayError(Messages.getMessages().getError(
 					Messages.ERROR_NOT_LOGGED_IN), false);
 			return;
 		}
@@ -109,16 +101,16 @@ public class ViewData
 		TimePeriodContainer timeperiod =
 				new TimePeriodContainer(false, msg.getInfo(
 						Messages.INFO_VD_SELECT_QUESTIONS), null);
-		Implementations.Database().loadQResultDates(userHandle.getUser(), timeperiod);
+		Implementations.Database().loadQResultDates(uh.getUser(), timeperiod);
 		form.insert(timeperiod, Form.AT_END);
 		
 		form.jumpTo(Form.AT_BEGIN);
 
-		userInterface.presentForm(form, this::validateSelection, false);
+		ui.presentForm(form, this::validateSelection, false);
 	}
 	
 	/**
-	 * Validates the user entry.
+	 * Validates the user entry for the time period and questions.
 	 * 
 	 * @param form The form that has been filled in by the user.
 	 * 
@@ -154,31 +146,30 @@ public class ViewData
 		}
 		nEntries = timeperiod.getPeriodEntries();
 		
-		// validate selected questions
+		// validate selected questions not needed
 		selQuestions = questionselect.getEntry();
 
 		StatisticsContainer sc = new StatisticsContainer();
-		Implementations.Database().loadQResults(userHandle.getUser(),
+		Implementations.Database().loadQResults(uh.getUser(),
 				lower, upper, selQuestions, sc);
-		vdc = new ViewDataContainer(userInterface, sc.getStatistics(),
-				upper, lower, nEntries);
+		vdc = new ViewDataContainer(sc.getStatistics(), upper,
+				lower, nEntries);
 		
 		rfc.valid = true;
 		return rfc;
 	}
 	
 	/**
-	 * Prints the statistics to the standard output. This method
-	 * should be replaced by a method to properly display statistics
-	 * to the user.
+	 * Displays the statistics. This method should be replaced by a
+	 * method to properly display statistics to the user.
 	 */
 	private void displayStatistics()
 	{
-		userInterface.presentViewData(vdc);
+		ui.presentViewData(vdc);
 	}
 	
-	private UserHandle userHandle;
-	private UserInterface userInterface;
+	private UserHandle uh;
+	private UserInterface ui;
 	private Calendar upper, lower;
 	private int nEntries;
 	private List<Integer> selQuestions;

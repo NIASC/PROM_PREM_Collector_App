@@ -1,4 +1,5 @@
-/**
+/** Database.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -35,24 +36,158 @@ public interface Database
 {
 	/* Public */
 	
-	public String addUser					(JSONObject obj);
-	public String addQuestionnaireAnswers	(JSONObject obj);
-	public String addClinic					(JSONObject obj);
-	public String getClinics				(JSONObject obj);
-	public String getUser					(JSONObject obj);
-	public String setPassword				(JSONObject obj);
-	public String getErrorMessages			(JSONObject obj);
-	public String getInfoMessages			(JSONObject obj);
-	public String loadQuestions				(JSONObject obj);
-	public String loadQResultDates			(JSONObject obj);
-	public String loadQResults				(JSONObject obj);
+	/**
+	 * Adds a user contained in {@code obj} to the database.
+	 * 
+	 * @param obj The JSONObject that contains the user data.
+	 * 
+	 * @return A JSONObject with information about if the user
+	 * 		was added.
+	 */
+	public String addUser(JSONObject obj);
+	
+	/**
+	 * Adds questionnaire answers contained in {@code obj} to the
+	 * database.
+	 * 
+	 * @param obj The JSONObject that contains the questionnaire answer
+	 * 		data.
+	 * 
+	 * @return A JSONObject with information about if the answers
+	 * 		were added.
+	 */
+	public String addQuestionnaireAnswers(JSONObject obj);
+	
+	/**
+	 * Adds a clinic contained in {@code obj} to the database.
+	 * 
+	 * @param obj The JSONObject that contains the clinic data.
+	 * 
+	 * @return A JSONObject with information about if the clinic
+	 * 		was added.
+	 */
+	public String addClinic(JSONObject obj);
+	
+	/**
+	 * Retrieves the clinics from the database.
+	 * 
+	 * @param obj The JSONObject that contains the request.
+	 * 
+	 * @return A JSONObject that contains the clinics.
+	 */
+	public String getClinics(JSONObject obj);
+	
+	/**
+	 * Retrieves the user from the database.
+	 * 
+	 * @param obj The JSONObject that contains the request, including
+	 * 		which user to retrieve.
+	 * 
+	 * @return A JSONObject that contains the user.
+	 */
+	public String getUser(JSONObject obj);
+	
+	/**
+	 * Updates the password for the user contained in {@code obj}.
+	 * 
+	 * @param obj The JSONObject that contains the new password,
+	 * 		new salt, old password and the username.
+	 * 
+	 * @return A JSONObject that contains the user with the new password.
+	 */
+	public String setPassword(JSONObject obj);
+	
+	/**
+	 * Retrieves the error messages from the database.
+	 * 
+	 * @param obj The JSONObject that contains the request.
+	 * 
+	 * @return A JSONObject that contains the error messages.
+	 */
+	public String getErrorMessages(JSONObject obj);
+	
+	/**
+	 * Retrieves the information messages from the database.
+	 * 
+	 * @param obj The JSONObject that contains the request.
+	 * 
+	 * @return A JSONObject that contains the information messages.
+	 */
+	public String getInfoMessages(JSONObject obj);
+	
+	/**
+	 * Retrieves the questionnaire questions from the database.
+	 * 
+	 * @param obj The JSONObject that contains the request.
+	 * 
+	 * @return A JSONObject that contains the questionnaire questions.
+	 */
+	public String loadQuestions(JSONObject obj);
+	
+	/**
+	 * Retrieves the dates that questionnaire answers were added to the
+	 * database.
+	 * 
+	 * @param obj The JSONObject that contains the request.
+	 * 
+	 * @return A JSONObject that contains the dates.
+	 */
+	public String loadQResultDates(JSONObject obj);
+	
+	/**
+	 * Retrieves the questionnaire results from the database.
+	 * 
+	 * @param obj The JSONObject that contains the request, including
+	 * 		the upper and lower limit as well as which questions to
+	 * 		retrieve.
+	 * 
+	 * @return A JSONObject that contains the questionnaire results.
+	 */
+	public String loadQResults(JSONObject obj);
+	
+	/**
+	 * Sends a registration request to an administrator.
+	 * 
+	 * @param obj The JSONObject that contains the request, including
+	 * 		the name, clinic and email.
+	 * 
+	 * @return A JSONObject that contains the status of the request.
+	 */
 	public String requestRegistration		(JSONObject obj);
+	
+	/**
+	 * Requests to log in.
+	 * 
+	 * @param obj The JSONObject that contains the request, including the
+	 * 		username.
+	 * 
+	 * @return A JSONObject that contains the status of the request.
+	 */
 	public String requestLogin				(JSONObject obj);
+	
+	/**
+	 * Requests to log out.
+	 * 
+	 * @param obj The JSONObject that contains the request, including the
+	 * 		username.
+	 * 
+	 * @return A JSONObject that contains the status of the request.
+	 */
 	public String requestLogout				(JSONObject obj);
 
 	@FunctionalInterface
 	public interface DatabaseFunction
 	{
+		/**
+		 * A method that processes the request contained in {@code obj}
+		 * and returns the answer as a string.
+		 * 
+		 * @param obj The JSONObject that contains the request along with
+		 * 		required data to process the request.
+		 * 
+		 * @return The String representation of the JSONObject that
+		 * 		contains the answer.
+		 */
 		public String dbfunc(JSONObject obj);
 	}
 	

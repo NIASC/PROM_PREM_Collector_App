@@ -1,4 +1,5 @@
-/**
+/** SliderContainer.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -87,13 +88,12 @@ public class SliderContainer extends FormContainer
 	
 	/**
 	 * Sets the entry (i.e. the user input in response to the field's
-	 * statement) of this container's field. Setting the entry to null
-	 * can be used to reset the field.
+	 * statement) of this container's field. Setting the entry to
+	 * {@code null} can be used to reset the field.
 	 * 
 	 * @param entry The user entry to set.
 	 * 
-	 * @return {@code true} if the value was set. {@code false} if
-	 * 		not.
+	 * @return {@code true} if the value was set. {@code false} if not.
 	 */
 	public boolean setEntry(int entry)
 	{
@@ -107,8 +107,9 @@ public class SliderContainer extends FormContainer
 	}
 	
 	/**
+	 * Retrieves the upper bound for this slider.
 	 * 
-	 * @return The lower bound of this slider.
+	 * @return The upper bound of this slider.
 	 */
 	public int getUpperBound()
 	{
@@ -116,6 +117,7 @@ public class SliderContainer extends FormContainer
 	}
 	
 	/**
+	 * Retrieves the lower bound for this slider.
 	 * 
 	 * @return The upper bound of this slider.
 	 */

@@ -1,4 +1,5 @@
-/**
+/** Encryption.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -56,7 +57,7 @@ public interface Encryption
 	 * @param message The message to hash.
 	 * @param append The salt to append.
 	 * 
-	 * @return
+	 * @return The hashed version of {@code message}.
 	 */
 	public String encryptMessage(
 			String prepend, String message, String append);

@@ -1,4 +1,5 @@
-/**
+/** GUI_UserInterface.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -62,6 +63,15 @@ import applet.implementation.containerdisplay.ContainerDisplays;
 import applet.core.interfaces.Database;
 import applet.core.interfaces.Questions;
 
+/**
+ * This is a Swing implementation of the {@code UserInterface}. It handles
+ * displaying information to the user and handling input from the user.
+ * 
+ * @author Marcus Malmquist
+ * 
+ * @see UserInterface
+ *
+ */
 public class GUI_UserInterface extends JApplet implements ActionListener, UserInterface
 {
 	/* Public */
@@ -73,13 +83,24 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		GUI_UserInterface gui = new GUI_UserInterface(false);
 		gui.init();
 		gui.start();
+		gui.showFrame();
 	}
 	
+	/**
+	 * Initializes this class as an applet.
+	 */
 	public GUI_UserInterface()
 	{
 		this(true);
 	}
 	
+	/**
+	 * Initializes this class as an applet or stand-alone.
+	 * 
+	 * @param embedded {@code true} if this application is embedded in a
+	 * 		website (applet). {@code false} if this application is
+	 * 		stand-alone (It will then be put in a window of its own.)
+	 */
 	public GUI_UserInterface(boolean embedded)
 	{
 		this.embedded = embedded;
@@ -109,16 +130,13 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 				}
 				else if (b.getName().equals(exitButton.getName()))
 				{
-					stop();
+					uh.logout();
+					if (frame != null)
+						frame.dispatchEvent(new WindowEvent(
+								frame, WindowEvent.WINDOW_CLOSING));
+					else // can not close applet, return to login screen
+						setContent(new LoginScreen());
 				}
-			}
-		}
-		else if (e.getSource() instanceof JTextField)
-		{
-			JTextField t = (JTextField) e.getSource();
-			if (t.getName() != null)
-			{
-				// unimplemented
 			}
 		}
 	}
@@ -174,8 +192,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		if (!Messages.getMessages().loadMessages()
 				|| !Questions.getQuestions().loadQuestionnaire())
 		{
-			System.out.printf("%s\n", Database.DATABASE_ERROR);
-			/* should exit the app */
+			displayError(Database.DATABASE_ERROR, false);
 		}
 	}
 	
@@ -184,33 +201,21 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	{
 		/* when the webpage is destroyed */
 		uh.logout();
-		if (!embedded && frame != null)
-			frame.dispose();
 	}
 	
 	@Override
 	public void start()
 	{
 		/* when the user returns to the webpage. */
-		if (!embedded)
-		{
-			frame.setVisible(true);
-			frame.pack();
-		}
 		setContent(new LoginScreen());
 	}
 	
+	@Override
 	public void stop()
 	{
 		/* when the user leaves the web page. */
 		/* stores the page in cache              */
-		
 		uh.logout();
-		if (frame != null)
-		{
-			frame.setVisible(false);
-			frame.dispose();
-		}
 	}
 	
 	/**
@@ -232,7 +237,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 	
 	/**
-	 * Retrieves the current contaient container.
+	 * Retrieves the current content container.
 	 * 
 	 * @return The current content container.
 	 */
@@ -254,16 +259,17 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	
 	private JFrame frame;
 	private UserHandle uh;
-	private JButton mainmenuButton, logoutButton, menuButton1, exitButton;
+	private JButton mainmenuButton, logoutButton, exitButton;
 	private JPanel pageContent;
 	private JScrollPane pageScroll, messagePanel;
 	private static final long serialVersionUID = -3896988492887782839L;
 	
+	/* displays memory usage. this will be printed in the servlet console
 	static
 	{
-		/* Prints (an estimation of the) memory usage of this
-		 * application. The code is a placeholder for future
-		 * statistics. */
+		// Prints (an estimation of the) memory usage of this
+		// application. The code is a placeholder for future
+		// statistics.
 		Runtime runtime = Runtime.getRuntime();
 
 		StringBuilder sb = new StringBuilder();
@@ -279,6 +285,19 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		sb.append(String.format("| Total free:  | %7d Kb |\n", ((freeMemory + (maxMemory - allocatedMemory))/1024)));
 		sb.append("|______________|____________|\n");
 		System.out.println(sb.toString());
+	}
+	*/
+	
+	/**
+	 * Shows the frame if the application is not embedded.
+	 */
+	private void showFrame()
+	{
+		if (!embedded)
+		{
+			frame.setVisible(true);
+			frame.pack();
+		}
 	}
 	
 	/**
@@ -306,8 +325,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		if (!embedded)
 		{
-			frame = new JFrame("PROM/PREM Collector GUI");
+			frame = new JFrame("PROM/PREM Collector");
 			frame.setContentPane(this);
+			/* make sure that the user logs out if window is closed */
 			frame.addWindowListener(new WindowListener() {
 				@Override
 				public void windowClosing(WindowEvent e) { uh.logout(); }
@@ -353,6 +373,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		return bPanel;
 	}
 	
+	/**
+	 * Displays a message in the message console.
+	 * 
+	 * @param message The message to display.
+	 * @param textColor The color of the text.
+	 */
 	private void displayEmbeddedMessage(String message, Color textColor)
 	{
 		JTextArea jtf = SwingComponents.makeTextArea(message, null, null, false,
@@ -365,6 +391,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 	
 	/**
+	 * This class handles the login screen.
 	 * 
 	 * @author Marcus Malmquist
 	 *
@@ -425,6 +452,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		JTextField usernameTF;
 		JPasswordField passwordTF;
 
+		/**
+		 * Creates the login screen.
+		 */
 		LoginScreen()
 		{
 			setLayout(new GridBagLayout());
@@ -481,6 +511,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		}
 	}
 	
+	/**
+	 * This class handles the welcome screen. the welcome screen is the
+	 * main menu when the user has logged in.
+	 * @author Marcus Malmquist
+	 *
+	 */
 	private class WelcomeScreen extends JPanel implements ActionListener
 	{
 		
@@ -510,6 +546,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		static final long serialVersionUID = 2805273101165405918L;
 		JButton questionnaire, viewData;
 		
+		/**
+		 * Creates the login screen
+		 */
 		WelcomeScreen()
 		{
 			setLayout(new GridBagLayout());
@@ -534,19 +573,21 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 	
 	/**
-	 * This class should create a form. a form should have two types of
-	 * layout:
-	 * 		* One question at a time
-	 * 		* All (or as many as the page can fit) questions at a
-	 * 		  time.
+	 * This class handles displaying {@code Form} objects. This class is
+	 * designed to be generic and no modifications to this class are needed
+	 * when creating new forms as long as the form entries conforms to the
+	 * standard. The standard is declared in the Form class. In addition
+	 * to being generic this class can also take a Method Reference as
+	 * a constructor argument. The method will be called when the form has
+	 * been filled. This allows the creator of the form to control what
+	 * happens when the form has been filled in. If the form has been
+	 * incorrectly filled in the method can reject the form and the user
+	 * has to correct the mistakes.
 	 * 
-	 * Ths class should have methods to display the questions. should
-	 * pass the caller to this object, or like a template class that
-	 * contains the instance of the class, so we know where to return
-	 * when the user has filled in the form.
-	 * 
-	 * @author marcus
+	 * @author Marcus Malmquist
 	 *
+	 * @see Form
+	 * @see ReturnFunction
 	 */
 	private class GUIForm extends JPanel implements ActionListener
 	{
@@ -618,15 +659,10 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 					{
 						setContent(retpan);
 					}
-					if (cIdx == getNextEntry(cIdx, nEntries, 1, false))
-						fc_next.setEnabled(false);
-					else
-						fc_next.setEnabled(true);
 					
-					if (cIdx == getNextEntry(cIdx, nEntries, -1, false))
-						fc_previous.setEnabled(false);
-					else
-						fc_previous.setEnabled(true);
+					/* update buttons */
+					fc_next.setEnabled(cIdx != getNextEntry(cIdx, nEntries, 1, false));
+					fc_previous.setEnabled(cIdx != getNextEntry(cIdx, nEntries, -1, false));
 					if (getNextUnfilledEntry(cIdx, components) == cIdx)
 						fc_continue.setText(msg.getInfo(
 								Messages.INFO_UI_FORM_FINISH));
@@ -766,6 +802,9 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			return i;
 		}
 		
+		/**
+		 * Sets the current form content.
+		 */
 		void setFormContent()
 		{
 			removeAll();
@@ -794,6 +833,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 			repaint();
 		}
 		
+		/**
+		 * Initializes the control panel. The control panel is a set of
+		 * buttons that allows the user to navigate the form.
+		 * 
+		 * @return The control panel.
+		 */
 		JPanel initControlPanel()
 		{
 			JPanel panel = new JPanel(new GridLayout(1, 0));
@@ -820,12 +865,25 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		}
 	}
 	
+	/**
+	 * This class handles displaying statistical data. It is temporary
+	 * and displays the data in text form.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	public class ViewDataDisplay extends JPanel
 	{
-		
+		/**
+		 * Creates a displayable wrapper for the {@code ViewDataContainer}.
+		 * 
+		 * @param vdc The {@code ViewDataContainer} object that contains
+		 * 		the statistical data that this class should display.
+		 * 
+		 * @see ViewDataContainer
+		 */
 		public ViewDataDisplay(ViewDataContainer vdc)
 		{
-			this.vdc = vdc;
 			setLayout(new BorderLayout());
 			title = AddTextArea(vdc.getTitle(), 0, 35, false, false);
 			results = AddTextArea(vdc.getResults(), 0, 35, false, false);
@@ -836,7 +894,6 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 
 		private static final long serialVersionUID = -5340643717796983977L;
 		
-		private ViewDataContainer vdc;
 		private JTextArea title, results;
 		
 		private JTextArea AddTextArea(String text, int rows, int columns,

@@ -1,4 +1,5 @@
-/**
+/** Locale_se.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -38,6 +39,7 @@ public class Locale_se implements Locale
 	/* Public */
 	
 	/**
+	 * Retrieves the active instance of this class.
 	 * 
 	 * @return The active instance of this class.
 	 */
@@ -66,15 +68,19 @@ public class Locale_se implements Locale
 		{
 			switch(pID.length())
 			{
-			case 10: // yymmddxxx
 			case 11: // yymmdd-xxxx
+				if (pID.charAt(6) != '-')
+					return null;
+			case 10: // yymmddxxx
 				dateFormat = new SimpleDateFormat("yyMMdd");
 				dateFormat.setLenient(false);
 				date = dateFormat.parse(pID.substring(0, 6));
 				lastFour = Integer.parseInt(pID.substring(pID.length()-4));
 				break;
-			case 12: // yyyymmddxxx
 			case 13: // yyyymmdd-xxxx
+				if (pID.charAt(8) != '-')
+					return null;
+			case 12: // yyyymmddxxx
 				dateFormat = new SimpleDateFormat("yyyyMMdd");
 				dateFormat.setLenient(false);
 				date = dateFormat.parse(pID.substring(0, 8));
@@ -97,6 +103,9 @@ public class Locale_se implements Locale
 	
 	private static Locale_se locale;
 	
+	/**
+	 * Singleton class
+	 */
 	private Locale_se()
 	{
 		

@@ -1,3 +1,23 @@
+/** ViewDataContainer.java
+ * 
+ * Copyright 2017 Marcus Malmquist
+ * 
+ * This file is part of PROM_PREM_Collector.
+ * 
+ * PROM_PREM_Collector is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ * 
+ * PROM_PREM_Collector is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with PROM_PREM_Collector.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package applet.core.containers;
 
 import java.text.SimpleDateFormat;
@@ -8,33 +28,67 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import applet.core.UserHandle;
 import applet.core.containers.StatisticsContainer.Statistics;
 import applet.core.containers.form.AreaContainer;
 import applet.core.containers.form.SingleOptionContainer;
 import applet.core.containers.form.SliderContainer;
-import applet.core.interfaces.Implementations;
-import applet.core.interfaces.UserInterface;
 
+/**
+ * This class is a container for statistical data that has been processed
+ * and is ready to be displayed.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class ViewDataContainer
 {
-	public ViewDataContainer(UserInterface ui, List<Statistics> res,
-			Calendar upper, Calendar lower, int nEntries)
+	/**
+	 * Initializes a class that contains processed statistical data.
+	 * 
+	 * @param res A list of the statistical data objects.
+	 * @param upper The upper bound that this data was retrieved for.
+	 * @param lower The lower bound that this data was retrieved for.
+	 * @param nEntries The number of entries that have been used to
+	 * 		create the statistical data.
+	 */
+	public ViewDataContainer(List<Statistics> res, Calendar upper,
+			Calendar lower, int nEntries)
 	{
-		this.userInterface = ui;
 		this.res = res;
 		this.upper = upper;
 		this.lower = lower;
 		this.nEntries = nEntries;
 	}
 	
+	/**
+	 * Retrieves the results as a string that should be places in some
+	 * kind of text area. This method is temporary.
+	 * 
+	 * @return The results as a formatted string, The format is as
+	 * 		follows:<br><br>
+	 * 		<code>
+	 * 		statement:<br>
+	 * 		|- &lt;count&gt; (&lt;percent&gt; %) - answer/option<br>
+	 * 		...<br>
+	 * 		|- &lt;count&gt; (&lt;percent&gt; %) - answer/option<br>
+	 * 		|- ----------<br>
+	 * 		\- &lt;count&gt; (&lt;percent&gt; %) - Total<br><br>
+	 * 		...<br><br>
+	 * 		statement:<br>
+	 * 		|- &lt;count&gt; (&lt;percent&gt; %) - answer/option<br>
+	 * 		...<br>
+	 * 		|- &lt;count&gt; (&lt;percent&gt; %) - answer/option<br>
+	 * 		|- ----------<br>
+	 * 		\- &lt;count&gt; (&lt;percent&gt; %) - Total<br>
+	 * 		</code>
+	 */
 	public String getResults()
 	{
 		StringBuilder sb = new StringBuilder();
 		for (Statistics s : res)
 		{
-			List<Object> lstr = new ArrayList<Object>();
-			List<Integer> lint = new ArrayList<Integer>();
+			List<Object> statements = new ArrayList<Object>();
+			List<Integer> occurences = new ArrayList<Integer>();
 			int tot = 0;
 			
 			Class<?> c = s.getQuestionClass();
@@ -48,8 +102,8 @@ public class ViewDataContainer
 					statement = itr.next();
 					if ((count = ans.get(statement)) == null)
 						continue;
-					lint.add(count);
-					lstr.add(statement);
+					occurences.add(count);
+					statements.add(statement);
 					tot += count;
 				}
 			}
@@ -59,8 +113,8 @@ public class ViewDataContainer
 				{
 					if ((count = ans.get(i)) == null)
 						continue;
-					lint.add(count);
-					lstr.add(i);
+					occurences.add(count);
+					statements.add(i);
 					tot += count;
 				}
 			}
@@ -69,8 +123,8 @@ public class ViewDataContainer
 				for (Entry<Object, Integer> e : ans.entrySet())
 				{
 					count = e.getValue();
-					lint.add(count);
-					lstr.add(e.getKey().toString());
+					occurences.add(count);
+					statements.add(e.getKey().toString());
 					tot += count;
 				}
 			}
@@ -78,7 +132,7 @@ public class ViewDataContainer
 			
 			Iterator<Object> sitr;
 			Iterator<Integer> iitr;
-			for (sitr = lstr.iterator(), iitr = lint.iterator();
+			for (sitr = statements.iterator(), iitr = occurences.iterator();
 					sitr.hasNext() && iitr.hasNext();)
 			{
 				Integer i = iitr.next();
@@ -92,6 +146,12 @@ public class ViewDataContainer
 		return sb.toString();
 	}
 	
+	/**
+	 * 
+	 * @return The title as a formatted string. The title contains
+	 * 		information about how many entries that have been used and
+	 * 		which period that is being displayed.
+	 */
 	public String getTitle()
 	{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -101,7 +161,6 @@ public class ViewDataContainer
 				sdf.format(upper.getTime()));
 	}
 
-	private UserInterface userInterface;
 	private Calendar upper, lower;
 	private int nEntries;
 	private List<Statistics> res;

@@ -1,4 +1,5 @@
-/**
+/** SliderDisplay.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -29,6 +30,7 @@ import javax.swing.event.ChangeListener;
 
 import applet.core.containers.form.SliderContainer;
 import applet.core.interfaces.Messages;
+import applet.core.interfaces.UserInterface;
 import applet.core.interfaces.UserInterface.FormComponentDisplay;
 import applet.implementation.SwingComponents;
 

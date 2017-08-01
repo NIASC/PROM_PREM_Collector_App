@@ -1,4 +1,5 @@
-/**
+/** StatisticsContainer.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -102,7 +103,7 @@ public class StatisticsContainer
 	public class Statistics
 	{
 		/**
-		 * Retrieves the options for object's question.
+		 * Retrieves the options for this object's question.
 		 * 
 		 * @return A list of the options for this object's question.
 		 */
@@ -115,8 +116,7 @@ public class StatisticsContainer
 		}
 		
 		/**
-		 * Retrieves the question/statement for this objects'
-		 * question.
+		 * Retrieves the question/statement for this objects' question.
 		 * 
 		 * @return The question/statement for this object's question.
 		 */

@@ -1,4 +1,5 @@
-/**
+/** MessageContainer.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -57,11 +58,12 @@ public class MessageContainer
 	 * 
 	 * @param code The message code/id.
 	 * @param name The message name/identifier.
-	 * @param message The list of messages for different locales. The
-	 * 		format should be <locale, message> e.g <"en", "Hello">,
-	 * 		<"fr", "Bonjour"> etc.
+	 * @param text The list of messages for different locales. The
+	 * 		format should be &lt;locale, message&gt; e.g &lt;"en",
+	 * 		"Hello"&gt;, &lt;"fr", "Bonjour"&gt; etc.
 	 */
-	public synchronized void addMessage(int code, String name, Map<String, String> text)
+	public synchronized void addMessage(int code, String name,
+			Map<String, String> text)
 	{
 		Message message = new Message(code, name, text);
 		if (!messages.containsKey(name))

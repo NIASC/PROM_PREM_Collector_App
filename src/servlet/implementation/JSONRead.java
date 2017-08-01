@@ -1,4 +1,5 @@
-/**
+/** JSONRead.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -19,6 +20,9 @@
  */
 package servlet.implementation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -28,13 +32,47 @@ import servlet.core.interfaces.Database;
 import servlet.core.interfaces.Implementations;
 import servlet.core.interfaces.Database.DatabaseFunction;
 
+/**
+ * This class handles redirecting a request from the applet to the
+ * appropriate method in the servlet.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
 public class JSONRead
 {
 	private static JSONParser parser;
+	private static Map<String, DatabaseFunction> dbm;
 	
 	static {
 		parser = new JSONParser();
+		dbm = new HashMap<String, DatabaseFunction>();
+
+		Database db = Implementations.Database();
+		dbm.put(Constants.CMD_ADD_USER, db::addUser);
+		dbm.put(Constants.CMD_ADD_QANS, db::addQuestionnaireAnswers);
+		dbm.put(Constants.CMD_ADD_CLINIC, db::addClinic);
+		dbm.put(Constants.CMD_GET_CLINICS, db::getClinics);
+		dbm.put(Constants.CMD_GET_USER, db::getUser);
+		dbm.put(Constants.CMD_SET_PASSWORD, db::setPassword);
+		dbm.put(Constants.CMD_GET_ERR_MSG, db::getErrorMessages);
+		dbm.put(Constants.CMD_GET_INFO_MSG, db::getInfoMessages);
+		dbm.put(Constants.CMD_LOAD_Q, db::loadQuestions);
+		dbm.put(Constants.CMD_LOAD_QR_DATE, db::loadQResultDates);
+		dbm.put(Constants.CMD_LOAD_QR, db::loadQResults);
+		dbm.put(Constants.CMD_REQ_REGISTR, db::requestRegistration);
+		dbm.put(Constants.CMD_REQ_LOGIN, db::requestLogin);
+		dbm.put(Constants.CMD_REQ_LOGOUT, db::requestLogout);
 	}
+	
+	/**
+	 * Parses the {@code message} and redirects the request to the request
+	 * to the appropriate method.
+	 * 
+	 * @param message The request from the applet.
+	 * 
+	 * @return The response from the servlet.
+	 */
 	public static String handleRequest(String message)
 	{
 		try
@@ -47,39 +85,20 @@ public class JSONRead
 		return null;
 	}
 	
+	/**
+	 * Finds the Method Reference associated with the {@code command}
+	 * 
+	 * @param command The command/method that is associated with a servlet
+	 * 		method that shuld handle the request.
+	 * 
+	 * @return A reference to the servlet method that should handle the
+	 * 		request.
+	 * 
+	 * @throws NullPointerException If no method exists that can handle
+	 * 		the request.
+	 */
 	private static DatabaseFunction getDBMethod(String command)
-			throws NullPointerException
 	{
-		Database db = Implementations.Database();
-		if (command.equalsIgnoreCase(Constants.CMD_ADD_USER))
-			return db::addUser;
-		else if (command.equalsIgnoreCase(Constants.CMD_ADD_QANS))
-			return db::addQuestionnaireAnswers;
-		else if (command.equalsIgnoreCase(Constants.CMD_ADD_CLINIC))
-			return db::addClinic;
-		else if (command.equalsIgnoreCase(Constants.CMD_GET_CLINICS))
-			return db::getClinics;
-		else if (command.equalsIgnoreCase(Constants.CMD_GET_USER))
-			return db::getUser;
-		else if (command.equalsIgnoreCase(Constants.CMD_SET_PASSWORD))
-			return db::setPassword;
-		else if (command.equalsIgnoreCase(Constants.CMD_GET_ERR_MSG))
-			return db::getErrorMessages;
-		else if (command.equalsIgnoreCase(Constants.CMD_GET_INFO_MSG))
-			return db::getInfoMessages;
-		else if (command.equalsIgnoreCase(Constants.CMD_LOAD_Q))
-			return db::loadQuestions;
-		else if (command.equalsIgnoreCase(Constants.CMD_LOAD_QR_DATE))
-			return db::loadQResultDates;
-		else if (command.equalsIgnoreCase(Constants.CMD_LOAD_QR))
-			return db::loadQResults;
-		else if (command.equalsIgnoreCase(Constants.CMD_REQ_REGISTR))
-			return db::requestRegistration;
-		else if (command.equalsIgnoreCase(Constants.CMD_REQ_LOGIN))
-			return db::requestLogin;
-		else if (command.equalsIgnoreCase(Constants.CMD_REQ_LOGOUT))
-			return db::requestLogout;
-		
-		throw new NullPointerException("unkown command");
+		return dbm.get(command);
 	}
 }

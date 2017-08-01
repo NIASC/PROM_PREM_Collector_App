@@ -1,4 +1,5 @@
-/**
+/** Utilities.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -41,6 +42,7 @@ public class Utilities
 	 * is located. This function is useful for finding resources that
 	 * are not included in the class path and/or needs write access.
 	 * 
+	 * @param <T> {@code c}'s class.
 	 * @param c The class that the path finding will be based on.
 	 * 
 	 * @return The /path/to/class/c.
@@ -67,7 +69,9 @@ public class Utilities
 	 * then filePath should be "mypackage/file.txt" and the class should be
 	 * any class which has the same class loader as the resource file.
 	 * 
+	 * @param <T> {@code c}'s class.
 	 * @param c The class to get the class path from.
+	 * 
 	 * @param filePath The path to the file to retrieve as an
 	 * 		InpuStream.
 	 * 

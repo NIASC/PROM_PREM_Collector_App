@@ -43,14 +43,15 @@ public class TimePeriodContainer extends FormContainer
 {
 	/**
 	 * Creates a time period container. The time period can be extended by
-	 * adding dates (using {@code addDate(int, int, int)}).
+	 * adding dates (using {@code addDate(Calendar)}).
 	 * 
 	 * @param allowEmpty Whether or not this container should require an
 	 * 		entry / user response.
 	 * @param statement The statement that the user should respond to.
 	 * @param description A more detailed description of the
 	 * 		{@code statement}
-	 * @see #addDate(int, int, int)
+	 * 
+	 * @see #addDate(Calendar)
 	 */
 	public TimePeriodContainer(boolean allowEmpty, String statement,
 			String description)
@@ -179,6 +180,11 @@ public class TimePeriodContainer extends FormContainer
 		return entries.size();
 	}
 	
+	/**
+	 * Retrieves the number of entries within the selected time period.
+	 * 
+	 * @return The number of entries within the selected time period.
+	 */
 	public int getPeriodEntries()
 	{
 		return nSelDates;

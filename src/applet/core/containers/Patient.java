@@ -1,4 +1,5 @@
-/**
+/** Patient.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -52,6 +53,7 @@ public class Patient
 	}
 	
 	/**
+	 * Retrieves this patient's forename.
 	 * 
 	 * @return This patient's forename
 	 */
@@ -61,6 +63,7 @@ public class Patient
 	}
 	
 	/**
+	 * Retrieves this patient's surname.
 	 * 
 	 * @return This patient's surname.
 	 */
@@ -70,6 +73,7 @@ public class Patient
 	}
 	
 	/**
+	 * Retrieves this patient's personal id number.
 	 * 
 	 * @return This patient's personal number.
 	 */
@@ -79,6 +83,7 @@ public class Patient
 	}
 	
 	/**
+	 * Retrieves user that added this patient.
 	 * 
 	 * @return The user that added this patient.
 	 */
@@ -88,6 +93,7 @@ public class Patient
 	}
 	
 	/**
+	 * Retrieves this patient's clinic id.
 	 * 
 	 * @return The clinic ID that this user belongs to. This will be
 	 * 		the same clinic ID as that of the user who added this

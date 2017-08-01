@@ -29,6 +29,7 @@ import javax.swing.JTextArea;
 
 import applet.core.containers.form.TimePeriodContainer;
 import applet.core.interfaces.Messages;
+import applet.core.interfaces.UserInterface;
 import applet.core.interfaces.UserInterface.FormComponentDisplay;
 import applet.implementation.SwingComponents;
 import applet.implementation.containerdisplay.extended.CalendarPanel;

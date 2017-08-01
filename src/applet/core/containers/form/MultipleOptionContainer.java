@@ -1,4 +1,5 @@
-/**
+/** MultipleOptionContainer.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -93,6 +94,7 @@ public class MultipleOptionContainer extends FormContainer
 	 * with that ID exists in the list of options.
 	 * 
 	 * @param selectedIDs The ID of the selected option.
+	 * 
 	 * @return True if an option with the supplied ID exists (and that
 	 * 		option was marked as selected).
 	 * 		False if not (and no option has been marked as selected).
@@ -133,7 +135,7 @@ public class MultipleOptionContainer extends FormContainer
 	 * Puts the options in a map that contains the ID of the option as well
 	 * as the option's text. The ID should be used to mark the selected
 	 * option through the method setSelected.<br>
-	 * The ID ranges from 0 <= ID < <no. entries>.
+	 * The ID ranges from 0 &lt;= ID &lt; &lt;no. entries&gt;.
 	 * 
 	 * @return A map of the options, the keys are the ID of the options
 	 * 		(the order at which they where added to this container,
@@ -148,6 +150,7 @@ public class MultipleOptionContainer extends FormContainer
 	}
 	
 	/**
+	 * Retrieves the IDs of the selected options.
 	 * 
 	 * @return A list of the selected IDs
 	 */
@@ -165,7 +168,7 @@ public class MultipleOptionContainer extends FormContainer
 	private int nextOption;
 	
 	/**
-	 * This class is a data container for single-option form entries.
+	 * This class is a data container for form entry options.
 	 * 
 	 * @author Marcus Malmquist
 	 *
@@ -176,6 +179,7 @@ public class MultipleOptionContainer extends FormContainer
 		 * The identifier for this Option.
 		 */
 		final int identifier;
+		
 		/**
 		 * The text for this Option.
 		 */

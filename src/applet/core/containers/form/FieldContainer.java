@@ -1,4 +1,5 @@
-/**
+/** FieldContainer.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -62,6 +63,7 @@ public class FieldContainer extends AreaContainer
 	}
 	
 	/**
+	 * Whether or not the input should be hidden.
 	 * 
 	 * @return {@code true} if this form's entry should be hidden.
 	 * 		{@code false} if it should be displayed in plain text.

@@ -1,4 +1,5 @@
-/**
+/** Questionnaire.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -91,11 +92,15 @@ public class Questionnaire
 	private void createPatientRegistration()
 	{
 		Form form = new Form();
-		FieldContainer forename = new FieldContainer(false, false, "Patient forename", null);
+		Messages msg = Messages.getMessages();
+		FieldContainer forename = new FieldContainer(false, false,
+				msg.getInfo(Messages.INFO_Q_PATIENT_FORENAME), null);
 		form.insert(forename, Form.AT_END);
-		FieldContainer lastname = new FieldContainer(false, false, "Patient surname", null);
+		FieldContainer lastname = new FieldContainer(false, false,
+				msg.getInfo(Messages.INFO_Q_PATIENT_SURNAME), null);
 		form.insert(lastname, Form.AT_END);
-		FieldContainer pnr = new FieldContainer(false, false, "Patient Personal number", null);
+		FieldContainer pnr = new FieldContainer(false, false,
+				msg.getInfo(Messages.INFO_Q_PATIENT_PNR), null);
 		if (patient != null)
 		{
 			forename.setEntry(patient.getForename());

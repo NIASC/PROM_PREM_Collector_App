@@ -1,4 +1,5 @@
-/**
+/** User.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -66,6 +67,7 @@ public class User
 	}
 	
 	/**
+	 * Retrieves the user's username.
 	 * 
 	 * @return The user's username.
 	 */
@@ -75,6 +77,7 @@ public class User
 	}
 	
 	/**
+	 * Retrieves the user's email.
 	 * 
 	 * @return The user's email address.
 	 */
@@ -84,6 +87,7 @@ public class User
 	}
 	
 	/**
+	 * Retrieves the user's clinic id.
 	 * 
 	 * @return The id of the clinic that the user is registered at.
 	 */
@@ -93,6 +97,7 @@ public class User
 	}
 	
 	/**
+	 * Retrieves the user's password update flag.
 	 * 
 	 * @return {@code true} if the user is flagged to password update.
 	 * 		{@code false} if not.

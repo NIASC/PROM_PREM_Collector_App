@@ -1,4 +1,5 @@
-/**
+/** QuestionContainer.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -19,17 +20,11 @@
  */
 package applet.core.containers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import applet.core.Questionnaire;
 import applet.core.containers.form.AreaContainer;
@@ -87,11 +82,11 @@ public class QuestionContainer
 	 * 		etc.) as it appears in the database.
 	 * @param question The question/statement that the user should
 	 * 		respond to.
-	 * @param description TODO
+	 * @param description A more detailed description of the statement.
 	 * @param options The available options to select in response to
 	 * 		the question/statement. If this entry type does not have
 	 * 		options this variable will be discarded can be set to
-	 * 		{@null}.
+	 * 		{@code null}.
 	 * @param optional If it is <i><b>not</b></i> required to answer
 	 * 		this question this should be set to {@code true} else
 	 * 		{@code false}.
@@ -101,6 +96,7 @@ public class QuestionContainer
 	 * @param lower The lower limit for this entry. If this user is
 	 * 		supposed to enter a numerical value this should be the
 	 * 		lower limit for that value.
+	 * 
 	 * @see Questionnaire
 	 */
 	public synchronized void addQuestion(int id,
@@ -131,17 +127,31 @@ public class QuestionContainer
 		return q != null ? q.getContainer() : null;
 	}
 	
+	/**
+	 * Retrieves the question at index {@code index}. The index represents
+	 * the order at which the question was added in.
+	 * 
+	 * @param index The index of the question to retrieve.
+	 * 
+	 * @return The question at index {@code index}.
+	 */
 	public Question getQuestion(int index)
 	{
-		try
+		if (index >= 0 && index < questions.size())
 		{
-			return (new ArrayList<Question>(questions.values())).get(index);
+			int i = 0;
+			for (Iterator<Question> itr = questions.values().iterator(); itr.hasNext(); ++i)
+			{
+				Question q = itr.next();
+				if (i == index)
+					return q;
+			}
 		}
-		catch (Exception e) { }
 		return null;
 	}
 	
 	/**
+	 * Retrieves the number of entries in this container.
 	 * 
 	 * @return The size (number of entries) of this container.
 	 */
@@ -164,11 +174,49 @@ public class QuestionContainer
 	 */
 	public final class Question
 	{
+		/**
+		 * Retrieves the ID of the question.
+		 * 
+		 * @return The ID of the question.
+		 */
 		public int getID() { return id; }
+
+		/**
+		 * Retrieves this question's class.
+		 * 
+		 * @return This question's class.
+		 */
 		public Class<?> getContainerClass() { return type; }
+
+		/**
+		 * Retrieves the optional flag for the question.
+		 * 
+		 * @return {@code true} if the question is optional.
+		 */
 		public boolean isOptional() { return optional; }
+
+		/**
+		 * Retrieves the statement of the question.
+		 * 
+		 * @return The statement of the question.
+		 */
 		public String getStatement() { return question; }
+
+		/**
+		 * Retrieves the description of the question.
+		 * 
+		 * @return The description of the question.
+		 */
 		public String getDescription() { return description; }
+
+		/**
+		 * Retrieves the option text associated with {@code id}
+		 * of the question.
+		 * 
+		 * @param id the ID of the option.
+		 * 
+		 * @return The option text associated with {@code id}.
+		 */
 		public String getOption(int id)
 		{
 			String optn = null;
@@ -181,11 +229,29 @@ public class QuestionContainer
 			}
 			return optn;
 		}
+		
+		/**
+		 * Retrieves the options for this question.
+		 * 
+		 * @return A list of the available options in this container.
+		 */
 		public List<String> getOptions()
 		{
 			return Collections.unmodifiableList(options);
 		}
+		
+		/**
+		 * Retrieves the upper/max value that can be entered as an answer.
+		 * 
+		 * @return The upper/max value for this question
+		 */
 		public int getUpper() { return upper; }
+		
+		/**
+		 * Retrieves the lower/min value that can be entered as an answer.
+		 * 
+		 * @return The lower/min value for this question
+		 */
 		public int getLower() { return lower; }
 		
 		private int id;
@@ -194,6 +260,7 @@ public class QuestionContainer
 		 * Whether or not it is not required to answer this question.
 		 */
 		private boolean optional;
+		
 		/**
 		 * The type of question (SliderContainer, SingleOptionContainer,
 		 * FieldContainer etc.)
@@ -235,7 +302,8 @@ public class QuestionContainer
 		 * 		Slider, Field
 		 * @param question The question/statement that the user should
 		 * 		respond to.
-		 * @param description TODO
+		 * @param description A more detailed description of the
+		 * 		{@code question}.
 		 * @param options The available options to select in response
 		 * 		to the question/statement. If this entry type does not
 		 * 		have options this variable will be discarded can be
@@ -268,7 +336,8 @@ public class QuestionContainer
 		 * Places this question in an appropriate container based on
 		 * the type of question this is.
 		 * 
-		 * @return The container for this question.
+		 * @return The container for this question, or {@code null} if no
+		 * 		container could be found for this question.
 		 * 
 		 * @see FormContainer
 		 */

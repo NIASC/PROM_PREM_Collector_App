@@ -1,4 +1,5 @@
-/**
+/** Locale.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -25,7 +26,7 @@ package applet.core.interfaces;
  * regardless of where it is used.
  * 
  * An example of a locale-related method is formatting a national
- * identification number. 
+ * identification number.
  * 
  * @author Marcus Malmquist
  *

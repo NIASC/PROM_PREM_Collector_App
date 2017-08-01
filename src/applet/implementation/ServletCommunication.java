@@ -1,4 +1,5 @@
-/**
+/** ServletCommunication.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -77,6 +78,7 @@ public class ServletCommunication implements Database
 	/* Public */
 	
 	/**
+	 * Retrieves the active instance of this class.
 	 * 
 	 * @return The active instance of this class.
 	 */
@@ -93,10 +95,6 @@ public class ServletCommunication implements Database
 	{
 		throw new CloneNotSupportedException();
 	}
-	
-	/* 
-	 * Public methods required by the interface.
-	 */
 
 	@Override
 	public boolean addUser(String username, String password,
@@ -111,7 +109,7 @@ public class ServletCommunication implements Database
 		rmap.put("email", email);
 		rmap.put("salt", salt);
 		
-		JSONObject ans = sendMessage(ret.toString());
+		JSONObject ans = sendMessage(ret);
 		if (ans == null)
 			return false;
 		String insert = (String) ans.get(Constants.INSERT_RESULT);
@@ -146,7 +144,7 @@ public class ServletCommunication implements Database
 		rmap.put("identifier", identifier);
 		rmap.put("questions", questions.toString());
 
-		JSONObject ans = sendMessage(ret.toString());
+		JSONObject ans = sendMessage(ret);
 		if (ans == null)
 			return false;
 		String insert = (String) ans.get(Constants.INSERT_RESULT);
@@ -161,7 +159,7 @@ public class ServletCommunication implements Database
 		rmap.put("command", Constants.CMD_ADD_CLINIC);
 		rmap.put("name", clinicName);
 		
-		JSONObject ans = sendMessage(ret.toString());
+		JSONObject ans = sendMessage(ret);
 		if (ans == null)
 			return false;
 		Map<String, String> amap = (Map<String, String>) ans;
@@ -176,7 +174,7 @@ public class ServletCommunication implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_GET_CLINICS);
 		
-		JSONObject ans = sendMessage(ret.toString());
+		JSONObject ans = sendMessage(ret);
 		JSONObject clinics = getJSONObject((String) ans.get("clinics"));
 		Map<String, String> cmap = (Map<String, String>) clinics;
 		
@@ -197,7 +195,7 @@ public class ServletCommunication implements Database
 		rmap.put("command", Constants.CMD_GET_USER);
 		rmap.put("name", username);
 
-		JSONObject ans = sendMessage(ret.toString());
+		JSONObject ans = sendMessage(ret);
 		JSONObject user = getJSONObject((String) ans.get("user"));
 		Map<String, String> umap = (Map<String, String>) user;
 		User usr = null;
@@ -226,7 +224,7 @@ public class ServletCommunication implements Database
 		rmap.put("new_password", newPass);
 		rmap.put("new_salt", newSalt);
 
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
 		Map<String, String> umap = (Map<String, String>) getJSONObject(amap.get("user"));
 		User usr = null;
 		try {
@@ -263,7 +261,7 @@ public class ServletCommunication implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_LOAD_Q);
 		
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
 		Map<String, String> qmap = (Map<String, String>) getJSONObject(amap.get("questions"));
 		for (Entry<String, String> e : qmap.entrySet())
 		{
@@ -296,7 +294,7 @@ public class ServletCommunication implements Database
 		rmap.put("command", Constants.CMD_LOAD_QR_DATE);
 		rmap.put("name", user.getUsername());
 
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
 		List<String> dlist = (List<String>) getJSONArray(amap.get("dates"));
 		try
 		{
@@ -336,7 +334,7 @@ public class ServletCommunication implements Database
 		rmap.put("end", sdf.format(end.getTime()));
 		
 		
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
 		List<String> rlist = (List<String>) getJSONArray(amap.get("results"));
 		for (Iterator<String> itr = rlist.iterator(); itr.hasNext();)
 		{
@@ -352,6 +350,7 @@ public class ServletCommunication implements Database
 		return true;
 	}
 	
+	@Override
 	public boolean requestRegistration(
 			String name, String email, String clinic)
 	{
@@ -362,13 +361,14 @@ public class ServletCommunication implements Database
 		rmap.put("email", email);
 		rmap.put("clinic", clinic);
 		
-		JSONObject ans = sendMessage(ret.toString());
+		JSONObject ans = sendMessage(ret);
 		if (ans == null)
 			return false;
 		String insert = (String) ans.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
-	
+
+	@Override
 	public int requestLogin(String username, String password)
 	{
 		JSONObject ret = new JSONObject();
@@ -381,13 +381,14 @@ public class ServletCommunication implements Database
 		rmap.put("name", username);
 		rmap.put("password", user.hashWithSalt(password));
 		
-		JSONObject ans = sendMessage(ret.toString());
+		JSONObject ans = sendMessage(ret);
 		if (ans == null)
 			return Constants.ERROR;
 		Map<String, String> amap = (Map<String, String>) ans;
 		return Integer.parseInt(amap.get(Constants.LOGIN_REPONSE));
 	}
-	
+
+	@Override
 	public boolean requestLogout(String username)
 	{
 		JSONObject ret = new JSONObject();
@@ -395,7 +396,7 @@ public class ServletCommunication implements Database
 		rmap.put("command", Constants.CMD_REQ_LOGOUT);
 		rmap.put("name", username);
 		
-		JSONObject ans = sendMessage(ret.toString());
+		JSONObject ans = sendMessage(ret);
 		if (ans == null)
 			return false;
 		Map<String, String> amap = (Map<String, String>) ans;
@@ -409,6 +410,8 @@ public class ServletCommunication implements Database
 	private static ServletCommunication database;
 	private Encryption crypto;
 	
+	private JSONParser parser;
+	
 	/**
 	 * Initializes variables and loads the database configuration.
 	 * This class is a singleton and should only be instantiated once.
@@ -416,26 +419,32 @@ public class ServletCommunication implements Database
 	private ServletCommunication()
 	{
 		crypto = Implementations.Encryption();
+		parser = new JSONParser();
 	}
 	
-	private JSONObject sendMessage(String obj)
+	/**
+	 * Sends a JSONObject to the servlet.
+	 * 
+	 * @param obj The JSONObject to send.
+	 * 
+	 * @return The JSONObject returned from the servlet.
+	 */
+	private JSONObject sendMessage(JSONObject obj)
 	{
-		/* send message */
-		URL url;
 		HttpURLConnection connection;
 		try {
-			url = new URL("http://localhost:8080/PROM_PREM_Collector/main");
-			connection = (HttpURLConnection) url.openConnection();
+			connection = (HttpURLConnection) Constants.SERVER_URL.openConnection();
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setUseCaches(false);
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
-			//Send request
+			
+			/* send message */
 			OutputStream os = connection.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
 			// System.out.println(obj);
-			osw.write(obj);
+			osw.write(obj.toString());
 			osw.flush();
 			osw.close();
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -460,38 +469,53 @@ public class ServletCommunication implements Database
 		return null;
 	}
 	
+	/**
+	 * Attempts to parse {@code str} into a {@code JSONObject}.
+	 * 
+	 * @param str The string to be converted into a {@code JSONObject}.
+	 * 
+	 * @return The {@code JSONObject} representation of {@code str}, or
+	 * 		{@code null} if {@code str} does not represent a
+	 * 		{@code JSONObject}.
+	 */
 	private JSONObject getJSONObject(String str)
 	{
-		JSONParser parser = new JSONParser();
-		JSONObject userobj = null;
-		try{
-			userobj = (JSONObject) parser.parse(str);
-		} catch (org.json.simple.parser.ParseException pe) {
-			return null;
+		try
+		{
+			return (JSONObject) parser.parse(str);
 		}
-		return userobj;
+		catch (org.json.simple.parser.ParseException pe) { }
+		return null;
 	}
 	
+	/**
+	 * Attempts to parse {@code str} into a {@code JSONArray}.
+	 * 
+	 * @param str The string to be converted into a {@code JSONArray}.
+	 * 
+	 * @return The {@code JSONArray} representation of {@code str}, or
+	 * 		{@code null} if {@code str} does not represent a
+	 *  	{@code JSONArray}.
+	 */
 	private JSONArray getJSONArray(String str)
 	{
-		JSONParser parser = new JSONParser();
-		JSONArray userarr = null;
-		try{
-			userarr = (JSONArray) parser.parse(str);
-		} catch (org.json.simple.parser.ParseException pe) {
-			return null;
+		try
+		{
+			return (JSONArray) parser.parse(str);
 		}
-		return userarr;
+		catch (org.json.simple.parser.ParseException pe) { }
+		return null;
 	}
 
 	/**
-	 * Retrieves messages from the database and places them in a
-	 * MessageContainer.
+	 * Retrieves messages from the database and places them in the
+	 * {@code MessageContainer}.
 	 * 
 	 * @param commandName The name of the (message) table to retrieve
 	 * 		messages from.
-	 * @param mc
-	 * @return
+	 * @param mc The {@code MessageContainer} to put the messages in.
+	 * 
+	 * @return true if the messages was put in {@code mc}.
 	 */
 	private boolean getMessages(String commandName, MessageContainer mc)
 	{
@@ -499,7 +523,7 @@ public class ServletCommunication implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", commandName);
 		
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret.toString());
+		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
 		Map<String, String> mmap = (Map<String, String>) getJSONObject(amap.get("messages"));
 		try {
 			for (Entry<String, String> e : mmap.entrySet())
@@ -550,9 +574,8 @@ public class ServletCommunication implements Database
 	}
 	
 	/**
-	 * This class handles converting question answer formats
-	 * between its database representation and its java
-	 * representation.
+	 * This class handles converting question answer formats between its
+	 * database representation and its java representation.
 	 * 
 	 * @author Marcus Malmquist
 	 *
@@ -560,15 +583,15 @@ public class ServletCommunication implements Database
 	private static class QDBFormat
 	{
 		/**
-		 * Converts the answer stored in {@code fc} to the
-		 * format used in the database.
+		 * Converts the answer stored in {@code fc} to the format used
+		 * in the database.
 		 * 
-		 * @param fc The container for the question which have
-		 * 		been answered and should have the answer stored
-		 * 		in the database.
+		 * @param fc The container for the question which have been
+		 * 		answered and should have the answer stored in the
+		 * 		database.
 		 * 
-		 * @return The database representation for the answer
-		 * 		in {@code fc}.
+		 * @return The database representation for the answer in
+		 * 		{@code fc}.
 		 */
 		static String getDBFormat(FormContainer fc)
 		{
@@ -606,10 +629,10 @@ public class ServletCommunication implements Database
 		
 		/**
 		 * Converts the answer {@code dbEntry} from its database
-		 * representation to its java representation. The return
-		 * type is {@code Object} to keep the formats general. The
-		 * returned objects are in the format they need to be in
-		 * order to represent the answer in its java format.
+		 * representation to its java representation. The return type
+		 * is {@code Object} to keep the formats general. The returned
+		 * objects are in the format they need to be in order to
+		 * represent the answer in its java format.
 		 * 
 		 * @param dbEntry The database entry that is to be converted
 		 * 		to a java entry.

@@ -1,4 +1,5 @@
-/**
+/** UserHandle.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -67,12 +68,16 @@ public class UserHandle
 	}
 	
 	/**
-	 * Attempts to match the supplied user deatils with data in the
+	 * Attempts to match the supplied user details with data in the
 	 * database. If the user successfully logs in it will be flagged
 	 * as logged in (which can be used to verify that the user has
 	 * logged in using the function isLoggedIn). This flag prevents
-	 * the same user from being logged in on the same account in
-	 * multiple instances.
+	 * methods only available when logged in from being called if
+	 * the user has logged out.
+	 * 
+	 * @param username The username of the user that wants to log in.
+	 * @param password The (unhashed) password of the user that wants
+	 * 		to log in.
 	 */
 	public void login(String username, String password)
 	{
@@ -149,7 +154,7 @@ public class UserHandle
 	/**
 	 * Returns the 'logged in' flag.
 	 * 
-	 * @return True if the user is logged in. False if not.
+	 * @return {@code true} if the user is logged in. {@code false} if not.
 	 */
 	public boolean isLoggedIn()
 	{
@@ -160,8 +165,8 @@ public class UserHandle
 	 * If the user has/wants to update his password then this method
 	 * will call the part of program that displays that form.
 	 * 
-	 * @return True if the user needed to update its password. False
-	 * 		if not.
+	 * @return {@code true} if the user needed to update its password.
+	 * 		{@code false} if not.
 	 */
 	public boolean updatePassword()
 	{
@@ -210,6 +215,7 @@ public class UserHandle
 	/* Protected */
 	
 	/**
+	 * Retrieves this handle's active {@code User}.
 	 * 
 	 * @return This handle's active {@code User}. If this handle does
 	 * 		not have an active user then {@code null} is returned.
@@ -322,16 +328,16 @@ public class UserHandle
 	 * This should typically be done when the user wants to set a new
 	 * password.
 	 * The criterion are:
-	 * password length: >5 and < 33 characters.
+	 * password length: &gt;5 and &lt;33 characters.
 	 * password strength: contain characters from at least 2 groups
 	 * 		out of lowercase, uppercase, digits, punctuation
 	 * 		(including space).
 	 * 
 	 * @param password The password to validate.
 	 * 
-	 * @return <0 if the password does not fit the length constraint.
+	 * @return &lt;0 if the password does not fit the length constraint.
 	 * 		0 if the password does not fit the strength constraint.
-	 * 		>0 if the password fits the length constraint and strength
+	 * 		&gt;0 if the password fits the length constraint and strength
 	 * 		constraint.
 	 */
 	private int validatePassword(String password)

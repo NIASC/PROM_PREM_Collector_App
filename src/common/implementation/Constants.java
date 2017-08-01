@@ -1,12 +1,51 @@
+/** Constants.java
+ * 
+ * Copyright 2017 Marcus Malmquist
+ * 
+ * This file is part of PROM_PREM_Collector.
+ * 
+ * PROM_PREM_Collector is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ * 
+ * PROM_PREM_Collector is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with PROM_PREM_Collector.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package common.implementation;
 
-public interface Constants {
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ * This interface contains constant values that are used in both the
+ * applet and servlet when communicating between them.
+ * 
+ * @author Marcus Malmquist
+ *
+ */
+public abstract class Constants {
+	
 	/**
-	 * If the messages was not retrieved from the database this
-	 * message (in English) should be used to notify the caller that
-	 * there was a database error.
+	 * The URL to the server.
 	 */
-	public static final String DATABASE_ERROR = "Database error.";
+	public static final URL SERVER_URL;
+	
+	static {
+		URL url = null;
+		try
+		{
+			url = new URL("http://localhost:8080/PROM_PREM_Collector/main");
+		}
+		catch (MalformedURLException _e) { }
+		SERVER_URL = url;
+	}
 	
 	public static final String INSERT_RESULT = "insert_result";
 	public static final String INSERT_SUCCESS = "1";

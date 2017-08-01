@@ -1,4 +1,5 @@
-/**
+/** MultipleOptionDisplay.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -38,10 +39,9 @@ import javax.swing.JTextArea;
 import applet.core.containers.form.MultipleOptionContainer;
 import applet.core.containers.form.SingleOptionContainer;
 import applet.core.interfaces.Messages;
+import applet.core.interfaces.UserInterface;
 import applet.core.interfaces.UserInterface.FormComponentDisplay;
 import applet.implementation.SwingComponents;
-
-
 
 /**
  * This class is a displayable wrapper the for
@@ -96,10 +96,10 @@ public class MultipleOptionDisplay extends JPanel implements FormComponentDispla
 	/* Protected */
 	
 	/**
-	 * Creates a displayable wrapper for {@code soc}.
+	 * Creates a displayable wrapper for {@code moc}.
 	 * 
-	 * @param moc The instance of the SingleOptionContainer that
-	 * 		the instance of this SingleOptionDisplay should act as
+	 * @param moc The instance of the MultipleOptionContainer that
+	 * 		the instance of this MultipleOptionDisplay should act as
 	 * 		a wrapper for.
 	 */
 	protected MultipleOptionDisplay(MultipleOptionContainer moc)

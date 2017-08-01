@@ -1,4 +1,5 @@
-/**
+/** Database.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -113,7 +114,7 @@ public interface Database
 	 * oldPass matches the user's current password.
 	 * 
 	 * @param user The user that is updating it's password.
-	 * @param oldPass The old (current) (unhashed) password.
+	 * @param oldPass The old/current (unhashed) password.
 	 * @param newPass The new password hashed using the new salt.
 	 * @param newSalt The new salt.
 	 * 
@@ -126,7 +127,7 @@ public interface Database
 	
 	/**
 	 * Loads error messages from the database and puts them in a
-	 * MessageContainer.
+	 * {@code MessageContainer}.
 	 * 
 	 * @param mc The (empty) message container to put error messages in.
 	 * 
@@ -138,7 +139,7 @@ public interface Database
 	
 	/**
 	 * Loads info messages from the database and puts them in a
-	 * MessageContainer.
+	 * {@code MessageContainer}.
 	 * 
 	 * @param mc The (empty) message container to put info messages in.
 	 * 
@@ -210,16 +211,29 @@ public interface Database
 
 	/**
 	 * 
-	 * @param username
-	 * @param password
+	 * @param username The username of the user that wants to log in.
+	 * @param password The (unhashed) password of the user that
+	 * 		wants to log in.
+	 * 
 	 * @return
+	 *		<code>Constants.ERROR</code>
+	 * 			If an error occurred.<br>
+	 * 		<code>Constants.SUCCESS</code>
+	 * 			If the logout was successful.<br>
+	 * 		<code>Constants.SERVER_FULL</code>
+	 * 			If the server is full.<br>
+	 * 		<code>Constants.ALREADY_ONLINE</code>
+	 * 			If the user is already online.<br>
+	 * 		<code>Constants.INVALID_DETAILS</code>
+	 * 			If the details mismatch with the details in the database.
 	 */
 	public int requestLogin(String username, String password);
 
 	/**
 	 * 
-	 * @param username
-	 * @return
+	 * @param username The username of the user that wants to log out.
+	 * 
+	 * @return {@code true} if the user was successfully logged out.
 	 */
 	public boolean requestLogout(String username);
 	

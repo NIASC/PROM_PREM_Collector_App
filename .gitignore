@@ -1,6 +1,7 @@
 local/
 bin/
 build/
+dist/
 .classpath
 .project
 build.properties

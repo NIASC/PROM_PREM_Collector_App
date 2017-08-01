@@ -1,4 +1,5 @@
-/**
+/** Form.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -26,9 +27,9 @@ import applet.core.containers.form.FormContainer;
  * subclasses. It is used to create a form and add entries to it. This
  * class also provides many useful functions for navigating the form.
  * 
- * This class have been written with great flexibility in mind. It
- * should be easy to add new types of form entries as long as those
- * types inherit from the FieldContainer class.
+ * This class have been written with flexibility in mind. It should be
+ * easy to add new types of form entries as long as those types inherit
+ * from the FieldContainer class.
  * 
  * @author Marcus Malmquist
  *
@@ -38,12 +39,24 @@ public class Form
 	/* Public */
 	
 	/**
-	 * This variable is an identifier that will be used to tell the
-	 * methods of this class where to put/look for entries in this
-	 * form.
+	 * Operation should be performed at the beginning of the list.
 	 */
-	public static final int AT_BEGIN = 0, AT_END = 1,
-			AT_PREVIOUS = 2, AT_NEXT = 3;
+	public static final int AT_BEGIN = 0;
+	
+	/**
+	 * Operation should be performed at the end of the list.
+	 */
+	public static final int AT_END = 1;
+	
+	/**
+	 * Operation should be performed at the previous position in the list.
+	 */
+	public static final int AT_PREVIOUS = 2;
+	
+	/**
+	 * Operation should be performed at the next position in the list.
+	 */
+	public static final int AT_NEXT = 3;
 	
 	/**
 	 * Initializes an empty form.
@@ -97,7 +110,7 @@ public class Form
 	}
 	
 	/**
-	 * Delete an entry from the form. An deletion can occur at the
+	 * Delete an entry from the form. A deletion can occur at the
 	 * beginning, at the end, before or after the current position.
 	 * 
 	 * @param location The location to delete. The location is
@@ -208,7 +221,7 @@ public class Form
 	}
 	
 	/**
-	 * Jumps a number of steps (>0 forward, <0 backward).
+	 * Jumps a number of steps (&gt;0 forward, &lt;0 backward).
 	 * 
 	 * @param steps The number of steps to jump.
 	 * 		Positive number of steps will move forward.
@@ -342,9 +355,9 @@ public class Form
 	
 	/**
 	 * Moves forward a number of steps. If the number of steps are
-	 * <= 0 then nothing is done.
+	 * &lt;= 0 then nothing is done.
 	 * 
-	 * @param steps The number of steps (>0) to move forward.
+	 * @param steps The number of steps (&gt;0) to move forward.
 	 */
 	private void jumpForward(int steps)
 	{
@@ -360,9 +373,9 @@ public class Form
 	
 	/**
 	 * Moves backward a number of steps. If the number of steps are
-	 * <= 0 then nothing is done.
+	 * &ld;= 0 then nothing is done.
 	 * 
-	 * @param steps The number of steps (>0) to move backward.
+	 * @param steps The number of steps (&gt;0) to move backward.
 	 */
 	private void jumpBackward(int steps)
 	{

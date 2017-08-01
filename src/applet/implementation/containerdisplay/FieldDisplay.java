@@ -1,4 +1,5 @@
-/**
+/** FieldDisplay.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -30,6 +31,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import applet.core.containers.form.FieldContainer;
+import applet.core.interfaces.UserInterface;
 import applet.core.interfaces.UserInterface.FormComponentDisplay;
 import applet.implementation.SwingComponents;
 

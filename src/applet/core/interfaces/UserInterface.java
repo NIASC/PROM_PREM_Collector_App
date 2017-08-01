@@ -1,4 +1,5 @@
-/**
+/** UserInterface.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -78,8 +79,7 @@ public interface UserInterface
 	 * 		time. {@code false} if only one entry should be displayed
 	 * 		at a time.
 	 * 
-	 * @return {@code true} if the form was filled. {@code false} if
-	 * 		the form was not fully filled in.
+	 * @return {@code true} if the form was displayed.
 	 * 
 	 * @see Form
 	 * @see ReturnFunction
@@ -164,15 +164,13 @@ public interface UserInterface
 		 * 		entries. The {@code RetFunContainer} also contains
 		 * 		a functional interface {@code NextFunction} which
 		 * 		should be called if the {@code Form} was accepted (and
-		 * 		the function is not null). If the {@code Form} was not
-		 * 		accepted by the function then {@code null} is
+		 * 		the function is not {@code null}). If the {@code Form}
+		 * 		was not accepted by the function then {@code null} is
 		 * 		returned.
 		 * 
 		 * @see UserInterface
 		 * @see Form
-		 * @see NextFunction#call()
-		 * 
-		 * @author Marcus Malmquist
+		 * @see RetFunContainer.NextFunction#call()
 		 */
 		RetFunContainer call(Form form);
 	}
@@ -189,7 +187,7 @@ public interface UserInterface
 	 * @author Marcus Malmquist
 	 * 
 	 * @see ReturnFunction#call(Form)
-	 * @see NextFunction#call()
+	 * @see RetFunContainer.NextFunction#call()
 	 */
 	public class RetFunContainer
 	{
@@ -230,10 +228,10 @@ public interface UserInterface
 		
 		/**
 		 * Initializes this container with the next function set to
-		 * {@code nextfunc} and the valid flag set to false.
+		 * {@code nextfunc} and the valid flag set to {@code false}.
 		 * 
 		 * @param nextfunc The function to be called if {@code valid}
-		 * 		is true.
+		 * 		is {@code true}.
 		 * 
 		 * @see #valid
 		 * @see #nextfunc
@@ -257,7 +255,7 @@ public interface UserInterface
 		{
 			/**
 			 * This function should be called if the {@code valid}
-			 * flag is true.
+			 * flag is {@code true}.
 			 * 
 			 * @see RetFunContainer#valid
 			 */

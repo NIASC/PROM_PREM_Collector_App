@@ -1,4 +1,5 @@
-/**
+/** MySQL_Database.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -71,6 +72,7 @@ public class MySQL_Database implements Database
 	/* Public */
 	
 	/**
+	 * Retrieves the active instance of this class
 	 * 
 	 * @return The active instance of this class.
 	 */
@@ -87,10 +89,6 @@ public class MySQL_Database implements Database
 	{
 		throw new CloneNotSupportedException();
 	}
-	
-	/* 
-	 * Public methods required by the interface.
-	 */
 
 	@Override
 	public String addUser(JSONObject obj)
@@ -475,6 +473,7 @@ public class MySQL_Database implements Database
 		return ret.toString();
 	}
 	
+	@Override
 	public String requestLogin(JSONObject obj)
 	{
 		Map<String, String> omap = (Map<String, String>) obj;
@@ -501,7 +500,8 @@ public class MySQL_Database implements Database
 		rmap.put(Constants.LOGIN_REPONSE, um.addUser(user.get("name")));
 		return ret.toString();
 	}
-	
+
+	@Override
 	public String requestLogout(JSONObject obj)
 	{
 		Map<String, String> omap = (Map<String, String>) obj;
@@ -521,11 +521,16 @@ public class MySQL_Database implements Database
 	/* Private */
 
 	private static MySQL_Database database;
+	
 	/**
 	 * Handles connection with the database.
 	 */
 	private DataSource dataSource;
 	
+	/**
+	 * Configuration data for sending an email from the servlet's email
+	 * to the admin's email.
+	 */
 	private EmailConfig config;
 	
 	/**
@@ -571,6 +576,14 @@ public class MySQL_Database implements Database
 		return false;
 	}
 	
+	/**
+	 * Quick method for calling {@code getUser(JSONObject)} using only the
+	 * username as an argument.
+	 * 
+	 * @param username The username of the user to look for.
+	 * 
+	 * @return A map containing the information about the user.
+	 */
 	private Map<String, String> getUser(String username)
 	{
 		JSONObject getuser = new JSONObject();
@@ -638,13 +651,15 @@ public class MySQL_Database implements Database
 	}
 
 	/**
-	 * Retrieves messages from the database and places them in a
-	 * MessageContainer.
+	 * Retrieves messages from the database and places them in
+	 * {@code retobj}
 	 * 
 	 * @param tableName The name of the (message) table to retrieve
 	 * 		messages from.
-	 * @param mc
-	 * @return
+	 * 
+	 * @param retobj The map to put the messages in.
+	 * 
+	 * @return true if the messages were put in the map.
 	 */
 	private boolean getMessages(String tableName, Map<String, String> retobj)
 	{
@@ -683,6 +698,15 @@ public class MySQL_Database implements Database
 		return ret;
 	}
 	
+	/**
+	 * Attempts to parse {@code str} into a {@code JSONObject}.
+	 * 
+	 * @param str The string to be converted into a {@code JSONObject}.
+	 * 
+	 * @return The {@code JSONObject} representation of {@code str}, or
+	 * 		{@code null} if {@code str} does not represent a
+	 * 		{@code JSONObject}.
+	 */
 	private JSONObject getJSONObject(String str)
 	{
 		JSONParser parser = new JSONParser();
@@ -695,6 +719,15 @@ public class MySQL_Database implements Database
 		return userobj;
 	}
 	
+	/**
+	 * Attempts to parse {@code str} into a {@code JSONArray}.
+	 * 
+	 * @param str The string to be converted into a {@code JSONArray}.
+	 * 
+	 * @return The {@code JSONArray} representation of {@code str}, or
+	 * 		{@code null} if {@code str} does not represent a
+	 *  	{@code JSONArray}.
+	 */
 	private JSONArray getJSONArray(String str)
 	{
 		JSONParser parser = new JSONParser();
@@ -708,7 +741,7 @@ public class MySQL_Database implements Database
 	}
 	
 	/**
-	 * Sends an email from the program's email account.
+	 * Sends an email from the servlet's email account.
 	 * 
 	 * @param recipient The email address of to send the email to.
 	 * @param emailSubject The subject of the email.
@@ -744,6 +777,12 @@ public class MySQL_Database implements Database
 		return true;
 	}
 	
+	/**
+	 * This class contains the configuration data for sending emails.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	private final class EmailConfig
 	{
 		final String CONFIG_FILE =

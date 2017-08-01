@@ -1,4 +1,5 @@
-/**
+/** Messages.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -85,9 +86,6 @@ public final class Messages
 	INFO_REG_CLINIC_NAME			= "REG_CLINIC_NAME"			,
 	INFO_REG_USER_NAME				= "REG_USER_NAME"			,
 	INFO_REG_USER_EMAIL				= "REG_USER_EMAIL"			,
-	INFO_REG_EMAIL_SUBJECT			= "REG_EMAIL_SUBJECT"		,
-	INFO_REG_BODY_DESCRIPTION		= "REG_BODY_DESCRIPTION"	,
-	INFO_REG_EMAIL_SIGNATURE		= "REG_EMAIL_SIGNATURE"		,
 	INFO_REG_REQUEST_SENT			= "REG_REQUEST_SENT"		,
 	INFO_UI_UNFILLED				= "UI_UNFILLED"				,
 	INFO_UI_FILLED					= "UI_FILLED"				,
@@ -100,7 +98,10 @@ public final class Messages
 	INFO_VD_SELECT_PREIOD			= "VD_SELECT_PREIOD"		,
 	INFO_VD_SELECT_QUESTIONS		= "VD_SELECT_QUESTIONS"		,
 	INFO_VD_DATE_FROM				= "VD_DATE_FROM"			,
-	INFO_VD_DATE_TO					= "VD_DATE_TO"
+	INFO_VD_DATE_TO					= "VD_DATE_TO"				,
+	INFO_Q_PATIENT_FORENAME			= "Q_PATIENT_FORENAME"		,
+	INFO_Q_PATIENT_SURNAME			= "Q_PATIENT_SURNAME"		,
+	INFO_Q_PATIENT_PNR				= "Q_PATIENT_PNR"
 	;
 	
 	/**
@@ -118,6 +119,7 @@ public final class Messages
 	}
 	
 	/**
+	 * Retrieves the active instance of this class.
 	 * 
 	 * @return The active instance of this class.
 	 */

@@ -1,4 +1,5 @@
-/**
+/** FormContainer.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -104,20 +105,31 @@ public abstract class FormContainer
 	}
 	
 	/**
+	 * Whether or not this container allows empty entries.
 	 * 
-	 * @return True if this container allows empty entries. False if
-	 * 		not.
+	 * @return {@code true} if this container allows empty entries.
+	 * 		{@code false} if not.
 	 */
 	public boolean allowsEmpty()
 	{
 		return allowEmpty;
 	}
 	
+	/**
+	 * Retrieves this container's statement.
+	 * 
+	 * @return This container's statement.
+	 */
 	public String getStatement()
 	{
 		return statement;
 	}
 	
+	/**
+	 * Retrieves this container's description.
+	 * 
+	 * @return This container's description.
+	 */
 	public String getDescription()
 	{
 		return description;
@@ -148,14 +160,15 @@ public abstract class FormContainer
 	}
 	
 	/**
-	 * Sets the next FormContainer to the supplied FormContainer and
-	 * returns the FormContainer that currently is the next.
+	 * Sets the next {@code FormContainer} to the supplied
+	 * {@code FormContainer} and returns the {@code FormContainer} that
+	 * currently is the next.
 	 * 
-	 * @param fc The FormContainer that will be the FormContainer
-	 * 		after this.
+	 * @param fc The {@code FormContainer} that will be the
+	 * 		{@code FormContainer} after this.
 	 * 
-	 * @return The FormContainer that currently is the FormContainer
-	 * 		after this.
+	 * @return The {@code FormContainer} that currently is the
+	 * 		{@code FormContainer} after this.
 	 * 
 	 * @see Form
 	 */
@@ -167,14 +180,15 @@ public abstract class FormContainer
 	}
 	
 	/**
-	 * Sets the previous FormContainer to the supplied FormContainer
-	 * and returns the FormContainer that currently is the previous.
+	 * Sets the previous {@code FormContainer} to the supplied
+	 * {@code FormContainer} and returns the {@code FormContainer} that
+	 * currently is the previous.
 	 * 
-	 * @param fc The FormContainer that will be the FormContainer
-	 * 		before this.
+	 * @param fc The {@code FormContainer} that will be the
+	 * 		{@code FormContainer} before this.
 	 * 
-	 * @return The FormContainer that currently is the FormContainer
-	 * 		before this.
+	 * @return The {@code FormContainer} that currently is the
+	 * 		{@code FormContainer} before this.
 	 * 
 	 * @see Form
 	 */
@@ -188,13 +202,13 @@ public abstract class FormContainer
 	/* Protected */
 
 	/**
-	 * The next container in the {@code Form}
+	 * The next container in the {@code Form}.
 	 * 
 	 * @see Form
 	 */
 	protected FormContainer nextFC;
 	/**
-	 * The next container in the {@code Form}
+	 * The next container in the {@code Form}.
 	 * 
 	 * @see Form
 	 */

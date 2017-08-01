@@ -1,4 +1,5 @@
-/**
+/** AreaContainer.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -76,12 +77,12 @@ public class AreaContainer extends FormContainer
 	
 	/**
 	 * Sets the entry (i.e. the user input in response to the field's
-	 * statement) of this container's field. Setting the entry to null
-	 * can be used to reset the field.
+	 * statement) of this container's field. Setting the entry to
+	 * {@code null} can be used to reset the field.
 	 * 
 	 * @param entry The user entry to set.
 	 * 
-	 * @return True if the entry was set
+	 * @return {@code true} if the entry was set
 	 */
 	public boolean setEntry(String entry)
 	{

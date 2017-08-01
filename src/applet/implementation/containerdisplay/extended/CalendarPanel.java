@@ -217,8 +217,8 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 	}
 	
 	/**
-	 * Fills the year combobox with years rangin from the lower year limit
-	 * to the upper year limit.
+	 * Fills the year combobox with years ranging from the lower year
+	 * limit to the upper year limit.
 	 */
 	private void initYears()
 	{
@@ -233,8 +233,8 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 	 * Fills the day combobox with day numbers 1-31* and selects the
 	 * current day.
 	 * 
-	 * <br><br>* If the current month does not have 31 day the values will
-	 * instead range from 1 to the highest day number.
+	 * <br><br>* If the current month does not have 31 day the values
+	 * will instead range from 1 to the highest day number.
 	 */
 	private void initDays()
 	{
@@ -352,6 +352,14 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 				new EmptyBorder(0, 0, 0, 0));
 	}
 	
+	/**
+	 * This class handles dates. It contains methods that facilitates
+	 * access to day, month, year as well as handles updating those if
+	 * one of them change.
+	 * 
+	 * @author Marcus Malmquist
+	 *
+	 */
 	private class DateContainer
 	{
 		DateContainer(Calendar c)
@@ -363,21 +371,41 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 			refresh();
 		}
 		
+		/**
+		 * Retrieves the day of month.
+		 * 
+		 * @return The day of month,
+		 */
 		int getDay()
 		{
 			return day;
 		}
 		
+		/**
+		 * Retrieves the month.
+		 * 
+		 * @return The month.
+		 */
 		int getMonth()
 		{
 			return month;
 		}
 		
+		/**
+		 * Retrieves the year.
+		 * 
+		 * @return The year.
+		 */
 		int getYear()
 		{
 			return year;
 		}
 		
+		/**
+		 * Sets the day and updates month and year if needed.
+		 * 
+		 * @param day The day to set.
+		 */
 		void setDay(int day)
 		{
 			if (day == this.day)
@@ -386,6 +414,11 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 			refresh();
 		}
 		
+		/**
+		 * Sets the month and updates day and year if needed.
+		 * 
+		 * @param month The month to set.
+		 */
 		void setMonth(int month)
 		{
 			if (month == this.month)
@@ -395,6 +428,11 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 			refresh();
 		}
 		
+		/**
+		 * Sets the year and update the day and month if needed.
+		 * 
+		 * @param year The year to set.
+		 */
 		void setYear(int year)
 		{
 			if (year == this.year)
@@ -404,11 +442,21 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 			refresh();
 		}
 		
+		/**
+		 * Retrieves the number of days in the current month.
+		 * 
+		 * @return The number of days in the current month.
+		 */
 		int getDaysInMonth()
 		{
 			return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 		}
 		
+		/**
+		 * Retrieves the number of months in the current year.
+		 * 
+		 * @return The number of months in the current year.
+		 */
 		int getMaxMonthInYear()
 		{
 			return calendar.getActualMaximum(Calendar.MONTH);
@@ -432,6 +480,9 @@ public class CalendarPanel extends JPanel implements ChangeListener, ItemListene
 			return daysInMonth < day ? daysInMonth : day;
 		}
 		
+		/**
+		 * Updates day, month and year.
+		 */
 		synchronized void refresh()
 		{
 			day = calendar.get(Calendar.DAY_OF_MONTH);

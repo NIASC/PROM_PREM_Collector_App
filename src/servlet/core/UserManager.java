@@ -1,4 +1,5 @@
-/**
+/** UserManager.java
+ * 
  * Copyright 2017 Marcus Malmquist
  * 
  * This file is part of PROM_PREM_Collector.
@@ -58,14 +59,20 @@ public class UserManager
 	/* Protected */
 	
 	/**
-	 * Adds {@code uh} to the list of online users if they exist.
+	 * Adds {@code username} to the list of online users if they exist.
 	 * 
-	 * @param uh The {@code UserHandle} to add.
+	 * @param username The username of the user to add.
 	 * 
-	 * @return {@code true} if the {@code UserHandle} was added.
-	 * 		{@code false} if not.
-	 * 
-	 * @see UserHandle
+	 * @return
+	 * 		<code>Constants.ERROR_STR</code>
+	 * 			If an error occurred.<br>
+	 * 		<code>Constants.SERVER_FULL_STR</code>
+	 * 			If the server is full.<br>
+	 * 		<code>Constants.ALREADY_ONLINE_STR</code>
+	 * 			If the user with username {@code username} is already
+	 * 			online.<br>
+	 * 		<code>Constants.SUCCESS_STR</code>
+	 * 			If the user was successfully added.
 	 */
 	public synchronized String addUser(String username)
 	{
@@ -80,18 +87,17 @@ public class UserManager
 	}
 	
 	/**
-	 * Removes {@code uh} from the list of online users if they exist.
+	 * Removes {@code username} from the list of online users if they exist.
 	 * 
-	 * @param uh The {@code UserHandle} to delete.
+	 * @param username The username of the user to delete.
 	 * 
 	 * @return {@code true} if the user was deleted. False if the user
 	 * 		did not exist in the list of users.
-	 * 
-	 * @see UserHandle
 	 */
 	public synchronized boolean delUser(String username)
 	{
-		if (username == null || username.isEmpty() || !users.contains(username))
+		if (username == null || username.isEmpty()
+				|| !users.contains(username))
 			return false;
 		users.remove(username);
 		return true;
@@ -100,7 +106,7 @@ public class UserManager
 	/* Private */
 	
 	private static UserManager manager;
-	private static final int MAX_USERS;
+	private static final int MAX_USERS = 2;
 	private List<String> users;
 
 	/**
@@ -109,10 +115,5 @@ public class UserManager
 	private UserManager()
 	{
 		users = new ArrayList<String>();
-	}
-	
-	static
-	{
-		MAX_USERS = 2;
 	}
 }

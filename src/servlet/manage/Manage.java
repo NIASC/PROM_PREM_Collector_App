@@ -43,9 +43,7 @@ public class Manage
 	
 	public static void main(String[] args)
 	{
-		Manage m = new Manage();
-		m.runManager();
-		
+		(new Manage()).runManager();
 	}
 	
 	/**
@@ -63,6 +61,8 @@ public class Manage
 	 */
 	public void runManager()
 	{
+		System.out.println("Username: " +generateUsername("Örjæñ", "Kãrlssøñ-Añðérssóñ"));
+		System.out.println("Password: " +generateFirstPassword());
 		boolean exit = false;
 		final int EXIT = 0, ADD_CLINIC = 1, ADD_USER = 2;
 		while (!exit)
@@ -102,6 +102,110 @@ public class Manage
 	/* Protected */
 	
 	/* Private */
+	
+	/**
+	 * Generates a first password. The password contains 8 characters
+	 * from the groups:<br>
+	 * ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+	 * abcdefghijklmnopqrstuvwxyz<br>
+	 * !, ?, =, #, $, &amp;, @, (, ), [, ], {, }, &lt;, &gt;<br>
+	 * 0123456789<br>
+	 * 
+	 * @return A password of length 8 with randomly generated characters.
+	 */
+	private String generateFirstPassword()
+	{
+		char[] punct = "!?=#$&@()[]{}<>".toCharArray();
+		char[] upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+		char[] lower = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+		char[] digit = "0123456789".toCharArray();
+		char[][] valid = {punct, upper, lower, digit};
+		char[] pass = new char[8];
+		for (int i = 0; i < 8; ++i)
+		{
+			char[] group = valid[(int) (valid.length * Math.random())];
+			pass[i] = group[(int) (group.length * Math.random())];
+		}
+		return new String(pass);
+	}
+	
+	private String generateUsername(String firstname, String surname)
+	{
+		firstname = replaceSpecialCharacters(firstname);
+		surname = replaceSpecialCharacters(surname);
+		
+		firstname = firstname.replaceAll("[^a-z]", "");
+		surname = surname.replaceAll("[^a-z]", "");
+		String username = firstname.substring(0, firstname.length() < 3 ? firstname.length() : 3)
+				+ surname.substring(0, surname.length() < 3 ? surname.length() : 3)
+				+ String.format("%03d", (int) (1000*Math.random()));
+		return username;
+	}
+	
+	private String replaceSpecialCharacters(String str)
+	{
+		String alike = new String(new char[]{
+				(char) 224, /* LATIN SMALL LETTER A WITH GRAVE */
+				(char) 225, /* LATIN SMALL LETTER A WITH ACUTE  */
+				(char) 226, /* LATIN SMALL LETTER A WITH CIRCUMFLEX */
+				(char) 227, /* LATIN SMALL LETTER A WITH TILDE */
+				(char) 228, /* LATIN SMALL LETTER A WITH DIAERESIS */
+				(char) 229, /* LATIN SMALL LETTER A WITH RING ABOVE */
+				(char) 230, /* LATIN SMALL LETTER AE */
+		});
+
+		String clike = new String(new char[]{
+				(char) 231, /* LATIN SMALL LETTER C WITH CEDILLA */
+		});
+
+		String elike = new String(new char[]{
+				(char) 232, /* LATIN SMALL LETTER E WITH GRAVE */
+				(char) 233, /* LATIN SMALL LETTER E WITH ACUTE */
+				(char) 234, /* LATIN SMALL LETTER E WITH CIRCUMFLEX */
+				(char) 235, /* LATIN SMALL LETTER E WITH DIAERESIS */
+		});
+
+		String ilike = new String(new char[]{
+				(char) 236, /* LATIN SMALL LETTER I WITH GRAVE */
+				(char) 237, /* LATIN SMALL LETTER I WITH ACUTE */
+				(char) 238, /* LATIN SMALL LETTER I WITH CIRCUMFLEX */
+				(char) 239, /* LATIN SMALL LETTER I WITH DIAERESIS */
+		});
+
+		String dlike = new String(new char[]{
+				(char) 240, /* LATIN SMALL LETTER ETH */
+		});
+
+		String nlike = new String(new char[]{
+				(char) 241, /* LATIN SMALL LETTER N WITH TILDE */
+		});
+
+		String olike = new String(new char[]{
+				(char) 242, /* LATIN SMALL LETTER O WITH GRAVE */
+				(char) 243, /* LATIN SMALL LETTER O WITH ACUTE */
+				(char) 244, /* LATIN SMALL LETTER O WITH CIRCUMFLEX */
+				(char) 245, /* LATIN SMALL LETTER O WITH TILDE */
+				(char) 246, /* LATIN SMALL LETTER O WITH DIAERESIS */
+				(char) 248, /* LATIN SMALL LETTER O WITH STROKE */
+		});
+
+		String ulike = new String(new char[] {
+				(char) 249, /* LATIN SMALL LETTER U WITH GRAVE */
+				(char) 250, /* LATIN SMALL LETTER U WITH ACUTE */
+				(char) 251, /* LATIN SMALL LETTER U WITH CIRCUMFLEX */
+				(char) 252, /* LATIN SMALL LETTER U WITH DIAERESIS */
+		});
+
+		return str.toLowerCase()
+				.replaceAll(String.format("[%s]", alike), "a")
+				.replaceAll(String.format("[%s]", clike), "c")
+				.replaceAll(String.format("[%s]", elike), "e")
+				.replaceAll(String.format("[%s]", ilike), "i")
+				.replaceAll(String.format("[%s]", dlike), "d")
+				.replaceAll(String.format("[%s]", nlike), "n")
+				.replaceAll(String.format("[%s]", olike), "o")
+				.replaceAll(String.format("[%s]", ulike), "u");
+	}
 	
 	/**
 	 * Adds a new clinic to the database. The administrator will be

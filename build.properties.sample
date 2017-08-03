@@ -1,6 +1,9 @@
 # Context path to install this application on
 app.path=/PROM_PREM_Collector
 
+# server website
+app.website=http://localhost:8080
+
 # Tomcat installation directory
 catalina.home=
 

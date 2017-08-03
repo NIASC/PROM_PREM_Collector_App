@@ -20,7 +20,10 @@
  */
 package servlet.implementation;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -802,9 +805,14 @@ public class MySQL_Database implements Database
 			transport.close();
 		} catch (MessagingException me)
 		{
+			try(PrintStream ps = new PrintStream(new File("/root/git/ppc_log.txt")))
+			{
+				me.printStackTrace(ps);
+			} catch (Exception ex) {
+				
+			}
 			return false;
 		}
-		System.out.printf("Message sent to: %s", recipient);
 		return true;
 	}
 	

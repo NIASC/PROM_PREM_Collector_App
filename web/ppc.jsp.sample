@@ -14,8 +14,8 @@
             <applet codebase="http://localhost:8080/PROM_PREM_Collector"
                     code="applet.implementation.GUI_UserInterface.class"
                     archive="prom_prem_collector.jar"
-                    width=500
-                    height=400
+                    width=600
+                    height=500
                     align=top>
               <param name="permissions" value="sandbox"/>
             </applet>

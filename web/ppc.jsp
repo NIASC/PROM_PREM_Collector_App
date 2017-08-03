@@ -1,31 +1,28 @@
 <html>
-<head>
-<title>JSP Page (Testing)</title>
-</head>
-<body bgcolor=white>
+  <head>
+    <title>PROM/PERM Collector applet</title>
+  </head>
+  <body bgcolor=white>
 
-<table border="0">
-<tr>
-<td align=center>
-<img src="images/NIASC_black.jpg">
-</td>
-<td>
-<h1>JSP Page (Testing)</h1>
-This is a test JaveServer Page.
-</td>
-</tr>
-</table>
+    <table border="0">
+      <tr>
+        <td>
+          <div align="center">
+            <a href="index.html">[Main menu]</a>
+          </div>
+          <div align="center">
+            <applet codebase="http://localhost:8080/PROM_PREM_Collector"
+                    code="applet.implementation.GUI_UserInterface.class"
+                    archive="prom_prem_collector.jar"
+                    width=500
+                    height=400
+                    align=top>
+              <param name="permissions" value="sandbox"/>
+            </applet>
+          </div>
+        </td>
+      </tr>
+    </table>
 
-<%= new String("FooBar") %>
-
-<P>
-  <APPLET codebase="WEB-INF/classes"
-	  code="applet/implementation/GUI_UserInterface.class"
-	  width=500
-	  height=400>
-    <param name="permissions" value="sandbox"/>
-  </APPLET>
-</P>
-
-</body>
+  </body>
 </html>

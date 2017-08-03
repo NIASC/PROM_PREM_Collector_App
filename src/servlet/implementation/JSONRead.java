@@ -28,6 +28,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import common.implementation.Constants;
+import servlet.core.ServletConst;
 import servlet.core.interfaces.Database;
 import servlet.core.interfaces.Implementations;
 import servlet.core.interfaces.Database.DatabaseFunction;
@@ -49,9 +50,9 @@ public class JSONRead
 		dbm = new HashMap<String, DatabaseFunction>();
 
 		Database db = Implementations.Database();
-		dbm.put(Constants.CMD_ADD_USER, db::addUser);
+		dbm.put(ServletConst.CMD_ADD_USER, db::addUser);
 		dbm.put(Constants.CMD_ADD_QANS, db::addQuestionnaireAnswers);
-		dbm.put(Constants.CMD_ADD_CLINIC, db::addClinic);
+		dbm.put(ServletConst.CMD_ADD_CLINIC, db::addClinic);
 		dbm.put(Constants.CMD_GET_CLINICS, db::getClinics);
 		dbm.put(Constants.CMD_GET_USER, db::getUser);
 		dbm.put(Constants.CMD_SET_PASSWORD, db::setPassword);
@@ -61,6 +62,7 @@ public class JSONRead
 		dbm.put(Constants.CMD_LOAD_QR_DATE, db::loadQResultDates);
 		dbm.put(Constants.CMD_LOAD_QR, db::loadQResults);
 		dbm.put(Constants.CMD_REQ_REGISTR, db::requestRegistration);
+		dbm.put(ServletConst.CMD_RSP_REGISTR, db::respondRegistration);
 		dbm.put(Constants.CMD_REQ_LOGIN, db::requestLogin);
 		dbm.put(Constants.CMD_REQ_LOGOUT, db::requestLogout);
 	}

@@ -49,6 +49,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import servlet.core.ServletConst;
 import servlet.core.UserManager;
 import servlet.core.Utilities;
 import servlet.core.interfaces.Database;
@@ -97,7 +98,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_ADD_USER);
+		rmap.put("command", ServletConst.CMD_ADD_USER);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String qInsert = String.format(
@@ -162,7 +163,7 @@ public class MySQL_Database implements Database
 		
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_ADD_CLINIC);
+		rmap.put("command", ServletConst.CMD_ADD_CLINIC);
 		
 		String qInsert = String.format(
 				"INSERT INTO `clinics` (`id`, `name`) VALUES (NULL, '%s')",
@@ -472,6 +473,35 @@ public class MySQL_Database implements Database
 			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
 		return ret.toString();
 	}
+
+	public String respondRegistration(JSONObject obj)
+	{
+		Map<String, String> omap = (Map<String, String>) obj;
+		
+		JSONObject ret = new JSONObject();
+		Map<String, String> rmap = (Map<String, String>) ret;
+		rmap.put("command", ServletConst.CMD_RSP_REGISTR);
+		
+		String username = omap.get("username");
+		String email = omap.get("email");
+		String password = omap.get("password");
+		
+		String emailSubject = "PROM_PREM: Registration response";
+		String emailDescription = "You have been registered at the PROM/PREM Collector. "
+				+ "You will find your login details below. When you first log in you will"
+				+ "be asked to update your password.";
+		String emailSignature = "This message was sent from the PROM/PREM Collector";
+		String emailBody = String.format(
+				("%s<br><br> %s: %s<br>%s: %s<br><br> %s"),
+				emailDescription, "Username", username,
+				"Password", password, emailSignature);
+		
+		if (send(email, emailSubject, emailBody, "text/html"))
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_SUCCESS);
+		else
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
+		return ret.toString();
+	}
 	
 	@Override
 	public String requestLogin(JSONObject obj)
@@ -774,6 +804,7 @@ public class MySQL_Database implements Database
 		{
 			return false;
 		}
+		System.out.printf("Message sent to: %s", recipient);
 		return true;
 	}
 	

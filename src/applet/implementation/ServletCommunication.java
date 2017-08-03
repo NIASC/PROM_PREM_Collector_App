@@ -97,26 +97,6 @@ public class ServletCommunication implements Database
 	}
 
 	@Override
-	public boolean addUser(String username, String password,
-			String salt, int clinic, String email)
-	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_ADD_USER);
-		rmap.put("clinic_id", Integer.toString(clinic));
-		rmap.put("name", username);
-		rmap.put("password", password);
-		rmap.put("email", email);
-		rmap.put("salt", salt);
-		
-		JSONObject ans = sendMessage(ret);
-		if (ans == null)
-			return false;
-		String insert = (String) ans.get(Constants.INSERT_RESULT);
-		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
-	}
-
-	@Override
 	public boolean addQuestionnaireAnswers(Patient patient, List<FormContainer> answers)
 	{
 		JSONObject ret = new JSONObject();
@@ -149,42 +129,6 @@ public class ServletCommunication implements Database
 			return false;
 		String insert = (String) ans.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
-	}
-
-	@Override
-	public boolean addClinic(String clinicName)
-	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_ADD_CLINIC);
-		rmap.put("name", clinicName);
-		
-		JSONObject ans = sendMessage(ret);
-		if (ans == null)
-			return false;
-		Map<String, String> amap = (Map<String, String>) ans;
-		String insert = amap.get(Constants.INSERT_RESULT);
-		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
-	}
-	
-	@Override
-	public Map<Integer, String> getClinics()
-	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_GET_CLINICS);
-		
-		JSONObject ans = sendMessage(ret);
-		JSONObject clinics = getJSONObject((String) ans.get("clinics"));
-		Map<String, String> cmap = (Map<String, String>) clinics;
-		
-		Map<Integer, String> clinic = new TreeMap<Integer, String>();
-		for (Entry<String, String> e : cmap.entrySet())
-		{
-			clinic.put(Integer.parseInt(e.getKey()),
-					e.getValue());
-		}
-		return clinic;
 	}
 
 	@Override

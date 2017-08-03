@@ -65,9 +65,7 @@ public abstract class Constants {
 	public static final String ALREADY_ONLINE_STR = Integer.toString(ALREADY_ONLINE);
 	public static final String INVALID_DETAILS_STR = Integer.toString(INVALID_DETAILS);
 	
-	public static final String CMD_ADD_USER		= "add_user";
 	public static final String CMD_ADD_QANS		= "add_questionnaire_answers";
-	public static final String CMD_ADD_CLINIC	= "add_clinic";
 	public static final String CMD_GET_CLINICS	= "get_clinics";
 	public static final String CMD_GET_USER		= "get_user";
 	public static final String CMD_SET_PASSWORD	= "set_password";

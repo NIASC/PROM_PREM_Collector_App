@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import applet.core.interfaces.Database;
 import applet.core.interfaces.Encryption;
 import applet.core.interfaces.Implementations;
 
@@ -51,7 +50,7 @@ public class Manage
 	 */
 	public Manage()
 	{
-		db = Implementations.Database();
+		db = ServletCommunication.getDatabase();
 		in = new Scanner(System.in);
 	}
 	
@@ -129,19 +128,41 @@ public class Manage
 		return new String(pass);
 	}
 	
+	/**
+	 * Generates a username from a firstname and surname. The username will
+	 * contain up to the three first characters of the firstname and surname
+	 * as well as a three digit number.<br>
+	 * Example:
+	 * Anders Svensson might generate the username 'andsve123'<br>
+	 * Bo Göransson might generate the username 'bogor789'.
+	 * 
+	 * @param firstname The person's firstname.
+	 * @param surname The person's lastname.
+	 * 
+	 * @return A generated username.
+	 */
 	private String generateUsername(String firstname, String surname)
 	{
 		firstname = replaceSpecialCharacters(firstname);
 		surname = replaceSpecialCharacters(surname);
-		
 		firstname = firstname.replaceAll("[^a-z]", "");
 		surname = surname.replaceAll("[^a-z]", "");
+		
 		String username = firstname.substring(0, firstname.length() < 3 ? firstname.length() : 3)
 				+ surname.substring(0, surname.length() < 3 ? surname.length() : 3)
 				+ String.format("%03d", (int) (1000*Math.random()));
 		return username;
 	}
 	
+	/**
+	 * Replaces special characters with their ASCII 'equivalent'.<br>
+	 * Example: ö -> o, å -> a.
+	 * 
+	 * @param str The String to replace special characters.
+	 * 
+	 * @return A String where special characters have been replaced with
+	 * 		their ASCII 'equivalent'.
+	 */
 	private String replaceSpecialCharacters(String str)
 	{
 		String alike = new String(new char[]{
@@ -219,7 +240,8 @@ public class Manage
 		for (Entry<Integer, String> e : clinics.entrySet())
 			System.out.printf("%4d: %s\n", e.getKey(), e.getValue());
 		System.out.printf("Enter new clinic:\n");
-		String clinic = in.next();
+		String clinic;
+		while ((clinic = in.nextLine().trim()).isEmpty());
 		if (Pattern.compile("[^\\p{Print}]").matcher(clinic).find())
 		{
 			System.out.printf("Using non-ascii characters may cause trouble.\n\n");
@@ -241,32 +263,50 @@ public class Manage
 	 */
 	private void addUser()
 	{
-		Pattern validsRegEx = Pattern.compile("[^\\p{Print}]");
-		System.out.printf("Enter Username:\n");
-		String user = in.next();
-		if (validsRegEx.matcher(user).find())
+		/* username */
+		System.out.printf("Enter Firstname:\n");
+		String firstname;
+		while ((firstname = in.nextLine().trim()).isEmpty());
+		System.out.printf("Enter Surname:\n");
+		String surname;
+		while ((surname = in.nextLine().trim()).isEmpty());
+		
+		String user = null;
+		for(int i = 0; i < 100; ++i)
 		{
-			System.out.printf("Using non-ascii characters may cause trouble.\n\n");
-			return;
+			String generated = generateUsername(firstname, surname);
+			if (db.getUser(generated) != null)
+				continue;
+			user = generated;
+			break;
 		}
-		if (db.getUser(user) != null)
-		{
-			System.out.printf("That username is not available.\n\n");
-			return;
+		if (user == null)
+		{ /* could not automatically generat username */
+			System.out.printf("Could not generate a random username.\n");
+			while (user == null)
+			{
+				System.out.printf("Enter username:\n");
+				String suggested;
+				while ((suggested = in.next().trim()).isEmpty());
+				if (db.getUser(suggested) != null)
+				{
+					System.out.printf("That username is not available.\n");
+					continue;
+				}
+				user = suggested;
+				break;
+			}
 		}
+		
+		/* password */
+		String password = generateFirstPassword();
 
-		System.out.printf("Enter Password:\n");
-		String password = in.next();
-		if (validsRegEx.matcher(password).find())
-		{
-			System.out.printf("Using non-ascii characters may cause trouble.\n\n");
-			return;
-		}
-
+		/* clinic */
 		Map<Integer, String> clinics = db.getClinics();
 		if (clinics.size() == 0)
 		{
-			System.out.printf("There are no clinics in the database.\n\n");
+			System.out.printf("There are no clinics in the database.\n"
+					+ "Please add a clinic before you add a user.\n\n");
 			return;
 		}
 		System.out.printf("Select Clinic:\n");
@@ -277,17 +317,38 @@ public class Manage
 			clinic = in.nextInt();
 		else
 		{
-			in.next();
+			in.nextLine();
 			System.out.printf("No such clinic.\n\n");
 			return;
 		}
 
+		/* email */
 		System.out.printf("Enter Email:\n");
-		String email = in.next();
-		Encryption crypto = Implementations.Encryption();
-		String salt = crypto.getNewSalt();
-		db.addUser(user, crypto.hashString(password, salt), salt, clinic, email);
+		String email;
+		while ((email = in.next().trim()).isEmpty());
+		
+		/* verify */
+		System.out.printf("An email with the following login details will be "
+				+ "sent to '%s'\n\tUsername: %s\n\tPassword: %s\n"
+				+ "%d: Yes\n%d: No\n", email, user, password, 1, 0);
+		if (in.hasNextInt())
+		{
+			if (in.nextInt() == 1)
+			{
+				Encryption crypto = Implementations.Encryption();
+				String salt = crypto.getNewSalt();
+				if (db.addUser(user, crypto.hashString(password, salt), salt, clinic, email))
+					db.respondRegistration(user, password, email);
+				else
+					System.out.printf("An error occurred when adding the user.\n\n");
+				return;
+			}
+		}
+		in.nextLine();
+		System.out.printf("Exiting\n\n");
+		return;
 	}
+	
 	private Scanner in;
-	private Database db;
+	private ServletCommunication db;
 }

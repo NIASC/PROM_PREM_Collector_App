@@ -22,7 +22,6 @@ package applet.core.interfaces;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import applet.core.containers.MessageContainer;
 import applet.core.containers.Patient;
@@ -53,21 +52,6 @@ public interface Database
 	public static final String DATABASE_ERROR = "Database error.";
 	
 	/**
-	 * Adds a new user to the database.
-	 * 
-	 * @param username The username of the new user.
-	 * @param password The (hashed) password of the new user.
-	 * @param salt The salt that was used to hash the password.
-	 * @param clinic The clinic ID that the new user belongs to.
-	 * @param email The email of the new user.
-	 * 
-	 * @return {@code true} on successful update,
-	 *		{@code false} on failure.
-	 */
-	public boolean addUser(String username,
-			String password, String salt, int clinic, String email);
-	
-	/**
 	 * Adds a patient's answers to the database. If the patient does not
 	 * already exist in the database it will be added as well.
 	 * 
@@ -80,24 +64,6 @@ public interface Database
 	 *		{@code false} on failure.
 	 */
 	public boolean addQuestionnaireAnswers(Patient patient, List<FormContainer> answers);
-
-	/**
-	 * Adds a new clinic to the database.
-	 * 
-	 * @param clinicName The name of the clinic.
-	 * 
-	 * @return {@code true} on successful update,
-	 *		{@code false} on failure.
-	 */
-	public boolean addClinic(String clinicName);
-	
-	/**
-	 * Collects the clinic names and id and places them in a Map.
-	 * 
-	 * @return A Map containing clinic id as keys and clinic names
-	 * 		as values.
-	 */
-	public Map<Integer, String> getClinics();
 	
 	/**
 	 * Collects the information about the user from the database.

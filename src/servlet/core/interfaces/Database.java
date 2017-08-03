@@ -153,7 +153,18 @@ public interface Database
 	 * 
 	 * @return A JSONObject that contains the status of the request.
 	 */
-	public String requestRegistration		(JSONObject obj);
+	public String requestRegistration(JSONObject obj);
+
+	/**
+	 * Sends a registration responds that contains the login details
+	 * to the user that have been registered.
+	 * 
+	 * @param obj The JSONObject that contains the request, including
+	 * 		the usename and password.
+	 * 
+	 * @return A JSONObject that contains the status of the request.
+	 */
+	public String respondRegistration(JSONObject obj);
 	
 	/**
 	 * Requests to log in.

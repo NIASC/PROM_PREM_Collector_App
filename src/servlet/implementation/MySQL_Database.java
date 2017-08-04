@@ -21,7 +21,6 @@
 package servlet.implementation;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.Connection;
@@ -51,7 +50,9 @@ import javax.sql.DataSource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import servlet.core.PPCLogger;
 import servlet.core.ServletConst;
 import servlet.core.UserManager;
 import servlet.core.Utilities;
@@ -115,6 +116,7 @@ public class MySQL_Database implements Database
 		}
 		catch (DBWriteException dbw) {
 			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
+			logger.log("Database write error", dbw);
 		}
 		return ret.toString();
 	}
@@ -153,8 +155,20 @@ public class MySQL_Database implements Database
 			queryUpdate(resultInsert);
 			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_SUCCESS);
 		}
+		catch (DBReadException dbr)
+		{
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
+			logger.log("Database read error", dbr);
+		}
+		catch (SQLException se)
+		{
+			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
+			logger.log("Error opening connection to database "
+					+ "or while parsing SQL ResultSet", se);
+		}
 		catch (DBWriteException dbw) {
 			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
+			logger.log("Database write error", dbw);
 		}
 		return ret.toString();
 	}
@@ -171,12 +185,15 @@ public class MySQL_Database implements Database
 		String qInsert = String.format(
 				"INSERT INTO `clinics` (`id`, `name`) VALUES (NULL, '%s')",
 				omap.get("name"));
-		try {
+		try
+		{
 			queryUpdate(qInsert);
 			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_SUCCESS);
 		}
-		catch (DBWriteException dbw) {
+		catch (DBWriteException dbw)
+		{
 			rmap.put(Constants.INSERT_RESULT, Constants.INSERT_FAIL);
+			logger.log("Database write error", dbw);
 		}
 		return ret.toString();
 	}
@@ -192,18 +209,25 @@ public class MySQL_Database implements Database
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, "SELECT `id`, `name` FROM `clinics`");
-			if (rs != null)
-			{
-				JSONObject clinics = new JSONObject();
-				Map<String, String> cmap = (Map<String, String>) clinics;
-				while (rs.next())
-					cmap.put(Integer.toString(rs.getInt("id")),
-							rs.getString("name"));
-				rmap.put("clinics", clinics.toString());
-			}
+			
+			JSONObject clinics = new JSONObject();
+			Map<String, String> cmap = (Map<String, String>) clinics;
+			while (rs.next())
+				cmap.put(Integer.toString(rs.getInt("id")),
+						rs.getString("name"));
+			rmap.put("clinics", clinics.toString());
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
+		catch (DBReadException dbr)
+		{
+			rmap.put("clinics", new JSONObject().toString());
+			logger.log("Database read error", dbr);
+		}
+		catch (SQLException e)
+		{
+			rmap.put("clinics", new JSONObject().toString());
+			logger.log("Error opening connection to database "
+					+ "or while parsing SQL ResultSet", e);
+		}
 		return ret.toString();
 	}
 
@@ -220,8 +244,6 @@ public class MySQL_Database implements Database
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, "SELECT `clinic_id`, `name`, `password`, `email`, `salt`, `update_password` FROM `users`");
-			if (rs == null)
-				return ret.toString();
 
 			String username = omap.get("name");
 			JSONObject user = new JSONObject();
@@ -241,8 +263,17 @@ public class MySQL_Database implements Database
 			}
 			rmap.put("user", user.toString());
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException se) { }
+		catch (DBReadException dbr)
+		{
+			rmap.put("user", (new JSONObject()).toString());
+			logger.log("Database read error", dbr);
+		}
+		catch (SQLException se)
+		{
+			rmap.put("user", (new JSONObject()).toString());
+			logger.log("Error opening connection to database "
+					+ "or while parsing SQL ResultSet", se);
+		}
 		return ret.toString();
 	}
 
@@ -250,10 +281,20 @@ public class MySQL_Database implements Database
 	public String setPassword(JSONObject obj)
 	{
 		Map<String, String> omap = (Map<String, String>) obj;
+
+		JSONObject err = new JSONObject();
+		Map<String, String> emap = (Map<String, String>) err;
+		emap.put("command", Constants.CMD_GET_ERR_MSG);
+
+		Map<String, String> userobj;
+		try
+		{
+			userobj = getUser(omap.get("name"));
+		} catch (Exception e)
+		{
+			throw new NullPointerException("Can only update password for existing users");
+		}
 		
-		Map<String, String> userobj = getUser(omap.get("name"));
-		if (userobj == null)
-			return null;
 		Map<String, String> user = (Map<String, String>) getJSONObject(userobj.get("user"));
 		
 		String oldPass = omap.get("old_password");
@@ -261,15 +302,23 @@ public class MySQL_Database implements Database
 		String newSalt = omap.get("new_salt");
 
 		if (!user.get("password").equals(oldPass))
-			return null;
+		{
+			emap.put("user", (new JSONObject()).toString());
+			return err.toString();
+		}
 		
 		String qInsert = String.format(
 				"UPDATE `users` SET `password`='%s',`salt`='%s',`update_password`=%d WHERE `users`.`name` = '%s'",
 				newPass, newSalt, 0, user.get("name"));
-		try {
+		try
+		{
 			queryUpdate(qInsert);
-		} catch (DBWriteException dbw) {
-			return null;
+		}
+		catch (DBWriteException dbw)
+		{
+			logger.log("Database write error", dbw);
+			emap.put("user", (new JSONObject()).toString());
+			return err.toString();
 		}
 
 		JSONObject ret = new JSONObject();
@@ -312,45 +361,52 @@ public class MySQL_Database implements Database
 		{
 			Statement s = conn.createStatement();
 			ResultSet rs = query(s, "SELECT * FROM `questionnaire`");
-			if (rs != null)
+			
+			JSONObject questions = new JSONObject();
+			Map<String, String> qmap = (Map<String, String>) questions;
+			while (rs.next())
 			{
-				JSONObject questions = new JSONObject();
-				Map<String, String> qmap = (Map<String, String>) questions;
-				while (rs.next())
+				JSONObject question = new JSONObject();
+				Map<String, String> questionmap = (Map<String, String>) question;
+				for (int i = 0; ; ++i)
 				{
-					JSONObject question = new JSONObject();
-					Map<String, String> questionmap = (Map<String, String>) question;
-					for (int i = 0; ; ++i)
+					try
 					{
-						try
-						{
-							String tbl_name = String.format("option%d", i);
-							String entry = rs.getString(tbl_name);
-							if (entry == null || (entry = entry.trim()).isEmpty())
-								break;
-							questionmap.put(tbl_name, entry);
-						}
-						catch (SQLException e)
-						{ /* no more options */
+						String tbl_name = String.format("option%d", i);
+						String entry = rs.getString(tbl_name);
+						if (entry == null || (entry = entry.trim()).isEmpty())
 							break;
-						}
+						questionmap.put(tbl_name, entry);
 					}
-					String id = Integer.toString(rs.getInt("id"));
-					questionmap.put("type", rs.getString("type"));
-					questionmap.put("id", id);
-					questionmap.put("question", rs.getString("question"));
-					questionmap.put("description", rs.getString("description"));
-					questionmap.put("optional", Integer.toString(rs.getInt("optional")));
-					questionmap.put("max_val", Integer.toString(rs.getInt("max_val")));
-					questionmap.put("min_val", Integer.toString(rs.getInt("min_val")));
-					
-					qmap.put(id, question.toString());
+					catch (SQLException e)
+					{ /* no more options */
+						break;
+					}
 				}
-				rmap.put("questions", questions.toString());
+				String id = Integer.toString(rs.getInt("id"));
+				questionmap.put("type", rs.getString("type"));
+				questionmap.put("id", id);
+				questionmap.put("question", rs.getString("question"));
+				questionmap.put("description", rs.getString("description"));
+				questionmap.put("optional", Integer.toString(rs.getInt("optional")));
+				questionmap.put("max_val", Integer.toString(rs.getInt("max_val")));
+				questionmap.put("min_val", Integer.toString(rs.getInt("min_val")));
+
+				qmap.put(id, question.toString());
 			}
+			rmap.put("questions", questions.toString());
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
+		catch (DBReadException dbr)
+		{
+			rmap.put("questions", (new JSONObject()).toString());
+			logger.log("Database read error", dbr);
+		}
+		catch (SQLException e)
+		{
+			rmap.put("questions", (new JSONObject()).toString());
+			logger.log("Error opening connection to database "
+					+ "or while parsing SQL ResultSet", e);
+		}
 		return ret.toString();
 	}
 
@@ -363,9 +419,17 @@ public class MySQL_Database implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_LOAD_QR_DATE);
 
-		Map<String, String> userobj = getUser(omap.get("name"));
-		if (userobj == null)
-			return null;
+		Map<String, String> userobj;
+		try
+		{
+			userobj = getUser(omap.get("name"));
+		} catch (Exception e)
+		{
+			rmap.put("dates", (new JSONArray()).toString());
+			logger.log("No user specified");
+			return ret.toString();
+		}
+		
 		Map<String, String> user = (Map<String, String>) getJSONObject(userobj.get("user"));
 
 		try (Connection conn = dataSource.getConnection())
@@ -374,17 +438,22 @@ public class MySQL_Database implements Database
 			ResultSet rs = query(s, String.format(
 					"SELECT `date` FROM `questionnaire_answers` WHERE `clinic_id` = %d",
 					Integer.parseInt(user.get("clinic_id"))));
-			if (rs != null)
-			{
-				JSONArray dates = new JSONArray();
-				List<String> dlist = (List<String>) dates;
-				while (rs.next())
-					dlist.add(rs.getString("date"));
-				rmap.put("dates", dates.toString());
-			}
+			
+			JSONArray dates = new JSONArray();
+			List<String> dlist = (List<String>) dates;
+			while (rs.next())
+				dlist.add(rs.getString("date"));
+			rmap.put("dates", dates.toString());
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
+		catch (DBReadException dbr) {
+			rmap.put("dates", (new JSONArray()).toString());
+			logger.log("Database read error", dbr);
+		}
+		catch (SQLException e) {
+			rmap.put("dates", (new JSONArray()).toString());
+			logger.log("Error opening connection to database "
+					+ "or while parsing SQL ResultSet", e);
+		}
 		return ret.toString();
 	}
 	
@@ -397,9 +466,17 @@ public class MySQL_Database implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_LOAD_QR);
 
-		Map<String, String> userobj = getUser(omap.get("name"));
-		if (userobj == null)
-			return null;
+		Map<String, String> userobj;
+		try
+		{
+			userobj = getUser(omap.get("name"));
+		} catch (Exception e)
+		{
+			rmap.put("dates", (new JSONObject()).toString());
+			logger.log("No user specified");
+			return ret.toString();
+		}
+		
 		Map<String, String> user = (Map<String, String>) getJSONObject(userobj.get("user"));
 		
 		try (Connection conn = dataSource.getConnection())
@@ -407,14 +484,21 @@ public class MySQL_Database implements Database
 			Statement s = conn.createStatement();
 
 			JSONParser parser = new JSONParser();
-			JSONArray questions = null;
+			JSONArray questions;
 			try{
 				questions = (JSONArray) parser.parse(omap.get("questions"));
-			} catch (org.json.simple.parser.ParseException pe) {
-				return null;
+			} catch (ParseException pe)
+			{
+				rmap.put("results", (new JSONObject()).toString());
+				logger.log("Error parsing JSON object", pe);
+				return ret.toString();
+			} catch (NullPointerException e)
+			{
+				rmap.put("results", (new JSONObject()).toString());
+				logger.log("Missing 'questions' entry", e);
+				return ret.toString();
 			}
-			if (questions == null)
-				return null;
+			
 			List<String> qlist = (List<String>) questions;
 			
 			List<String> lstr = new ArrayList<String>();
@@ -425,27 +509,33 @@ public class MySQL_Database implements Database
 					"SELECT %s FROM `questionnaire_answers` WHERE `clinic_id` = %d AND `date` BETWEEN '%s' AND '%s'",
 					String.join(", ", lstr), Integer.parseInt(user.get("clinic_id")),
 					omap.get("begin"), omap.get("end")));
-			
-			if (rs != null)
+
+			JSONArray results = new JSONArray();
+			List<String> rlist = (List<String>) results;
+			while (rs.next())
 			{
-				JSONArray results = new JSONArray();
-				List<String> rlist = (List<String>) results;
-				while (rs.next())
+				JSONObject answers = new JSONObject();
+				Map<String, String> amap = (Map<String, String>) answers;
+				for (Iterator<String> itr = qlist.iterator(); itr.hasNext();)
 				{
-					JSONObject answers = new JSONObject();
-					Map<String, String> amap = (Map<String, String>) answers;
-					for (Iterator<String> itr = qlist.iterator(); itr.hasNext();)
-					{
-						String q = itr.next();
-						amap.put(q, rs.getString(q));
-					}
-					rlist.add(answers.toString());
+					String q = itr.next();
+					amap.put(q, rs.getString(q));
 				}
-				rmap.put("results", results.toString());
+				rlist.add(answers.toString());
 			}
+			rmap.put("results", results.toString());
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
+		catch (DBReadException dbr)
+		{
+			rmap.put("results", (new JSONArray()).toString());
+			logger.log("Database read error", dbr);
+		}
+		catch (SQLException e)
+		{
+			rmap.put("results", (new JSONArray()).toString());
+			logger.log("Error opening connection to database "
+					+ "or while parsing SQL ResultSet", e);
+		}
 		return ret.toString();
 	}
 	
@@ -515,12 +605,16 @@ public class MySQL_Database implements Database
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_REQ_LOGIN);
 
-		Map<String, String> userobj = getUser(omap.get("name"));
-		if (userobj == null)
+		Map<String, String> userobj;
+		try
+		{
+			userobj = getUser(omap.get("name"));
+		} catch (Exception e)
 		{
 			rmap.put(Constants.LOGIN_REPONSE, Constants.INVALID_DETAILS_STR);
 			return ret.toString();
 		}
+		
 		Map<String, String> user = (Map<String, String>) getJSONObject(userobj.get("user"));
 
 		if (!user.get("password").equals(omap.get("password")))
@@ -554,6 +648,8 @@ public class MySQL_Database implements Database
 	/* Private */
 
 	private static MySQL_Database database;
+	private static JSONParser parser;
+	private static PPCLogger logger = PPCLogger.getLogger();
 	
 	/**
 	 * Handles connection with the database.
@@ -566,20 +662,33 @@ public class MySQL_Database implements Database
 	 */
 	private EmailConfig config;
 	
+	static
+	{
+		parser = new JSONParser();
+	}
+	
 	/**
 	 * Initializes variables and loads the database configuration.
 	 * This class is a singleton and should only be instantiated once.
 	 */
 	private MySQL_Database()
 	{
-		config = new EmailConfig();
 		try
 		{
+			config = new EmailConfig();
 			Context initContext = new InitialContext();
 			Context envContext = (Context) initContext.lookup("java:comp/env");
 			dataSource = (DataSource) envContext.lookup("jdbc/prom_prem_db");
-		} catch (NamingException e) {
-			e.printStackTrace();
+		}
+		catch (NamingException e)
+		{
+			logger.log("FATAL: Could not load database configuration", e);
+			System.exit(1);
+		}
+		catch (IOException e)
+		{
+			logger.log("FATAL: Could not load email configuration", e);
+			System.exit(1);
 		}
 	}
 	
@@ -592,20 +701,15 @@ public class MySQL_Database implements Database
 	 * 		{@code false} if not.
 	 */
 	private boolean patientInDatabase(String identifier)
+			throws SQLException, DBReadException
 	{
-		try (Connection conn = dataSource.getConnection())
-		{
-			Statement s = conn.createStatement();
-			ResultSet rs = query(s, "SELECT `identifier` FROM `patients`");
-			if (rs == null)
-				return false;
-
-			while (rs.next())
-				if (rs.getString("identifier").equals(identifier))
-					return true;
-		}
-		catch (DBReadException dbr) { }
-		catch (SQLException se) { }
+		Connection conn = dataSource.getConnection();
+		Statement s = conn.createStatement();
+		ResultSet rs = query(s, "SELECT `identifier` FROM `patients`");
+		
+		while (rs.next())
+			if (rs.getString("identifier").equals(identifier))
+				return true;
 		return false;
 	}
 	
@@ -616,19 +720,16 @@ public class MySQL_Database implements Database
 	 * @param username The username of the user to look for.
 	 * 
 	 * @return A map containing the information about the user.
+	 * 
+	 * @throws Exception If a parse error occurs.
 	 */
-	private Map<String, String> getUser(String username)
+	private Map<String, String> getUser(String username) throws Exception
 	{
 		JSONObject getuser = new JSONObject();
 		getuser.put("command", "get_user");
 		getuser.put("name", username);
-		JSONParser parser = new JSONParser();
-		try{
-			JSONObject json = (JSONObject) parser.parse(getUser(getuser));
-			return (Map<String, String>) json;
-		} catch (org.json.simple.parser.ParseException pe) {
-			return null;
-		}
+		JSONObject json = (JSONObject) parser.parse(getUser(getuser));
+		return (Map<String, String>) json;
 	}
 	
 	/**
@@ -639,6 +740,8 @@ public class MySQL_Database implements Database
 	 * 		to send to the database.
 	 * 
 	 * @return QUERY_SUCCESS on successful query, ERROR on failure.
+	 * 
+	 * @throws DBWriteException If an update error occurs.
 	 */
 	private void queryUpdate(String message) throws DBWriteException
 	{
@@ -646,7 +749,8 @@ public class MySQL_Database implements Database
 		{
 			c.createStatement().executeUpdate(message);
 		}
-		catch (SQLException se) {
+		catch (SQLException se)
+		{
 			throw new DBWriteException(String.format(
 					"Database could not process request: '%s'. Check your arguments.",
 					message));
@@ -664,23 +768,23 @@ public class MySQL_Database implements Database
 	 * @param message The command (specified by the SQL language)
 	 * 		to send to the database.
 	 * 
-	 * @return The the ResultSet from the database. If the statement
-	 * 		is not initialized or a query error occurs then null is
-	 * 		returned.
+	 * @return The the ResultSet from the database.
+	 * 
+	 * @throws DBReadException If the statement is not initialized or a
+	 * 		query error occurs.
 	 */
 	private ResultSet query(Statement s, String message) throws DBReadException
 	{
-		ResultSet rs = null;
 		try
 		{
-			rs = s.executeQuery(message);
+			return s.executeQuery(message);
 		}
-		catch (SQLException se) {
+		catch (SQLException se)
+		{
 			throw new DBReadException(String.format(
 					"Database could not process request: '%s'. Check your arguments.",
 					message));
 		}
-		return rs;
 	}
 
 	/**
@@ -703,31 +807,36 @@ public class MySQL_Database implements Database
 			ResultSet rs = query(s, String.format(
 					"SELECT `code`, `name`, `locale`, `message` FROM `%s`",
 					tableName));
-			if (rs != null)
+			
+			JSONObject messages = new JSONObject();
+			Map<String, String> mmap = (Map<String, String>) messages;
+			while (rs.next())
 			{
-				JSONObject messages = new JSONObject();
-				Map<String, String> mmap = (Map<String, String>) messages;
-				while (rs.next())
-				{
-					JSONObject msg = new JSONObject();
-					Map<String, String> msgmap = (Map<String, String>) msg;
-					msgmap.put(rs.getString("locale"), rs.getString("message"));
-					
-					JSONObject message = new JSONObject();
-					Map<String, String> messagemap = (Map<String, String>) message;
-					String name = rs.getString("name");
-					messagemap.put("name", name);
-					messagemap.put("code", rs.getString("code"));
-					messagemap.put("message", msg.toString());
-					
-					mmap.put(name, message.toString());
-				}
-				retobj.put("messages", messages.toString());
-				ret = true;
+				JSONObject msg = new JSONObject();
+				Map<String, String> msgmap = (Map<String, String>) msg;
+				msgmap.put(rs.getString("locale"), rs.getString("message"));
+
+				JSONObject message = new JSONObject();
+				Map<String, String> messagemap = (Map<String, String>) message;
+				String name = rs.getString("name");
+				messagemap.put("name", name);
+				messagemap.put("code", rs.getString("code"));
+				messagemap.put("message", msg.toString());
+
+				mmap.put(name, message.toString());
 			}
+			retobj.put("messages", messages.toString());
+			ret = true;
 		}
-		catch (DBReadException dbr) { }
-		catch (SQLException e) { }
+		catch (DBReadException dbr) {
+			retobj.put("messages", (new JSONObject()).toString());
+			logger.log("Database read error", dbr);
+		}
+		catch (SQLException e) {
+			retobj.put("messages", (new JSONObject()).toString());
+			logger.log("Error opening connection to database "
+					+ "or while parsing SQL ResultSet", e);
+		}
 		return ret;
 	}
 	
@@ -742,14 +851,14 @@ public class MySQL_Database implements Database
 	 */
 	private JSONObject getJSONObject(String str)
 	{
-		JSONParser parser = new JSONParser();
-		JSONObject userobj = null;
-		try{
-			userobj = (JSONObject) parser.parse(str);
-		} catch (org.json.simple.parser.ParseException pe) {
-			return null;
+		try
+		{
+			return (JSONObject) parser.parse(str);
 		}
-		return userobj;
+		catch (ParseException pe)
+		{
+			throw new NullPointerException("JSON parse error");
+		}
 	}
 	
 	/**
@@ -763,14 +872,14 @@ public class MySQL_Database implements Database
 	 */
 	private JSONArray getJSONArray(String str)
 	{
-		JSONParser parser = new JSONParser();
-		JSONArray userarr = null;
-		try{
-			userarr = (JSONArray) parser.parse(str);
-		} catch (org.json.simple.parser.ParseException pe) {
-			return null;
+		try
+		{
+			return (JSONArray) parser.parse(str);
 		}
-		return userarr;
+		catch (ParseException pe)
+		{
+			throw new NullPointerException("JSON parse error");
+		}
 	}
 	
 	/**
@@ -805,12 +914,7 @@ public class MySQL_Database implements Database
 			transport.close();
 		} catch (MessagingException me)
 		{
-			try(PrintStream ps = new PrintStream(new File("/root/git/ppc_log.txt")))
-			{
-				me.printStackTrace(ps);
-			} catch (Exception ex) {
-				
-			}
+			logger.log("Could not send email", me);
 			return false;
 		}
 		return true;
@@ -833,7 +937,7 @@ public class MySQL_Database implements Database
 		// server mailing account
 		String serverEmail, serverPassword, adminEmail;
 		
-		EmailConfig()
+		EmailConfig() throws IOException
 		{
 			mailConfig = new Properties();
 			refreshConfig();
@@ -843,7 +947,7 @@ public class MySQL_Database implements Database
 		 * reloads the javax.mail config properties as well as
 		 * the email account config.
 		 */
-		synchronized void refreshConfig()
+		synchronized void refreshConfig() throws IOException
 		{
 			loadConfig(CONFIG_FILE);
 			loadEmailAccounts(ACCOUNT_FILE);
@@ -859,19 +963,11 @@ public class MySQL_Database implements Database
 		 * @return True if the file was loaded. False if an error
 		 * 		occurred.
 		 */
-		synchronized boolean loadConfig(String filePath)
+		synchronized void loadConfig(String filePath) throws IOException
 		{
 			if (!mailConfig.isEmpty())
 				mailConfig.clear();
-			try
-			{
-				mailConfig.load(Utilities.getResourceStream(getClass(), filePath));
-			}
-			catch(IOException ioe)
-			{
-				return false;
-			}
-			return true;
+			mailConfig.load(Utilities.getResourceStream(getClass(), filePath));
 		}
 		
 		/**
@@ -885,21 +981,14 @@ public class MySQL_Database implements Database
 		 * @return True if the file was loaded. False if an error
 		 * 		occurred.
 		 */
-		synchronized boolean loadEmailAccounts(String filePath)
+		synchronized void loadEmailAccounts(String filePath) throws IOException
 		{
-			try
-			{
-				Properties props = new Properties();
-				props.load(Utilities.getResourceStream(getClass(), filePath));
-				adminEmail = props.getProperty("admin_email");
-				serverEmail = props.getProperty("server_email");
-				serverPassword = props.getProperty("server_password");
-				props.clear();
-			} catch (IOException ioe)
-			{
-				return false;
-			}
-			return true;
+			Properties props = new Properties();
+			props.load(Utilities.getResourceStream(getClass(), filePath));
+			adminEmail = props.getProperty("admin_email");
+			serverEmail = props.getProperty("server_email");
+			serverPassword = props.getProperty("server_password");
+			props.clear();
 		}
 	}
 }

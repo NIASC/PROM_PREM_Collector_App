@@ -75,9 +75,7 @@ public final class Questions
 	{
 		if (qEntries == null && !loadQuestionnaire())
 			return null;
-		QuestionContainer qc = null;
-		qc = (QuestionContainer) qEntries.clone();
-		return qc;
+		return (QuestionContainer) qEntries.clone();
 	}
 	
 	/* Protected */

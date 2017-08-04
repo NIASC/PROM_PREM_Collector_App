@@ -82,7 +82,8 @@ public class PPCServlet extends HttpServlet
 			out.flush();
 			out.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			String msg = e.getMessage();
+			logger.log(msg != null ? msg : "Could not process request", e);
 		}
 	}
 
@@ -90,4 +91,6 @@ public class PPCServlet extends HttpServlet
 	public void destroy() {
 		// do nothing.
 	}
+	
+	private static PPCLogger logger = PPCLogger.getLogger();
 }

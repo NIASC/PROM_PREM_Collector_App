@@ -20,8 +20,13 @@
  */
 package common.implementation;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
+
+import servlet.core.ServletConst;
+import servlet.core.Utilities;
 
 /**
  * This interface contains constant values that are used in both the
@@ -37,13 +42,19 @@ public abstract class Constants {
 	 */
 	public static final URL SERVER_URL;
 	
-	static {
+	public static final String filePath = "common/implementation/settings.ini";
+	
+	static
+	{
 		URL url = null;
 		try
 		{
-			url = new URL("http://localhost:8080/PROM_PREM_Collector/main");
+			Properties props = new Properties();
+			props.load(Utilities.getResourceStream(Constants.class, filePath));
+			url = new URL(props.getProperty("srvlturl"));
+			props.clear();
 		}
-		catch (MalformedURLException _e) { }
+		catch (IOException | IllegalArgumentException _e) { }
 		SERVER_URL = url;
 	}
 	

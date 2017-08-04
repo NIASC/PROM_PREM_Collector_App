@@ -28,6 +28,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import common.implementation.Constants;
+import servlet.core.PPCLogger;
 import servlet.core.ServletConst;
 import servlet.core.interfaces.Database;
 import servlet.core.interfaces.Implementations;
@@ -75,17 +76,25 @@ public class JSONRead
 	 * 
 	 * @return The response from the servlet.
 	 */
+	@SuppressWarnings("unchecked")
 	public static String handleRequest(String message)
 	{
 		try
 		{
 			JSONObject obj = (JSONObject) parser.parse(message);
-			return getDBMethod((String) obj.get("command")).dbfunc(obj);
+			HashMap<String, String> omap = (HashMap<String, String>) obj;
+			return getDBMethod(omap.get("command")).dbfunc(obj);
 		}
-		catch (ParseException pe) { /* unknown format */ }
-		catch (NullPointerException _e) { /* unknown command */ }
+		catch (ParseException pe) {
+			logger.log("Unknown JSON format", pe);
+		}
+		catch (Exception e) {
+			logger.log("Unknown request", e);
+		}
 		return null;
 	}
+	
+	private static PPCLogger logger = PPCLogger.getLogger();
 	
 	/**
 	 * Finds the Method Reference associated with the {@code command}

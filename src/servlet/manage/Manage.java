@@ -60,8 +60,6 @@ public class Manage
 	 */
 	public void runManager()
 	{
-		System.out.println("Username: " +generateUsername("Örjæñ", "Kãrlssøñ-Añðérssóñ"));
-		System.out.println("Password: " +generateFirstPassword());
 		boolean exit = false;
 		final int EXIT = 0, ADD_CLINIC = 1, ADD_USER = 2;
 		while (!exit)

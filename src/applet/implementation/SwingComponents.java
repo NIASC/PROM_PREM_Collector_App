@@ -254,11 +254,14 @@ public class SwingComponents
 			boolean opaque, Color background, Color foreground,
 			Color border, Dimension d)
 	{
-			modifyJComponent(button, name, tooltip, opaque,
-					background, foreground, border, d);
+		modifyJComponent(button, name, tooltip, opaque,
+				background, foreground, border, d);
+		if (buttonText != null)
+		{
 			buttonText = String.format("<html>%s</html>",
 					buttonText.replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
 			button.setText(buttonText);
+		}
 	}
 
 }

@@ -926,12 +926,12 @@ public class MySQL_Database implements Database
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private final class EmailConfig
+	private static final class EmailConfig
 	{
-		final String CONFIG_FILE =
-				"servlet/implementation/mail_settings.txt";
-		final String ACCOUNT_FILE =
-				"servlet/implementation/mailaccount_settings.ini";
+		static final String CONFIG_FILE =
+				"servlet/implementation/email_settings.txt";
+		static final String ACCOUNT_FILE =
+				"servlet/implementation/email_accounts.ini";
 		Properties mailConfig;
 		
 		// server mailing account

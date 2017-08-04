@@ -50,7 +50,7 @@ public class Manage
 	 */
 	public Manage()
 	{
-		db = ServletCommunication.getDatabase();
+		db = ServletCommunication.getInstance();
 		in = new Scanner(System.in);
 	}
 	
@@ -60,29 +60,25 @@ public class Manage
 	 */
 	public void runManager()
 	{
-		boolean exit = false;
 		final int EXIT = 0, ADD_CLINIC = 1, ADD_USER = 2;
-		while (!exit)
+		mgr: while (true)
 		{
-			System.out.printf(
-					"What would you like to do?\n%d: %s\n%d: %s\n%d: %s\n",
+			System.out.printf("\n~~~~ PROM/PREM Manager ~~~~\n");
+			System.out.printf("\nWhat would you like to do?\n"
+					+ "%d: %s\n%d: %s\n%d: %s\n",
 					ADD_CLINIC, "Add Clinic",
 					ADD_USER, "Add user",
 					EXIT, "Exit");
-			int input = EXIT;
-			if (in.hasNextInt())
-				input = in.nextInt();
-			else
+			if (!in.hasNextInt())
 			{
 				in.next();
 				System.out.printf("Unknown option.\n\n");
 				continue;
 			}
-			switch (input)
+			switch (in.nextInt())
 			{
 			case EXIT:
-				exit = true;
-				break;
+				break mgr;
 			case ADD_CLINIC:
 				addClinic();
 				break;
@@ -91,7 +87,7 @@ public class Manage
 				break;
 			default:
 				System.out.printf("Unknown option.\n\n");
-				break;
+				continue;
 			}
 		}
 	}
@@ -233,11 +229,14 @@ public class Manage
 	 */
 	private void addClinic()
 	{
+		System.out.printf("\n~~~~ Add clinic ~~~~\n");
+		
 		Map<Integer, String> clinics = db.getClinics();
-		System.out.printf("Existing clinics:\n");
+		System.out.printf("\nExisting clinics:\n");
 		for (Entry<Integer, String> e : clinics.entrySet())
 			System.out.printf("%4d: %s\n", e.getKey(), e.getValue());
-		System.out.printf("Enter new clinic:\n");
+		
+		System.out.printf("\nEnter new clinic:\n");
 		String clinic;
 		while ((clinic = in.nextLine().trim()).isEmpty());
 		if (Pattern.compile("[^\\p{Print}]").matcher(clinic).find())
@@ -251,7 +250,18 @@ public class Manage
 				System.out.printf("That clinic already exist.\n\n");
 				return;
 			}
-		db.addClinic(clinic);
+		System.out.printf("\nAdd clinic '%s' to database?\n"
+				+ "%d: Yes\n%d: No\n", clinic, 1, 0);
+		if (in.hasNextInt())
+			if (in.nextInt() == 1)
+			{
+				if (db.addClinic(clinic))
+					System.out.printf("Clinic added\n");
+				else
+					System.out.printf("Error. Consult the logs for info\n");
+				return;
+			}
+		in.nextLine();
 	}
 	
 	/**
@@ -261,11 +271,12 @@ public class Manage
 	 */
 	private void addUser()
 	{
+		System.out.printf("\n~~~~ Add user ~~~~\n");
 		/* username */
-		System.out.printf("Enter Firstname:\n");
+		System.out.printf("\nEnter Firstname:\n");
 		String firstname;
 		while ((firstname = in.nextLine().trim()).isEmpty());
-		System.out.printf("Enter Surname:\n");
+		System.out.printf("\nEnter Surname:\n");
 		String surname;
 		while ((surname = in.nextLine().trim()).isEmpty());
 		
@@ -283,7 +294,7 @@ public class Manage
 			System.out.printf("Could not generate a random username.\n");
 			while (user == null)
 			{
-				System.out.printf("Enter username:\n");
+				System.out.printf("\nEnter username:\n");
 				String suggested;
 				while ((suggested = in.next().trim()).isEmpty());
 				if (db.getUser(suggested) != null)
@@ -307,12 +318,16 @@ public class Manage
 					+ "Please add a clinic before you add a user.\n\n");
 			return;
 		}
-		System.out.printf("Select Clinic:\n");
+		System.out.printf("\nSelect Clinic:\n");
 		for (Entry<Integer, String> e : clinics.entrySet())
 			System.out.printf("%d: %s\n", e.getKey(), e.getValue());
 		Integer clinic = null;
 		if (in.hasNextInt())
-			clinic = in.nextInt();
+		{
+			int c = in.nextInt();
+			if (clinics.containsKey(c))
+				clinic = c;
+		}
 		else
 		{
 			in.nextLine();
@@ -321,12 +336,12 @@ public class Manage
 		}
 
 		/* email */
-		System.out.printf("Enter Email:\n");
+		System.out.printf("\nEnter Email:\n");
 		String email;
 		while ((email = in.next().trim()).isEmpty());
 		
 		/* verify */
-		System.out.printf("An email with the following login details will be "
+		System.out.printf("\nAn email with the following login details will be "
 				+ "sent to '%s'\n\tUsername: %s\n\tPassword: %s\n"
 				+ "%d: Yes\n%d: No\n", email, user, password, 1, 0);
 		if (in.hasNextInt())
@@ -335,15 +350,20 @@ public class Manage
 			{
 				Encryption crypto = Implementations.Encryption();
 				String salt = crypto.getNewSalt();
-				if (db.addUser(user, crypto.hashString(password, salt), salt, clinic, email))
-					db.respondRegistration(user, password, email);
+				if (db.addUser(user, crypto.hashString(password, salt),
+						salt, clinic, email))
+				{
+					if (db.respondRegistration(user, password, email))
+						System.out.printf("Email sent\n");
+					else
+						System.out.printf("Error. Consult the logs for info\n");
+				}
 				else
-					System.out.printf("An error occurred when adding the user.\n\n");
+					System.out.printf("Error. Consult the logs for info\n");
 				return;
 			}
 		}
 		in.nextLine();
-		System.out.printf("Exiting\n\n");
 		return;
 	}
 	

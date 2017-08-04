@@ -57,7 +57,7 @@ public class ServletCommunication
 	 * 
 	 * @return The active instance of this class.
 	 */
-	public static synchronized ServletCommunication getDatabase()
+	public static synchronized ServletCommunication getInstance()
 	{
 		if (database == null)
 			database = new ServletCommunication();

@@ -21,12 +21,10 @@
 package common.implementation;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
 import common.Utilities;
-import servlet.core.ServletConst;
 
 /**
  * This interface contains constant values that are used in both the

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
+import common.Utilities;
+
 /**
  * This class contains useful constants for the servlet and loads the
  * serlvet settings file.

@@ -18,7 +18,7 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package servlet.core;
+package common;
 
 import java.io.File;
 import java.io.InputStream;

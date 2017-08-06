@@ -25,8 +25,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
+import common.Utilities;
 import servlet.core.ServletConst;
-import servlet.core.Utilities;
 
 /**
  * This interface contains constant values that are used in both the

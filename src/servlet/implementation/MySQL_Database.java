@@ -55,10 +55,10 @@ import org.json.simple.parser.ParseException;
 import servlet.core.PPCLogger;
 import servlet.core.ServletConst;
 import servlet.core.UserManager;
-import servlet.core.Utilities;
 import servlet.core.interfaces.Database;
 import servlet.implementation.exceptions.DBReadException;
 import servlet.implementation.exceptions.DBWriteException;
+import common.Utilities;
 import common.implementation.Constants;
 
 /**

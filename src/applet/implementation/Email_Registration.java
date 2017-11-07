@@ -26,11 +26,11 @@ import java.util.List;
 import applet.core.containers.Form;
 import applet.core.containers.form.FieldContainer;
 import applet.core.interfaces.Database;
+import applet.core.interfaces.FormUtils;
 import applet.core.interfaces.Implementations;
 import applet.core.interfaces.Messages;
 import applet.core.interfaces.Registration;
 import applet.core.interfaces.UserInterface;
-import applet.core.interfaces.UserInterface.RetFunContainer;
 
 /**
  * This class is an example of an implementation of
@@ -39,7 +39,7 @@ import applet.core.interfaces.UserInterface.RetFunContainer;
  * @author Marcus Malmquist
  *
  */
-public class Email_Registration implements Registration
+public class Email_Registration implements Registration, FormUtils
 {
 	/* Public */
 	
@@ -71,26 +71,13 @@ public class Email_Registration implements Registration
 		f.insert(clinic, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
 		
-		ui.presentForm(f, this::regProcReturn, true);
+		ui.presentForm(f, this, true);
 	}
-	
-	/* Protected */
-	
-	/* Private */
-	
-	private UserInterface ui;
-	
-	/**
-	 * Formats the user registration form into a registration request
-	 * and sends in to an administrator.
-	 * 
-	 * @param form The form that was sent to the UI.
-	 * 
-	 * @return {@code true} if the form was accepted.
-	 */
-	private RetFunContainer regProcReturn(Form form)
+
+	@Override
+	public RetFunContainer ValidateUserInput(Form form)
 	{
-		RetFunContainer rfc = new RetFunContainer(null);
+		RetFunContainer rfc = new RetFunContainer();
 		List<String> answers = new ArrayList<String>();
 		form.jumpTo(Form.AT_BEGIN);
 		do
@@ -111,4 +98,16 @@ public class Email_Registration implements Registration
 		rfc.valid = true;
 		return rfc;
 	}
+
+	@Override
+	public void callNext()
+	{
+		
+	}
+	
+	/* Protected */
+	
+	/* Private */
+	
+	private UserInterface ui;
 }

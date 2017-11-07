@@ -30,11 +30,11 @@ import applet.core.containers.User;
 import applet.core.containers.form.FieldContainer;
 import applet.core.interfaces.Database;
 import applet.core.interfaces.Encryption;
+import applet.core.interfaces.FormUtils;
 import applet.core.interfaces.Implementations;
 import applet.core.interfaces.Messages;
 import applet.core.interfaces.Registration;
 import applet.core.interfaces.UserInterface;
-import applet.core.interfaces.UserInterface.RetFunContainer;
 import common.implementation.Constants;
 
 /**
@@ -63,6 +63,7 @@ public class UserHandle
 		db = Implementations.Database();
 		questionnaire = new Questionnaire(ui, this);
 		viewData = new ViewData(ui, this);
+		updatePass = new UpdatePassword();
 		user = null;
 		loggedIn = false;
 	}
@@ -174,42 +175,10 @@ public class UserHandle
 		{
 			ui.displayMessage(Messages.getMessages().getInfo(
 					Messages.INFO_UH_UPDATE_PASSWORD), true);
-			setPassword();
+			updatePass.setPassword();
 			return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * Query the user for current password and new password if the user
-	 * is logged in. If the old password is correct and the password
-	 * matches the valid passwords criterion.
-	 * This function will query the user until the old and new password
-	 * fulfill the criterion described above.
-	 */
-	public void setPassword()
-	{
-		if (!loggedIn)
-			return; // no user to set password for
-
-		Form form = new Form();
-		form.insert(new FieldContainer(false, true,
-				Messages.getMessages().getInfo(
-						Messages.INFO_CURRENT_PASSWORD), null),
-				Form.AT_END);
-		form.insert(new FieldContainer(false, true,
-				Messages.getMessages().getInfo(
-						Messages.INFO_NEW_PASSWORD), null),
-				Form.AT_END);
-		form.insert(new FieldContainer(false, true,
-				Messages.getMessages().getInfo(
-						Messages.INFO_RE_NEW_PASSWORD), null),
-				Form.AT_END);
-		form.jumpTo(Form.AT_BEGIN);
-		
-		ui.displayMessage(Messages.getMessages().getInfo(
-				Messages.INFO_NEW_PASS_INFO), false);
-		ui.presentForm(form, this::setPassReturn, true);
 	}
 	
 	/* Protected */
@@ -233,49 +202,9 @@ public class UserHandle
 	private UserInterface ui;
 	private Questionnaire questionnaire;
 	private ViewData viewData;
+	private UpdatePassword updatePass;
 	private User user;
 	private boolean loggedIn;
-	
-	/**
-	 * The function to return to after the user have entered a new
-	 * password.
-	 * 
-	 * @param form The {@code Form} that was sent to the UI.
-	 * 
-	 * @return {@code true} if the form was sent. {@code false} if
-	 * 		not.
-	 * 
-	 * @see Form
-	 */
-	private RetFunContainer setPassReturn(Form form)
-	{
-		RetFunContainer rfc = new RetFunContainer(null);
-		List<String> answers = new ArrayList<String>();
-		form.jumpTo(Form.AT_BEGIN);
-		do
-			answers.add((String) form.currentEntry().getEntry());
-		while (form.nextEntry() != null);
-		String current = answers.get(0);
-		String new1 = answers.get(1);
-		String new2 = answers.get(2);
-
-		if (newPassError(current, new1, new2))
-			return rfc;
-		
-		Encryption crypto = Implementations.Encryption();
-		String newSalt = crypto.getNewSalt();
-		User tmpUser;
-		tmpUser = db.setPassword(user, user.hashWithSalt(current),
-				crypto.hashString(new1, newSalt), newSalt);
-		if (tmpUser == null)
-		{
-			rfc.message = Database.DATABASE_ERROR;
-			return rfc;
-		}
-		user = tmpUser;
-		rfc.valid = true;
-		return rfc;
-	}
 	
 	/**
 	 * Attempts to find any errors in the supplied passwords.
@@ -382,5 +311,82 @@ public class UserHandle
 	{
 		loggedIn = false;
 		user = null;
+	}
+	
+	public class UpdatePassword implements FormUtils
+	{
+
+		@Override
+		public RetFunContainer ValidateUserInput(Form form) {
+			RetFunContainer rfc = new RetFunContainer();
+			List<String> answers = new ArrayList<String>();
+			form.jumpTo(Form.AT_BEGIN);
+			do
+				answers.add((String) form.currentEntry().getEntry());
+			while (form.nextEntry() != null);
+			String current = answers.get(0);
+			String new1 = answers.get(1);
+			String new2 = answers.get(2);
+
+			if (newPassError(current, new1, new2))
+				return rfc;
+			
+			Encryption crypto = Implementations.Encryption();
+			String newSalt = crypto.getNewSalt();
+			User tmpUser;
+			tmpUser = db.setPassword(user, user.hashWithSalt(current),
+					crypto.hashString(new1, newSalt), newSalt);
+			if (tmpUser == null)
+			{
+				rfc.message = Database.DATABASE_ERROR;
+				return rfc;
+			}
+			user = tmpUser;
+			rfc.valid = true;
+			return rfc;
+		}
+
+		@Override
+		public void callNext()
+		{
+			
+		}
+		
+		private UpdatePassword()
+		{
+			
+		}
+		
+		/**
+		 * Query the user for current password and new password if the user
+		 * is logged in. If the old password is correct and the password
+		 * matches the valid passwords criterion.
+		 * This function will query the user until the old and new password
+		 * fulfill the criterion described above.
+		 */
+		private void setPassword()
+		{
+			if (!loggedIn)
+				return; // no user to set password for
+
+			Form form = new Form();
+			form.insert(new FieldContainer(false, true,
+					Messages.getMessages().getInfo(
+							Messages.INFO_CURRENT_PASSWORD), null),
+					Form.AT_END);
+			form.insert(new FieldContainer(false, true,
+					Messages.getMessages().getInfo(
+							Messages.INFO_NEW_PASSWORD), null),
+					Form.AT_END);
+			form.insert(new FieldContainer(false, true,
+					Messages.getMessages().getInfo(
+							Messages.INFO_RE_NEW_PASSWORD), null),
+					Form.AT_END);
+			form.jumpTo(Form.AT_BEGIN);
+			
+			ui.displayMessage(Messages.getMessages().getInfo(
+					Messages.INFO_NEW_PASS_INFO), false);
+			ui.presentForm(form, this, true);
+		}
 	}
 }

@@ -61,6 +61,8 @@ import applet.core.interfaces.Messages;
 import applet.core.interfaces.UserInterface;
 import applet.implementation.containerdisplay.ContainerDisplays;
 import applet.core.interfaces.Database;
+import applet.core.interfaces.FormUtils;
+import applet.core.interfaces.FormUtils.RetFunContainer;
 import applet.core.interfaces.Questions;
 
 /**
@@ -165,7 +167,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 	}
 
 	@Override
-	public boolean presentForm(Form form, ReturnFunction function,
+	public boolean presentForm(Form form, FormUtils function,
 			boolean multiple)
 	{
 		setContent(new GUIForm(form, function, getContent(), multiple));
@@ -626,13 +628,12 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 								cIdx, components);
 						if (nextComponent == cIdx && components.get(cIdx).entryFilled())
 						{
-							RetFunContainer rfc = function.call(form);
+							RetFunContainer rfc = function.ValidateUserInput(form);
 							if (rfc.valid)
 							{
 								displayMessage("", false);
 								setContent(retpan);
-								if (rfc.nextfunc != null)
-									rfc.nextfunc.call();
+								function.callNext();
 							}
 							else if (rfc.message != null)
 								displayError(rfc.message, false);
@@ -685,7 +686,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		
 		final Map<Integer, FormComponentDisplay> components;
 		final Form form;
-		final ReturnFunction function;
+		final FormUtils function;
 		final Container retpan;
 		/**
 		 * 
@@ -697,7 +698,7 @@ public class GUI_UserInterface extends JApplet implements ActionListener, UserIn
 		 * @param displayMultiple True if the form should display
 		 * 		multiple entries at the same time.
 		 */
-		GUIForm(final Form form, final ReturnFunction function,
+		GUIForm(final Form form, final FormUtils function,
 				final Container retpan, boolean displayMultiple)
 		{
 			this.form = form;

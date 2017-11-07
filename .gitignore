@@ -1,12 +1,7 @@
 local/
 bin/
 build/
-dist/
 .classpath
 .project
-build.properties
-web/META-INF/context.xml
-web/ppc.jsp
-web/prom_prem_collector.jnlp
 *~
 PROM_PREM_Collector*.jar

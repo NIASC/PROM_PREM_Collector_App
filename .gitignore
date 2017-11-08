@@ -1,7 +1,2 @@
-local/
-bin/
-build/
-.classpath
-.project
 *~
-PROM_PREM_Collector*.jar
+build

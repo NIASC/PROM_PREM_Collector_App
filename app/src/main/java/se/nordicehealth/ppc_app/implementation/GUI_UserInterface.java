@@ -3,6 +3,7 @@ package se.nordicehealth.ppc_app.implementation;
 import android.app.Activity;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.v7.widget.LinearLayoutCompat;
@@ -43,6 +44,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         uh = new UserHandle(this);
         initGUI();

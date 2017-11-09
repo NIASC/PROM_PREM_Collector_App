@@ -30,6 +30,7 @@ import android.widget.TextView;
 import java.util.Map;
 import java.util.Map.Entry;
 import se.nordicehealth.ppc_app.core.containers.form.SingleOptionContainer;
+import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface.FormComponentDisplay;
@@ -80,7 +81,7 @@ public class SingleOptionDisplay extends LinearLayout implements FormComponentDi
 		responseID = null;
 
 		String description = "";
-		String optional = Messages.getMessages().getInfo(
+		String optional = Implementations.Messages().getInfo(
 				Messages.INFO_UI_FORM_OPTIONAL);
 		if (soc.getDescription() != null && !soc.getDescription().isEmpty())
 			description = "\n\n"+soc.getDescription();

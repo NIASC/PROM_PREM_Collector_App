@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 
 import java.util.TreeMap;
@@ -121,7 +122,7 @@ public class MessageContainer
 			if (ret != null)
 				return ret;
 			// message exists but not in the requested locale
-			return message.getMessage(Messages.getMessages().fallbackLocale);
+			return message.getMessage(Implementations.Messages().fallbackLocale);
 		}
 		return null;
 	}

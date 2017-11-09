@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
+import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface.FormComponentDisplay;
@@ -116,7 +117,7 @@ public class TimePeriodDisplay extends LinearLayout implements FormComponentDisp
 			//dpTo.setMaxDate((new GregorianCalendar()).getTimeInMillis());
 			//dpTo.setMinDate((new GregorianCalendar()).getTimeInMillis());
 		}
-		Messages msg = Messages.getMessages();
+		Messages msg = Implementations.Messages();
 
 		LinearLayout date = new LinearLayout(c);
 		date.setOrientation(LinearLayout.VERTICAL);

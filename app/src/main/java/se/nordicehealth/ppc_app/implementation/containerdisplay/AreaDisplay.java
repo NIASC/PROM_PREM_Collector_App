@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import se.nordicehealth.ppc_app.core.containers.form.AreaContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
+import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface.FormComponentDisplay;
@@ -78,7 +79,7 @@ public class AreaDisplay extends LinearLayout implements FormComponentDisplay
 		this.ac = ac;
 
 		String description = "";
-		String optional = Messages.getMessages().getInfo(
+		String optional = Implementations.Messages().getInfo(
 				Messages.INFO_UI_FORM_OPTIONAL);
 		if (ac.getDescription() != null && !ac.getDescription().isEmpty())
 			description = "\n\n"+ac.getDescription();

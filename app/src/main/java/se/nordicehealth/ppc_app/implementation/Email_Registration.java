@@ -61,13 +61,13 @@ public class Email_Registration implements Registration, FormUtils
 	{
 		Form f = new Form();
 		FieldContainer name = new FieldContainer(false, false,
-				Messages.getMessages().getInfo(Messages.INFO_REG_USER_NAME), null);
+				ResourceStrings.getMessages().getInfo(Messages.INFO_REG_USER_NAME), null);
 		f.insert(name, Form.AT_END);
 		FieldContainer email = new FieldContainer(false, false,
-				Messages.getMessages().getInfo(Messages.INFO_REG_USER_EMAIL), null);
+				ResourceStrings.getMessages().getInfo(Messages.INFO_REG_USER_EMAIL), null);
 		f.insert(email, Form.AT_END);
 		FieldContainer clinic = new FieldContainer(false, false,
-				Messages.getMessages().getInfo(Messages.INFO_REG_CLINIC_NAME), null);
+				ResourceStrings.getMessages().getInfo(Messages.INFO_REG_CLINIC_NAME), null);
 		f.insert(clinic, Form.AT_END);
 		f.jumpTo(Form.AT_BEGIN);
 		
@@ -90,10 +90,10 @@ public class Email_Registration implements Registration, FormUtils
 		Database db = Implementations.Database();
 		boolean success = db.requestRegistration(name, email, clinic);
 		if (success)
-			ui.displayMessage(Messages.getMessages().getInfo(
+			ui.displayMessage(ResourceStrings.getMessages().getInfo(
 					Messages.INFO_REG_REQUEST_SENT), true);
 		else
-			ui.displayMessage(Messages.getMessages().getError(
+			ui.displayMessage(ResourceStrings.getMessages().getError(
 					Messages.ERROR_REG_REQUEST_FAILED), true);
 		rfc.valid = true;
 		return rfc;

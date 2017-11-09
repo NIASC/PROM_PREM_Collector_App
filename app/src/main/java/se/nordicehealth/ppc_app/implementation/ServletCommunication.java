@@ -21,6 +21,7 @@
 package se.nordicehealth.ppc_app.implementation;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -139,6 +140,8 @@ public class ServletCommunication implements Database, Runnable
 		rmap.put("name", username);
 
 		JSONObject ans = sendMessage(ret);
+        if (ans == null)
+            return null;
 		JSONObject user = getJSONObject((String) ans.get("user"));
 		Map<String, String> umap = (Map<String, String>) user;
         assert umap != null;
@@ -179,11 +182,13 @@ public class ServletCommunication implements Database, Runnable
 	}
 
 	@Override
+    @Deprecated
 	public boolean getErrorMessages(MessageContainer mc) {
         return mc != null && getMessages(Constants.CMD_GET_ERR_MSG, mc);
     }
 
 	@Override
+    @Deprecated
 	public boolean getInfoMessages(MessageContainer mc) {
         return mc != null && getMessages(Constants.CMD_GET_INFO_MSG, mc);
     }
@@ -344,6 +349,7 @@ public class ServletCommunication implements Database, Runnable
 	private Encryption crypto;
 	
 	private JSONParser parser;
+	private volatile JSONObject JSONOut, JSONIn;
 	
 	/**
 	 * Initializes variables and loads the database configuration.
@@ -355,7 +361,6 @@ public class ServletCommunication implements Database, Runnable
 		parser = new JSONParser();
 	}
 
-	private volatile JSONObject JSONOut, JSONIn;
 
 	@Override
 	public void run()
@@ -398,9 +403,7 @@ public class ServletCommunication implements Database, Runnable
 			synchronized (this) {
 				JSONIn = getJSONObject(sb.toString());
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		} catch (Exception ignored) { }
 	}
 	
 	/**
@@ -463,12 +466,13 @@ public class ServletCommunication implements Database, Runnable
 	 * 
 	 * @return true if the messages was put in {@code mc}.
 	 */
+	@Deprecated
 	private boolean getMessages(String commandName, MessageContainer mc)
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", commandName);
-		
+
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
 		Map<String, String> mmap = (Map<String, String>) getJSONObject(amap.get("messages"));
 		try {

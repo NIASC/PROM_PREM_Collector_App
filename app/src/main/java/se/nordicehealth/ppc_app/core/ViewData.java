@@ -71,7 +71,7 @@ class ViewData
 	{
 		if (!uh.isLoggedIn())
 		{
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_NOT_LOGGED_IN), false);
 			return;
 		}
@@ -92,7 +92,7 @@ class ViewData
 
 		@Override
 		public RetFunContainer ValidateUserInput(Form form) {
-			Messages msg = Messages.getMessages();
+			Messages msg = Implementations.Messages();
 			RetFunContainer rfc = new RetFunContainer();
 			form.jumpTo(Form.AT_BEGIN);
 			MultipleOptionContainer questionselect = (MultipleOptionContainer) form.currentEntry();
@@ -146,7 +146,7 @@ class ViewData
 		 */
 		private void queryTimePeriod()
 		{
-			Messages msg = Messages.getMessages();
+			Messages msg = Implementations.Messages();
 			Form form = new Form();
 			QuestionContainer qc = Questions.getQuestions().getContainer();
 			if (qc == null) {
@@ -154,7 +154,7 @@ class ViewData
 			}
 			MultipleOptionContainer questionselect =
 					new MultipleOptionContainer(false, msg.getInfo(
-							Messages.INFO_VD_SELECT_PREIOD), null);
+							Messages.INFO_VD_SELECT_PERIOD), null);
 			for (int i = 0; i < qc.getSize(); ++i)
 				questionselect.addOption(i, qc.getContainer(i).getStatement());
 			form.insert(questionselect, Form.AT_END);

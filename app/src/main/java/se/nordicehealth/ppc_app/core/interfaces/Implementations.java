@@ -22,6 +22,7 @@ package se.nordicehealth.ppc_app.core.interfaces;
 
 import se.nordicehealth.ppc_app.implementation.Email_Registration;
 import se.nordicehealth.ppc_app.implementation.Locale_se;
+import se.nordicehealth.ppc_app.implementation.ResourceStrings;
 import se.nordicehealth.ppc_app.implementation.ServletCommunication;
 import se.nordicehealth.ppc_app.implementation.SHA_Encryption;
 
@@ -91,6 +92,11 @@ public abstract class Implementations
 	public static Locale Locale()
 	{
 		return Locale_se.getLocale();
+	}
+
+	public static Messages Messages()
+	{
+		return ResourceStrings.getMessages();
 	}
 	
 	/* Protected */

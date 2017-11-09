@@ -61,7 +61,6 @@ public class UserHandle
 	{
 		this.ui = ui;
 		db = Implementations.Database();
-		questionnaire = new Questionnaire(ui, this);
 		viewData = new ViewData(ui, this);
 		updatePass = new UpdatePassword();
 		user = null;
@@ -87,21 +86,22 @@ public class UserHandle
 		case Constants.SUCCESS:
 			user = db.getUser(username);
 			initLoginVars();
+            questionnaire = new Questionnaire(ui, this);
 			break;
 		case Constants.ALREADY_ONLINE:
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_UH_ALREADY_ONLINE), false);
 			break;
 		case Constants.SERVER_FULL:
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_UH_SERVER_FULL), false);
 			break;
 		case Constants.INVALID_DETAILS:
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_UH_INVALID_LOGIN), false);
 			break;
 		default:
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_UNKNOWN_RESPONSE), false);
 			break;
 		}
@@ -173,7 +173,7 @@ public class UserHandle
 	{
 		if (user.getUpdatePassword())
 		{
-			ui.displayMessage(Messages.getMessages().getInfo(
+			ui.displayMessage(Implementations.Messages().getInfo(
 					Messages.INFO_UH_UPDATE_PASSWORD), true);
 			updatePass.setPassword();
 			return true;
@@ -226,26 +226,26 @@ public class UserHandle
 	{
 		if (!user.passwordMatch(oldPass))
 		{
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_UH_PR_INVALID_CURRENT), false);
 			return true;
 		}
 		if (!newPass1.equals(newPass2))
 		{
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_UH_PR_MISMATCH_NEW), false);
 			return true;
 		}
 		int ret = validatePassword(newPass1);
 		if (ret < 0)
 		{
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_UH_PR_INVALID_LENGTH), false);
 			return true;
 		}
 		else if (ret == 0)
 		{
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_UH_PR_PASSWORD_SIMPLE), false);
 			return true;
 		}
@@ -370,21 +370,15 @@ public class UserHandle
 				return; // no user to set password for
 
 			Form form = new Form();
-			form.insert(new FieldContainer(false, true,
-					Messages.getMessages().getInfo(
-							Messages.INFO_CURRENT_PASSWORD), null),
-					Form.AT_END);
-			form.insert(new FieldContainer(false, true,
-					Messages.getMessages().getInfo(
-							Messages.INFO_NEW_PASSWORD), null),
-					Form.AT_END);
-			form.insert(new FieldContainer(false, true,
-					Messages.getMessages().getInfo(
-							Messages.INFO_RE_NEW_PASSWORD), null),
-					Form.AT_END);
+			form.insert(new FieldContainer(false, true, Implementations.Messages().getInfo(
+			        Messages.INFO_CURRENT_PASSWORD), null), Form.AT_END);
+			form.insert(new FieldContainer(false, true, Implementations.Messages().getInfo(
+			        Messages.INFO_NEW_PASSWORD), null), Form.AT_END);
+			form.insert(new FieldContainer(false, true, Implementations.Messages().getInfo(
+                    Messages.INFO_RE_NEW_PASSWORD), null), Form.AT_END);
 			form.jumpTo(Form.AT_BEGIN);
 			
-			ui.displayMessage(Messages.getMessages().getInfo(
+			ui.displayMessage(Implementations.Messages().getInfo(
 					Messages.INFO_NEW_PASS_INFO), false);
 			ui.presentForm(form, this, true);
 		}

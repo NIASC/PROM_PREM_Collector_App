@@ -49,12 +49,16 @@ public class GUI_UserInterface extends Activity implements UserInterface
         uh = new UserHandle(this);
         initGUI();
 
-        if (!Messages.getMessages().loadMessages()
+        /*
+        if (!ResourceStrings.loadMessages(getResources())
                 || !Questions.getQuestions().loadQuestionnaire()) {
             displayError(Database.DATABASE_ERROR, false);
         } else {
             setContent(new LoginScreen(this));
         }
+        */
+        ResourceStrings.loadMessages(getResources());
+        setContent(new LoginScreen(this));
     }
 
     private void initGUI()
@@ -175,13 +179,13 @@ public class GUI_UserInterface extends Activity implements UserInterface
 
             usernameTF = new EditText(c);
             usernameTF.setHint(String.format("%s",
-                    Messages.getMessages().getInfo(Messages.INFO_UH_ENTER_USERNAME)));
+                    ResourceStrings.getMessages().getInfo(Messages.INFO_UH_ENTER_USERNAME)));
             userPanel.addView(usernameTF);
 
             passwordTF = new EditText(c);
             passwordTF.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             passwordTF.setHint(String.format("%s",
-                    Messages.getMessages().getInfo(Messages.INFO_UH_ENTER_PASSWORD)));
+                    ResourceStrings.getMessages().getInfo(Messages.INFO_UH_ENTER_PASSWORD)));
             userPanel.addView(passwordTF);
 
 			/* button panel */
@@ -191,7 +195,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
             final Context _c = c;
 
             login = new Button(c);
-            login.setText(Messages.getMessages().getInfo(Messages.INFO_LOGIN));
+            login.setText(ResourceStrings.getMessages().getInfo(Messages.INFO_LOGIN));
             login.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -207,7 +211,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
             });
 
             register = new Button(c);
-            register.setText(Messages.getMessages().getInfo(Messages.INFO_REGISTER));
+            register.setText(ResourceStrings.getMessages().getInfo(Messages.INFO_REGISTER));
             register.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -236,7 +240,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
 
 
             questionnaire = new Button(c);
-            questionnaire.setText(Messages.getMessages().getInfo(Messages.INFO_START_QUESTIONNAIRE));
+            questionnaire.setText(ResourceStrings.getMessages().getInfo(Messages.INFO_START_QUESTIONNAIRE));
             questionnaire.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -245,7 +249,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
             });
 
             viewData = new Button(c);
-            viewData.setText(Messages.getMessages().getInfo(Messages.INFO_VIEW_STATISTICS));
+            viewData.setText(ResourceStrings.getMessages().getInfo(Messages.INFO_VIEW_STATISTICS));
             viewData.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -263,7 +267,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
         final int nEntries;
         boolean displayMultiple;
         int cIdx;
-        Messages msg = Messages.getMessages();
+        ResourceStrings msg = ResourceStrings.getMessages();
 
         LinearLayout formControl;
         Button fc_continue, fc_previous, fc_next, fc_back;

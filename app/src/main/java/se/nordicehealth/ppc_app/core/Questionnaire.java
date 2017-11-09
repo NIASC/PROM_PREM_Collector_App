@@ -56,7 +56,7 @@ public class Questionnaire
 	{
 		if (!uh.isLoggedIn())
 		{
-			ui.displayError(Messages.getMessages().getError(
+			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_NOT_LOGGED_IN), false);
 			return;
 		}
@@ -91,7 +91,6 @@ public class Questionnaire
 	
 	private class PatientQuestionnaire implements FormUtils
 	{
-
 		@Override
 		public RetFunContainer ValidateUserInput(Form form) {
 			RetFunContainer rfc = new RetFunContainer();
@@ -167,7 +166,7 @@ public class Questionnaire
 			String pID = Implementations.Locale().formatPersonalID(pnr);
 			if (pID == null)
 			{
-				rfc.message = Messages.getMessages().getError(
+				rfc.message = Implementations.Messages().getError(
 						Messages.ERROR_QP_INVALID_PID);
 				return rfc;
 			}
@@ -179,7 +178,7 @@ public class Questionnaire
 			}
 			catch (NullPointerException npe)
 			{
-				rfc.message = Messages.getMessages().getError(
+				rfc.message = Implementations.Messages().getError(
 						Messages.ERROR_NOT_LOGGED_IN);
 				return rfc;
 			}
@@ -204,7 +203,7 @@ public class Questionnaire
 		private void createPatientRegistration()
 		{
 			Form form = new Form();
-			Messages msg = Messages.getMessages();
+			Messages msg = Implementations.Messages();
 			FieldContainer forename = new FieldContainer(false, false,
 					msg.getInfo(Messages.INFO_Q_PATIENT_FORENAME), null);
 			form.insert(forename, Form.AT_END);

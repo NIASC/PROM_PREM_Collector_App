@@ -28,6 +28,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import se.nordicehealth.ppc_app.core.containers.form.SliderContainer;
+import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface.FormComponentDisplay;
@@ -69,7 +70,7 @@ public class SliderDisplay extends LinearLayout implements FormComponentDisplay
 		response = sc.getLowerBound();
 
 		String description = "";
-		String optional = Messages.getMessages().getInfo(
+		String optional = Implementations.Messages().getInfo(
 				Messages.INFO_UI_FORM_OPTIONAL);
 		if (sc.getDescription() != null && !sc.getDescription().isEmpty())
 			description = "\n\n"+sc.getDescription();

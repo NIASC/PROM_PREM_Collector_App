@@ -100,6 +100,7 @@ public interface Database
 	 * 		successfully loaded. {@code false} if there was an error
 	 * 		with the database.
 	 */
+	@Deprecated
 	boolean getErrorMessages(MessageContainer mc);
 	
 	/**
@@ -112,6 +113,7 @@ public interface Database
 	 * 		successfully loaded. {@code false} if there was an error
 	 * 		with the database.
 	 */
+	@Deprecated
 	boolean getInfoMessages(MessageContainer mc);
 	
 	/**

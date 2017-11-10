@@ -1,0 +1,61 @@
+<resources>
+    <string name="app_name">PPC_App</string>
+    <string name="main_menu_btn">Huvudmenu</string>
+    <string name="logout_btn">Logga ut</string>
+    <string name="exit_btn">Avsluta</string>
+
+    <!-- Info messages -->
+    <string name="INFO_SELECT_OPTION">Välj ett alternativ</string>
+    <string name="INFO_LOGIN">Logga in</string>
+    <string name="INFO_REGISTER">Registrera</string>
+    <string name="INFO_EXIT">Avsluta</string>
+    <string name="INFO_NEW_PASS_INFO">Det nya lösenordet måste innehålla mellan 6 och 32 tecken och endast innehålla ASCII tecken från minst 2 utav grupperna: gemener, versaler, siffror, skiljetecken (inklusive blanksteg).</string>
+    <string name="INFO_CURRENT_PASSWORD">Ange nuvarande lösenod</string>
+    <string name="INFO_NEW_PASSWORD">Ange nytt lösenord</string>
+    <string name="INFO_RE_NEW_PASSWORD">Ange nytt lösenord</string>
+    <string name="INFO_START_QUESTIONNAIRE">Starta formuläret</string>
+    <string name="INFO_VIEW_STATISTICS">Se statistik</string>
+    <string name="INFO_LOGOUT">Logga out</string>
+    <string name="INFO_UH_ENTER_USERNAME">Ange användarnamn</string>
+    <string name="INFO_UH_ENTER_PASSWORD">Ange lösenord</string>
+    <string name="INFO_UH_UPDATE_PASSWORD">Ditt konto har flaggats för uppdatering av lösenord.</string>
+    <string name="INFO_REG_CLINIC_NAME">Klinik</string>
+    <string name="INFO_REG_USER_NAME">Namn</string>
+    <string name="INFO_REG_USER_EMAIL">E-post</string>
+    <string name="INFO_REG_REQUEST_SENT">Registreringsförfrågan skickad.</string>
+    <string name="INFO_UI_FORM_FINISH">Skicka in</string>
+    <string name="INFO_UI_FORM_CONTINUE">Nästa</string>
+    <string name="INFO_UI_FORM_PREVIOUS">Föregående</string>
+    <string name="INFO_UI_FORM_NEXT">Nästa</string>
+    <string name="INFO_UI_FORM_BACK">Tillbaka</string>
+    <string name="INFO_UI_FORM_OPTIONAL">valfri</string>
+    <string name="INFO_UI_FILLED">ifylld</string>
+    <string name="INFO_UI_UNFILLED">ej ifylld</string>
+    <string name="INFO_VD_SELECT_QUESTIONS">Välj villka frågor du vill se statistik över.</string>
+    <string name="INFO_VD_SELECT_PERIOD">Välj villken tidsperiod du vill se statistik över.</string>
+    <string name="INFO_VD_DATE_FROM">Från</string>
+    <string name="INFO_VD_DATE_TO">Till</string>
+    <string name="INFO_VD_DATE_YEAR">År</string>
+    <string name="INFO_VD_DATE_MONTH">Månad</string>
+    <string name="INFO_VD_DATE_DAY">Dag</string>
+    <string name="INFO_Q_PATIENT_FORENAME">Patientens förenamn</string>
+    <string name="INFO_Q_PATIENT_SURNAME">Patientens efternamn</string>
+    <string name="INFO_Q_PATIENT_PNR">Patientens personnumber</string>
+
+    <!-- Error messages -->
+    <string name="ERROR_UNKNOWN_RESPONSE">Okänt svar från servern.</string>
+    <string name="ERROR_NULL_SELECTED">Du har inte valt något alternativ.</string>
+    <string name="ERROR_UH_INVALID_LOGIN">Fel användarnamn eller lösenord. Detta kan också betyda att servern (om någon) inte kan nås. Verifiera att du har en fungerande internetuppkoppling och försök igen.</string>
+    <string name="ERROR_UH_PR_INVALID_CURRENT">Nuvarande lösenord är felaktigt.</string>
+    <string name="ERROR_UH_PR_MISMATCH_NEW">Nya lösenorden måste stämma överrens.</string>
+    <string name="ERROR_UH_PR_INVALID_LENGTH">Lösenordet måste innehålla mellan 6 och 32 tecken.</string>
+    <string name="ERROR_UH_PR_PASSWORD_SIMPLE">Lösenordet bör innehålla ASCII tecken från minst 2 utav groupperna: gemener, versaler, siffror, skiljetecken (inclusive blanksteg).</string>
+    <string name="ERROR_OPERATION_NOT_PERMITTED">Det här kontot saknar rättigheter att utföra denna handling.</string>
+    <string name="ERROR_NOT_LOGGED_IN">Du kan inte utföra den här handlingen om du inte loggat in.</string>
+    <string name="ERROR_UH_ALREADY_ONLINE">Den användaren är redan inlåggad.</string>
+    <string name="ERROR_UH_SERVER_FULL">Servern är full. Försök igen om en stund.</string>
+    <string name="ERROR_REG_REQUEST_FAILED">Kunde inte skicka förfrågan</string>
+    <string name="ERROR_QP_INVALID_PID">Giltiga personnummer måste anges på något av följande format: ååmmddxxxx, ååmmdd-xxxx, ååååmmddxxxx, ååååmmdd-xxxx</string>
+    <string name="ERROR_VD_INVALID_PERIOD">Ogiltig tidsperiod.</string>
+    <string name="ERROR_VD_FEW_ENTRIES">Av sekretesskäl måste den angivna tidsperioden innehålla data från minst fem personer. Vänligen utöka tidsperioden.</string>
+</resources>

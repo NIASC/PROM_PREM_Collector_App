@@ -18,20 +18,20 @@
     <string name="INFO_LOGOUT">Log out</string>
     <string name="INFO_UH_ENTER_USERNAME">Enter username</string>
     <string name="INFO_UH_ENTER_PASSWORD">Enter password</string>
-    <string name="INFO_UH_UPDATE_PASSWORD">Your account have been flagged for password update</string>
+    <string name="INFO_UH_UPDATE_PASSWORD">Your account have been flagged for password update.</string>
     <string name="INFO_REG_CLINIC_NAME">Clinic</string>
     <string name="INFO_REG_USER_NAME">Name</string>
     <string name="INFO_REG_USER_EMAIL">E-mail</string>
-    <string name="INFO_REG_REQUEST_SENT">Registration request sent</string>
+    <string name="INFO_REG_REQUEST_SENT">Registration request sent.</string>
     <string name="INFO_UI_FORM_FINISH">Finish</string>
     <string name="INFO_UI_FORM_CONTINUE">Continue</string>
     <string name="INFO_UI_FORM_PREVIOUS">Previous</string>
     <string name="INFO_UI_FORM_NEXT">Next</string>
     <string name="INFO_UI_FORM_BACK">Back</string>
-    <string name="INFO_UI_FORM_OPTIONAL">Optional</string>
+    <string name="INFO_UI_FORM_OPTIONAL">optional</string>
     <string name="INFO_UI_FILLED">filled</string>
     <string name="INFO_UI_UNFILLED">unfilled</string>
-    <string name="INFO_VD_SELECT_QUESTIONS">Select which questions you would like to view</string>
+    <string name="INFO_VD_SELECT_QUESTIONS">Select which questions you would like to view.</string>
     <string name="INFO_VD_SELECT_PERIOD">Select which period you want to see statistics for.</string>
     <string name="INFO_VD_DATE_FROM">From</string>
     <string name="INFO_VD_DATE_TO">To</string>
@@ -44,7 +44,7 @@
 
     <!-- Error messages -->
     <string name="ERROR_UNKNOWN_RESPONSE">Unknown response.</string>
-    <string name="ERROR_NULL_SELECTED">Nothing selected!</string>
+    <string name="ERROR_NULL_SELECTED">Nothing selected.</string>
     <string name="ERROR_UH_INVALID_LOGIN">Invalid username or password. This may also indicate that the server (if any) is unreachable. Verify that you have a working internet connection and try again.</string>
     <string name="ERROR_UH_PR_INVALID_CURRENT">Current password is invalid.</string>
     <string name="ERROR_UH_PR_MISMATCH_NEW">New passwords must match.</string>
@@ -54,8 +54,8 @@
     <string name="ERROR_NOT_LOGGED_IN">You may not perform this action unless you log in.</string>
     <string name="ERROR_UH_ALREADY_ONLINE">That user is already online.</string>
     <string name="ERROR_UH_SERVER_FULL">The server is full. Try again later.</string>
-    <string name="ERROR_REG_REQUEST_FAILED">Could not send request</string>
-    <string name="ERROR_QP_INVALID_PID">Valid personal id numbers formats are: yymmddxxxx, yymmdd-xxxx, yyyymmddxxxx, yyyymmdd-xxxx</string>
-    <string name="ERROR_VD_INVALID_PERIOD">Invalid time period</string>
+    <string name="ERROR_REG_REQUEST_FAILED">Could not send request.</string>
+    <string name="ERROR_QP_INVALID_PID">Valid personal id numbers formats are: yymmddxxxx, yymmdd-xxxx, yyyymmddxxxx, yyyymmdd-xxxx.</string>
+    <string name="ERROR_VD_INVALID_PERIOD">Invalid time period.</string>
     <string name="ERROR_VD_FEW_ENTRIES">For privacy reasons the selected period must contain at leas 5 entries. Please extend the period.</string>
 </resources>

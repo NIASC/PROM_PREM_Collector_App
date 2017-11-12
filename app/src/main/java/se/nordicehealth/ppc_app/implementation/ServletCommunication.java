@@ -20,6 +20,8 @@
  */
 package se.nordicehealth.ppc_app.implementation;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -140,7 +142,7 @@ public class ServletCommunication implements Database, Runnable
 		rmap.put("name", username);
 
 		JSONObject ans = sendMessage(ret);
-        if (ans == null)
+		if (ans == null)
             return null;
 		JSONObject user = getJSONObject((String) ans.get("user"));
 		Map<String, String> umap = (Map<String, String>) user;
@@ -307,7 +309,7 @@ public class ServletCommunication implements Database, Runnable
 	}
 
 	@Override
-	public int requestLogin(String username, String password)
+	public Session requestLogin(String username, String password)
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
@@ -315,15 +317,18 @@ public class ServletCommunication implements Database, Runnable
 
 		User user = getUser(username);
 		if (user == null)
-			return Constants.INVALID_DETAILS;
+			return new Session(0L, Constants.INVALID_DETAILS);
 		rmap.put("name", username);
 		rmap.put("password", user.hashWithSalt(password));
-		
+
 		JSONObject ans = sendMessage(ret);
 		if (ans == null)
-			return Constants.ERROR;
+			return new Session(0L, Constants.ERROR);
 		Map<String, String> amap = (Map<String, String>) ans;
-		return Integer.parseInt(amap.get(Constants.LOGIN_REPONSE));
+        String response = amap.get(Constants.LOGIN_REPONSE);
+        String uid = amap.get(Constants.LOGIN_UID);
+        return new Session(uid != null ? Long.parseLong(uid) : 0L,
+                Integer.parseInt(response));
 	}
 
 	@Override
@@ -365,6 +370,7 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public void run()
 	{
+        JSONIn = null;
 		HttpURLConnection connection;
 		try {
 			connection = (HttpURLConnection) Constants.SERVER_URL.openConnection();
@@ -378,6 +384,7 @@ public class ServletCommunication implements Database, Runnable
 			OutputStream os = connection.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
 			// System.out.println(obj);
+            Log.i("TEST", JSONOut.toString());
 			synchronized (this) {
 				osw.write(JSONOut.toString());
 			}
@@ -400,6 +407,7 @@ public class ServletCommunication implements Database, Runnable
 				sb.append(inputLine);
 			in.close();
 
+            Log.i("TEST", sb.toString());
 			synchronized (this) {
 				JSONIn = getJSONObject(sb.toString());
 			}

@@ -193,7 +193,7 @@ public interface Database
 	 * 		<code>Constants.INVALID_DETAILS</code>
 	 * 			If the details mismatch with the details in the database.
 	 */
-	int requestLogin(String username, String password);
+    Session requestLogin(String username, String password);
 
 	/**
 	 * 
@@ -202,7 +202,18 @@ public interface Database
 	 * @return {@code true} if the user was successfully logged out.
 	 */
 	boolean requestLogout(String username);
-	
+
+	class Session
+	{
+		public final long uid;
+		public final int response;
+
+		public Session(long uid, int response)
+		{
+			this.uid = uid;
+			this.response = response;
+		}
+	}
 	/* Protected */
 	
 	/* Private */

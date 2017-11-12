@@ -81,7 +81,8 @@ public class UserHandle
 	 */
 	public void login(String username, String password)
 	{
-		switch(db.requestLogin(username, password))
+		Database.Session session = db.requestLogin(username, password);
+		switch(session.response)
 		{
 		case Constants.SUCCESS:
 			user = db.getUser(username);

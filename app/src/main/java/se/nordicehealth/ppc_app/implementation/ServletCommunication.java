@@ -316,13 +316,8 @@ public class ServletCommunication implements Database, Runnable
 		rmap.put("command", Constants.CMD_REQ_LOGIN);
 
 		Encryption crypto = Implementations.Encryption();
-        String cryptoName = crypto.encrypt(username);
-		User user = getUser(username);
-		if (user == null)
-			return new Session(0L, Constants.INVALID_DETAILS);
-		rmap.put("name", cryptoName);
-        String cryptoPass = crypto.encrypt(user.hashWithSalt(password));
-		rmap.put("password", cryptoPass);
+		rmap.put("name", crypto.encrypt(username));
+		rmap.put("password", crypto.encrypt(password));
 
 		JSONObject ans = sendMessage(ret);
 		if (ans == null)

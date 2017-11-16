@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Locale;
 
 import se.nordicehealth.ppc_app.core.interfaces.Encryption;
 
@@ -43,6 +44,8 @@ public class SHA_Encryption implements Encryption
 	 */
 	public SHA_Encryption() throws NullPointerException
 	{
+		e = ResourceKeys.getKeys().getExp();
+		n = ResourceKeys.getKeys().getMod();
 		try {
 			sr = SecureRandom.getInstance("SHA1PRNG");
 			md = MessageDigest.getInstance("SHA-256");
@@ -76,10 +79,27 @@ public class SHA_Encryption implements Encryption
 		return String.format("%064x", new BigInteger(1,
 				md.digest(messageDigest.getBytes())));
 	}
+
+	@Override
+	public String encrypt(String message)
+	{
+		byte b[] = encryptRSA(message.getBytes());
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < b.length; sb.append(i < b.length ? ":" : ""))
+			sb.append(String.format(Locale.US, "%02x", b[i++]));
+		return sb.toString();
+	}
 	
 	/* Protected */
 	
 	/* Private */
 	private SecureRandom sr;
 	private MessageDigest md;
+	private BigInteger e, n;
+
+	private byte[] encryptRSA(byte msgBytes[])
+	{
+		return new BigInteger(msgBytes).modPow(e, n).toByteArray();
+	}
 }

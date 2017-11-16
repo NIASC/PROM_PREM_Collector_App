@@ -60,6 +60,15 @@ public interface Encryption
 	 * @return The hashed version of {@code message}.
 	 */
 	String encryptMessage(String prepend, String message, String append);
+
+    /**
+     * Encrypts a string into a format that can be decrypted by the server.
+     *
+     * @param message The message to encrypt.
+     *
+     * @return The encrypted message.
+     */
+	String encrypt(String message);
 	
 	/* Protected */
 	

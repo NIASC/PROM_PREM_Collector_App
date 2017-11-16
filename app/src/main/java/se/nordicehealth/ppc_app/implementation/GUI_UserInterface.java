@@ -46,6 +46,9 @@ public class GUI_UserInterface extends Activity implements UserInterface
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        ResourceStrings.loadMessages(getResources());
+        ResourceKeys.loadKeys(getResources());
+
         uh = new UserHandle(this);
         initGUI();
 
@@ -57,7 +60,6 @@ public class GUI_UserInterface extends Activity implements UserInterface
             setContent(new LoginScreen(this));
         }
         */
-        ResourceStrings.loadMessages(getResources());
         setContent(new LoginScreen(this));
     }
 

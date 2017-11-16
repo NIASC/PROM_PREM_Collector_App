@@ -315,11 +315,14 @@ public class ServletCommunication implements Database, Runnable
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_REQ_LOGIN);
 
+		Encryption crypto = Implementations.Encryption();
+        String cryptoName = crypto.encrypt(username);
 		User user = getUser(username);
 		if (user == null)
 			return new Session(0L, Constants.INVALID_DETAILS);
-		rmap.put("name", username);
-		rmap.put("password", user.hashWithSalt(password));
+		rmap.put("name", cryptoName);
+        String cryptoPass = crypto.encrypt(user.hashWithSalt(password));
+		rmap.put("password", cryptoPass);
 
 		JSONObject ans = sendMessage(ret);
 		if (ans == null)

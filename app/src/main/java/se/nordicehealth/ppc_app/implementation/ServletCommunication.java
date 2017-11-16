@@ -323,12 +323,12 @@ public class ServletCommunication implements Database, Runnable
 	}
 
 	@Override
-	public boolean requestLogout(String username)
+	public boolean requestLogout(long uid)
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_REQ_LOGOUT);
-		rmap.put("name", username);
+		rmap.put("uid", Long.toString(uid));
 		
 		JSONObject ans = sendMessage(ret);
 		if (ans == null)

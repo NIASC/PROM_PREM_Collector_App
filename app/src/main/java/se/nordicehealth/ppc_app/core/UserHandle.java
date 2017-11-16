@@ -86,6 +86,7 @@ public class UserHandle
 		{
 		case Constants.SUCCESS:
 			user = db.getUser(username);
+            uid = session.uid;
             update_password = session.update_password;
 			initLoginVars();
             questionnaire = new Questionnaire(ui, this);
@@ -130,7 +131,7 @@ public class UserHandle
 	{
 		if (!loggedIn)
 			return;
-		db.requestLogout(user.getUsername());
+		db.requestLogout(uid);
 		resetLoginVars();
 	}
 	
@@ -206,6 +207,7 @@ public class UserHandle
 	private ViewData viewData;
 	private UpdatePassword updatePass;
 	private User user;
+    private long uid;
 	private boolean loggedIn;
     private boolean update_password;
 

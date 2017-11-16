@@ -197,11 +197,11 @@ public interface Database
 
 	/**
 	 * 
-	 * @param username The username of the user that wants to log out.
+	 * @param uid The uid of the user that wants to log out.
 	 * 
 	 * @return {@code true} if the user was successfully logged out.
 	 */
-	boolean requestLogout(String username);
+	boolean requestLogout(long uid);
 
 	class Session
 	{

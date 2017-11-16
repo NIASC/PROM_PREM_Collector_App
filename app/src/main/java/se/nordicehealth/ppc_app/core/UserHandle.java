@@ -268,7 +268,7 @@ public class UserHandle
 			String new1 = answers.get(1);
 			String new2 = answers.get(2);
 
-            int response = db.setPassword(user.getUsername(), current, new1, new2);
+            int response = db.setPassword(uid, current, new1, new2);
 			if (!newPassError(response))
                 rfc.valid = true;
 			return rfc;

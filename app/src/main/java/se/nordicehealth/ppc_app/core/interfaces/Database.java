@@ -79,7 +79,7 @@ public interface Database
 	 * Updates the user's password and salt to newPass and newSalt if
 	 * oldPass matches the user's current password.
 	 * 
-	 * @param username The user that is updating it's password.
+	 * @param uid The user that is updating it's password.
 	 * @param oldPass The old/current (unhashed) password.
 	 * @param newPass1 The new password.
 	 * @param newPass2 The new password.
@@ -88,7 +88,7 @@ public interface Database
 	 * 		old password does not match the user's password then the
 	 * 		password is not updated and null is returned.
 	 */
-	int setPassword(String username, String oldPass, String newPass1, String newPass2);
+	int setPassword(long uid, String oldPass, String newPass1, String newPass2);
 	
 	/**
 	 * Loads error messages from the database and puts them in a

@@ -160,13 +160,13 @@ public class ServletCommunication implements Database, Runnable
 	}
 
 	@Override
-	public int setPassword(String username, String oldPass, String newPass1, String newPass2) throws NumberFormatException {
+	public int setPassword(long uid, String oldPass, String newPass1, String newPass2) throws NumberFormatException {
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_SET_PASSWORD);
 
         Encryption crypto = Implementations.Encryption();
-		rmap.put("name", crypto.encrypt(username));
+		rmap.put("uid", crypto.encrypt(Long.toString(uid)));
 		rmap.put("old_password", crypto.encrypt(oldPass));
 		rmap.put("new_password1", crypto.encrypt(newPass1));
         rmap.put("new_password2", crypto.encrypt(newPass2));

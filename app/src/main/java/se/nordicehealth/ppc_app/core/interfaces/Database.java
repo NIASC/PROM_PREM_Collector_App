@@ -79,16 +79,16 @@ public interface Database
 	 * Updates the user's password and salt to newPass and newSalt if
 	 * oldPass matches the user's current password.
 	 * 
-	 * @param user The user that is updating it's password.
+	 * @param username The user that is updating it's password.
 	 * @param oldPass The old/current (unhashed) password.
-	 * @param newPass The new password hashed using the new salt.
-	 * @param newSalt The new salt.
+	 * @param newPass1 The new password.
+	 * @param newPass2 The new password.
 	 * 
 	 * @return The instance of the user with updated password. If the
 	 * 		old password does not match the user's password then the
 	 * 		password is not updated and null is returned.
 	 */
-	User setPassword(User user, String oldPass, String newPass, String newSalt);
+	int setPassword(String username, String oldPass, String newPass1, String newPass2);
 	
 	/**
 	 * Loads error messages from the database and puts them in a
@@ -207,11 +207,13 @@ public interface Database
 	{
 		public final long uid;
 		public final int response;
+		public final boolean update_password;
 
-		public Session(long uid, int response)
+		public Session(long uid, int response, boolean update_password)
 		{
 			this.uid = uid;
 			this.response = response;
+			this.update_password = update_password;
 		}
 	}
 	/* Protected */

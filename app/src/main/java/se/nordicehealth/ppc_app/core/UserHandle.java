@@ -86,6 +86,7 @@ public class UserHandle
 		{
 		case Constants.SUCCESS:
 			user = db.getUser(username);
+            update_password = session.update_password;
 			initLoginVars();
             questionnaire = new Questionnaire(ui, this);
 			break;
@@ -172,7 +173,7 @@ public class UserHandle
 	 */
 	public boolean updatePassword()
 	{
-		if (user.getUpdatePassword())
+		if (update_password)
 		{
 			ui.displayMessage(Implementations.Messages().getInfo(
 					Messages.INFO_UH_UPDATE_PASSWORD), true);
@@ -206,94 +207,30 @@ public class UserHandle
 	private UpdatePassword updatePass;
 	private User user;
 	private boolean loggedIn;
-	
-	/**
-	 * Attempts to find any errors in the supplied passwords.
-	 * The errors it looks for are:
-	 * Old/current password must match the user's current password.
-	 * The two new passwords must be the same.
-	 * The new password must fit the length constraint.
-	 * The new password must fit the strength constraint.
-	 * 
-	 * @param oldPass The unhashed old/current password.
-	 * @param newPass1 The first entry of the new unhashed password.
-	 * @param newPass2 The second entry of the new unhashed password.
-	 *  
-	 * @return {@code true} if an error occurred (see description
-	 * 		above). {@code false} if no errors were found.
-	 */
-	private boolean newPassError(
-			String oldPass, String newPass1, String newPass2)
+    private boolean update_password;
+
+	private boolean newPassError(int response)
 	{
-		if (!user.passwordMatch(oldPass))
-		{
-			ui.displayError(Implementations.Messages().getError(
-					Messages.ERROR_UH_PR_INVALID_CURRENT), false);
-			return true;
+		switch(response) {
+			case Constants.INVALID_DETAILS:
+				ui.displayError(Implementations.Messages().getError(
+						Messages.ERROR_UH_PR_INVALID_CURRENT), false);
+				return true;
+			case Constants.MISMATCH_NEW:
+				ui.displayError(Implementations.Messages().getError(
+						Messages.ERROR_UH_PR_MISMATCH_NEW), false);
+				return true;
+			case Constants.PASSWORD_SHORT:
+				ui.displayError(Implementations.Messages().getError(
+						Messages.ERROR_UH_PR_INVALID_LENGTH), false);
+				return true;
+            case Constants.PASSWORD_SIMPLE:
+				ui.displayError(Implementations.Messages().getError(
+						Messages.ERROR_UH_PR_PASSWORD_SIMPLE), false);
+				return true;
+			default:
+				return false;
 		}
-		if (!newPass1.equals(newPass2))
-		{
-			ui.displayError(Implementations.Messages().getError(
-					Messages.ERROR_UH_PR_MISMATCH_NEW), false);
-			return true;
-		}
-		int ret = validatePassword(newPass1);
-		if (ret < 0)
-		{
-			ui.displayError(Implementations.Messages().getError(
-					Messages.ERROR_UH_PR_INVALID_LENGTH), false);
-			return true;
-		}
-		else if (ret == 0)
-		{
-			ui.displayError(Implementations.Messages().getError(
-					Messages.ERROR_UH_PR_PASSWORD_SIMPLE), false);
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Validates the password according to the security criterion.
-	 * This should typically be done when the user wants to set a new
-	 * password.
-	 * The criterion are:
-	 * password length: &gt;5 and &lt;33 characters.
-	 * password strength: contain characters from at least 2 groups
-	 * 		out of lowercase, uppercase, digits, punctuation
-	 * 		(including space).
-	 * 
-	 * @param password The password to validate.
-	 * 
-	 * @return &lt;0 if the password does not fit the length constraint.
-	 * 		0 if the password does not fit the strength constraint.
-	 * 		&gt;0 if the password fits the length constraint and strength
-	 * 		constraint.
-	 */
-	private int validatePassword(String password)
-	{
-		if (password.length() < 6 || password.length() > 32)
-			return -1;
-		List<Pattern> pattern = Arrays.asList(
-				Pattern.compile("\\p{Lower}"), /* lowercase */
-				Pattern.compile("\\p{Upper}"), /* uppercase */
-				Pattern.compile("\\p{Digit}"), /* digits */
-				Pattern.compile("[\\p{Punct} ]") /* punctuation and space */
-		);
-		if (Pattern.compile("[^\\p{Print}]").matcher(password).find())
-		{ // expression contains non-ascii or non-printable characters
-			return 0;
-		}
-		int points = 0;
-		if (pattern.get(0).matcher(password).find())
-			++points;
-		if (pattern.get(1).matcher(password).find())
-			++points;
-		if (pattern.get(2).matcher(password).find())
-			++points;
-		if (pattern.get(3).matcher(password).find())
-			++points;
-		return points - 1;
 	}
 	
 	/**
@@ -329,21 +266,9 @@ public class UserHandle
 			String new1 = answers.get(1);
 			String new2 = answers.get(2);
 
-			if (newPassError(current, new1, new2))
-				return rfc;
-			
-			Encryption crypto = Implementations.Encryption();
-			String newSalt = crypto.getNewSalt();
-			User tmpUser;
-			tmpUser = db.setPassword(user, user.hashWithSalt(current),
-					crypto.hashString(new1, newSalt), newSalt);
-			if (tmpUser == null)
-			{
-				rfc.message = Database.DATABASE_ERROR;
-				return rfc;
-			}
-			user = tmpUser;
-			rfc.valid = true;
+            int response = db.setPassword(user.getUsername(), current, new1, new2);
+			if (!newPassError(response))
+                rfc.valid = true;
 			return rfc;
 		}
 

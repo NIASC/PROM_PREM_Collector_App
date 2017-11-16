@@ -160,27 +160,19 @@ public class ServletCommunication implements Database, Runnable
 	}
 
 	@Override
-	public User setPassword(User currentUser, String oldPass, String newPass,
-			String newSalt) throws NumberFormatException {
+	public int setPassword(String username, String oldPass, String newPass1, String newPass2) throws NumberFormatException {
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_SET_PASSWORD);
-		rmap.put("name", currentUser.getUsername());
-		rmap.put("old_password", oldPass);
-		rmap.put("new_password", newPass);
-		rmap.put("new_salt", newSalt);
+
+        Encryption crypto = Implementations.Encryption();
+		rmap.put("name", crypto.encrypt(username));
+		rmap.put("old_password", crypto.encrypt(oldPass));
+		rmap.put("new_password1", crypto.encrypt(newPass1));
+        rmap.put("new_password2", crypto.encrypt(newPass2));
 
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
-		Map<String, String> umap = (Map<String, String>) getJSONObject(amap.get("user"));
-        if (umap == null) {
-            throw new AssertionError();
-        }
-        return new User(Integer.parseInt(umap.get("clinic_id")),
-                umap.get("name"),
-                umap.get("password"),
-                umap.get("email"),
-                umap.get("salt"),
-                Integer.parseInt(umap.get("update_password")) != 0);
+        return Integer.parseInt(amap.get(Constants.SETPASS_REPONSE));
 	}
 
 	@Override
@@ -321,12 +313,13 @@ public class ServletCommunication implements Database, Runnable
 
 		JSONObject ans = sendMessage(ret);
 		if (ans == null)
-			return new Session(0L, Constants.ERROR);
+			return new Session(0L, Constants.ERROR, false);
 		Map<String, String> amap = (Map<String, String>) ans;
         String response = amap.get(Constants.LOGIN_REPONSE);
         String uid = amap.get(Constants.LOGIN_UID);
+        boolean update_password = Integer.parseInt(amap.get("update_password")) > 0;
         return new Session(uid != null ? Long.parseLong(uid) : 0L,
-                Integer.parseInt(response));
+                Integer.parseInt(response), update_password);
 	}
 
 	@Override

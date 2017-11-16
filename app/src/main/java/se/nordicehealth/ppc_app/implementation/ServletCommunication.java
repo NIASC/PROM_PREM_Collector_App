@@ -116,15 +116,18 @@ public class ServletCommunication implements Database, Runnable
                     QDBFormat.getDBFormat(fc));
         }
 
-        Encryption crypto = Implementations.Encryption();
         JSONObject pobj = new JSONObject();
         Map<String, String> pmap = (Map<String, String>) pobj;
-        pmap.put("forename", crypto.encrypt(patient.getForename()));
-        pmap.put("surname", crypto.encrypt(patient.getSurname()));
-        pmap.put("personal_id", crypto.encrypt(patient.getPersonalNumber()));
+        pmap.put("forename", patient.getForename());
+        pmap.put("surname", patient.getSurname());
+        pmap.put("personal_id", patient.getPersonalNumber());
 
-        rmap.put("uid", crypto.encrypt(Long.toString(uid)));
-        rmap.put("patient", pobj.toString());
+        JSONObject details = new JSONObject();
+        Map<String, String> dmap = (Map<String, String>) details;
+        dmap.put("uid", Long.toString(uid));
+
+        rmap.put("details", crypto.encrypt(details.toString()));
+        rmap.put("patient", crypto.encrypt(pobj.toString()));
 		rmap.put("questions", questions.toString());
 
 		JSONObject ans = sendMessage(ret);
@@ -140,11 +143,13 @@ public class ServletCommunication implements Database, Runnable
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_SET_PASSWORD);
 
-        Encryption crypto = Implementations.Encryption();
-		rmap.put("uid", crypto.encrypt(Long.toString(uid)));
-		rmap.put("old_password", crypto.encrypt(oldPass));
-		rmap.put("new_password1", crypto.encrypt(newPass1));
-        rmap.put("new_password2", crypto.encrypt(newPass2));
+        JSONObject details = new JSONObject();
+        Map<String, String> dmap = (Map<String, String>) details;
+        dmap.put("uid", Long.toString(uid));
+        dmap.put("old_password", oldPass);
+        dmap.put("new_password1", newPass1);
+        dmap.put("new_password2", newPass2);
+        rmap.put("details", crypto.encrypt(details.toString()));
 
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
         return Integer.parseInt(amap.get(Constants.SETPASS_REPONSE));
@@ -201,8 +206,11 @@ public class ServletCommunication implements Database, Runnable
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_LOAD_QR_DATE);
-        Encryption crypto = Implementations.Encryption();
-		rmap.put("uid", crypto.encrypt(Long.toString(uid)));
+
+        JSONObject details = new JSONObject();
+        Map<String, String> dmap = (Map<String, String>) details;
+        dmap.put("uid", Long.toString(uid));
+        rmap.put("details", crypto.encrypt(details.toString()));
 
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
 		List<String> dlist = (List<String>) getJSONArray(amap.get("dates"));
@@ -234,8 +242,10 @@ public class ServletCommunication implements Database, Runnable
 			qlist.add(String.format(Locale.US, "question%d", i));
 		rmap.put("questions", questions.toString());
 
-        Encryption crypto = Implementations.Encryption();
-        rmap.put("uid", crypto.encrypt(Long.toString(uid)));
+        JSONObject details = new JSONObject();
+        Map<String, String> dmap = (Map<String, String>) details;
+        dmap.put("uid", Long.toString(uid));
+        rmap.put("details", crypto.encrypt(details.toString()));
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 		rmap.put("begin", sdf.format(begin.getTime()));
@@ -266,9 +276,13 @@ public class ServletCommunication implements Database, Runnable
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_REQ_REGISTR);
-		rmap.put("name", name);
-		rmap.put("email", email);
-		rmap.put("clinic", clinic);
+
+        JSONObject details = new JSONObject();
+        Map<String, String> dmap = (Map<String, String>) details;
+        dmap.put("name", name);
+        dmap.put("email", email);
+        dmap.put("clinic", clinic);
+        rmap.put("details", crypto.encrypt(details.toString()));
 		
 		JSONObject ans = sendMessage(ret);
 		if (ans == null)
@@ -284,9 +298,11 @@ public class ServletCommunication implements Database, Runnable
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_REQ_LOGIN);
 
-		Encryption crypto = Implementations.Encryption();
-		rmap.put("name", crypto.encrypt(username));
-		rmap.put("password", crypto.encrypt(password));
+        JSONObject details = new JSONObject();
+        Map<String, String> dmap = (Map<String, String>) details;
+        dmap.put("name", username);
+        dmap.put("password", password);
+        rmap.put("details", crypto.encrypt(details.toString()));
 
 		JSONObject ans = sendMessage(ret);
 		if (ans == null)
@@ -305,7 +321,11 @@ public class ServletCommunication implements Database, Runnable
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_REQ_LOGOUT);
-		rmap.put("uid", Long.toString(uid));
+
+        JSONObject details = new JSONObject();
+        Map<String, String> dmap = (Map<String, String>) details;
+        dmap.put("uid", Long.toString(uid));
+        rmap.put("details", crypto.encrypt(details.toString()));
 		
 		JSONObject ans = sendMessage(ret);
 		if (ans == null)

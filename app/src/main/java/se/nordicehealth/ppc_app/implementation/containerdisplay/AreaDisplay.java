@@ -58,6 +58,8 @@ public class AreaDisplay extends LinearLayout implements FormComponentDisplay
 	@Override
 	public boolean entryFilled()
 	{
+		if (!area.getText().toString().trim().isEmpty())
+			fillEntry();
 		return ac.hasEntry();
 	}
 

@@ -135,7 +135,7 @@ public interface Database
 	 * Loads the dates at which questionnaires have been filled in for
 	 * {@code user}'s clinic.
 	 * 
-	 * @param user The user that requests statistics.
+	 * @param uid The user that requests statistics.
 	 * @param tpc The container for the dates.
 	 * 
 	 * @return {@code true} if the questions were successfully
@@ -144,7 +144,7 @@ public interface Database
 	 * 
 	 * @see TimePeriodContainer
 	 */
-	boolean loadQResultDates(User user, TimePeriodContainer tpc);
+	boolean loadQResultDates(long uid, TimePeriodContainer tpc);
 
 	/**
 	 * Loads questionnaire results for the questions contained in
@@ -153,7 +153,7 @@ public interface Database
 	 * Only the results associated with the same clinic as {@code user} will
 	 * be loaded.
 	 * 
-	 * @param user The user that is requesting the data.
+	 * @param uid The user that is requesting the data.
 	 * @param begin The (inclusive) start date.
 	 * @param end The (inclusive) end date.
 	 * @param questionIDs a list of question IDs for the requested questions.
@@ -161,7 +161,7 @@ public interface Database
 	 * 
 	 * @return {@code true} if the results were loaded. {@code false} if not.
 	 */
-	boolean loadQResults(User user, Calendar begin, Calendar end, List<Integer> questionIDs,
+	boolean loadQResults(long uid, Calendar begin, Calendar end, List<Integer> questionIDs,
 						 StatisticsContainer container);
 
 	/**

@@ -198,6 +198,11 @@ public class UserHandle
 	{
 		return (User) user.clone();
 	}
+
+    protected long getUID()
+    {
+        return uid;
+    }
 	
 	/* Private */
 	

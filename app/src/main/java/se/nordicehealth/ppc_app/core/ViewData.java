@@ -121,7 +121,7 @@ class ViewData
 			List<Integer> selQuestions = questionselect.getEntry();
 
 			StatisticsContainer sc = new StatisticsContainer();
-			Implementations.Database().loadQResults(uh.getUser(),
+			Implementations.Database().loadQResults(uh.getUID(),
 					lower, upper, selQuestions, sc);
 			vdc = new ViewDataContainer(sc.getStatistics(), upper,
 					lower, nEntries);
@@ -162,7 +162,7 @@ class ViewData
 			TimePeriodContainer timeperiod =
 					new TimePeriodContainer(false, msg.getInfo(
 							Messages.INFO_VD_SELECT_QUESTIONS), null);
-			Implementations.Database().loadQResultDates(uh.getUser(), timeperiod);
+			Implementations.Database().loadQResultDates(uh.getUID(), timeperiod);
 			form.insert(timeperiod, Form.AT_END);
 			
 			form.jumpTo(Form.AT_BEGIN);

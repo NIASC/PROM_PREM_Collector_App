@@ -221,12 +221,13 @@ public class ServletCommunication implements Database, Runnable
 	}
 
 	@Override
-	public boolean loadQResultDates(User user, TimePeriodContainer tpc)
+	public boolean loadQResultDates(long uid, TimePeriodContainer tpc)
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
 		rmap.put("command", Constants.CMD_LOAD_QR_DATE);
-		rmap.put("name", user.getUsername());
+        Encryption crypto = Implementations.Encryption();
+		rmap.put("uid", crypto.encrypt(Long.toString(uid)));
 
 		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
 		List<String> dlist = (List<String>) getJSONArray(amap.get("dates"));
@@ -245,7 +246,7 @@ public class ServletCommunication implements Database, Runnable
 	}
 	
 	@Override
-	public boolean loadQResults(User user, Calendar begin, Calendar end,
+	public boolean loadQResults(long uid, Calendar begin, Calendar end,
 			List<Integer> questionIDs, StatisticsContainer container)
 	{
 		JSONObject ret = new JSONObject();
@@ -258,7 +259,8 @@ public class ServletCommunication implements Database, Runnable
 			qlist.add(String.format(Locale.US, "question%d", i));
 		rmap.put("questions", questions.toString());
 
-		rmap.put("name", user.getUsername());
+        Encryption crypto = Implementations.Encryption();
+        rmap.put("uid", crypto.encrypt(Long.toString(uid)));
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 		rmap.put("begin", sdf.format(begin.getTime()));

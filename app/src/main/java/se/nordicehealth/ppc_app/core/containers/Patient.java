@@ -36,20 +36,14 @@ public class Patient
 	 * @param forename The forename of this patient.
 	 * @param surname The surname of this patient.
 	 * @param pnr The personal number of this patient.
-	 * @param user The user that added this patient.
 	 * 
 	 * @throws NullPointerException If the supplied user is null.
 	 */
-	public Patient(String forename, String surname, String pnr,
-			final User user) throws NullPointerException
+	public Patient(String forename, String surname, String pnr) throws NullPointerException
 	{
-		if (user == null)
-			throw new NullPointerException();
 		this.forename = forename.trim().toLowerCase();
 		this.surname = surname.trim().toLowerCase();
 		this.pnr = pnr;
-		this.user = user;
-		this.clinicID = user.getClinicID();
 	}
 	
 	/**
@@ -82,33 +76,9 @@ public class Patient
 		return pnr;
 	}
 	
-	/**
-	 * Retrieves user that added this patient.
-	 * 
-	 * @return The user that added this patient.
-	 */
-	public User getUser()
-	{
-		return user;
-	}
-	
-	/**
-	 * Retrieves this patient's clinic id.
-	 * 
-	 * @return The clinic ID that this user belongs to. This will be
-	 * 		the same clinic ID as that of the user who added this
-	 * 		patient.
-	 */
-	public int getClinicID()
-	{
-		return clinicID;
-	}
-	
 	/* Protected */
 	
 	/* Private */
 	
 	private final String forename, surname, pnr;
-	private final int clinicID;
-	private final User user;
 }

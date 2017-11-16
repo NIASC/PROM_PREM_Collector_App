@@ -100,7 +100,7 @@ public class Questionnaire
 				answers.add(form.currentEntry());
 			while (form.nextEntry() != null);
 			
-			if (!Implementations.Database().addQuestionnaireAnswers(patient,
+			if (!Implementations.Database().addQuestionnaireAnswers(uh.getUID(), patient,
 					Collections.unmodifiableList(answers)))
 			{
 				rfc.message = Database.DATABASE_ERROR;
@@ -173,8 +173,7 @@ public class Questionnaire
 			
 			try
 			{
-				patient = new Patient(forename, lastname,
-						pID, uh.getUser());
+				patient = new Patient(forename, lastname, pID);
 			}
 			catch (NullPointerException npe)
 			{

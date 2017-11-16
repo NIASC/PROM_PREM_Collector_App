@@ -23,7 +23,6 @@ package se.nordicehealth.ppc_app.implementation;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -49,7 +48,6 @@ import se.nordicehealth.ppc_app.core.containers.MessageContainer;
 import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;
-import se.nordicehealth.ppc_app.core.containers.User;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer.Question;
 import se.nordicehealth.ppc_app.core.containers.form.AreaContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
@@ -99,7 +97,7 @@ public class ServletCommunication implements Database, Runnable
 	}
 
 	@Override
-	public boolean addQuestionnaireAnswers(Patient patient, List<FormContainer> answers)
+	public boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers)
 	{
 		JSONObject ret = new JSONObject();
 		Map<String, String> rmap = (Map<String, String>) ret;
@@ -117,13 +115,16 @@ public class ServletCommunication implements Database, Runnable
             qmap.put(String.format(Locale.US, "`question%d`", i++),
                     QDBFormat.getDBFormat(fc));
         }
-		
-		String identifier = crypto.encryptMessage(
-				patient.getForename(), patient.getPersonalNumber(),
-				patient.getSurname());
-		
-		rmap.put("clinic_id", Integer.toString(patient.getClinicID()));
-		rmap.put("identifier", identifier);
+
+        Encryption crypto = Implementations.Encryption();
+        JSONObject pobj = new JSONObject();
+        Map<String, String> pmap = (Map<String, String>) pobj;
+        pmap.put("forename", crypto.encrypt(patient.getForename()));
+        pmap.put("surname", crypto.encrypt(patient.getSurname()));
+        pmap.put("personal_id", crypto.encrypt(patient.getPersonalNumber()));
+
+        rmap.put("uid", crypto.encrypt(Long.toString(uid)));
+        rmap.put("patient", pobj.toString());
 		rmap.put("questions", questions.toString());
 
 		JSONObject ans = sendMessage(ret);
@@ -131,32 +132,6 @@ public class ServletCommunication implements Database, Runnable
 			return false;
 		String insert = (String) ans.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
-	}
-
-	@Override
-	public User getUser(String username)
-	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_GET_USER);
-		rmap.put("name", username);
-
-		JSONObject ans = sendMessage(ret);
-		if (ans == null)
-            return null;
-		JSONObject user = getJSONObject((String) ans.get("user"));
-		Map<String, String> umap = (Map<String, String>) user;
-        assert umap != null;
-		User usr = null;
-		try {
-            usr = new User(Integer.parseInt(umap.get("clinic_id")),
-                    umap.get("name"),
-					umap.get("password"),
-					umap.get("email"),
-					umap.get("salt"),
-					Integer.parseInt(umap.get("update_password")) != 0);
-		} catch (NumberFormatException ignored) {}
-		return usr;
 	}
 
 	@Override

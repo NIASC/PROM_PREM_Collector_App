@@ -24,7 +24,7 @@ import se.nordicehealth.ppc_app.implementation.Email_Registration;
 import se.nordicehealth.ppc_app.implementation.Locale_se;
 import se.nordicehealth.ppc_app.implementation.ResourceStrings;
 import se.nordicehealth.ppc_app.implementation.ServletCommunication;
-import se.nordicehealth.ppc_app.implementation.SHA_Encryption;
+import se.nordicehealth.ppc_app.implementation.RSA_Encryption;
 
 /**
  * This class acts as an interface between the implementation of the
@@ -62,7 +62,7 @@ public abstract class Implementations
 	 */
 	public static Encryption Encryption()
 	{
-		return new SHA_Encryption();
+		return new RSA_Encryption();
 	}
 	
 	/**

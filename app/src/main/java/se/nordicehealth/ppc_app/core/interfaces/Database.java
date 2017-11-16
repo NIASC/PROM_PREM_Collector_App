@@ -27,7 +27,6 @@ import se.nordicehealth.ppc_app.core.containers.MessageContainer;
 import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;
-import se.nordicehealth.ppc_app.core.containers.User;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
 
@@ -63,17 +62,7 @@ public interface Database
 	 * @return {@code true} on successful update,
 	 *		{@code false} on failure.
 	 */
-	boolean addQuestionnaireAnswers(Patient patient, List<FormContainer> answers);
-	
-	/**
-	 * Collects the information about the user from the database.
-	 * 
-	 * @param username The name of the user to look for.
-	 * 
-	 * @return If the user was found the instance of the user is
-	 * 		returned else {@code null}.
-	 */
-	User getUser(String username);
+	boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers);
 
 	/**
 	 * Updates the user's password and salt to newPass and newSalt if

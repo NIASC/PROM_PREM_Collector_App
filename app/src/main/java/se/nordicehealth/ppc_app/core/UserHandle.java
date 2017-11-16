@@ -21,15 +21,11 @@
 package se.nordicehealth.ppc_app.core;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import se.nordicehealth.ppc_app.core.containers.Form;
-import se.nordicehealth.ppc_app.core.containers.User;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Database;
-import se.nordicehealth.ppc_app.core.interfaces.Encryption;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
@@ -63,8 +59,7 @@ public class UserHandle
 		db = Implementations.Database();
 		viewData = new ViewData(ui, this);
 		updatePass = new UpdatePassword();
-		user = null;
-		loggedIn = false;
+        resetLoginVars();
 	}
 	
 	/**
@@ -85,10 +80,7 @@ public class UserHandle
 		switch(session.response)
 		{
 		case Constants.SUCCESS:
-			user = db.getUser(username);
-            uid = session.uid;
-            update_password = session.update_password;
-			initLoginVars();
+			initLoginVars(new User(session.uid, session.update_password, true));
             questionnaire = new Questionnaire(ui, this);
 			break;
 		case Constants.ALREADY_ONLINE:
@@ -117,7 +109,7 @@ public class UserHandle
 	 */
 	public void register()
 	{
-		if (loggedIn)
+		if (user.loggedIn)
 			return;
 		Registration register = Implementations.Registration(ui);
 		register.registrationProcess();
@@ -129,9 +121,9 @@ public class UserHandle
 	 */
 	public void logout()
 	{
-		if (!loggedIn)
+		if (!user.loggedIn)
 			return;
-		db.requestLogout(uid);
+		db.requestLogout(user.uid);
 		resetLoginVars();
 	}
 	
@@ -140,7 +132,7 @@ public class UserHandle
 	 */
 	public void startQuestionnaire()
 	{
-		if (!loggedIn)
+		if (!user.loggedIn)
 			return;
 		questionnaire.start();
 	}
@@ -150,7 +142,7 @@ public class UserHandle
 	 */
 	public void viewData()
 	{
-		if (!loggedIn)
+		if (!user.loggedIn)
 			return;
 		viewData.start();
 	}
@@ -162,7 +154,7 @@ public class UserHandle
 	 */
 	public boolean isLoggedIn()
 	{
-		return loggedIn;
+		return user.loggedIn;
 	}
 	
 	/**
@@ -174,7 +166,7 @@ public class UserHandle
 	 */
 	public boolean updatePassword()
 	{
-		if (update_password)
+		if (user.update_password)
 		{
 			ui.displayMessage(Implementations.Messages().getInfo(
 					Messages.INFO_UH_UPDATE_PASSWORD), true);
@@ -185,23 +177,10 @@ public class UserHandle
 	}
 	
 	/* Protected */
-	
-	/**
-	 * Retrieves this handle's active {@code User}.
-	 * 
-	 * @return This handle's active {@code User}. If this handle does
-	 * 		not have an active user then {@code null} is returned.
-	 * 
-	 * @see User
-	 */
-	protected User getUser()
-	{
-		return (User) user.clone();
-	}
 
-    protected long getUID()
+    long getUID()
     {
-        return uid;
+        return user.uid;
     }
 	
 	/* Private */
@@ -211,10 +190,7 @@ public class UserHandle
 	private Questionnaire questionnaire;
 	private ViewData viewData;
 	private UpdatePassword updatePass;
-	private User user;
-    private long uid;
-	private boolean loggedIn;
-    private boolean update_password;
+    private User user;
 
 	private boolean newPassError(int response)
 	{
@@ -244,9 +220,9 @@ public class UserHandle
 	 * Initializes variables that are useful during the time the user
 	 * is logged in.
 	 */
-	private void initLoginVars()
+	private void initLoginVars(User user)
 	{
-		loggedIn = true;
+        this.user = user;
 	}
 	
 	/**
@@ -254,8 +230,7 @@ public class UserHandle
 	 */
 	private void resetLoginVars()
 	{
-		loggedIn = false;
-		user = null;
+        user = new User(0L, false, false);
 	}
 	
 	private class UpdatePassword implements FormUtils
@@ -273,7 +248,7 @@ public class UserHandle
 			String new1 = answers.get(1);
 			String new2 = answers.get(2);
 
-            int response = db.setPassword(uid, current, new1, new2);
+            int response = db.setPassword(user.uid, current, new1, new2);
 			if (!newPassError(response))
                 rfc.valid = true;
 			return rfc;
@@ -299,7 +274,7 @@ public class UserHandle
 		 */
 		private void setPassword()
 		{
-			if (!loggedIn)
+			if (!user.loggedIn)
 				return; // no user to set password for
 
 			Form form = new Form();
@@ -316,4 +291,18 @@ public class UserHandle
 			ui.presentForm(form, this, true);
 		}
 	}
+
+	private class User
+    {
+        long uid;
+        boolean update_password;
+        private boolean loggedIn;
+
+        User(long uid, boolean update_password, boolean loggedIn)
+        {
+            this.uid = uid;
+            this.update_password = update_password;
+            this.loggedIn = loggedIn;
+        }
+    }
 }

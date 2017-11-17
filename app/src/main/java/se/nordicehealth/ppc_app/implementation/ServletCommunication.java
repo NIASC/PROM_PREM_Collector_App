@@ -372,19 +372,12 @@ public class ServletCommunication implements Database, Runnable
 			OutputStream os = connection.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
 			// System.out.println(obj);
-            Log.i("TEST", JSONOut.toString());
+            //Log.i("TEST", JSONOut.toString());
 			synchronized (this) {
 				osw.write(JSONOut.toString());
 			}
 			osw.flush();
 			osw.close();
-            /*
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				System.out.println("Ok response");
-			} else {
-				System.out.println("Bad response");
-			}
-			*/
 
 			/* receive message */
 			BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -395,7 +388,7 @@ public class ServletCommunication implements Database, Runnable
 				sb.append(inputLine);
 			in.close();
 
-            Log.i("TEST", sb.toString());
+            //Log.i("TEST", sb.toString());
 			synchronized (this) {
 				JSONIn = getJSONObject(sb.toString());
 			}

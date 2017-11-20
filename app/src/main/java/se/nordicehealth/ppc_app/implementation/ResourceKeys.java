@@ -6,7 +6,7 @@ import java.math.BigInteger;
 
 import se.nordicehealth.ppc_app.R;
 
-class ResourceKeys
+class ResourceKeys implements Key
 {
     static ResourceKeys getKeys() throws NullPointerException
     {
@@ -15,12 +15,14 @@ class ResourceKeys
         return self;
     }
 
-    BigInteger getExp()
+    @Override
+    public BigInteger getExp()
     {
         return exp;
     }
 
-    BigInteger getMod()
+    @Override
+    public BigInteger getMod()
     {
         return mod;
     }
@@ -29,25 +31,18 @@ class ResourceKeys
 
 	/* Package */
 
-    /**
-     * Loads messages from the resources.
-     *
-     * @return {@code true} if messages was successfully loaded.
-     * 		{@code false} if an error occurred while loading messages.
-     */
-    static boolean loadKeys(Resources r)
+    static void loadKeys(Resources r)
     {
-        if (self == null)
-            self = new ResourceKeys(r);
-        return true;
+        self = new ResourceKeys(r);
     }
 
 	/* Private */
 
-	private BigInteger exp, mod;
     private static ResourceKeys self;
+	private BigInteger exp, mod;
 
-    private ResourceKeys(Resources r) {
+    private ResourceKeys(Resources r)
+    {
         exp = new BigInteger(r.getString(R.string.exp), 16);
         mod = new BigInteger(r.getString(R.string.mod), 16);
     }

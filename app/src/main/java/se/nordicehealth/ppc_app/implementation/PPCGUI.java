@@ -26,15 +26,13 @@ import se.nordicehealth.ppc_app.core.UserHandle;
 import se.nordicehealth.ppc_app.core.containers.Form;
 import se.nordicehealth.ppc_app.core.containers.ViewDataContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
-import se.nordicehealth.ppc_app.core.interfaces.Database;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
-import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils.RetFunContainer;
 import se.nordicehealth.ppc_app.implementation.containerdisplay.ContainerDisplays;
 
-public class GUI_UserInterface extends Activity implements UserInterface
+public class PPCGUI extends Activity implements UserInterface
 {
     private UserHandle uh;
     private ScrollView pageContent;
@@ -48,6 +46,8 @@ public class GUI_UserInterface extends Activity implements UserInterface
 
         ResourceStrings.loadMessages(getResources());
         ResourceKeys.loadKeys(getResources());
+        PacketHandler.initialize(new RSA(ResourceKeys.getKeys().getExp(),
+                ResourceKeys.getKeys().getMod()));
 
         uh = new UserHandle(this);
         initGUI();
@@ -65,7 +65,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
 
     private void initGUI()
     {
-        final GUI_UserInterface c = this;
+        final PPCGUI c = this;
         setContentView(R.layout.activity_login);
 
         pageContent = findViewById(R.id.page_scroll);
@@ -283,7 +283,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
                 final View retpan, boolean displayMultiple)
         {
             super(c);
-            displayMessage("Setting GUI form as content", false);
+            displayMessage("Setting PPCGUI form as content", false);
 
             this.form = form;
             this.function = function;
@@ -305,7 +305,7 @@ public class GUI_UserInterface extends Activity implements UserInterface
             List<FormComponentDisplay> contents = new ArrayList<>();
             form.jumpTo(Form.AT_BEGIN);
             do {
-                contents.add(form.currentEntry().getDisplayable(GUI_UserInterface.this));
+                contents.add(form.currentEntry().getDisplayable(PPCGUI.this));
             } while(!form.endOfForm() && form.nextEntry() != null);
             return contents;
         }

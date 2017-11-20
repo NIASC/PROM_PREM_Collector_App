@@ -39,7 +39,7 @@ import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
  * @author Marcus Malmquist
  *
  */
-public class Email_Registration implements Registration, FormUtils
+public class EmailRegistration implements Registration, FormUtils
 {
 	/* Public */
 	
@@ -47,7 +47,7 @@ public class Email_Registration implements Registration, FormUtils
 	 * 
 	 * @param ui The user user interface instance.
 	 */
-	public Email_Registration(UserInterface ui)
+	public EmailRegistration(UserInterface ui)
 	{
 		this.ui = ui;
 	}

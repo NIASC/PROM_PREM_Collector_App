@@ -20,11 +20,10 @@
  */
 package se.nordicehealth.ppc_app.core.interfaces;
 
-import se.nordicehealth.ppc_app.implementation.Email_Registration;
-import se.nordicehealth.ppc_app.implementation.Locale_se;
+import se.nordicehealth.ppc_app.implementation.EmailRegistration;
+import se.nordicehealth.ppc_app.implementation.LocaleSE;
 import se.nordicehealth.ppc_app.implementation.ResourceStrings;
-import se.nordicehealth.ppc_app.implementation.ServletCommunication;
-import se.nordicehealth.ppc_app.implementation.RSA_Encryption;
+import se.nordicehealth.ppc_app.implementation.PacketHandler;
 
 /**
  * This class acts as an interface between the implementation of the
@@ -49,20 +48,7 @@ public abstract class Implementations
 	 */
 	public static Database Database()
 	{
-		return ServletCommunication.getDatabase();
-	}
-	
-	/**
-	 * Constructor for the implementation of {@code Encryption}.
-	 * 
-	 * @return A new instance of the current implementation of
-	 * 		{@code Encryption}.
-	 * 
-	 * @see Encryption
-	 */
-	public static Encryption Encryption()
-	{
-		return new RSA_Encryption();
+		return PacketHandler.getPacketHandler();
 	}
 	
 	/**
@@ -78,7 +64,7 @@ public abstract class Implementations
 	 */
 	public static Registration Registration(UserInterface ui)
 	{
-		return new Email_Registration(ui);
+		return new EmailRegistration(ui);
 	}
 	
 	/**
@@ -91,7 +77,7 @@ public abstract class Implementations
 	 */
 	public static Locale Locale()
 	{
-		return Locale_se.getLocale();
+		return LocaleSE.getLocale();
 	}
 
 	public static Messages Messages()

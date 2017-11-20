@@ -1,4 +1,4 @@
-/*! SHA_Encryption.java
+/*! Encryption.java
  * 
  * Copyright 2017 Marcus Malmquist
  * 
@@ -21,48 +21,16 @@
 package se.nordicehealth.ppc_app.implementation;
 
 import java.math.BigInteger;
-import java.util.Locale;
 
-import se.nordicehealth.ppc_app.core.interfaces.Encryption;
-
-/**
- * This class is an example of an implementation of
- * Entryption_Interface.
- * 
- * @author Marcus Malmquist
- *
- */
-public class RSA_Encryption implements Encryption
+public interface Key
 {
 	/* Public */
-	
-	/**
-	 * Initializes variables.
-	 */
-	public RSA_Encryption()
-	{
-		e = ResourceKeys.getKeys().getExp();
-		n = ResourceKeys.getKeys().getMod();
-	}
 
-	@Override
-	public String encrypt(String message)
-	{
-		byte b[] = encryptRSA(message.getBytes());
+    BigInteger getExp();
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < b.length; sb.append(i < b.length ? ":" : ""))
-			sb.append(String.format(Locale.US, "%02x", b[i++]));
-		return sb.toString();
-	}
+    BigInteger getMod();
 	
 	/* Protected */
 	
 	/* Private */
-	private BigInteger e, n;
-
-	private byte[] encryptRSA(byte msgBytes[])
-	{
-		return new BigInteger(msgBytes).modPow(e, n).toByteArray();
-	}
 }

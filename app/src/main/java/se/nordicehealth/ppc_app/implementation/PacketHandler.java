@@ -20,15 +20,6 @@
  */
 package se.nordicehealth.ppc_app.implementation;
 
-import android.util.Log;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,12 +30,7 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import se.nordicehealth.ppc_app.core.containers.MessageContainer;
 import se.nordicehealth.ppc_app.core.containers.Patient;
@@ -59,14 +45,17 @@ import se.nordicehealth.ppc_app.core.containers.form.SingleOptionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.SliderContainer;
 import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Database;
-import se.nordicehealth.ppc_app.core.interfaces.Encryption;
-import se.nordicehealth.ppc_app.core.interfaces.Implementations;
+import se.nordicehealth.ppc_app.implementation.io.ListData;
+import se.nordicehealth.ppc_app.implementation.io.MapData;
+import se.nordicehealth.ppc_app.implementation.io.PacketData;
+import se.nordicehealth.ppc_app.implementation.io.ServletConnection;
+import se.nordicehealth.ppc_app.implementation.security.Encryption;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.common.implementation.Constants;
 
 /**
  * This class is an example of an implementation of
- * Database_Interface. This is done using a MySQL database and a
+ * Database_Interface. This is done using a MySQL pktHandler and a
  * MySQL Connector/J to provide a MySQL interface to Java.
  * 
  * This class is designed to be thread safe and a singleton.
@@ -74,7 +63,7 @@ import se.nordicehealth.ppc_app.common.implementation.Constants;
  * @author Marcus Malmquist
  *
  */
-public class ServletCommunication implements Database, Runnable
+public class PacketHandler implements Database
 {
 	/* Public */
 	
@@ -83,12 +72,17 @@ public class ServletCommunication implements Database, Runnable
 	 * 
 	 * @return The active instance of this class.
 	 */
-	public static synchronized ServletCommunication getDatabase()
+	public static synchronized PacketHandler getPacketHandler()
 	{
-		if (database == null)
-			database = new ServletCommunication();
-		return database;
+		if (pktHandler == null)
+		    throw new NullPointerException("PacketHandler have not been initialized.");
+		return pktHandler;
 	}
+
+	static void initialize(Encryption crypto)
+    {
+        pktHandler = new PacketHandler(crypto);
+    }
 
 	@Override
 	public final Object clone()
@@ -100,7 +94,7 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers)
 	{
-        JSONMapData ret = new JSONMapData(null);
+        MapData ret = new MapData(null);
         ret.put("command", Constants.CMD_ADD_QANS);
 
         QuestionContainer qc = Questions.getQuestions().getContainer();
@@ -108,26 +102,26 @@ public class ServletCommunication implements Database, Runnable
 			return false;
 		}
 
-		JSONMapData questions = new JSONMapData(null);
+		MapData questions = new MapData(null);
 		int i = 0;
         for (FormContainer fc : answers) {
             questions.put(String.format(Locale.US, "`question%d`", i++),
                     QDBFormat.getDBFormat(fc));
         }
 
-        JSONMapData pobj = new JSONMapData(null);
+		MapData pobj = new MapData(null);
         pobj.put("forename", patient.getForename());
         pobj.put("surname", patient.getSurname());
         pobj.put("personal_id", patient.getPersonalNumber());
 
-        JSONMapData details = new JSONMapData(null);
+		MapData details = new MapData(null);
         details.put("uid", Long.toString(uid));
 
         ret.put("details", crypto.encrypt(details.toString()));
         ret.put("patient", crypto.encrypt(pobj.toString()));
         ret.put("questions", questions.toString());
 
-        JSONMapData ans = sendMessage(ret);
+		MapData ans = sendMessage(ret);
 		String insert = ans.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
@@ -135,17 +129,17 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public int setPassword(long uid, String oldPass, String newPass1, String newPass2) throws NumberFormatException
     {
-        JSONMapData ret = new JSONMapData(null);
+		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_SET_PASSWORD);
 
-        JSONMapData details = new JSONMapData(null);
+		MapData details = new MapData(null);
         details.put("uid", Long.toString(uid));
         details.put("old_password", oldPass);
         details.put("new_password1", newPass1);
         details.put("new_password2", newPass2);
         ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData amap = sendMessage(ret);
+		MapData amap = sendMessage(ret);
         return Integer.parseInt(amap.get(Constants.SETPASS_REPONSE));
 	}
 
@@ -164,13 +158,13 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public boolean loadQuestions(QuestionContainer qc)
 	{
-        JSONMapData ret = new JSONMapData(null);
+		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_LOAD_Q);
 
-        JSONMapData amap = sendMessage(ret);
-        JSONMapData qmap = new JSONMapData(getJSONObject(amap.get("questions")));
+		MapData amap = sendMessage(ret);
+		MapData qmap = jsonData.getMapData(amap.get("questions"));
         for (Entry<String, String> e : qmap.iterable()) {
-            JSONMapData qtnmap = new JSONMapData(getJSONObject(e.getValue()));
+			MapData qtnmap = jsonData.getMapData(e.getValue());
 			List<String> options = new ArrayList<>();
 			for (int i = 0; ; ++i) {
                 String entry = qtnmap.get(String.format(Locale.US, "option%d", i));
@@ -194,15 +188,15 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public boolean loadQResultDates(long uid, TimePeriodContainer tpc)
 	{
-        JSONMapData ret = new JSONMapData(null);
+		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_LOAD_QR_DATE);
 
-        JSONMapData details = new JSONMapData(null);
+		MapData details = new MapData(null);
         details.put("uid", Long.toString(uid));
         ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData amap = sendMessage(ret);
-        JSONArrData dlist = new JSONArrData(getJSONArray(amap.get("dates")));
+		MapData amap = sendMessage(ret);
+        ListData dlist = jsonData.getListData(amap.get("dates"));
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
             for (String str : dlist.iterable()) {
@@ -220,27 +214,27 @@ public class ServletCommunication implements Database, Runnable
 	public boolean loadQResults(long uid, Calendar begin, Calendar end,
 			List<Integer> questionIDs, StatisticsContainer container)
 	{
-        JSONMapData ret = new JSONMapData(null);
+		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_LOAD_QR);
 
-        JSONArrData questions = new JSONArrData(null);
+		ListData questions = new ListData(null);
 		for (Integer i : questionIDs)
 			questions.add(String.format(Locale.US, "question%d", i));
         ret.put("questions", questions.toString());
 
-        JSONMapData details = new JSONMapData(null);
+		MapData details = new MapData(null);
         details.put("uid", Long.toString(uid));
         ret.put("details", crypto.encrypt(details.toString()));
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         ret.put("begin", sdf.format(begin.getTime()));
         ret.put("end", sdf.format(end.getTime()));
-		
 
-        JSONMapData amap = sendMessage(ret);
-        JSONArrData rlist = new JSONArrData(getJSONArray(amap.get("results")));
+
+		MapData amap = sendMessage(ret);
+		ListData rlist = jsonData.getListData(amap.get("results"));
         for (String str : rlist.iterable()) {
-            JSONMapData ansmap = new JSONMapData(getJSONObject(str));
+			MapData ansmap = jsonData.getMapData(str);
             QuestionContainer qc = Questions.getQuestions().getContainer();
             assert qc != null;
             for (Entry<String, String> e : ansmap.iterable()) {
@@ -256,16 +250,16 @@ public class ServletCommunication implements Database, Runnable
 	public boolean requestRegistration(
 			String name, String email, String clinic)
 	{
-        JSONMapData ret = new JSONMapData(null);
+		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_REQ_REGISTR);
 
-        JSONMapData details = new JSONMapData(null);
+		MapData details = new MapData(null);
         details.put("name", name);
         details.put("email", email);
         details.put("clinic", clinic);
         ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData ans = sendMessage(ret);
+		MapData ans = sendMessage(ret);
 		String insert = ans.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
@@ -273,15 +267,15 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public Session requestLogin(String username, String password)
 	{
-        JSONMapData ret = new JSONMapData(null);
+		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_REQ_LOGIN);
 
-        JSONMapData details = new JSONMapData(null);
+		MapData details = new MapData(null);
         details.put("name", username);
         details.put("password", password);
         ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData ans = sendMessage(ret);
+		MapData ans = sendMessage(ret);
         String response = ans.get(Constants.LOGIN_REPONSE);
         String uid = ans.get(Constants.LOGIN_UID);
         String update_password = ans.get("update_password");
@@ -293,14 +287,14 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public boolean requestLogout(long uid)
 	{
-        JSONMapData ret = new JSONMapData(null);
+		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_REQ_LOGOUT);
 
-        JSONMapData details = new JSONMapData(null);
+		MapData details = new MapData(null);
         details.put("uid", Long.toString(uid));
         ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData ans = sendMessage(ret);
+		MapData ans = sendMessage(ret);
 		return Integer.parseInt(ans.get(Constants.LOGOUT_REPONSE)) == Constants.SUCCESS;
 	}
 	
@@ -308,73 +302,23 @@ public class ServletCommunication implements Database, Runnable
 	
 	/* Private */
 
-	private static ServletCommunication database;
+	private static PacketHandler pktHandler;
 	private Encryption crypto;
 	
-	private JSONParser parser;
-    private volatile JSONMapData JSONOut, JSONIn;
-    private _ServletCommunication scom;
+	private PacketData jsonData;
+    private volatile MapData JSONOut, JSONIn;
+    private ServletConnection scom;
 	
 	/**
-	 * Initializes variables and loads the database configuration.
+	 * Initializes variables and loads the pktHandler configuration.
 	 * This class is a singleton and should only be instantiated once.
 	 */
-	private ServletCommunication()
+	private PacketHandler(Encryption crypto)
 	{
-		crypto = Implementations.Encryption();
-        scom = new _ServletCommunication(Constants.SERVER_URL);
-		parser = new JSONParser();
+        this.crypto = crypto;
+        scom = new ServletConnection(Constants.SERVER_URL);
+		jsonData = new PacketData();
 	}
-
-
-	@Override
-	public void run()
-	{
-        JSONIn = null;
-        String pktIn = null;
-		HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) Constants.SERVER_URL.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setUseCaches(false);
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-
-            sendPacket(connection.getOutputStream(), JSONOut);
-            pktIn = receivePacket(connection.getInputStream());
-        } catch (java.io.IOException pe) {
-            return;
-        } finally {
-            if (connection != null)
-                connection.disconnect();
-        }
-
-        Log.i("MSGIN", pktIn);
-        synchronized (this) {
-            JSONIn = new JSONMapData(getJSONObject(pktIn));
-        }
-	}
-
-	private void sendPacket(OutputStream os, JSONMapData pktOut) throws IOException
-    {
-        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-        Log.i("MSGOUT", JSONOut.toString());
-        synchronized (this) {
-            osw.write(JSONOut.toString());
-        }
-        osw.flush();
-    }
-
-    private String receivePacket(InputStream is) throws IOException
-    {
-        BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        StringBuilder sb = new StringBuilder();
-
-        for (String inputLine; (inputLine = in.readLine()) != null; sb.append(inputLine));
-
-        return sb.toString();
-    }
 	
 	/**
 	 * Sends a JSONObject to the servlet.
@@ -383,49 +327,13 @@ public class ServletCommunication implements Database, Runnable
 	 * 
 	 * @return The JSONObject returned from the servlet.
 	 */
-	private JSONMapData sendMessage(JSONMapData obj)
+	private MapData sendMessage(MapData obj)
 	{
-        return new JSONMapData(getJSONObject(scom.sendMessage(obj.toString())));
-	}
-	
-	/**
-	 * Attempts to parse {@code str} into a {@code JSONObject}.
-	 * 
-	 * @param str The string to be converted into a {@code JSONObject}.
-	 * 
-	 * @return The {@code JSONObject} representation of {@code str}, or
-	 * 		{@code null} if {@code str} does not represent a
-	 * 		{@code JSONObject}.
-	 */
-	private JSONObject getJSONObject(String str)
-	{
-		try {
-			return (JSONObject) parser.parse(str);
-		} catch (org.json.simple.parser.ParseException | NullPointerException e) {
-            return null;
-		}
-	}
-	
-	/**
-	 * Attempts to parse {@code str} into a {@code JSONArray}.
-	 * 
-	 * @param str The string to be converted into a {@code JSONArray}.
-	 * 
-	 * @return The {@code JSONArray} representation of {@code str}, or
-	 * 		{@code null} if {@code str} does not represent a
-	 *  	{@code JSONArray}.
-	 */
-	private JSONArray getJSONArray(String str)
-	{
-		try {
-			return (JSONArray) parser.parse(str);
-		} catch (org.json.simple.parser.ParseException | NullPointerException e) {
-            return null;
-        }
+        return jsonData.getMapData(scom.sendMessage(obj.toString()));
 	}
 
 	/**
-	 * Retrieves messages from the database and places them in the
+	 * Retrieves messages from the pktHandler and places them in the
 	 * {@code MessageContainer}.
 	 * 
 	 * @param commandName The name of the (message) table to retrieve
@@ -437,15 +345,15 @@ public class ServletCommunication implements Database, Runnable
 	@Deprecated
 	private boolean getMessages(String commandName, MessageContainer mc)
 	{
-        JSONMapData ret = new JSONMapData(null);
+		MapData ret = new MapData(null);
 		ret.put("command", commandName);
 
-        JSONMapData ans = sendMessage(ret);
-        JSONMapData messages = new JSONMapData(getJSONObject(ans.get("messages")));
+		MapData ans = sendMessage(ret);
+		MapData messages = jsonData.getMapData(ans.get("messages"));
 		try {
             for (Entry<String, String> e : messages.iterable()) {
-                JSONMapData messagedata = new JSONMapData(getJSONObject(e.getValue()));
-                JSONMapData message = new JSONMapData(getJSONObject(messagedata.get("message")));
+				MapData messagedata = jsonData.getMapData(e.getValue());
+				MapData message = jsonData.getMapData(messagedata.get("message"));
 				mc.addMessage(Integer.parseInt(messagedata.get("code")),
                         messagedata.get("name"), message.map());
 			}
@@ -458,10 +366,10 @@ public class ServletCommunication implements Database, Runnable
 	
 	/**
 	 * This method converts a container type from the String
-	 * representation in the database to the appropriate class
+	 * representation in the pktHandler to the appropriate class
 	 * representation in java.
 	 * 
-	 * @param type The type of container as it appears in the database
+	 * @param type The type of container as it appears in the pktHandler
 	 * 		(SingleOption, Slider, Field etc.).
 	 * 
 	 * @return The class representation of the supplied {@code type}.
@@ -492,7 +400,7 @@ public class ServletCommunication implements Database, Runnable
 	
 	/**
 	 * This class handles converting question answer formats between its
-	 * database representation and its java representation.
+	 * pktHandler representation and its java representation.
 	 * 
 	 * @author Marcus Malmquist
 	 *
@@ -501,13 +409,13 @@ public class ServletCommunication implements Database, Runnable
 	{
 		/**
 		 * Converts the answer stored in {@code fc} to the format used
-		 * in the database.
+		 * in the pktHandler.
 		 * 
 		 * @param fc The container for the question which have been
 		 * 		answered and should have the answer stored in the
-		 * 		database.
+		 * 		pktHandler.
 		 * 
-		 * @return The database representation for the answer in
+		 * @return The pktHandler representation for the answer in
 		 * 		{@code fc}.
 		 */
 		static String getDBFormat(FormContainer fc)
@@ -544,13 +452,13 @@ public class ServletCommunication implements Database, Runnable
 		}
 		
 		/**
-		 * Converts the answer {@code dbEntry} from its database
+		 * Converts the answer {@code dbEntry} from its pktHandler
 		 * representation to its java representation. The return type
 		 * is {@code Object} to keep the formats general. The returned
 		 * objects are in the format they need to be in order to
 		 * represent the answer in its java format.
 		 * 
-		 * @param dbEntry The database entry that is to be converted
+		 * @param dbEntry The pktHandler entry that is to be converted
 		 * 		to a java entry.
 		 * 
  		 * @return The {@code Object} representation of the answer.
@@ -583,70 +491,4 @@ public class ServletCommunication implements Database, Runnable
 			return null;
 		}
 	}
-
-    private class JSONMapData
-    {
-        JSONObject jobj;
-        Map<String, String> jmap;
-
-        @SuppressWarnings("unchecked")
-        JSONMapData(JSONObject jobj)
-        {
-            this.jobj = jobj != null ? jobj : new JSONObject();
-            this.jmap = (Map<String, String>) this.jobj;
-        }
-
-        void put(String key, String value)
-		{
-			jmap.put(key, value);
-		}
-
-		String get(String key)
-        {
-            return jmap.get(key);
-        }
-
-        Iterable<Entry<String, String>> iterable()
-        {
-            return jmap.entrySet();
-        }
-
-        Map<String, String> map()
-        {
-            return Collections.unmodifiableMap(jmap);
-        }
-
-        public String toString()
-        {
-            return jobj.toString();
-        }
-    }
-
-    private class JSONArrData
-    {
-        JSONArray jarr;
-        List<String> jlist;
-
-        @SuppressWarnings("unchecked")
-        JSONArrData(JSONArray jarr)
-        {
-            this.jarr = jarr != null ? jarr : new JSONArray();
-            this.jlist = (List<String>) this.jarr;
-        }
-
-        void add(String value)
-        {
-            jlist.add(value);
-        }
-
-        Iterable<String> iterable()
-        {
-            return Collections.unmodifiableList(jlist);
-        }
-
-        public String toString()
-        {
-            return jarr.toString();
-        }
-    }
 }

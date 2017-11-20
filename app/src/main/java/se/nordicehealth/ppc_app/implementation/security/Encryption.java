@@ -18,7 +18,7 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package se.nordicehealth.ppc_app.core.interfaces;
+package se.nordicehealth.ppc_app.implementation.security;
 
 /**
  * This interface contains the methods required by the core part of

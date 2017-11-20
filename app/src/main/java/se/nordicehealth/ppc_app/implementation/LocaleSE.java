@@ -34,7 +34,7 @@ import se.nordicehealth.ppc_app.core.interfaces.Locale;
  * @author Marcus Malmquist
  *
  */
-public class Locale_se implements Locale
+public class LocaleSE implements Locale
 {
 	/* Public */
 	
@@ -43,10 +43,10 @@ public class Locale_se implements Locale
 	 * 
 	 * @return The active instance of this class.
 	 */
-	public static synchronized Locale_se getLocale()
+	public static synchronized LocaleSE getLocale()
 	{
 		if (locale == null)
-			locale = new Locale_se();
+			locale = new LocaleSE();
 		return locale;
 	}
 
@@ -102,12 +102,12 @@ public class Locale_se implements Locale
 	
 	/* Private */
 	
-	private static Locale_se locale;
+	private static LocaleSE locale;
 	
 	/**
 	 * Singleton class
 	 */
-	private Locale_se()
+	private LocaleSE()
 	{
 		
 	}

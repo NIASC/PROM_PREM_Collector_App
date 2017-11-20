@@ -18,7 +18,7 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package se.nordicehealth.ppc_app.implementation;
+package se.nordicehealth.ppc_app.implementation.io;
 
 import android.util.Log;
 
@@ -41,29 +41,76 @@ import java.net.URL;
  * @author Marcus Malmquist
  *
  */
-class _ServletCommunication implements Runnable
+public class ServletConnection
 {
 	/* Public */
 
-    @Override
-    public void run()
+	/* Protected */
+
+	/* Package */
+
+    public ServletConnection(URL servletURL)
     {
-        //while (true) {
-            // wait here
-        msgIn = null;
-        HttpURLConnection connection;
-        try {
-            connection = (HttpURLConnection) servletURL.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setUseCaches(false);
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-        } catch (IOException e) {
-            Log.e("ECONN", e.getMessage());
-            return;
-        }
+        this.servletURL = servletURL;
+    }
+
+    public String sendMessage(String message)
+    {
+        Thread t = new Thread(new IOHandler());
+        msgOut = message;
+        t.start();
+        try { t.join(); } catch (InterruptedException ignored) { }
+        return msgIn;
+    }
+
+	/* Private */
+
+    private volatile String msgOut, msgIn;
+    private final URL servletURL;
+
+	private void sendPacket(OutputStream os, String pktOut) throws IOException
+    {
+        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+        osw.write(pktOut);
+        osw.flush();
+    }
+
+    private String receivePacket(InputStream is) throws IOException
+    {
+        BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+
+        for (String inputLine; (inputLine = in.readLine()) != null;)
+            sb.append(inputLine);
+
+        return sb.toString();
+    }
+
+    private HttpURLConnection openConnection(URL url) throws IOException
+    {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setUseCaches(false);
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        return connection;
+    }
+
+    private class IOHandler implements Runnable
+    {
+        @Override
+        public void run() {
+            msgIn = null;
+            HttpURLConnection connection;
+            try {
+                connection = openConnection(servletURL);
+            } catch (IOException e) {
+                Log.e("ECONN", e.getMessage());
+                return;
+            }
             synchronized (this) {
+                Log.i("MSGOUT", msgOut);
                 try (OutputStream os = connection.getOutputStream()) {
                     sendPacket(os, msgOut);
                 } catch (IOException pe) {
@@ -77,52 +124,6 @@ class _ServletCommunication implements Runnable
                 }
                 Log.i("MSGIN", msgIn);
             }
-            // notify here
-        //}
-    }
-
-	/* Protected */
-
-	/* Package */
-
-    _ServletCommunication(URL servletURL)
-    {
-        this.servletURL = servletURL;
-    }
-
-    String sendMessage(String message)
-    {
-        // set message
-        // notify here
-        // wait here
-        // return message
-        Thread t = new Thread(this);
-        msgOut = message;
-        t.start();
-        try { t.join(); } catch (InterruptedException ignored) { }
-        return msgIn;
-    }
-
-	/* Private */
-
-    private volatile String msgOut, msgIn;
-    private URL servletURL;
-
-	private void sendPacket(OutputStream os, String pktOut) throws IOException
-    {
-        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-        Log.i("MSGOUT", pktOut);
-        osw.write(pktOut);
-        osw.flush();
-    }
-
-    private String receivePacket(InputStream is) throws IOException
-    {
-        BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        StringBuilder sb = new StringBuilder();
-
-        for (String inputLine; (inputLine = in.readLine()) != null; sb.append(inputLine));
-
-        return sb.toString();
+        }
     }
 }

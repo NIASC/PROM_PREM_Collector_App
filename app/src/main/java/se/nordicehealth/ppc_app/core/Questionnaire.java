@@ -55,12 +55,10 @@ public class Questionnaire
 	void start()
 	{
 		if (!uh.isLoggedIn())
-		{
 			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_NOT_LOGGED_IN), false);
-			return;
-		}
-		preg.createPatientRegistration();
+		else
+			preg.createPatientRegistration();
 	}
 	
 	/* Protected */
@@ -101,8 +99,7 @@ public class Questionnaire
 			while (form.nextEntry() != null);
 			
 			if (!Implementations.Database().addQuestionnaireAnswers(uh.getUID(), patient,
-					Collections.unmodifiableList(answers)))
-			{
+					Collections.unmodifiableList(answers))) {
 				rfc.message = Database.DATABASE_ERROR;
 				return rfc;
 			}

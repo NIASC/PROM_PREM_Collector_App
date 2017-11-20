@@ -20,8 +20,6 @@
  */
 package se.nordicehealth.ppc_app.core.interfaces;
 
-import se.nordicehealth.ppc_app.core.containers.MessageContainer;
-
 /**
  * This class should contain error and information messages from the
  * {@code Database}.

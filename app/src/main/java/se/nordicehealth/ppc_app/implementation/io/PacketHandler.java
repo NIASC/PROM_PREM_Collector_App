@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-import se.nordicehealth.ppc_app.core.containers.MessageContainer;
 import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;
@@ -136,20 +135,9 @@ public class PacketHandler implements Database
         ret.put("details", crypto.encrypt(details.toString()));
 
 		MapData amap = sendMessage(ret);
-        return Integer.parseInt(amap.get(Constants.SETPASS_REPONSE));
+        String response = amap.get(Constants.SETPASS_REPONSE);
+        return response != null ? Integer.parseInt(response) : Constants.ERROR;
 	}
-
-	@Override
-    @Deprecated
-	public boolean getErrorMessages(MessageContainer mc) {
-        return mc != null && getMessages(Constants.CMD_GET_ERR_MSG, mc);
-    }
-
-	@Override
-    @Deprecated
-	public boolean getInfoMessages(MessageContainer mc) {
-        return mc != null && getMessages(Constants.CMD_GET_INFO_MSG, mc);
-    }
 	
 	@Override
 	public boolean loadQuestions(QuestionContainer qc)
@@ -232,7 +220,6 @@ public class PacketHandler implements Database
         for (String str : rlist.iterable()) {
 			MapData ansmap = jsonData.getMapData(str);
             QuestionContainer qc = Questions.getQuestions().getContainer();
-            assert qc != null;
             for (Entry<String, String> e : ansmap.iterable()) {
                 int qid = Integer.parseInt(e.getKey().substring("question".length()));
                 Question q1 = qc.getQuestion(qid);
@@ -291,7 +278,8 @@ public class PacketHandler implements Database
         ret.put("details", crypto.encrypt(details.toString()));
 
 		MapData ans = sendMessage(ret);
-		return Integer.parseInt(ans.get(Constants.LOGOUT_REPONSE)) == Constants.SUCCESS;
+		String response = ans.get(Constants.LOGOUT_REPONSE);
+		return response != null && Integer.parseInt(response) == Constants.SUCCESS;
 	}
 	
 	/* Protected */
@@ -302,7 +290,6 @@ public class PacketHandler implements Database
 	private Encryption crypto;
 	
 	private PacketData jsonData;
-    private volatile MapData JSONOut, JSONIn;
     private ServletConnection scom;
 	
 	/**
@@ -326,38 +313,6 @@ public class PacketHandler implements Database
 	private MapData sendMessage(MapData obj)
 	{
         return jsonData.getMapData(scom.sendMessage(obj.toString()));
-	}
-
-	/**
-	 * Retrieves messages from the pktHandler and places them in the
-	 * {@code MessageContainer}.
-	 * 
-	 * @param commandName The name of the (message) table to retrieve
-	 * 		messages from.
-	 * @param mc The {@code MessageContainer} to put the messages in.
-	 * 
-	 * @return true if the messages was put in {@code mc}.
-	 */
-	@Deprecated
-	private boolean getMessages(String commandName, MessageContainer mc)
-	{
-		MapData ret = new MapData(null);
-		ret.put("command", commandName);
-
-		MapData ans = sendMessage(ret);
-		MapData messages = jsonData.getMapData(ans.get("messages"));
-		try {
-            for (Entry<String, String> e : messages.iterable()) {
-				MapData messagedata = jsonData.getMapData(e.getValue());
-				MapData message = jsonData.getMapData(messagedata.get("message"));
-				mc.addMessage(Integer.parseInt(messagedata.get("code")),
-                        messagedata.get("name"), message.map());
-			}
-		}
-		catch (NullPointerException _e) {
-			return false;
-		}
-		return true;
 	}
 	
 	/**

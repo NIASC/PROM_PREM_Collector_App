@@ -20,6 +20,8 @@
  */
 package se.nordicehealth.ppc_app.core;
 
+import android.provider.ContactsContract;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,8 +111,6 @@ public class UserHandle
 	 */
 	public void register()
 	{
-		if (user.loggedIn)
-			return;
 		Registration register = Implementations.Registration(ui);
 		register.registrationProcess();
 	}
@@ -121,8 +121,6 @@ public class UserHandle
 	 */
 	public void logout()
 	{
-		if (!user.loggedIn)
-			return;
 		db.requestLogout(user.uid);
 		resetLoginVars();
 	}
@@ -132,8 +130,6 @@ public class UserHandle
 	 */
 	public void startQuestionnaire()
 	{
-		if (!user.loggedIn)
-			return;
 		questionnaire.start();
 	}
 	
@@ -142,8 +138,6 @@ public class UserHandle
 	 */
 	public void viewData()
 	{
-		if (!user.loggedIn)
-			return;
 		viewData.start();
 	}
 	
@@ -212,6 +206,8 @@ public class UserHandle
 						Messages.ERROR_UH_PR_PASSWORD_SIMPLE), false);
 				return true;
 			default:
+				ui.displayError(Implementations.Messages().getError(
+						Messages.ERROR_UNKNOWN_RESPONSE), false);
 				return false;
 		}
 	}

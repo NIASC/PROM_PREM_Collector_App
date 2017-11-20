@@ -70,12 +70,10 @@ class ViewData
 	void start()
 	{
 		if (!uh.isLoggedIn())
-		{
 			ui.displayError(Implementations.Messages().getError(
 					Messages.ERROR_NOT_LOGGED_IN), false);
-			return;
-		}
-		dateSel.queryTimePeriod();
+		else
+			dateSel.queryTimePeriod();
 	}
 	
 	/* Protected */

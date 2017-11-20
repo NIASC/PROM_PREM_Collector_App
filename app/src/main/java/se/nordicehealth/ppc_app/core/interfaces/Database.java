@@ -23,7 +23,6 @@ package se.nordicehealth.ppc_app.core.interfaces;
 import java.util.Calendar;
 import java.util.List;
 
-import se.nordicehealth.ppc_app.core.containers.MessageContainer;
 import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;
@@ -78,32 +77,6 @@ public interface Database
 	 * 		password is not updated and null is returned.
 	 */
 	int setPassword(long uid, String oldPass, String newPass1, String newPass2);
-	
-	/**
-	 * Loads error messages from the database and puts them in a
-	 * {@code MessageContainer}.
-	 * 
-	 * @param mc The (empty) message container to put error messages in.
-	 * 
-	 * @return {@code true} if the error messages were
-	 * 		successfully loaded. {@code false} if there was an error
-	 * 		with the database.
-	 */
-	@Deprecated
-	boolean getErrorMessages(MessageContainer mc);
-	
-	/**
-	 * Loads info messages from the database and puts them in a
-	 * {@code MessageContainer}.
-	 * 
-	 * @param mc The (empty) message container to put info messages in.
-	 * 
-	 * @return {@code true} if the info messages were
-	 * 		successfully loaded. {@code false} if there was an error
-	 * 		with the database.
-	 */
-	@Deprecated
-	boolean getInfoMessages(MessageContainer mc);
 	
 	/**
 	 * Loads questions from the database and stores them in a list

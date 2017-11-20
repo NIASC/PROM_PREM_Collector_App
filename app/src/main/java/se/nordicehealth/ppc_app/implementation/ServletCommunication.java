@@ -72,7 +72,6 @@ import se.nordicehealth.ppc_app.common.implementation.Constants;
  * @author Marcus Malmquist
  *
  */
-@SuppressWarnings("unchecked")
 public class ServletCommunication implements Database, Runnable
 {
 	/* Public */
@@ -99,60 +98,53 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers)
 	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_ADD_QANS);
+        JSONMapData ret = new JSONMapData(null);
+        ret.jmap.put("command", Constants.CMD_ADD_QANS);
 
         QuestionContainer qc = Questions.getQuestions().getContainer();
         if (qc == null || qc.getSize() != answers.size()) {
 			return false;
 		}
 
-		JSONObject questions = new JSONObject();
-		Map<String, String> qmap = (Map<String, String>) questions;
+		JSONMapData questions = new JSONMapData(null);
 		int i = 0;
         for (FormContainer fc : answers) {
-            qmap.put(String.format(Locale.US, "`question%d`", i++),
+            questions.jmap.put(String.format(Locale.US, "`question%d`", i++),
                     QDBFormat.getDBFormat(fc));
         }
 
-        JSONObject pobj = new JSONObject();
-        Map<String, String> pmap = (Map<String, String>) pobj;
-        pmap.put("forename", patient.getForename());
-        pmap.put("surname", patient.getSurname());
-        pmap.put("personal_id", patient.getPersonalNumber());
+        JSONMapData pobj = new JSONMapData(null);
+        pobj.jmap.put("forename", patient.getForename());
+        pobj.jmap.put("surname", patient.getSurname());
+        pobj.jmap.put("personal_id", patient.getPersonalNumber());
 
-        JSONObject details = new JSONObject();
-        Map<String, String> dmap = (Map<String, String>) details;
-        dmap.put("uid", Long.toString(uid));
+        JSONMapData details = new JSONMapData(null);
+        details.jmap.put("uid", Long.toString(uid));
 
-        rmap.put("details", crypto.encrypt(details.toString()));
-        rmap.put("patient", crypto.encrypt(pobj.toString()));
-		rmap.put("questions", questions.toString());
+        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+        ret.jmap.put("patient", crypto.encrypt(pobj.jobj.toString()));
+        ret.jmap.put("questions", questions.jobj.toString());
 
-		JSONObject ans = sendMessage(ret);
-		if (ans == null)
-			return false;
-		String insert = (String) ans.get(Constants.INSERT_RESULT);
+        JSONMapData ans = new JSONMapData(sendMessage(ret.jobj));
+		String insert = ans.jmap.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
 
 	@Override
-	public int setPassword(long uid, String oldPass, String newPass1, String newPass2) throws NumberFormatException {
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_SET_PASSWORD);
+	public int setPassword(long uid, String oldPass, String newPass1, String newPass2) throws NumberFormatException
+    {
+        JSONMapData ret = new JSONMapData(null);
+		ret.jmap.put("command", Constants.CMD_SET_PASSWORD);
 
-        JSONObject details = new JSONObject();
-        Map<String, String> dmap = (Map<String, String>) details;
-        dmap.put("uid", Long.toString(uid));
-        dmap.put("old_password", oldPass);
-        dmap.put("new_password1", newPass1);
-        dmap.put("new_password2", newPass2);
-        rmap.put("details", crypto.encrypt(details.toString()));
+        JSONMapData details = new JSONMapData(null);
+        details.jmap.put("uid", Long.toString(uid));
+        details.jmap.put("old_password", oldPass);
+        details.jmap.put("new_password1", newPass1);
+        details.jmap.put("new_password2", newPass2);
+        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
 
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
-        return Integer.parseInt(amap.get(Constants.SETPASS_REPONSE));
+        JSONMapData amap = new JSONMapData(sendMessage(ret.jobj));
+        return Integer.parseInt(amap.jmap.get(Constants.SETPASS_REPONSE));
 	}
 
 	@Override
@@ -170,32 +162,29 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public boolean loadQuestions(QuestionContainer qc)
 	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_LOAD_Q);
-		
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
-		Map<String, String> qmap = (Map<String, String>) getJSONObject(amap.get("questions"));
-        assert qmap != null;
-        for (Entry<String, String> e : qmap.entrySet()) {
-			Map<String, String> qtnmap = (Map<String, String>) getJSONObject(e.getValue());
+        JSONMapData ret = new JSONMapData(null);
+		ret.jmap.put("command", Constants.CMD_LOAD_Q);
+
+        JSONMapData amap = new JSONMapData(sendMessage(ret.jobj));
+        JSONMapData qmap = new JSONMapData(getJSONObject(amap.jmap.get("questions")));
+        for (Entry<String, String> e : qmap.jmap.entrySet()) {
+            JSONMapData qtnmap = new JSONMapData(getJSONObject(e.getValue()));
 			List<String> options = new ArrayList<>();
-            assert qtnmap != null;
 			for (int i = 0; ; ++i) {
-                String entry = qtnmap.get(String.format(Locale.US, "option%d", i));
+                String entry = qtnmap.jmap.get(String.format(Locale.US, "option%d", i));
 				if (entry == null)
 					break;
 				options.add(entry);
 			}
 			Class<? extends FormContainer> c;
-			if ((c = getContainerClass(qtnmap.get("type"))) == null) {
+			if ((c = getContainerClass(qtnmap.jmap.get("type"))) == null) {
                 continue;
             }
-			qc.addQuestion(Integer.parseInt(qtnmap.get("id")), c,
-					qtnmap.get("question"), qtnmap.get("description"),
-					options, Integer.parseInt(qtnmap.get("optional")) != 0,
-					Integer.parseInt(qtnmap.get("max_val")),
-					Integer.parseInt(qtnmap.get("min_val")));
+			qc.addQuestion(Integer.parseInt(qtnmap.jmap.get("id")), c,
+                    qtnmap.jmap.get("question"), qtnmap.jmap.get("description"),
+					options, Integer.parseInt(qtnmap.jmap.get("optional")) != 0,
+					Integer.parseInt(qtnmap.jmap.get("max_val")),
+					Integer.parseInt(qtnmap.jmap.get("min_val")));
 		}
 		return true;
 	}
@@ -203,21 +192,18 @@ public class ServletCommunication implements Database, Runnable
 	@Override
 	public boolean loadQResultDates(long uid, TimePeriodContainer tpc)
 	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_LOAD_QR_DATE);
+        JSONMapData ret = new JSONMapData(null);
+		ret.jmap.put("command", Constants.CMD_LOAD_QR_DATE);
 
-        JSONObject details = new JSONObject();
-        Map<String, String> dmap = (Map<String, String>) details;
-        dmap.put("uid", Long.toString(uid));
-        rmap.put("details", crypto.encrypt(details.toString()));
+        JSONMapData details = new JSONMapData(null);
+        details.jmap.put("uid", Long.toString(uid));
+        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
 
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
-		List<String> dlist = (List<String>) getJSONArray(amap.get("dates"));
+        JSONMapData amap = new JSONMapData(sendMessage(ret.jobj));
+        JSONArrData dlist = new JSONArrData(getJSONArray(amap.jmap.get("dates")));
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            assert dlist != null;
-            for (String str : dlist) {
+            for (String str : dlist.jlist) {
 				Calendar cal = new GregorianCalendar();
 				cal.setTime(sdf.parse(str));
 				tpc.addDate(cal);
@@ -232,36 +218,31 @@ public class ServletCommunication implements Database, Runnable
 	public boolean loadQResults(long uid, Calendar begin, Calendar end,
 			List<Integer> questionIDs, StatisticsContainer container)
 	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_LOAD_QR);
+        JSONMapData ret = new JSONMapData(null);
+		ret.jmap.put("command", Constants.CMD_LOAD_QR);
 
-		JSONArray questions = new JSONArray();
-		List<String> qlist = (List<String>) questions;
+        JSONArrData questions = new JSONArrData(null);
 		for (Integer i : questionIDs)
-			qlist.add(String.format(Locale.US, "question%d", i));
-		rmap.put("questions", questions.toString());
+			questions.jlist.add(String.format(Locale.US, "question%d", i));
+        ret.jmap.put("questions", questions.jarr.toString());
 
-        JSONObject details = new JSONObject();
-        Map<String, String> dmap = (Map<String, String>) details;
-        dmap.put("uid", Long.toString(uid));
-        rmap.put("details", crypto.encrypt(details.toString()));
+        JSONMapData details = new JSONMapData(null);
+        details.jmap.put("uid", Long.toString(uid));
+        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-		rmap.put("begin", sdf.format(begin.getTime()));
-		rmap.put("end", sdf.format(end.getTime()));
+        ret.jmap.put("begin", sdf.format(begin.getTime()));
+        ret.jmap.put("end", sdf.format(end.getTime()));
 		
-		
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
-		List<String> rlist = (List<String>) getJSONArray(amap.get("results"));
-        assert rlist != null;
-        for (String str : rlist) {
-            Map<String, String> ansmap = (Map<String, String>) getJSONObject(str);
+
+        JSONMapData amap = new JSONMapData(sendMessage(ret.jobj));
+        JSONArrData rlist = new JSONArrData(getJSONArray(amap.jmap.get("results")));
+        for (String str : rlist.jlist) {
+            JSONMapData ansmap = new JSONMapData(getJSONObject(str));
             QuestionContainer qc = Questions.getQuestions().getContainer();
-            assert ansmap != null;
-            for (Entry<String, String> e : ansmap.entrySet()) {
+            assert qc != null;
+            for (Entry<String, String> e : ansmap.jmap.entrySet()) {
                 int qid = Integer.parseInt(e.getKey().substring("question".length()));
-                assert qc != null;
                 Question q1 = qc.getQuestion(qid);
                 container.addResult(q1, QDBFormat.getQFormat(e.getValue()));
             }
@@ -273,65 +254,52 @@ public class ServletCommunication implements Database, Runnable
 	public boolean requestRegistration(
 			String name, String email, String clinic)
 	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_REQ_REGISTR);
+        JSONMapData ret = new JSONMapData(null);
+		ret.jmap.put("command", Constants.CMD_REQ_REGISTR);
 
-        JSONObject details = new JSONObject();
-        Map<String, String> dmap = (Map<String, String>) details;
-        dmap.put("name", name);
-        dmap.put("email", email);
-        dmap.put("clinic", clinic);
-        rmap.put("details", crypto.encrypt(details.toString()));
-		
-		JSONObject ans = sendMessage(ret);
-		if (ans == null)
-			return false;
-		String insert = (String) ans.get(Constants.INSERT_RESULT);
+        JSONMapData details = new JSONMapData(null);
+        details.jmap.put("name", name);
+        details.jmap.put("email", email);
+        details.jmap.put("clinic", clinic);
+        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+
+        JSONMapData ans = new JSONMapData(sendMessage(ret.jobj));
+		String insert = ans.jmap.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
 
 	@Override
 	public Session requestLogin(String username, String password)
 	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_REQ_LOGIN);
+        JSONMapData ret = new JSONMapData(null);
+		ret.jmap.put("command", Constants.CMD_REQ_LOGIN);
 
-        JSONObject details = new JSONObject();
-        Map<String, String> dmap = (Map<String, String>) details;
-        dmap.put("name", username);
-        dmap.put("password", password);
-        rmap.put("details", crypto.encrypt(details.toString()));
+        JSONMapData details = new JSONMapData(null);
+        details.jmap.put("name", username);
+        details.jmap.put("password", password);
+        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
 
-		JSONObject ans = sendMessage(ret);
-		if (ans == null)
-			return new Session(0L, Constants.ERROR, false);
-		Map<String, String> amap = (Map<String, String>) ans;
-        String response = amap.get(Constants.LOGIN_REPONSE);
-        String uid = amap.get(Constants.LOGIN_UID);
-        boolean update_password = Integer.parseInt(amap.get("update_password")) > 0;
+        JSONMapData _ans = new JSONMapData(sendMessage(ret.jobj));
+        String response = _ans.jmap.get(Constants.LOGIN_REPONSE);
+        String uid = _ans.jmap.get(Constants.LOGIN_UID);
+        String update_password = _ans.jmap.get("update_password");
         return new Session(uid != null ? Long.parseLong(uid) : 0L,
-                Integer.parseInt(response), update_password);
+                response != null ? Integer.parseInt(response) : Constants.ERROR,
+                update_password != null && Integer.parseInt(update_password) > 0);
 	}
 
 	@Override
 	public boolean requestLogout(long uid)
 	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", Constants.CMD_REQ_LOGOUT);
+        JSONMapData ret = new JSONMapData(null);
+		ret.jmap.put("command", Constants.CMD_REQ_LOGOUT);
 
-        JSONObject details = new JSONObject();
-        Map<String, String> dmap = (Map<String, String>) details;
-        dmap.put("uid", Long.toString(uid));
-        rmap.put("details", crypto.encrypt(details.toString()));
-		
-		JSONObject ans = sendMessage(ret);
-		if (ans == null)
-			return false;
-		Map<String, String> amap = (Map<String, String>) ans;
-		return Integer.parseInt(amap.get(Constants.LOGOUT_REPONSE)) == Constants.SUCCESS;
+        JSONMapData details = new JSONMapData(null);
+        details.jmap.put("uid", Long.toString(uid));
+        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+
+        JSONMapData ans = new JSONMapData(sendMessage(ret.jobj));
+		return Integer.parseInt(ans.jmap.get(Constants.LOGOUT_REPONSE)) == Constants.SUCCESS;
 	}
 	
 	/* Protected */
@@ -371,8 +339,8 @@ public class ServletCommunication implements Database, Runnable
 			/* send message */
 			OutputStream os = connection.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-			// System.out.println(obj);
-            //Log.i("TEST", JSONOut.toString());
+
+            Log.i("MSGOUT", JSONOut.toString());
 			synchronized (this) {
 				osw.write(JSONOut.toString());
 			}
@@ -388,7 +356,7 @@ public class ServletCommunication implements Database, Runnable
 				sb.append(inputLine);
 			in.close();
 
-            //Log.i("TEST", sb.toString());
+            Log.i("MSGIN", sb.toString());
 			synchronized (this) {
 				JSONIn = getJSONObject(sb.toString());
 			}
@@ -458,21 +426,17 @@ public class ServletCommunication implements Database, Runnable
 	@Deprecated
 	private boolean getMessages(String commandName, MessageContainer mc)
 	{
-		JSONObject ret = new JSONObject();
-		Map<String, String> rmap = (Map<String, String>) ret;
-		rmap.put("command", commandName);
+        JSONMapData ret = new JSONMapData(null);
+		ret.jmap.put("command", commandName);
 
-		Map<String, String> amap = (Map<String, String>) sendMessage(ret);
-		Map<String, String> mmap = (Map<String, String>) getJSONObject(amap.get("messages"));
+        JSONMapData ans = new JSONMapData(sendMessage(ret.jobj));
+        JSONMapData messages = new JSONMapData(getJSONObject(ans.jmap.get("messages")));
 		try {
-            assert mmap != null;
-            for (Entry<String, String> e : mmap.entrySet())
-			{
-				Map<String, String> messagemap = (Map<String, String>) getJSONObject(e.getValue());
-                assert messagemap != null;
-                Map<String, String> msgmap = (Map<String, String>) getJSONObject(messagemap.get("message"));
-				mc.addMessage(Integer.parseInt(messagemap.get("code")),
-						messagemap.get("name"), msgmap);
+            for (Entry<String, String> e : messages.jmap.entrySet()) {
+                JSONMapData messagedata = new JSONMapData(getJSONObject(e.getValue()));
+                JSONMapData message = new JSONMapData(getJSONObject(messagedata.jmap.get("message")));
+				mc.addMessage(Integer.parseInt(messagedata.jmap.get("code")),
+                        messagedata.jmap.get("name"), message.jmap);
 			}
 		}
 		catch (NullPointerException _e) {
@@ -500,18 +464,19 @@ public class ServletCommunication implements Database, Runnable
 	 */
 	private Class<? extends FormContainer> getContainerClass(String type)
 	{
-		if (type.equalsIgnoreCase("SingleOption"))
-			return SingleOptionContainer.class;
-		else if (type.equalsIgnoreCase("MultipleOption"))
-			return MultipleOptionContainer.class;
-		else if (type.equalsIgnoreCase("Field"))
-			return FieldContainer.class;
-		else if (type.equalsIgnoreCase("Slider"))
-			return SliderContainer.class;
-		else if (type.equalsIgnoreCase("Area"))
-			return AreaContainer.class;
-		else
-			return null;
+		if (type.equalsIgnoreCase("SingleOption")) {
+            return SingleOptionContainer.class;
+        } else if (type.equalsIgnoreCase("MultipleOption")) {
+            return MultipleOptionContainer.class;
+        } else if (type.equalsIgnoreCase("Field")) {
+            return FieldContainer.class;
+        } else if (type.equalsIgnoreCase("Slider")) {
+            return SliderContainer.class;
+        } else if (type.equalsIgnoreCase("Area")) {
+            return AreaContainer.class;
+        } else {
+            return null;
+        }
 	}
 	
 	/**
@@ -539,13 +504,10 @@ public class ServletCommunication implements Database, Runnable
 			if (fc.getEntry() == null)
 				return "''";
 			
-			if (fc instanceof SingleOptionContainer)
-			{
+			if (fc instanceof SingleOptionContainer) {
 				SingleOptionContainer soc = (SingleOptionContainer) fc;
 				return String.format(Locale.US, "'option%d'", soc.getEntry());
-			}
-			else if (fc instanceof MultipleOptionContainer)
-			{
+			} else if (fc instanceof MultipleOptionContainer) {
 				MultipleOptionContainer moc = (MultipleOptionContainer) fc;
 				List<String> lstr = new ArrayList<>();
 				List<Integer> lint = new ArrayList<>(moc.getEntry());
@@ -556,23 +518,17 @@ public class ServletCommunication implements Database, Runnable
                 StringBuilder sb = new StringBuilder();
                 for (Iterator<String> itr = lstr.iterator(); itr.hasNext();) {
                     sb.append(itr.next());
-                    if (itr.hasNext()) {
+                    if (itr.hasNext())
                         sb.append(",");
-                    }
                 }
 				return String.format("[%s]", sb.toString());
-			}
-			else if (fc instanceof SliderContainer)
-			{
+			} else if (fc instanceof SliderContainer) {
 				SliderContainer sc = (SliderContainer) fc;
 				return String.format(Locale.US, "'slider%d'", sc.getEntry());
-			}
-			else if (fc instanceof AreaContainer)
-			{
+			} else if (fc instanceof AreaContainer) {
 				AreaContainer ac = (AreaContainer) fc;
 				return String.format("'%s'", ac.getEntry());
-			}
-			else
+			} else
 				return "''";
 		}
 		
@@ -593,30 +549,53 @@ public class ServletCommunication implements Database, Runnable
 			if (dbEntry == null || dbEntry.trim().isEmpty())
 				return null;
 			
-			if (dbEntry.startsWith("option"))
-			{ /* single option */
+			if (dbEntry.startsWith("option")) {
+                /* single option */
 				return Integer.valueOf(dbEntry.substring("option".length()));
-			}
-			else if (dbEntry.startsWith("slider"))
-			{ /* slider */
+			} else if (dbEntry.startsWith("slider")) {
+                /* slider */
 				return Integer.valueOf(dbEntry.substring("slider".length()));
-			}
-			else if (dbEntry.startsWith("[") && dbEntry.endsWith("]"))
-			{ /* multiple answers */
+			} else if (dbEntry.startsWith("[") && dbEntry.endsWith("]")) {
+                /* multiple answers */
 				List<String> entries = Arrays.asList(dbEntry.split(","));
-				if (entries.get(0).startsWith("option"))
-				{ /* multiple option */
+				if (entries.get(0).startsWith("option")) {
+                    /* multiple option */
 					List<Integer> lint = new ArrayList<>();
 					for (String str : entries)
 						lint.add(Integer.valueOf(str.substring("option".length())));
 					return lint;
 				}
-			}
-			else
-			{ /* must be plain text entry */
+			} else {
+                /* must be plain text entry */
 				return dbEntry;
 			}
 			return null;
 		}
 	}
+
+    private class JSONMapData
+    {
+        JSONObject jobj;
+        Map<String, String> jmap;
+
+        @SuppressWarnings("unchecked")
+        JSONMapData(JSONObject jobj)
+        {
+            this.jobj = jobj != null ? jobj : new JSONObject();
+            this.jmap = (Map<String, String>) this.jobj;
+        }
+    }
+
+    private class JSONArrData
+    {
+        JSONArray jarr;
+        List<String> jlist;
+
+        @SuppressWarnings("unchecked")
+        JSONArrData(JSONArray jarr)
+        {
+            this.jarr = jarr != null ? jarr : new JSONArray();
+            this.jlist = (List<String>) this.jarr;
+        }
+    }
 }

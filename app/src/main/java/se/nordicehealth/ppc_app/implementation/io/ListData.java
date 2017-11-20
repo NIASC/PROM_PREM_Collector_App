@@ -25,24 +25,24 @@ import org.json.simple.JSONArray;
 import java.util.Collections;
 import java.util.List;
 
-public class ListData
+class ListData
 {
     private JSONArray jarr;
     private List<String> jlist;
 
     @SuppressWarnings("unchecked")
-    public ListData(JSONArray jarr)
+    ListData(JSONArray jarr)
     {
         this.jarr = jarr != null ? jarr : new JSONArray();
         this.jlist = (List<String>) this.jarr;
     }
 
-    public void add(String value)
+    void add(String value)
     {
         jlist.add(value);
     }
 
-    public Iterable<String> iterable()
+    Iterable<String> iterable()
     {
         return Collections.unmodifiableList(jlist);
     }

@@ -1,4 +1,4 @@
-package se.nordicehealth.ppc_app.implementation;
+package se.nordicehealth.ppc_app.implementation.res;
 
 import android.content.res.Resources;
 
@@ -10,7 +10,7 @@ import se.nordicehealth.ppc_app.core.interfaces.Messages;
 
 final class InfoMessages
 {
-    public final Map<String, String> msgInfo;
+    final Map<String, String> msgInfo;
 
     InfoMessages(Resources r)
     {

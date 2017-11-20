@@ -22,8 +22,8 @@ package se.nordicehealth.ppc_app.core.interfaces;
 
 import se.nordicehealth.ppc_app.implementation.EmailRegistration;
 import se.nordicehealth.ppc_app.implementation.LocaleSE;
-import se.nordicehealth.ppc_app.implementation.ResourceStrings;
-import se.nordicehealth.ppc_app.implementation.PacketHandler;
+import se.nordicehealth.ppc_app.implementation.res.Resource;
+import se.nordicehealth.ppc_app.implementation.io.PacketHandler;
 
 /**
  * This class acts as an interface between the implementation of the
@@ -82,7 +82,7 @@ public abstract class Implementations
 
 	public static Messages Messages()
 	{
-		return ResourceStrings.getMessages();
+		return Resource.messages();
 	}
 	
 	/* Protected */

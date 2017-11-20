@@ -18,7 +18,7 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package se.nordicehealth.ppc_app.implementation;
+package se.nordicehealth.ppc_app.implementation.io;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,10 +45,6 @@ import se.nordicehealth.ppc_app.core.containers.form.SingleOptionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.SliderContainer;
 import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Database;
-import se.nordicehealth.ppc_app.implementation.io.ListData;
-import se.nordicehealth.ppc_app.implementation.io.MapData;
-import se.nordicehealth.ppc_app.implementation.io.PacketData;
-import se.nordicehealth.ppc_app.implementation.io.ServletConnection;
 import se.nordicehealth.ppc_app.implementation.security.Encryption;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.common.implementation.Constants;
@@ -79,7 +75,7 @@ public class PacketHandler implements Database
 		return pktHandler;
 	}
 
-	static void initialize(Encryption crypto)
+	public static void initialize(Encryption crypto)
     {
         pktHandler = new PacketHandler(crypto);
     }

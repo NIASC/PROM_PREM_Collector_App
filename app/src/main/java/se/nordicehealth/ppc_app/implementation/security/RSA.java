@@ -1,4 +1,4 @@
-/*! ViewComponents.java
+/*! SHA_Encryption.java
  * 
  * Copyright 2017 Marcus Malmquist
  * 
@@ -18,20 +18,39 @@
  * along with PROM_PREM_Collector.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package se.nordicehealth.ppc_app.implementation;
+package se.nordicehealth.ppc_app.implementation.security;
 
+import java.math.BigInteger;
+import java.util.Locale;
 
-/**
- * This class provides functions to make swing components in a compact
- * manner as well as make it easier to modify default settings to all
- * components in the program.
- * 
- * Any swing components (JLabel, JButton etc.) in this program should
- * use these 'constructors'.
- * 
- * @author Marcus
- *
- */
-public class ViewComponents {
+public class RSA implements Encryption
+{
+	/* Public */
 
+	public RSA(BigInteger exp, BigInteger mod)
+	{
+		e = exp;
+		n = mod;
+	}
+
+	@Override
+	public String encrypt(String message)
+	{
+		byte b[] = encryptRSA(message.getBytes());
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < b.length; sb.append(i < b.length ? ":" : ""))
+			sb.append(String.format(Locale.US, "%02x", b[i++]));
+		return sb.toString();
+	}
+	
+	/* Protected */
+	
+	/* Private */
+	private BigInteger e, n;
+
+	private byte[] encryptRSA(byte msgBytes[])
+	{
+		return new BigInteger(msgBytes).modPow(e, n).toByteArray();
+	}
 }

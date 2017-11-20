@@ -1,28 +1,24 @@
-package se.nordicehealth.ppc_app.implementation;
+package se.nordicehealth.ppc_app.implementation.res;
 
 import android.content.res.Resources;
 
 import java.math.BigInteger;
 
 import se.nordicehealth.ppc_app.R;
+import se.nordicehealth.ppc_app.implementation.Key;
 
 class ResourceKeys implements Key
 {
-    static ResourceKeys getKeys() throws NullPointerException
-    {
-        if (self == null)
-            throw new NullPointerException("Keys have not been loaded");
-        return self;
-    }
+    /* Public */
 
     @Override
-    public BigInteger getExp()
+    public BigInteger exp()
     {
         return exp;
     }
 
     @Override
-    public BigInteger getMod()
+    public BigInteger mod()
     {
         return mod;
     }
@@ -30,6 +26,13 @@ class ResourceKeys implements Key
 	/* Protected */
 
 	/* Package */
+
+    static ResourceKeys getKeys() throws NullPointerException
+    {
+        if (self == null)
+            throw new NullPointerException("Keys have not been loaded");
+        return self;
+    }
 
     static void loadKeys(Resources r)
     {

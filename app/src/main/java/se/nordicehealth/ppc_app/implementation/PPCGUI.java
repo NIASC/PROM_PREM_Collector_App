@@ -31,6 +31,9 @@ import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils.RetFunContainer;
 import se.nordicehealth.ppc_app.implementation.containerdisplay.ContainerDisplays;
+import se.nordicehealth.ppc_app.implementation.io.PacketHandler;
+import se.nordicehealth.ppc_app.implementation.res.Resource;
+import se.nordicehealth.ppc_app.implementation.security.RSA;
 
 public class PPCGUI extends Activity implements UserInterface
 {
@@ -44,10 +47,9 @@ public class PPCGUI extends Activity implements UserInterface
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        ResourceStrings.loadMessages(getResources());
-        ResourceKeys.loadKeys(getResources());
-        PacketHandler.initialize(new RSA(ResourceKeys.getKeys().getExp(),
-                ResourceKeys.getKeys().getMod()));
+        Resource.loadResources(getResources());
+        PacketHandler.initialize(new RSA(Resource.key().exp(),
+                Resource.key().mod()));
 
         uh = new UserHandle(this);
         initGUI();
@@ -181,13 +183,13 @@ public class PPCGUI extends Activity implements UserInterface
 
             usernameTF = new EditText(c);
             usernameTF.setHint(String.format("%s",
-                    ResourceStrings.getMessages().getInfo(Messages.INFO_UH_ENTER_USERNAME)));
+                    Resource.messages().getInfo(Messages.INFO_UH_ENTER_USERNAME)));
             userPanel.addView(usernameTF);
 
             passwordTF = new EditText(c);
             passwordTF.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             passwordTF.setHint(String.format("%s",
-                    ResourceStrings.getMessages().getInfo(Messages.INFO_UH_ENTER_PASSWORD)));
+                    Resource.messages().getInfo(Messages.INFO_UH_ENTER_PASSWORD)));
             userPanel.addView(passwordTF);
 
 			/* button panel */
@@ -197,7 +199,7 @@ public class PPCGUI extends Activity implements UserInterface
             final Context _c = c;
 
             login = new Button(c);
-            login.setText(ResourceStrings.getMessages().getInfo(Messages.INFO_LOGIN));
+            login.setText(Resource.messages().getInfo(Messages.INFO_LOGIN));
             login.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -213,7 +215,7 @@ public class PPCGUI extends Activity implements UserInterface
             });
 
             register = new Button(c);
-            register.setText(ResourceStrings.getMessages().getInfo(Messages.INFO_REGISTER));
+            register.setText(Resource.messages().getInfo(Messages.INFO_REGISTER));
             register.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -242,7 +244,7 @@ public class PPCGUI extends Activity implements UserInterface
 
 
             questionnaire = new Button(c);
-            questionnaire.setText(ResourceStrings.getMessages().getInfo(Messages.INFO_START_QUESTIONNAIRE));
+            questionnaire.setText(Resource.messages().getInfo(Messages.INFO_START_QUESTIONNAIRE));
             questionnaire.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -251,7 +253,7 @@ public class PPCGUI extends Activity implements UserInterface
             });
 
             viewData = new Button(c);
-            viewData.setText(ResourceStrings.getMessages().getInfo(Messages.INFO_VIEW_STATISTICS));
+            viewData.setText(Resource.messages().getInfo(Messages.INFO_VIEW_STATISTICS));
             viewData.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -269,7 +271,7 @@ public class PPCGUI extends Activity implements UserInterface
         final int nEntries;
         boolean displayMultiple;
         int cIdx;
-        ResourceStrings msg = ResourceStrings.getMessages();
+        Messages msg = Resource.messages();
 
         LinearLayout formControl;
         Button fc_continue, fc_previous, fc_next, fc_back;

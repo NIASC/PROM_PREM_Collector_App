@@ -1,11 +1,11 @@
-package se.nordicehealth.ppc_app.implementation;
+package se.nordicehealth.ppc_app.implementation.res;
 
 import android.content.res.Resources;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 
-public class ResourceStrings implements Messages
+class ResourceStrings implements Messages
 {
-    public static ResourceStrings getMessages() throws NullPointerException
+    static ResourceStrings getMessages() throws NullPointerException
     {
         if (self == null)
             throw new NullPointerException("Messages have not been loaded");

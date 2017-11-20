@@ -26,9 +26,9 @@ public interface Key
 {
 	/* Public */
 
-    BigInteger getExp();
+    BigInteger exp();
 
-    BigInteger getMod();
+    BigInteger mod();
 	
 	/* Protected */
 	

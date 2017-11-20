@@ -4,14 +4,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class PacketData
+class PacketData
 {
-    public PacketData()
+    PacketData()
     {
         parser = new JSONParser();
     }
 
-    public MapData getMapData(String str)
+    MapData getMapData(String str)
 	{
 		JSONObject obj;
 		try {
@@ -22,7 +22,7 @@ public class PacketData
 		return new MapData(obj);
 	}
 
-    public ListData getListData(String str)
+    ListData getListData(String str)
 	{
 		JSONArray arr;
 		try {

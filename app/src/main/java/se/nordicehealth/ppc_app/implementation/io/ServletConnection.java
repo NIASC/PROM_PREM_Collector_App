@@ -41,7 +41,7 @@ import java.net.URL;
  * @author Marcus Malmquist
  *
  */
-public class ServletConnection
+class ServletConnection
 {
 	/* Public */
 
@@ -49,12 +49,12 @@ public class ServletConnection
 
 	/* Package */
 
-    public ServletConnection(URL servletURL)
+    ServletConnection(URL servletURL)
     {
         this.servletURL = servletURL;
     }
 
-    public String sendMessage(String message)
+    String sendMessage(String message)
     {
         Thread t = new Thread(new IOHandler());
         msgOut = message;

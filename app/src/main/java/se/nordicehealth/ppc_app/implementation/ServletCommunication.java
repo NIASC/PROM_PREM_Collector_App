@@ -322,11 +322,7 @@ public class ServletCommunication implements Database, Runnable
 	private ServletCommunication()
 	{
 		crypto = Implementations.Encryption();
-        try {
-            scom = new _ServletCommunication(Constants.SERVER_URL);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+        scom = new _ServletCommunication(Constants.SERVER_URL);
 		parser = new JSONParser();
 	}
 
@@ -389,11 +385,7 @@ public class ServletCommunication implements Database, Runnable
 	 */
 	private JSONMapData sendMessage(JSONMapData obj)
 	{
-		Thread t = new Thread(this);
-		JSONOut = obj;
-		t.start();
-		try { t.join(); } catch (InterruptedException ignored) { }
-		return JSONIn;
+        return new JSONMapData(getJSONObject(scom.sendMessage(obj.toString())));
 	}
 	
 	/**
@@ -409,8 +401,9 @@ public class ServletCommunication implements Database, Runnable
 	{
 		try {
 			return (JSONObject) parser.parse(str);
-		} catch (org.json.simple.parser.ParseException ignored) { }
-		return null;
+		} catch (org.json.simple.parser.ParseException | NullPointerException e) {
+            return null;
+		}
 	}
 	
 	/**
@@ -426,8 +419,9 @@ public class ServletCommunication implements Database, Runnable
 	{
 		try {
 			return (JSONArray) parser.parse(str);
-		} catch (org.json.simple.parser.ParseException ignored) { }
-		return null;
+		} catch (org.json.simple.parser.ParseException | NullPointerException e) {
+            return null;
+        }
 	}
 
 	/**

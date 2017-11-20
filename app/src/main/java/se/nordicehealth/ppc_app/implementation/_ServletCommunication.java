@@ -31,8 +31,6 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import se.nordicehealth.ppc_app.common.implementation.Constants;
-
 /**
  * This class is an example of an implementation of
  * Database_Interface. This is done using a MySQL database and a
@@ -50,33 +48,46 @@ class _ServletCommunication implements Runnable
     @Override
     public void run()
     {
-        while (true) {
+        //while (true) {
             // wait here
+        msgIn = null;
+        HttpURLConnection connection;
+        try {
+            connection = (HttpURLConnection) servletURL.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setUseCaches(false);
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+        } catch (IOException e) {
+            Log.e("ECONN", e.getMessage());
+            return;
+        }
             synchronized (this) {
-                try {
-                    sendPacket(connection.getOutputStream(), msgOut);
-                    msgIn = receivePacket(connection.getInputStream());
+                try (OutputStream os = connection.getOutputStream()) {
+                    sendPacket(os, msgOut);
                 } catch (IOException pe) {
-                    msgIn = null;
+                    Log.e("EOUT", pe.getMessage());
+                    return;
+                }
+                try (InputStream is = connection.getInputStream()) {
+                    msgIn = receivePacket(is);
+                } catch (IOException pe) {
+                    Log.e("EIN", pe.getMessage());
                 }
                 Log.i("MSGIN", msgIn);
             }
             // notify here
-        }
+        //}
     }
 
 	/* Protected */
 
 	/* Package */
 
-    _ServletCommunication(URL servletURL) throws IOException
+    _ServletCommunication(URL servletURL)
     {
-        connection = (HttpURLConnection) servletURL.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setUseCaches(false);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
+        this.servletURL = servletURL;
     }
 
     String sendMessage(String message)
@@ -85,7 +96,6 @@ class _ServletCommunication implements Runnable
         // notify here
         // wait here
         // return message
-
         Thread t = new Thread(this);
         msgOut = message;
         t.start();
@@ -96,15 +106,13 @@ class _ServletCommunication implements Runnable
 	/* Private */
 
     private volatile String msgOut, msgIn;
-	private volatile HttpURLConnection connection;
+    private URL servletURL;
 
 	private void sendPacket(OutputStream os, String pktOut) throws IOException
     {
         OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
         Log.i("MSGOUT", pktOut);
-        synchronized (this) {
-            osw.write(pktOut);
-        }
+        osw.write(pktOut);
         osw.flush();
     }
 

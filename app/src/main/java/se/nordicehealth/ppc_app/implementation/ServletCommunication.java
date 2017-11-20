@@ -23,6 +23,8 @@ package se.nordicehealth.ppc_app.implementation;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -99,7 +101,7 @@ public class ServletCommunication implements Database, Runnable
 	public boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers)
 	{
         JSONMapData ret = new JSONMapData(null);
-        ret.jmap.put("command", Constants.CMD_ADD_QANS);
+        ret.put("command", Constants.CMD_ADD_QANS);
 
         QuestionContainer qc = Questions.getQuestions().getContainer();
         if (qc == null || qc.getSize() != answers.size()) {
@@ -109,24 +111,24 @@ public class ServletCommunication implements Database, Runnable
 		JSONMapData questions = new JSONMapData(null);
 		int i = 0;
         for (FormContainer fc : answers) {
-            questions.jmap.put(String.format(Locale.US, "`question%d`", i++),
+            questions.put(String.format(Locale.US, "`question%d`", i++),
                     QDBFormat.getDBFormat(fc));
         }
 
         JSONMapData pobj = new JSONMapData(null);
-        pobj.jmap.put("forename", patient.getForename());
-        pobj.jmap.put("surname", patient.getSurname());
-        pobj.jmap.put("personal_id", patient.getPersonalNumber());
+        pobj.put("forename", patient.getForename());
+        pobj.put("surname", patient.getSurname());
+        pobj.put("personal_id", patient.getPersonalNumber());
 
         JSONMapData details = new JSONMapData(null);
-        details.jmap.put("uid", Long.toString(uid));
+        details.put("uid", Long.toString(uid));
 
-        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
-        ret.jmap.put("patient", crypto.encrypt(pobj.jobj.toString()));
-        ret.jmap.put("questions", questions.jobj.toString());
+        ret.put("details", crypto.encrypt(details.toString()));
+        ret.put("patient", crypto.encrypt(pobj.toString()));
+        ret.put("questions", questions.toString());
 
-        JSONMapData ans = new JSONMapData(sendMessage(ret.jobj));
-		String insert = ans.jmap.get(Constants.INSERT_RESULT);
+        JSONMapData ans = sendMessage(ret);
+		String insert = ans.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
 
@@ -134,17 +136,17 @@ public class ServletCommunication implements Database, Runnable
 	public int setPassword(long uid, String oldPass, String newPass1, String newPass2) throws NumberFormatException
     {
         JSONMapData ret = new JSONMapData(null);
-		ret.jmap.put("command", Constants.CMD_SET_PASSWORD);
+		ret.put("command", Constants.CMD_SET_PASSWORD);
 
         JSONMapData details = new JSONMapData(null);
-        details.jmap.put("uid", Long.toString(uid));
-        details.jmap.put("old_password", oldPass);
-        details.jmap.put("new_password1", newPass1);
-        details.jmap.put("new_password2", newPass2);
-        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+        details.put("uid", Long.toString(uid));
+        details.put("old_password", oldPass);
+        details.put("new_password1", newPass1);
+        details.put("new_password2", newPass2);
+        ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData amap = new JSONMapData(sendMessage(ret.jobj));
-        return Integer.parseInt(amap.jmap.get(Constants.SETPASS_REPONSE));
+        JSONMapData amap = sendMessage(ret);
+        return Integer.parseInt(amap.get(Constants.SETPASS_REPONSE));
 	}
 
 	@Override
@@ -163,28 +165,28 @@ public class ServletCommunication implements Database, Runnable
 	public boolean loadQuestions(QuestionContainer qc)
 	{
         JSONMapData ret = new JSONMapData(null);
-		ret.jmap.put("command", Constants.CMD_LOAD_Q);
+		ret.put("command", Constants.CMD_LOAD_Q);
 
-        JSONMapData amap = new JSONMapData(sendMessage(ret.jobj));
-        JSONMapData qmap = new JSONMapData(getJSONObject(amap.jmap.get("questions")));
-        for (Entry<String, String> e : qmap.jmap.entrySet()) {
+        JSONMapData amap = sendMessage(ret);
+        JSONMapData qmap = new JSONMapData(getJSONObject(amap.get("questions")));
+        for (Entry<String, String> e : qmap.iterable()) {
             JSONMapData qtnmap = new JSONMapData(getJSONObject(e.getValue()));
 			List<String> options = new ArrayList<>();
 			for (int i = 0; ; ++i) {
-                String entry = qtnmap.jmap.get(String.format(Locale.US, "option%d", i));
+                String entry = qtnmap.get(String.format(Locale.US, "option%d", i));
 				if (entry == null)
 					break;
 				options.add(entry);
 			}
 			Class<? extends FormContainer> c;
-			if ((c = getContainerClass(qtnmap.jmap.get("type"))) == null) {
+			if ((c = getContainerClass(qtnmap.get("type"))) == null) {
                 continue;
             }
-			qc.addQuestion(Integer.parseInt(qtnmap.jmap.get("id")), c,
-                    qtnmap.jmap.get("question"), qtnmap.jmap.get("description"),
-					options, Integer.parseInt(qtnmap.jmap.get("optional")) != 0,
-					Integer.parseInt(qtnmap.jmap.get("max_val")),
-					Integer.parseInt(qtnmap.jmap.get("min_val")));
+			qc.addQuestion(Integer.parseInt(qtnmap.get("id")), c,
+                    qtnmap.get("question"), qtnmap.get("description"),
+					options, Integer.parseInt(qtnmap.get("optional")) != 0,
+					Integer.parseInt(qtnmap.get("max_val")),
+					Integer.parseInt(qtnmap.get("min_val")));
 		}
 		return true;
 	}
@@ -193,17 +195,17 @@ public class ServletCommunication implements Database, Runnable
 	public boolean loadQResultDates(long uid, TimePeriodContainer tpc)
 	{
         JSONMapData ret = new JSONMapData(null);
-		ret.jmap.put("command", Constants.CMD_LOAD_QR_DATE);
+		ret.put("command", Constants.CMD_LOAD_QR_DATE);
 
         JSONMapData details = new JSONMapData(null);
-        details.jmap.put("uid", Long.toString(uid));
-        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+        details.put("uid", Long.toString(uid));
+        ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData amap = new JSONMapData(sendMessage(ret.jobj));
-        JSONArrData dlist = new JSONArrData(getJSONArray(amap.jmap.get("dates")));
+        JSONMapData amap = sendMessage(ret);
+        JSONArrData dlist = new JSONArrData(getJSONArray(amap.get("dates")));
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            for (String str : dlist.jlist) {
+            for (String str : dlist.iterable()) {
 				Calendar cal = new GregorianCalendar();
 				cal.setTime(sdf.parse(str));
 				tpc.addDate(cal);
@@ -219,29 +221,29 @@ public class ServletCommunication implements Database, Runnable
 			List<Integer> questionIDs, StatisticsContainer container)
 	{
         JSONMapData ret = new JSONMapData(null);
-		ret.jmap.put("command", Constants.CMD_LOAD_QR);
+		ret.put("command", Constants.CMD_LOAD_QR);
 
         JSONArrData questions = new JSONArrData(null);
 		for (Integer i : questionIDs)
-			questions.jlist.add(String.format(Locale.US, "question%d", i));
-        ret.jmap.put("questions", questions.jarr.toString());
+			questions.add(String.format(Locale.US, "question%d", i));
+        ret.put("questions", questions.toString());
 
         JSONMapData details = new JSONMapData(null);
-        details.jmap.put("uid", Long.toString(uid));
-        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+        details.put("uid", Long.toString(uid));
+        ret.put("details", crypto.encrypt(details.toString()));
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-        ret.jmap.put("begin", sdf.format(begin.getTime()));
-        ret.jmap.put("end", sdf.format(end.getTime()));
+        ret.put("begin", sdf.format(begin.getTime()));
+        ret.put("end", sdf.format(end.getTime()));
 		
 
-        JSONMapData amap = new JSONMapData(sendMessage(ret.jobj));
-        JSONArrData rlist = new JSONArrData(getJSONArray(amap.jmap.get("results")));
-        for (String str : rlist.jlist) {
+        JSONMapData amap = sendMessage(ret);
+        JSONArrData rlist = new JSONArrData(getJSONArray(amap.get("results")));
+        for (String str : rlist.iterable()) {
             JSONMapData ansmap = new JSONMapData(getJSONObject(str));
             QuestionContainer qc = Questions.getQuestions().getContainer();
             assert qc != null;
-            for (Entry<String, String> e : ansmap.jmap.entrySet()) {
+            for (Entry<String, String> e : ansmap.iterable()) {
                 int qid = Integer.parseInt(e.getKey().substring("question".length()));
                 Question q1 = qc.getQuestion(qid);
                 container.addResult(q1, QDBFormat.getQFormat(e.getValue()));
@@ -255,16 +257,16 @@ public class ServletCommunication implements Database, Runnable
 			String name, String email, String clinic)
 	{
         JSONMapData ret = new JSONMapData(null);
-		ret.jmap.put("command", Constants.CMD_REQ_REGISTR);
+		ret.put("command", Constants.CMD_REQ_REGISTR);
 
         JSONMapData details = new JSONMapData(null);
-        details.jmap.put("name", name);
-        details.jmap.put("email", email);
-        details.jmap.put("clinic", clinic);
-        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+        details.put("name", name);
+        details.put("email", email);
+        details.put("clinic", clinic);
+        ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData ans = new JSONMapData(sendMessage(ret.jobj));
-		String insert = ans.jmap.get(Constants.INSERT_RESULT);
+        JSONMapData ans = sendMessage(ret);
+		String insert = ans.get(Constants.INSERT_RESULT);
 		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
 	}
 
@@ -272,17 +274,17 @@ public class ServletCommunication implements Database, Runnable
 	public Session requestLogin(String username, String password)
 	{
         JSONMapData ret = new JSONMapData(null);
-		ret.jmap.put("command", Constants.CMD_REQ_LOGIN);
+		ret.put("command", Constants.CMD_REQ_LOGIN);
 
         JSONMapData details = new JSONMapData(null);
-        details.jmap.put("name", username);
-        details.jmap.put("password", password);
-        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+        details.put("name", username);
+        details.put("password", password);
+        ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData _ans = new JSONMapData(sendMessage(ret.jobj));
-        String response = _ans.jmap.get(Constants.LOGIN_REPONSE);
-        String uid = _ans.jmap.get(Constants.LOGIN_UID);
-        String update_password = _ans.jmap.get("update_password");
+        JSONMapData ans = sendMessage(ret);
+        String response = ans.get(Constants.LOGIN_REPONSE);
+        String uid = ans.get(Constants.LOGIN_UID);
+        String update_password = ans.get("update_password");
         return new Session(uid != null ? Long.parseLong(uid) : 0L,
                 response != null ? Integer.parseInt(response) : Constants.ERROR,
                 update_password != null && Integer.parseInt(update_password) > 0);
@@ -292,14 +294,14 @@ public class ServletCommunication implements Database, Runnable
 	public boolean requestLogout(long uid)
 	{
         JSONMapData ret = new JSONMapData(null);
-		ret.jmap.put("command", Constants.CMD_REQ_LOGOUT);
+		ret.put("command", Constants.CMD_REQ_LOGOUT);
 
         JSONMapData details = new JSONMapData(null);
-        details.jmap.put("uid", Long.toString(uid));
-        ret.jmap.put("details", crypto.encrypt(details.jobj.toString()));
+        details.put("uid", Long.toString(uid));
+        ret.put("details", crypto.encrypt(details.toString()));
 
-        JSONMapData ans = new JSONMapData(sendMessage(ret.jobj));
-		return Integer.parseInt(ans.jmap.get(Constants.LOGOUT_REPONSE)) == Constants.SUCCESS;
+        JSONMapData ans = sendMessage(ret);
+		return Integer.parseInt(ans.get(Constants.LOGOUT_REPONSE)) == Constants.SUCCESS;
 	}
 	
 	/* Protected */
@@ -310,7 +312,8 @@ public class ServletCommunication implements Database, Runnable
 	private Encryption crypto;
 	
 	private JSONParser parser;
-	private volatile JSONObject JSONOut, JSONIn;
+    private volatile JSONMapData JSONOut, JSONIn;
+    private _ServletCommunication scom;
 	
 	/**
 	 * Initializes variables and loads the database configuration.
@@ -319,6 +322,11 @@ public class ServletCommunication implements Database, Runnable
 	private ServletCommunication()
 	{
 		crypto = Implementations.Encryption();
+        try {
+            scom = new _ServletCommunication(Constants.SERVER_URL);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
 		parser = new JSONParser();
 	}
 
@@ -327,41 +335,50 @@ public class ServletCommunication implements Database, Runnable
 	public void run()
 	{
         JSONIn = null;
-		HttpURLConnection connection;
-		try {
-			connection = (HttpURLConnection) Constants.SERVER_URL.openConnection();
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setUseCaches(false);
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
+        String pktIn = null;
+		HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) Constants.SERVER_URL.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setUseCaches(false);
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
 
-			/* send message */
-			OutputStream os = connection.getOutputStream();
-			OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+            sendPacket(connection.getOutputStream(), JSONOut);
+            pktIn = receivePacket(connection.getInputStream());
+        } catch (java.io.IOException pe) {
+            return;
+        } finally {
+            if (connection != null)
+                connection.disconnect();
+        }
 
-            Log.i("MSGOUT", JSONOut.toString());
-			synchronized (this) {
-				osw.write(JSONOut.toString());
-			}
-			osw.flush();
-			osw.close();
-
-			/* receive message */
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					connection.getInputStream(), "UTF-8"));
-			StringBuilder sb = new StringBuilder();
-			String inputLine;
-			while ((inputLine = in.readLine()) != null)
-				sb.append(inputLine);
-			in.close();
-
-            Log.i("MSGIN", sb.toString());
-			synchronized (this) {
-				JSONIn = getJSONObject(sb.toString());
-			}
-		} catch (Exception ignored) { }
+        Log.i("MSGIN", pktIn);
+        synchronized (this) {
+            JSONIn = new JSONMapData(getJSONObject(pktIn));
+        }
 	}
+
+	private void sendPacket(OutputStream os, JSONMapData pktOut) throws IOException
+    {
+        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+        Log.i("MSGOUT", JSONOut.toString());
+        synchronized (this) {
+            osw.write(JSONOut.toString());
+        }
+        osw.flush();
+    }
+
+    private String receivePacket(InputStream is) throws IOException
+    {
+        BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+
+        for (String inputLine; (inputLine = in.readLine()) != null; sb.append(inputLine));
+
+        return sb.toString();
+    }
 	
 	/**
 	 * Sends a JSONObject to the servlet.
@@ -370,7 +387,7 @@ public class ServletCommunication implements Database, Runnable
 	 * 
 	 * @return The JSONObject returned from the servlet.
 	 */
-	private JSONObject sendMessage(JSONObject obj)
+	private JSONMapData sendMessage(JSONMapData obj)
 	{
 		Thread t = new Thread(this);
 		JSONOut = obj;
@@ -427,16 +444,16 @@ public class ServletCommunication implements Database, Runnable
 	private boolean getMessages(String commandName, MessageContainer mc)
 	{
         JSONMapData ret = new JSONMapData(null);
-		ret.jmap.put("command", commandName);
+		ret.put("command", commandName);
 
-        JSONMapData ans = new JSONMapData(sendMessage(ret.jobj));
-        JSONMapData messages = new JSONMapData(getJSONObject(ans.jmap.get("messages")));
+        JSONMapData ans = sendMessage(ret);
+        JSONMapData messages = new JSONMapData(getJSONObject(ans.get("messages")));
 		try {
-            for (Entry<String, String> e : messages.jmap.entrySet()) {
+            for (Entry<String, String> e : messages.iterable()) {
                 JSONMapData messagedata = new JSONMapData(getJSONObject(e.getValue()));
-                JSONMapData message = new JSONMapData(getJSONObject(messagedata.jmap.get("message")));
-				mc.addMessage(Integer.parseInt(messagedata.jmap.get("code")),
-                        messagedata.jmap.get("name"), message.jmap);
+                JSONMapData message = new JSONMapData(getJSONObject(messagedata.get("message")));
+				mc.addMessage(Integer.parseInt(messagedata.get("code")),
+                        messagedata.get("name"), message.map());
 			}
 		}
 		catch (NullPointerException _e) {
@@ -584,6 +601,31 @@ public class ServletCommunication implements Database, Runnable
             this.jobj = jobj != null ? jobj : new JSONObject();
             this.jmap = (Map<String, String>) this.jobj;
         }
+
+        void put(String key, String value)
+		{
+			jmap.put(key, value);
+		}
+
+		String get(String key)
+        {
+            return jmap.get(key);
+        }
+
+        Iterable<Entry<String, String>> iterable()
+        {
+            return jmap.entrySet();
+        }
+
+        Map<String, String> map()
+        {
+            return Collections.unmodifiableMap(jmap);
+        }
+
+        public String toString()
+        {
+            return jobj.toString();
+        }
     }
 
     private class JSONArrData
@@ -596,6 +638,21 @@ public class ServletCommunication implements Database, Runnable
         {
             this.jarr = jarr != null ? jarr : new JSONArray();
             this.jlist = (List<String>) this.jarr;
+        }
+
+        void add(String value)
+        {
+            jlist.add(value);
+        }
+
+        Iterable<String> iterable()
+        {
+            return Collections.unmodifiableList(jlist);
+        }
+
+        public String toString()
+        {
+            return jarr.toString();
         }
     }
 }

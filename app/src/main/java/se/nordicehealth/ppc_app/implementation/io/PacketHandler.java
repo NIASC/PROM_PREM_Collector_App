@@ -97,11 +97,9 @@ public class PacketHandler implements Database
 			return false;
 		}
 
-		MapData questions = new MapData(null);
-		int i = 0;
+		ListData questions = new ListData(null);
         for (FormContainer fc : answers) {
-            questions.put(String.format(Locale.US, "`question%d`", i++),
-                    QDBFormat.getDBFormat(fc));
+            questions.add(QDBFormat.getDBFormat(fc));
         }
 
 		MapData pobj = new MapData(null);
@@ -371,35 +369,28 @@ public class PacketHandler implements Database
 		 */
 		static String getDBFormat(FormContainer fc)
 		{
+            MapData fmt = new MapData(null);
 			if (fc.getEntry() == null)
-				return "''";
-			
+				return fmt.toString();
+
 			if (fc instanceof SingleOptionContainer) {
 				SingleOptionContainer soc = (SingleOptionContainer) fc;
-				return String.format(Locale.US, "'option%d'", soc.getEntry());
+				fmt.put("SingleOption", String.format(Locale.US, "%d", soc.getEntry()));
 			} else if (fc instanceof MultipleOptionContainer) {
 				MultipleOptionContainer moc = (MultipleOptionContainer) fc;
-				List<String> lstr = new ArrayList<>();
-				List<Integer> lint = new ArrayList<>(moc.getEntry());
-				Collections.sort(lint);
-				for (Integer i : lint)
-					lstr.add(String.format(Locale.US, "option%d", i));
+                ListData options = new ListData(null);
+				for (Integer i : moc.getEntry())
+                    options.add(String.format(Locale.US, "%d", i));
 
-                StringBuilder sb = new StringBuilder();
-                for (Iterator<String> itr = lstr.iterator(); itr.hasNext();) {
-                    sb.append(itr.next());
-                    if (itr.hasNext())
-                        sb.append(",");
-                }
-				return String.format("[%s]", sb.toString());
+                fmt.put("MultipleOption", options.toString());
 			} else if (fc instanceof SliderContainer) {
 				SliderContainer sc = (SliderContainer) fc;
-				return String.format(Locale.US, "'slider%d'", sc.getEntry());
+                fmt.put("Slider", String.format(Locale.US, "%d", sc.getEntry()));
 			} else if (fc instanceof AreaContainer) {
 				AreaContainer ac = (AreaContainer) fc;
-				return String.format("'%s'", ac.getEntry());
-			} else
-				return "''";
+                fmt.put("Area", ac.getEntry());
+			}
+            return fmt.toString();
 		}
 		
 		/**

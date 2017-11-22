@@ -201,7 +201,7 @@ public class PacketHandler implements Database
 
 		ListData questions = new ListData(null);
 		for (Integer i : questionIDs)
-			questions.add(String.format(Locale.US, "question%d", i));
+			questions.add(String.format(Locale.US, "%d", i));
         ret.put("questions", questions.toString());
 
 		MapData details = new MapData(null);

@@ -87,6 +87,22 @@ public class PacketHandler implements Database
 	}
 
 	@Override
+	public boolean ping(long uid)
+	{
+		MapData ret = new MapData(null);
+		ret.put("command", Constants.CMD_PING);
+
+		MapData details = new MapData(null);
+		details.put("uid", Long.toString(uid));
+
+		ret.put("details", crypto.encrypt(details.toString()));
+
+		MapData ans = sendMessage(ret);
+        String resp = ans.get(Constants.INSERT_RESULT);
+        return (resp != null && resp.equals(Constants.INSERT_SUCCESS));
+	}
+
+	@Override
 	public boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers)
 	{
         MapData ret = new MapData(null);

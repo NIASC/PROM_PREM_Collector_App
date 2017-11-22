@@ -48,7 +48,14 @@ public interface Database
 	 * there was a database error.
 	 */
 	String DATABASE_ERROR = "Database error.";
-	
+
+    /**
+     * Poke the database to tell it thet the client is still available.
+     * @param uid The user that wants to poke the server.
+     * @return True if the server received the poke and the user was still connected.
+     */
+	boolean ping(long uid);
+
 	/**
 	 * Adds a patient's answers to the database. If the patient does not
 	 * already exist in the database it will be added as well.

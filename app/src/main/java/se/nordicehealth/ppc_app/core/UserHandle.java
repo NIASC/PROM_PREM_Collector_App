@@ -20,8 +20,6 @@
  */
 package se.nordicehealth.ppc_app.core;
 
-import android.provider.ContactsContract;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,13 +176,15 @@ public class UserHandle
     }
 	
 	/* Private */
-	
+
 	private Database db;
 	private UserInterface ui;
 	private Questionnaire questionnaire;
 	private ViewData viewData;
 	private UpdatePassword updatePass;
-    private User user;
+    private volatile User user;
+	private volatile boolean running;
+	private Thread monitor;
 
 	private boolean newPassError(int response)
 	{
@@ -219,6 +219,9 @@ public class UserHandle
 	private void initLoginVars(User user)
 	{
         this.user = user;
+		running = true;
+		monitor = new Thread(new Pinger());
+		monitor.start();
 	}
 	
 	/**
@@ -226,12 +229,20 @@ public class UserHandle
 	 */
 	private void resetLoginVars()
 	{
-        user = new User(0L, false, false);
+		running = false;
+		if (monitor != null && monitor.isAlive()) {
+			try {
+				monitor.join(0);
+                monitor = null;
+			} catch (InterruptedException ignored) {
+
+			}
+		}
+		user = new User(0L, false, false);
 	}
 	
 	private class UpdatePassword implements FormUtils
 	{
-
 		@Override
 		public RetFunContainer ValidateUserInput(Form form) {
 			RetFunContainer rfc = new RetFunContainer();
@@ -301,4 +312,31 @@ public class UserHandle
             this.loggedIn = loggedIn;
         }
     }
+
+    /**
+     * Periodically pokes the server with the goal of telling the server
+     * that the client (i.e. this app) is still running.
+     */
+    private class Pinger implements Runnable
+	{
+        final int sleepsPerCheck = 100; // cycles
+        final int checksPerInterval = 50; // ms
+        // pingInterval = sleepsPerCheck * checksPerInterval
+
+		@Override
+		public void run() {
+            int checksLeft;
+			while (running) {
+                checksLeft = checksPerInterval;
+                while (running && checksLeft-- > 0) {
+                    try {
+                        Thread.sleep(sleepsPerCheck);
+                    } catch (InterruptedException ignored) {
+
+                    }
+                }
+                db.ping(user.uid);
+			}
+		}
+	}
 }

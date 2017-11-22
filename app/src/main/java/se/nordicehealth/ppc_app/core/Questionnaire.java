@@ -55,7 +55,7 @@ public class Questionnaire
 	void start()
 	{
 		if (!uh.isLoggedIn())
-			ui.displayError(Implementations.Messages().getError(
+			ui.displayError(Implementations.Messages().error(
 					Messages.ERROR_NOT_LOGGED_IN), false);
 		else
 			preg.createPatientRegistration();
@@ -155,7 +155,7 @@ public class Questionnaire
 			String pID = Implementations.Locale().formatPersonalID(pnr);
 			if (pID == null)
 			{
-				rfc.message = Implementations.Messages().getError(
+				rfc.message = Implementations.Messages().error(
 						Messages.ERROR_QP_INVALID_PID);
 				return rfc;
 			}
@@ -166,7 +166,7 @@ public class Questionnaire
 			}
 			catch (NullPointerException npe)
 			{
-				rfc.message = Implementations.Messages().getError(
+				rfc.message = Implementations.Messages().error(
 						Messages.ERROR_NOT_LOGGED_IN);
 				return rfc;
 			}
@@ -193,13 +193,13 @@ public class Questionnaire
             List<FormContainer> form = new LinkedList<>();
 			Messages msg = Implementations.Messages();
 			FieldContainer forename = new FieldContainer(false, false,
-					msg.getInfo(Messages.INFO_Q_PATIENT_FORENAME), null);
+					msg.info(Messages.INFO_Q_PATIENT_FORENAME), null);
 			form.add(forename);
 			FieldContainer lastname = new FieldContainer(false, false,
-					msg.getInfo(Messages.INFO_Q_PATIENT_SURNAME), null);
+					msg.info(Messages.INFO_Q_PATIENT_SURNAME), null);
 			form.add(lastname);
 			FieldContainer pnr = new FieldContainer(false, false,
-					msg.getInfo(Messages.INFO_Q_PATIENT_PNR), null);
+					msg.info(Messages.INFO_Q_PATIENT_PNR), null);
 			if (patient != null) {
 				forename.setEntry(patient.getForename());
 				lastname.setEntry(patient.getSurname());

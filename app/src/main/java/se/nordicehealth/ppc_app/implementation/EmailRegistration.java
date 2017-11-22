@@ -63,13 +63,13 @@ public class EmailRegistration implements Registration, FormUtils
 	{
 		List<FormContainer> f = new LinkedList<>();
 		FieldContainer name = new FieldContainer(false, false,
-				Resource.messages().getInfo(Messages.INFO_REG_USER_NAME), null);
+				Resource.messages().info(Messages.INFO_REG_USER_NAME), null);
 		f.add(name);
 		FieldContainer email = new FieldContainer(false, false,
-				Resource.messages().getInfo(Messages.INFO_REG_USER_EMAIL), null);
+				Resource.messages().info(Messages.INFO_REG_USER_EMAIL), null);
 		f.add(email);
 		FieldContainer clinic = new FieldContainer(false, false,
-				Resource.messages().getInfo(Messages.INFO_REG_CLINIC_NAME), null);
+				Resource.messages().info(Messages.INFO_REG_CLINIC_NAME), null);
 		f.add(clinic);
 		
 		ui.presentForm(f, this, true);
@@ -89,10 +89,10 @@ public class EmailRegistration implements Registration, FormUtils
 		Database db = Implementations.Database();
 		boolean success = db.requestRegistration(name, email, clinic);
 		if (success)
-			ui.displayMessage(Resource.messages().getInfo(
+			ui.displayMessage(Resource.messages().info(
 					Messages.INFO_REG_REQUEST_SENT), true);
 		else
-			ui.displayMessage(Resource.messages().getError(
+			ui.displayMessage(Resource.messages().error(
 					Messages.ERROR_REG_REQUEST_FAILED), true);
 		rfc.valid = true;
 		return rfc;

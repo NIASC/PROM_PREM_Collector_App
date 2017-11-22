@@ -86,7 +86,7 @@ public class MultipleOptionDisplay extends LinearLayout implements FormComponent
 		responseID = new ArrayList<>();
 
 		String description = "";
-		String optional = Implementations.Messages().getInfo(
+		String optional = Implementations.Messages().info(
 				Messages.INFO_UI_FORM_OPTIONAL);
 		if (moc.getDescription() != null && !moc.getDescription().isEmpty())
 			description = "\n\n"+moc.getDescription();

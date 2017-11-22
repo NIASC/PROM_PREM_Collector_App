@@ -40,8 +40,6 @@ import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
  */
 public interface Database
 {
-	/* Public */
-	
 	/**
 	 * If the messages was not retrieved from the database this
 	 * message (in English) should be used to notify the caller that
@@ -185,7 +183,4 @@ public interface Database
 			this.update_password = update_password;
 		}
 	}
-	/* Protected */
-	
-	/* Private */
 }

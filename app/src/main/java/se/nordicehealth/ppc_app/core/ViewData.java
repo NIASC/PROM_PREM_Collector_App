@@ -20,9 +20,7 @@
  */
 package se.nordicehealth.ppc_app.core;
 
-import java.text.Normalizer;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,7 +71,7 @@ class ViewData
 	void start()
 	{
 		if (!uh.isLoggedIn())
-			ui.displayError(Implementations.Messages().getError(
+			ui.displayError(Implementations.Messages().error(
 					Messages.ERROR_NOT_LOGGED_IN), false);
 		else
 			dateSel.queryTimePeriod();
@@ -104,13 +102,13 @@ class ViewData
 			Calendar upper = bounds.get(1);
 			if (lower == null || upper == null)
 			{
-				rfc.message = msg.getError(
+				rfc.message = msg.error(
 						Messages.ERROR_VD_INVALID_PERIOD);
 				return rfc;
 			}
 			if (timeperiod.getPeriodEntries() < 5)
 			{
-				rfc.message = msg.getError(
+				rfc.message = msg.error(
 						Messages.ERROR_VD_FEW_ENTRIES);
 				return rfc;
 			}
@@ -149,14 +147,14 @@ class ViewData
             List<FormContainer> form = new LinkedList<>();
 			QuestionContainer qc = Questions.getQuestions().getContainer();
 			MultipleOptionContainer questionselect =
-					new MultipleOptionContainer(false, msg.getInfo(
+					new MultipleOptionContainer(false, msg.info(
 							Messages.INFO_VD_SELECT_PERIOD), null);
 			for (int i = 0; i < qc.getSize(); ++i)
 				questionselect.addOption(i, qc.getContainer(i).getStatement());
 			form.add(questionselect);
 
 			TimePeriodContainer timeperiod =
-					new TimePeriodContainer(false, msg.getInfo(
+					new TimePeriodContainer(false, msg.info(
 							Messages.INFO_VD_SELECT_QUESTIONS), null);
 			Implementations.Database().loadQResultDates(uh.getUID(), timeperiod);
 			form.add(timeperiod);

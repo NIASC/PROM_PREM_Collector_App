@@ -71,18 +71,15 @@ public abstract class ContainerDisplays
 			return new SingleOptionDisplay(c, (SingleOptionContainer) fc);
 		else if (fc instanceof MultipleOptionContainer)
 			return new MultipleOptionDisplay(c, (MultipleOptionContainer) fc);
-		else if (fc instanceof AreaContainer)
-		{
+		else if (fc instanceof AreaContainer) {
 			if (fc instanceof FieldContainer)
 				return new FieldDisplay(c, (FieldContainer) fc);
 			return new AreaDisplay(c, (AreaContainer) fc);
-		}
-		else if (fc instanceof SliderContainer)
+		} else if (fc instanceof SliderContainer)
 			return new SliderDisplay(c, (SliderContainer) fc);
 		else if (fc instanceof TimePeriodContainer)
 			return new TimePeriodDisplay(c, (TimePeriodContainer) fc);
-		else
-		{
+		else {
 			System.out.println("Unknown Form container");
 			return null;
 		}

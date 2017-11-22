@@ -37,8 +37,6 @@ import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
  */
 public interface UserInterface
 {
-	/* Public */
-	
 	/**
 	 * Presents an error message to the user. The message should
 	 * contain clear information about why the error was displayed.
@@ -139,8 +137,4 @@ public interface UserInterface
 		 */
 		boolean entryFilled();
 	}
-	
-	/* Protected */
-	
-	/* Private */
 }

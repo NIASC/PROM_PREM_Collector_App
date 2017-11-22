@@ -13,13 +13,13 @@ class ResourceStrings implements Messages
     }
 
     @Override
-    public String getError(String errorName)
+    public String error(String errorName)
     {
         return emsg.msgError.get(errorName);
     }
 
     @Override
-    public String getInfo(String infoName)
+    public String info(String infoName)
     {
         return imsg.msgInfo.get(infoName);
     }

@@ -20,7 +20,6 @@
  */
 package se.nordicehealth.ppc_app.core;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -85,19 +84,19 @@ public class UserHandle
             questionnaire = new Questionnaire(ui, this);
 			break;
 		case Constants.ALREADY_ONLINE:
-			ui.displayError(Implementations.Messages().getError(
+			ui.displayError(Implementations.Messages().error(
 					Messages.ERROR_UH_ALREADY_ONLINE), false);
 			break;
 		case Constants.SERVER_FULL:
-			ui.displayError(Implementations.Messages().getError(
+			ui.displayError(Implementations.Messages().error(
 					Messages.ERROR_UH_SERVER_FULL), false);
 			break;
 		case Constants.INVALID_DETAILS:
-			ui.displayError(Implementations.Messages().getError(
+			ui.displayError(Implementations.Messages().error(
 					Messages.ERROR_UH_INVALID_LOGIN), false);
 			break;
 		default:
-			ui.displayError(Implementations.Messages().getError(
+			ui.displayError(Implementations.Messages().error(
 					Messages.ERROR_UNKNOWN_RESPONSE), false);
 			break;
 		}
@@ -161,7 +160,7 @@ public class UserHandle
 	{
 		if (user.update_password)
 		{
-			ui.displayMessage(Implementations.Messages().getInfo(
+			ui.displayMessage(Implementations.Messages().info(
 					Messages.INFO_UH_UPDATE_PASSWORD), true);
 			updatePass.setPassword();
 			return true;
@@ -191,23 +190,23 @@ public class UserHandle
 	{
 		switch(response) {
 			case Constants.INVALID_DETAILS:
-				ui.displayError(Implementations.Messages().getError(
+				ui.displayError(Implementations.Messages().error(
 						Messages.ERROR_UH_PR_INVALID_CURRENT), false);
 				return true;
 			case Constants.MISMATCH_NEW:
-				ui.displayError(Implementations.Messages().getError(
+				ui.displayError(Implementations.Messages().error(
 						Messages.ERROR_UH_PR_MISMATCH_NEW), false);
 				return true;
 			case Constants.PASSWORD_SHORT:
-				ui.displayError(Implementations.Messages().getError(
+				ui.displayError(Implementations.Messages().error(
 						Messages.ERROR_UH_PR_INVALID_LENGTH), false);
 				return true;
             case Constants.PASSWORD_SIMPLE:
-				ui.displayError(Implementations.Messages().getError(
+				ui.displayError(Implementations.Messages().error(
 						Messages.ERROR_UH_PR_PASSWORD_SIMPLE), false);
 				return true;
 			default:
-				ui.displayError(Implementations.Messages().getError(
+				ui.displayError(Implementations.Messages().error(
 						Messages.ERROR_UNKNOWN_RESPONSE), false);
 				return false;
 		}
@@ -284,14 +283,14 @@ public class UserHandle
 				return; // no user to set password for
 
             List<FormContainer> form = new LinkedList<>();
-			form.add(new FieldContainer(false, true, Implementations.Messages().getInfo(
+			form.add(new FieldContainer(false, true, Implementations.Messages().info(
 			        Messages.INFO_CURRENT_PASSWORD), null));
-			form.add(new FieldContainer(false, true, Implementations.Messages().getInfo(
+			form.add(new FieldContainer(false, true, Implementations.Messages().info(
 			        Messages.INFO_NEW_PASSWORD), null));
-			form.add(new FieldContainer(false, true, Implementations.Messages().getInfo(
+			form.add(new FieldContainer(false, true, Implementations.Messages().info(
                     Messages.INFO_RE_NEW_PASSWORD), null));
 			
-			ui.displayMessage(Implementations.Messages().getInfo(
+			ui.displayMessage(Implementations.Messages().info(
 					Messages.INFO_NEW_PASS_INFO), false);
 			ui.presentForm(form, this, true);
 		}

@@ -131,7 +131,7 @@ public class TimePeriodDisplay extends LinearLayout implements FormComponentDisp
 		fromTF.setLayoutParams(new FrameLayout.LayoutParams(
 				LinearLayoutCompat.LayoutParams.MATCH_PARENT,
 				LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-		fromTF.setText(msg.getInfo(Messages.INFO_VD_DATE_FROM));
+		fromTF.setText(msg.info(Messages.INFO_VD_DATE_FROM));
 		from.addView(fromTF);
 		from.addView(dpFrom);
 
@@ -141,7 +141,7 @@ public class TimePeriodDisplay extends LinearLayout implements FormComponentDisp
 		toTF.setLayoutParams(new FrameLayout.LayoutParams(
 				LinearLayoutCompat.LayoutParams.MATCH_PARENT,
 				LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-		toTF.setText(msg.getInfo(Messages.INFO_VD_DATE_TO));
+		toTF.setText(msg.info(Messages.INFO_VD_DATE_TO));
 		to.addView(toTF);
 		to.addView(dpTo);
 

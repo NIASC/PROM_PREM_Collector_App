@@ -182,13 +182,13 @@ public class PPCGUI extends Activity implements UserInterface
 
             usernameTF = new EditText(c);
             usernameTF.setHint(String.format("%s",
-                    Resource.messages().getInfo(Messages.INFO_UH_ENTER_USERNAME)));
+                    Resource.messages().info(Messages.INFO_UH_ENTER_USERNAME)));
             userPanel.addView(usernameTF);
 
             passwordTF = new EditText(c);
             passwordTF.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             passwordTF.setHint(String.format("%s",
-                    Resource.messages().getInfo(Messages.INFO_UH_ENTER_PASSWORD)));
+                    Resource.messages().info(Messages.INFO_UH_ENTER_PASSWORD)));
             userPanel.addView(passwordTF);
 
 			/* button panel */
@@ -198,7 +198,7 @@ public class PPCGUI extends Activity implements UserInterface
             final Context _c = c;
 
             login = new Button(c);
-            login.setText(Resource.messages().getInfo(Messages.INFO_LOGIN));
+            login.setText(Resource.messages().info(Messages.INFO_LOGIN));
             login.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -214,7 +214,7 @@ public class PPCGUI extends Activity implements UserInterface
             });
 
             register = new Button(c);
-            register.setText(Resource.messages().getInfo(Messages.INFO_REGISTER));
+            register.setText(Resource.messages().info(Messages.INFO_REGISTER));
             register.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -243,7 +243,7 @@ public class PPCGUI extends Activity implements UserInterface
 
 
             questionnaire = new Button(c);
-            questionnaire.setText(Resource.messages().getInfo(Messages.INFO_START_QUESTIONNAIRE));
+            questionnaire.setText(Resource.messages().info(Messages.INFO_START_QUESTIONNAIRE));
             questionnaire.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -252,7 +252,7 @@ public class PPCGUI extends Activity implements UserInterface
             });
 
             viewData = new Button(c);
-            viewData.setText(Resource.messages().getInfo(Messages.INFO_VIEW_STATISTICS));
+            viewData.setText(Resource.messages().info(Messages.INFO_VIEW_STATISTICS));
             viewData.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -339,10 +339,10 @@ public class PPCGUI extends Activity implements UserInterface
             fc_next.setEnabled(cIdx != getNextEntry(cIdx, nEntries, 1, false));
             fc_previous.setEnabled(cIdx != getNextEntry(cIdx, nEntries, -1, false));
             if (getNextUnfilledEntry(cIdx, components) == cIdx)
-                fc_continue.setText(msg.getInfo(
+                fc_continue.setText(msg.info(
                         Messages.INFO_UI_FORM_FINISH));
             else
-                fc_continue.setText(msg.getInfo(
+                fc_continue.setText(msg.info(
                         Messages.INFO_UI_FORM_CONTINUE));
         }
 
@@ -368,7 +368,7 @@ public class PPCGUI extends Activity implements UserInterface
             LinearLayout panel = new LinearLayout(c);
 
             fc_continue = new Button(c);
-            fc_continue.setText(msg.getInfo(Messages.INFO_UI_FORM_CONTINUE));
+            fc_continue.setText(msg.info(Messages.INFO_UI_FORM_CONTINUE));
             fc_continue.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -392,7 +392,7 @@ public class PPCGUI extends Activity implements UserInterface
             });
 
             fc_previous = new Button(c);
-            fc_previous.setText(msg.getInfo(Messages.INFO_UI_FORM_PREVIOUS));
+            fc_previous.setText(msg.info(Messages.INFO_UI_FORM_PREVIOUS));
             fc_previous.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -407,7 +407,7 @@ public class PPCGUI extends Activity implements UserInterface
                 fc_previous.setEnabled(false);
 
             fc_next = new Button(c);
-            fc_next.setText(msg.getInfo(Messages.INFO_UI_FORM_NEXT));
+            fc_next.setText(msg.info(Messages.INFO_UI_FORM_NEXT));
             fc_next.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -420,7 +420,7 @@ public class PPCGUI extends Activity implements UserInterface
             });
 
             fc_back = new Button(c);
-            fc_back.setText(msg.getInfo(Messages.INFO_UI_FORM_BACK));
+            fc_back.setText(msg.info(Messages.INFO_UI_FORM_BACK));
             fc_back.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {

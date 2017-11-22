@@ -81,7 +81,7 @@ public class SingleOptionDisplay extends LinearLayout implements FormComponentDi
 		responseID = null;
 
 		String description = "";
-		String optional = Implementations.Messages().getInfo(
+		String optional = Implementations.Messages().info(
 				Messages.INFO_UI_FORM_OPTIONAL);
 		if (soc.getDescription() != null && !soc.getDescription().isEmpty())
 			description = "\n\n"+soc.getDescription();

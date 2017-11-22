@@ -98,8 +98,6 @@ public interface Messages
 			INFO_Q_PATIENT_SURNAME			= "Q_PATIENT_SURNAME"		,
 			INFO_Q_PATIENT_PNR				= "Q_PATIENT_PNR"
 					;
-
-    String fallbackLocale = "en";
 	
 	/**
 	 * Retrieves the error message associated with {@code errorName}
@@ -112,7 +110,7 @@ public interface Messages
 	 * 		message does not exist in the current locale then the
 	 * 		message for the default locale is returned.
 	 */
-	String getError(String errorName);
+	String error(String errorName);
 	
 	/**
 	 * Retrieves the error message associated with {@code infoName}
@@ -125,5 +123,5 @@ public interface Messages
 	 * 		message does not exist in the current locale then the
 	 * 		message for the default locale is returned.
 	 */
-	String getInfo(String infoName);
+	String info(String infoName);
 }

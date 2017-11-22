@@ -35,8 +35,6 @@ package se.nordicehealth.ppc_app.core.interfaces;
  */
 public interface Registration
 {
-	/* Public */
-	
 	/**
 	 * Presets a registration form to the user. The form should
 	 * contain necessary information to be able to register the user.
@@ -46,8 +44,4 @@ public interface Registration
 	 * a user).
 	 */
 	void registrationProcess();
-	
-	/* Protected */
-	
-	/* Private */
 }

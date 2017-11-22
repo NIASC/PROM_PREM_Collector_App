@@ -99,7 +99,7 @@ public class PacketHandler implements Database
 
 		ListData questions = new ListData(null);
         for (FormContainer fc : answers) {
-            questions.add(QDBFormat.getDBFormat(fc));
+            questions.add(qdbfmt.getDBFormat(fc));
         }
 
 		MapData pobj = new MapData(null);
@@ -219,9 +219,9 @@ public class PacketHandler implements Database
 			MapData ansmap = jsonData.getMapData(str);
             QuestionContainer qc = Questions.getQuestions().getContainer();
             for (Entry<String, String> e : ansmap.iterable()) {
-                int qid = Integer.parseInt(e.getKey().substring("question".length()));
+                int qid = Integer.parseInt(e.getKey());
                 Question q1 = qc.getQuestion(qid);
-                container.addResult(q1, QDBFormat.getQFormat(e.getValue()));
+                container.addResult(q1, qdbfmt.getQFormat(jsonData.getMapData(e.getValue())));
             }
         }
 		return true;
@@ -289,6 +289,7 @@ public class PacketHandler implements Database
 	
 	private PacketData jsonData;
     private ServletConnection scom;
+    private QDBFormat qdbfmt;
 	
 	/**
 	 * Initializes variables and loads the pktHandler configuration.
@@ -299,6 +300,7 @@ public class PacketHandler implements Database
         this.crypto = crypto;
         scom = new ServletConnection(Constants.SERVER_URL);
 		jsonData = new PacketData();
+        qdbfmt = new QDBFormat();
 	}
 	
 	/**
@@ -354,7 +356,7 @@ public class PacketHandler implements Database
 	 * @author Marcus Malmquist
 	 *
 	 */
-	private static class QDBFormat
+	private class QDBFormat
 	{
 		/**
 		 * Converts the answer stored in {@code fc} to the format used
@@ -367,7 +369,7 @@ public class PacketHandler implements Database
 		 * @return The pktHandler representation for the answer in
 		 * 		{@code fc}.
 		 */
-		static String getDBFormat(FormContainer fc)
+		String getDBFormat(FormContainer fc)
 		{
             MapData fmt = new MapData(null);
 			if (fc.getEntry() == null)
@@ -381,7 +383,6 @@ public class PacketHandler implements Database
                 ListData options = new ListData(null);
 				for (Integer i : moc.getEntry())
                     options.add(String.format(Locale.US, "%d", i));
-
                 fmt.put("MultipleOption", options.toString());
 			} else if (fc instanceof SliderContainer) {
 				SliderContainer sc = (SliderContainer) fc;
@@ -405,30 +406,21 @@ public class PacketHandler implements Database
 		 * 
  		 * @return The {@code Object} representation of the answer.
 		 */
-		static Object getQFormat(String dbEntry)
+		Object getQFormat(MapData dbEntry)
 		{
-			if (dbEntry == null || dbEntry.trim().isEmpty())
-				return null;
-			
-			if (dbEntry.startsWith("option")) {
-                /* single option */
-				return Integer.valueOf(dbEntry.substring("option".length()));
-			} else if (dbEntry.startsWith("slider")) {
-                /* slider */
-				return Integer.valueOf(dbEntry.substring("slider".length()));
-			} else if (dbEntry.startsWith("[") && dbEntry.endsWith("]")) {
-                /* multiple answers */
-				List<String> entries = Arrays.asList(dbEntry.split(","));
-				if (entries.get(0).startsWith("option")) {
-                    /* multiple option */
-					List<Integer> lint = new ArrayList<>();
-					for (String str : entries)
-						lint.add(Integer.valueOf(str.substring("option".length())));
-					return lint;
-				}
-			} else {
-                /* must be plain text entry */
-				return dbEntry;
+            String val;
+			if ((val = dbEntry.get("SingleOption")) != null) {
+				return Integer.valueOf(val);
+			} else if ((val = dbEntry.get("Slider")) != null) {
+				return Integer.valueOf(val);
+			} else if ((val = dbEntry.get("MultipleOption")) != null) {
+                ListData options = jsonData.getListData(val);
+                List<Integer> lint = new ArrayList<>();
+                for (String str : options.iterable())
+                    lint.add(Integer.valueOf(str));
+                return lint;
+			} else if ((val = dbEntry.get("Area")) != null) {
+				return val;
 			}
 			return null;
 		}

@@ -21,10 +21,11 @@
 package se.nordicehealth.ppc_app.core;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import se.nordicehealth.ppc_app.core.containers.Form;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
+import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Database;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
@@ -244,13 +245,11 @@ public class UserHandle
 	private class UpdatePassword implements FormUtils
 	{
 		@Override
-		public RetFunContainer ValidateUserInput(Form form) {
+		public RetFunContainer ValidateUserInput(List<FormContainer> form) {
 			RetFunContainer rfc = new RetFunContainer();
-			List<String> answers = new ArrayList<>();
-			form.jumpTo(Form.AT_BEGIN);
-			do
-				answers.add((String) form.currentEntry().getEntry());
-			while (form.nextEntry() != null);
+			List<String> answers = new LinkedList<>();
+            for (FormContainer fc : form)
+				answers.add((String) fc.getEntry());
 			String current = answers.get(0);
 			String new1 = answers.get(1);
 			String new2 = answers.get(2);
@@ -284,14 +283,13 @@ public class UserHandle
 			if (!user.loggedIn)
 				return; // no user to set password for
 
-			Form form = new Form();
-			form.insert(new FieldContainer(false, true, Implementations.Messages().getInfo(
-			        Messages.INFO_CURRENT_PASSWORD), null), Form.AT_END);
-			form.insert(new FieldContainer(false, true, Implementations.Messages().getInfo(
-			        Messages.INFO_NEW_PASSWORD), null), Form.AT_END);
-			form.insert(new FieldContainer(false, true, Implementations.Messages().getInfo(
-                    Messages.INFO_RE_NEW_PASSWORD), null), Form.AT_END);
-			form.jumpTo(Form.AT_BEGIN);
+            List<FormContainer> form = new LinkedList<>();
+			form.add(new FieldContainer(false, true, Implementations.Messages().getInfo(
+			        Messages.INFO_CURRENT_PASSWORD), null));
+			form.add(new FieldContainer(false, true, Implementations.Messages().getInfo(
+			        Messages.INFO_NEW_PASSWORD), null));
+			form.add(new FieldContainer(false, true, Implementations.Messages().getInfo(
+                    Messages.INFO_RE_NEW_PASSWORD), null));
 			
 			ui.displayMessage(Implementations.Messages().getInfo(
 					Messages.INFO_NEW_PASS_INFO), false);

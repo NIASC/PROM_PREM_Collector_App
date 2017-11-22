@@ -20,7 +20,9 @@
  */
 package se.nordicehealth.ppc_app.core.interfaces;
 
-import se.nordicehealth.ppc_app.core.containers.Form;
+import java.util.LinkedList;
+import java.util.List;
+
 import se.nordicehealth.ppc_app.core.containers.ViewDataContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 
@@ -80,10 +82,8 @@ public interface UserInterface
 	 * 		at a time.
 	 * 
 	 * @return {@code true} if the form was displayed.
-	 * 
-	 * @see Form
 	 */
-	boolean presentForm(Form form, FormUtils retfun, boolean multiple);
+	boolean presentForm(List<FormContainer> form, FormUtils retfun, boolean multiple);
 
 	/**
 	 * Presents the statistical data contained in {@code vdc}.

@@ -21,10 +21,11 @@
 package se.nordicehealth.ppc_app.implementation;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import se.nordicehealth.ppc_app.core.containers.Form;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
+import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Database;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
@@ -60,30 +61,27 @@ public class EmailRegistration implements Registration, FormUtils
 	@Override
 	public void registrationProcess()
 	{
-		Form f = new Form();
+		List<FormContainer> f = new LinkedList<>();
 		FieldContainer name = new FieldContainer(false, false,
 				Resource.messages().getInfo(Messages.INFO_REG_USER_NAME), null);
-		f.insert(name, Form.AT_END);
+		f.add(name);
 		FieldContainer email = new FieldContainer(false, false,
 				Resource.messages().getInfo(Messages.INFO_REG_USER_EMAIL), null);
-		f.insert(email, Form.AT_END);
+		f.add(email);
 		FieldContainer clinic = new FieldContainer(false, false,
 				Resource.messages().getInfo(Messages.INFO_REG_CLINIC_NAME), null);
-		f.insert(clinic, Form.AT_END);
-		f.jumpTo(Form.AT_BEGIN);
+		f.add(clinic);
 		
 		ui.presentForm(f, this, true);
 	}
 
 	@Override
-	public RetFunContainer ValidateUserInput(Form form)
+	public RetFunContainer ValidateUserInput(List<FormContainer> form)
 	{
 		RetFunContainer rfc = new RetFunContainer();
 		List<String> answers = new ArrayList<>();
-		form.jumpTo(Form.AT_BEGIN);
-		do
-			answers.add((String) form.currentEntry().getEntry());
-		while (form.nextEntry() != null);
+        for (FormContainer fc : form)
+			answers.add((String) fc.getEntry());
 		String name = answers.get(0);
 		String email = answers.get(1);
 		String clinic = answers.get(2);

@@ -22,9 +22,9 @@ package se.nordicehealth.ppc_app.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
-import se.nordicehealth.ppc_app.core.containers.Form;
 import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
@@ -90,16 +90,11 @@ public class Questionnaire
 	private class PatientQuestionnaire implements FormUtils
 	{
 		@Override
-		public RetFunContainer ValidateUserInput(Form form) {
+		public RetFunContainer ValidateUserInput(List<FormContainer> form) {
 			RetFunContainer rfc = new RetFunContainer();
-			List<FormContainer> answers = new ArrayList<>();
-			form.jumpTo(Form.AT_BEGIN);
-			do
-				answers.add(form.currentEntry());
-			while (form.nextEntry() != null);
 			
 			if (!Implementations.Database().addQuestionnaireAnswers(uh.getUID(), patient,
-					Collections.unmodifiableList(answers))) {
+					Collections.unmodifiableList(form))) {
 				rfc.message = Database.DATABASE_ERROR;
 				return rfc;
 			}
@@ -128,10 +123,9 @@ public class Questionnaire
 		{
 			if (patient == null)
 				return;
-			Form form = new Form();
+            List<FormContainer> form = new LinkedList<>();
 			for (int i = 0; i < questions.getSize(); ++i)
-				form.insert(questions.getContainer(i), Form.AT_END);
-			form.jumpTo(Form.AT_BEGIN);
+			    form.add(questions.getContainer(i));
 			
 			ui.presentForm(form, this, false);
 		}
@@ -148,14 +142,12 @@ public class Questionnaire
 		/* Private */
 		
 		@Override
-		public RetFunContainer ValidateUserInput(Form form)
+		public RetFunContainer ValidateUserInput(List<FormContainer> form)
 		{
 			RetFunContainer rfc = new RetFunContainer();
 			List<String> answers = new ArrayList<>();
-			form.jumpTo(Form.AT_BEGIN);
-			do {
-				answers.add((String) form.currentEntry().getEntry());
-			} while (form.nextEntry() != null);
+            for (FormContainer fc : form)
+                answers.add((String) fc.getEntry());
 			String forename = answers.get(0);
 			String lastname = answers.get(1);
 			String pnr = answers.get(2);
@@ -198,14 +190,14 @@ public class Questionnaire
 		 */
 		private void createPatientRegistration()
 		{
-			Form form = new Form();
+            List<FormContainer> form = new LinkedList<>();
 			Messages msg = Implementations.Messages();
 			FieldContainer forename = new FieldContainer(false, false,
 					msg.getInfo(Messages.INFO_Q_PATIENT_FORENAME), null);
-			form.insert(forename, Form.AT_END);
+			form.add(forename);
 			FieldContainer lastname = new FieldContainer(false, false,
 					msg.getInfo(Messages.INFO_Q_PATIENT_SURNAME), null);
-			form.insert(lastname, Form.AT_END);
+			form.add(lastname);
 			FieldContainer pnr = new FieldContainer(false, false,
 					msg.getInfo(Messages.INFO_Q_PATIENT_PNR), null);
 			if (patient != null) {
@@ -213,9 +205,7 @@ public class Questionnaire
 				lastname.setEntry(patient.getSurname());
 				pnr.setEntry(patient.getPersonalNumber());
 			}
-			form.insert(pnr, Form.AT_END);
-
-			form.jumpTo(Form.AT_BEGIN);
+			form.add(pnr);
 
 			ui.presentForm(form, this, true);
 		}

@@ -1,6 +1,8 @@
 package se.nordicehealth.ppc_app.core.interfaces;
 
-import se.nordicehealth.ppc_app.core.containers.Form;
+import java.util.List;
+
+import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 
 public interface FormUtils {
 	
@@ -21,9 +23,8 @@ public interface FormUtils {
 	 * 		returned.
 	 * 
 	 * @see UserInterface
-	 * @see Form
 	 */
-	RetFunContainer ValidateUserInput(Form form);
+	RetFunContainer ValidateUserInput(List<FormContainer> form);
 	
 	/**
 	 * This function should be called if the {@code valid}

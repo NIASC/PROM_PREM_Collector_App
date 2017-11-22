@@ -23,7 +23,6 @@ import java.util.List;
 import se.nordicehealth.ppc_app.R;
 
 import se.nordicehealth.ppc_app.core.UserHandle;
-import se.nordicehealth.ppc_app.core.containers.Form;
 import se.nordicehealth.ppc_app.core.containers.ViewDataContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
@@ -130,7 +129,7 @@ public class PPCGUI extends Activity implements UserInterface
     }
 
     @Override
-    public boolean presentForm(Form form, FormUtils retfun, boolean multiple) {
+    public boolean presentForm(List<FormContainer> form, FormUtils retfun, boolean multiple) {
         setContent(new GUIForm(this, form, retfun, getContent(), multiple));
         return true;
     }
@@ -277,11 +276,11 @@ public class PPCGUI extends Activity implements UserInterface
         Button fc_continue, fc_previous, fc_next, fc_back;
 
         final List<FormComponentDisplay> components;
-        final Form form;
+        final List<FormContainer> form;
         final FormUtils function;
         final View retpan;
 
-        GUIForm(Context c, final Form form, final FormUtils function,
+        GUIForm(Context c, final List<FormContainer> form, final FormUtils function,
                 final View retpan, boolean displayMultiple)
         {
             super(c);
@@ -302,13 +301,11 @@ public class PPCGUI extends Activity implements UserInterface
             setFormContent();
         }
 
-        List<FormComponentDisplay> fillContents(Form form)
+        List<FormComponentDisplay> fillContents(List<FormContainer> form)
         {
             List<FormComponentDisplay> contents = new ArrayList<>();
-            form.jumpTo(Form.AT_BEGIN);
-            do {
-                contents.add(form.currentEntry().getDisplayable(PPCGUI.this));
-            } while(!form.endOfForm() && form.nextEntry() != null);
+            for (FormContainer fc : form)
+                contents.add(fc.getDisplayable(PPCGUI.this));
             return contents;
         }
 

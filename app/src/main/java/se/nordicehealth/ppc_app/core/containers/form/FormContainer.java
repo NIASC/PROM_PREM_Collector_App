@@ -20,7 +20,6 @@
  */
 package se.nordicehealth.ppc_app.core.containers.form;
 
-import se.nordicehealth.ppc_app.core.containers.Form;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface.FormComponentDisplay;
 
@@ -139,8 +138,6 @@ public abstract class FormContainer
 	 * Retrieves the next FormContainer.
 	 * 
 	 * @return The next FormContainer.
-	 * 
-	 * @see Form
 	 */
 	public FormContainer getNextFC()
 	{
@@ -151,8 +148,6 @@ public abstract class FormContainer
 	 * Retrieves the previous FormContainer.
 	 * 
 	 * @return The previous FormContainer.
-	 * 
-	 * @see Form
 	 */
 	public FormContainer getPrevFC()
 	{
@@ -169,8 +164,6 @@ public abstract class FormContainer
 	 * 
 	 * @return The {@code FormContainer} that currently is the
 	 * 		{@code FormContainer} after this.
-	 * 
-	 * @see Form
 	 */
 	public synchronized FormContainer setNextFC(FormContainer fc)
 	{
@@ -189,8 +182,6 @@ public abstract class FormContainer
 	 * 
 	 * @return The {@code FormContainer} that currently is the
 	 * 		{@code FormContainer} before this.
-	 * 
-	 * @see Form
 	 */
 	public synchronized FormContainer setPrevFC(FormContainer fc)
 	{
@@ -203,14 +194,10 @@ public abstract class FormContainer
 
 	/**
 	 * The next container in the {@code Form}.
-	 * 
-	 * @see Form
 	 */
 	private FormContainer nextFC;
 	/**
 	 * The next container in the {@code Form}.
-	 * 
-	 * @see Form
 	 */
 	private FormContainer prevFC;
 	

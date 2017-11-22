@@ -20,13 +20,16 @@
  */
 package se.nordicehealth.ppc_app.core;
 
+import java.text.Normalizer;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-import se.nordicehealth.ppc_app.core.containers.Form;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;
 import se.nordicehealth.ppc_app.core.containers.ViewDataContainer;
+import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.containers.form.MultipleOptionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
@@ -89,14 +92,12 @@ class ViewData
 	{
 
 		@Override
-		public RetFunContainer ValidateUserInput(Form form) {
+		public RetFunContainer ValidateUserInput(List<FormContainer> form) {
 			Messages msg = Implementations.Messages();
 			RetFunContainer rfc = new RetFunContainer();
-			form.jumpTo(Form.AT_BEGIN);
-			MultipleOptionContainer questionselect = (MultipleOptionContainer) form.currentEntry();
-			form.jumpTo(Form.AT_NEXT);
-			TimePeriodContainer timeperiod = (TimePeriodContainer) form.currentEntry();
-			form.jumpTo(Form.AT_NEXT);
+
+			MultipleOptionContainer questionselect = (MultipleOptionContainer) form.get(0);
+			TimePeriodContainer timeperiod = (TimePeriodContainer) form.get(1);
 			
 			List<Calendar> bounds = timeperiod.getEntry();
 			Calendar lower = bounds.get(0);
@@ -145,25 +146,20 @@ class ViewData
 		private void queryTimePeriod()
 		{
 			Messages msg = Implementations.Messages();
-			Form form = new Form();
+            List<FormContainer> form = new LinkedList<>();
 			QuestionContainer qc = Questions.getQuestions().getContainer();
-			if (qc == null) {
-				throw new AssertionError();
-			}
 			MultipleOptionContainer questionselect =
 					new MultipleOptionContainer(false, msg.getInfo(
 							Messages.INFO_VD_SELECT_PERIOD), null);
 			for (int i = 0; i < qc.getSize(); ++i)
 				questionselect.addOption(i, qc.getContainer(i).getStatement());
-			form.insert(questionselect, Form.AT_END);
+			form.add(questionselect);
 
 			TimePeriodContainer timeperiod =
 					new TimePeriodContainer(false, msg.getInfo(
 							Messages.INFO_VD_SELECT_QUESTIONS), null);
 			Implementations.Database().loadQResultDates(uh.getUID(), timeperiod);
-			form.insert(timeperiod, Form.AT_END);
-			
-			form.jumpTo(Form.AT_BEGIN);
+			form.add(timeperiod);
 
 			ui.presentForm(form, this, false);
 		}

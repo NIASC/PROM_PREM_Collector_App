@@ -31,8 +31,6 @@ import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
  */
 public final class Questions
 {
-	/* Public */
-
 	@Override
 	public final Object clone()
 			throws CloneNotSupportedException
@@ -77,10 +75,6 @@ public final class Questions
 			return null;
 		return (QuestionContainer) qEntries.clone();
 	}
-	
-	/* Protected */
-	
-	/* Private */
 
 	private Questions()
 	{

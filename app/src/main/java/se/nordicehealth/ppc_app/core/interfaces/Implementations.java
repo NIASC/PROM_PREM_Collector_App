@@ -21,7 +21,6 @@
 package se.nordicehealth.ppc_app.core.interfaces;
 
 import se.nordicehealth.ppc_app.implementation.EmailRegistration;
-import se.nordicehealth.ppc_app.implementation.LocaleSE;
 import se.nordicehealth.ppc_app.implementation.res.Resource;
 import se.nordicehealth.ppc_app.implementation.io.PacketHandler;
 
@@ -65,19 +64,6 @@ public abstract class Implementations
 	public static Registration Registration(UserInterface ui)
 	{
 		return new EmailRegistration(ui);
-	}
-	
-	/**
-	 * Constructor for the implementation of {@code Locale}.
-	 * 
-	 * @return A new/running instance of the current implementation of
-	 * 		{@code Locale}.
-	 * 
-	 * @see Locale
-	 */
-	public static Locale Locale()
-	{
-		return LocaleSE.getLocale();
 	}
 
 	public static Messages Messages()

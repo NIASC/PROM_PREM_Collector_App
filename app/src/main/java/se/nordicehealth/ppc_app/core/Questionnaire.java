@@ -151,25 +151,14 @@ public class Questionnaire
 			String forename = answers.get(0);
 			String lastname = answers.get(1);
 			String pnr = answers.get(2);
-			
-			String pID = Implementations.Locale().formatPersonalID(pnr);
-			if (pID == null)
-			{
+
+			if (!Implementations.Database().validatePatientID(uh.getUID(), pnr)) {
 				rfc.message = Implementations.Messages().error(
 						Messages.ERROR_QP_INVALID_PID);
 				return rfc;
 			}
-			
-			try
-			{
-				patient = new Patient(forename, lastname, pID);
-			}
-			catch (NullPointerException npe)
-			{
-				rfc.message = Implementations.Messages().error(
-						Messages.ERROR_NOT_LOGGED_IN);
-				return rfc;
-			}
+
+            patient = new Patient(forename, lastname, pnr);
 			rfc.valid = true;
 			return rfc;
 		}

@@ -54,6 +54,8 @@ public interface Database
      */
 	boolean ping(long uid);
 
+    boolean validatePatientID(long uid, String patientID);
+
 	/**
 	 * Adds a patient's answers to the database. If the patient does not
 	 * already exist in the database it will be added as well.

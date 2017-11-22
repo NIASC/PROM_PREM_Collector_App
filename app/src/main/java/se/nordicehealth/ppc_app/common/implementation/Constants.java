@@ -72,6 +72,7 @@ public abstract class Constants {
 	public static final String INVALID_DETAILS_STR = Integer.toString(INVALID_DETAILS);
 
 	public static final String CMD_PING         = "ping";
+    public static final String CMD_VALIDATE_PID = "validate_pid";
 	public static final String CMD_ADD_QANS		= "add_questionnaire_answers";
 	public static final String CMD_GET_CLINICS	= "get_clinics";
 	public static final String CMD_GET_USER		= "get_user";

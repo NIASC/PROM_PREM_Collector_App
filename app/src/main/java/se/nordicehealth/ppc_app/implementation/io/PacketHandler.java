@@ -33,9 +33,9 @@ import java.util.Locale;
 import java.util.Map.Entry;
 
 import se.nordicehealth.ppc_app.core.containers.Patient;
+import se.nordicehealth.ppc_app.core.containers.Question;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;
-import se.nordicehealth.ppc_app.core.containers.QuestionContainer.Question;
 import se.nordicehealth.ppc_app.core.containers.form.AreaContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
@@ -101,6 +101,26 @@ public class PacketHandler implements Database
         String resp = ans.get(Constants.INSERT_RESULT);
         return (resp != null && resp.equals(Constants.INSERT_SUCCESS));
 	}
+
+	@Override
+    public boolean validatePatientID(long uid, String patientID)
+    {
+        MapData ret = new MapData(null);
+        ret.put("command", Constants.CMD_VALIDATE_PID);
+
+        MapData details = new MapData(null);
+        details.put("uid", Long.toString(uid));
+
+        MapData pobj = new MapData(null);
+        pobj.put("personal_id", patientID);
+
+        ret.put("details", crypto.encrypt(details.toString()));
+        ret.put("patient", crypto.encrypt(pobj.toString()));
+
+        MapData ans = sendMessage(ret);
+        String resp = ans.get(Constants.INSERT_RESULT);
+        return (resp != null && resp.equals(Constants.INSERT_SUCCESS));
+    }
 
 	@Override
 	public boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers)
@@ -171,14 +191,15 @@ public class PacketHandler implements Database
 				options.add(entry);
 			}
 			Class<? extends FormContainer> c;
-			if ((c = getContainerClass(qtnmap.get("type"))) == null) {
+			if ((c = getContainerClass(qtnmap.get("type"))) == null)
                 continue;
-            }
-			qc.addQuestion(Integer.parseInt(qtnmap.get("id")), c,
+
+            Question q = new Question(Integer.parseInt(qtnmap.get("id")), c,
                     qtnmap.get("question"), qtnmap.get("description"),
-					options, Integer.parseInt(qtnmap.get("optional")) != 0,
-					Integer.parseInt(qtnmap.get("max_val")),
-					Integer.parseInt(qtnmap.get("min_val")));
+                    options, Integer.parseInt(qtnmap.get("optional")) != 0,
+                    Integer.parseInt(qtnmap.get("max_val")),
+                    Integer.parseInt(qtnmap.get("min_val")));
+			qc.addQuestion(q);
 		}
 		return true;
 	}

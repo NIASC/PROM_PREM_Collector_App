@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import se.nordicehealth.ppc_app.core.containers.QuestionContainer.Question;
-
 /**
  * This class contains data for viewing questionnaire statistics.
  * The statistics consist of the question identifiers, options and

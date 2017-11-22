@@ -110,7 +110,7 @@ class ServletConnection
                 return;
             }
             synchronized (this) {
-                Log.i("MSGOUT", msgOut);
+                Log.i("MSGOUT", msgOut != null ? msgOut : "null");
                 try (OutputStream os = connection.getOutputStream()) {
                     sendPacket(os, msgOut);
                 } catch (IOException pe) {
@@ -122,7 +122,7 @@ class ServletConnection
                 } catch (IOException pe) {
                     Log.e("EIN", pe.getMessage());
                 }
-                Log.i("MSGIN", msgIn);
+                Log.i("MSGIN", msgIn != null ? msgIn : "null");
             }
         }
     }

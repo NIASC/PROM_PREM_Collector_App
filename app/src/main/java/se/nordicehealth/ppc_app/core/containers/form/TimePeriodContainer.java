@@ -1,184 +1,127 @@
-/*! TimePeriodContainer.java
- * 
- * Copyright 2017 Marcus Malmquist
- * 
- * This file is part of PROM_PREM_Collector.
- * 
- * PROM_PREM_Collector is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * PROM_PREM_Collector is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with PROM_PREM_Collector.  If not, see
- * <http://www.gnu.org/licenses/>.
- */
 package se.nordicehealth.ppc_app.core.containers.form;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-/**
- * This class contains data for selecting a time period. It contains an
- * upper and a lower bound for the time period and the ability to add dates
- * to this container. If the added dates pushed the current bounds the time
- * period will grow to fit the added date.
- * When all of the dates have been added the time period ranges form the
- * earliest occurring date to the latest occurring date.
- * 
- * @author Marcus Malmquist
- *
- */
 public class TimePeriodContainer extends FormContainer
 {
-	/**
-	 * Creates a time period container. The time period can be extended by
-	 * adding dates (using {@code addDate(Calendar)}).
-	 * 
-	 * @param allowEmpty Whether or not this container should require an
-	 * 		entry / user response.
-	 * @param statement The statement that the user should respond to.
-	 * @param description A more detailed description of the
-	 * 		{@code statement}
-	 * 
-	 * @see #addDate(Calendar)
-	 */
-	public TimePeriodContainer(boolean allowEmpty, String statement,
-			String description)
+	public TimePeriodContainer(boolean allowEmpty, String statement, String description)
 	{
 		super(allowEmpty, statement, description);
 		entries = new ArrayList<>();
-		upperLim = new GregorianCalendar();
-		lowerLim = (GregorianCalendar) upperLim.clone();
+
+        selected = new CalendarBounds(null, null);
+        limits = new CalendarBounds(new GregorianCalendar(), new GregorianCalendar());
+        limits.sort();
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return upperSel != null && lowerSel != null;
+		return selected.upper != null && selected.lower != null;
 	}
 
 	@Override
-	public List<Calendar> getEntry()
+	public CalendarBounds getEntry()
 	{
-		return Collections.unmodifiableList(Arrays.asList(lowerSel, upperSel));
+        return selected;
 	}
-	
-	/**
-	 * Sets the upper and lower bounds of the time period. The date that
-	 * occurs first will be set to the lower bound and the date that occurs
-	 * last will be set to the upper bound, even if {@code upper} occurs
-	 * before {@code upper}.
-	 * 
-	 * @param lower The lower bound for this time period.
-	 * @param upper The upper bound for this time period.
-	 * 
-	 * @return true if the bounds were set.
-	 */
-	public boolean setEntry(Calendar lower,
-			Calendar upper)
+
+	public boolean setEntry(Calendar lower, Calendar upper)
 	{
 		entryIsSet = true;
-		/* check for out of bounds */
-		if (lower.compareTo(lowerLim) < 0)
-			lower = (Calendar) lowerLim.clone();
-		else if (lower.compareTo(upperLim) > 0)
-			lower = (Calendar) upperLim.clone();
 
-		if (upper.compareTo(lowerLim) < 0)
-			upper = (Calendar) lowerLim.clone();
-		else if (upper.compareTo(upperLim) > 0)
-			upper = (Calendar) upperLim.clone();
-		
-		/* switch if wrong order */
-		if (lower.compareTo(upper) > 0)
-		{
-			Calendar tmp = lower;
-			lower = upper;
-			upper = tmp;
-		}
-		
-		lowerSel = lower;
-		upperSel = upper;
+        selected.lower = limits.setWithin(lower);
+        selected.upper = limits.setWithin(upper);
+        selected.sort();
+
 		nSelDates = 0;
 		for (Calendar cal : entries)
-		{
-			if (cal.compareTo(lowerSel) >= 0 && cal.compareTo(upperSel) <= 0)
+            if (selected.isWithin(cal))
 				nSelDates++;
-		}
 		return true;
 	}
-	
-	/**
-	 * Adds a date to this container.<br>
-	 * If this date pushes the current bounds then the bounds will be
-	 * changed to fit the supplied date.
-	 * 
-	 * @param cal A calendar which contains the dates to add.
-	 */
-	public synchronized void addDate(Calendar cal)
+
+	public void addDate(Calendar cal)
 	{
 		if (cal == null)
 			return;
-		if (lowerLim == null || lowerLim.compareTo(cal) > 0)
-			lowerLim = (Calendar) cal.clone();
-		if (upperLim == null || upperLim.compareTo(cal) < 0)
-			upperLim = (Calendar) cal.clone();
+        limits.pushBounds(cal);
 		entries.add(cal);
 		Collections.sort(entries);
 	}
-	
-	/**
-	 * Retrieves the lower limit for this time period container.
-	 * 
-	 * @return The earliest date that have been added to this container.
-	 */
+
 	public Calendar getLowerLimit()
 	{
-		return (Calendar) lowerLim.clone();
+		return (Calendar) limits.lower.clone();
 	}
-	
-	/**
-	 * Retrieves the upper limit for this time period container.
-	 * 
-	 * @return The latest date that have been added to this container.
-	 */
+
 	public Calendar getUpperLimit()
 	{
-		return (Calendar) upperLim.clone();
+		return (Calendar) limits.upper.clone();
 	}
-	
-	/**
-	 * Retrieves the number of dates that have been added to this
-	 * container.
-	 * 
-	 * @return The number of dates that have been added to this container.
-	 */
-	public int getDateCount()
-	{
-		return entries.size();
-	}
-	
-	/**
-	 * Retrieves the number of entries within the selected time period.
-	 * 
-	 * @return The number of entries within the selected time period.
-	 */
+
 	public int getPeriodEntries()
 	{
 		return nSelDates;
 	}
-	
-	private Calendar upperLim, lowerLim, upperSel, lowerSel;
+
+    private CalendarBounds limits, selected;
 	private List<Calendar> entries;
 	private int nSelDates;
+
+    public class CalendarBounds
+    {
+
+        public Calendar getUpper()
+        {
+            return upper;
+        }
+
+        public Calendar getLower()
+        {
+            return lower;
+        }
+        private Calendar upper, lower;
+
+        private CalendarBounds(Calendar upper, Calendar lower)
+        {
+            this.upper = upper;
+            this.lower = lower;
+        }
+
+        private Calendar setWithin(Calendar cal)
+        {
+            if (cal.compareTo(lower) < 0)
+                cal = (Calendar) lower.clone();
+            else if (cal.compareTo(upper) > 0)
+                cal = (Calendar) upper.clone();
+            return cal;
+        }
+
+        private boolean isWithin(Calendar cal)
+        {
+            return cal.compareTo(lower) >= 0 && cal.compareTo(upper) <= 0;
+        }
+
+        private void pushBounds(Calendar cal)
+        {
+            if (lower == null || lower.compareTo(cal) > 0)
+                lower = (Calendar) cal.clone();
+            if (upper == null || upper.compareTo(cal) < 0)
+                upper = (Calendar) cal.clone();
+        }
+
+        private void sort()
+        {
+            if (lower.compareTo(upper) > 0) {
+                Calendar tmp = lower;
+                lower = upper;
+                upper = tmp;
+            }
+        }
+    }
 }

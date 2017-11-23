@@ -44,10 +44,10 @@ class ViewData
 
 			MultipleOptionContainer questionselect = (MultipleOptionContainer) form.get(0);
 			TimePeriodContainer timeperiod = (TimePeriodContainer) form.get(1);
-			
-			List<Calendar> bounds = timeperiod.getEntry();
-			Calendar lower = bounds.get(0);
-			Calendar upper = bounds.get(1);
+
+            TimePeriodContainer.CalendarBounds bounds = timeperiod.getEntry();
+			Calendar lower = bounds.getLower();
+			Calendar upper = bounds.getUpper();
             int nEntries = timeperiod.getPeriodEntries();
 
             rfc.message = errorMessages(lower, upper, nEntries);

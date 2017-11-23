@@ -91,7 +91,7 @@ public class TimePeriodDisplay extends LinearLayout implements FormComponentDisp
 		{
             Calendar upper = tpc.getUpperLimit();
             upper.set(upper.get(Calendar.YEAR), upper.get(Calendar.MONTH) + 1, 0, 0, 0, 0 );
-            Calendar lower = tpc.getUpperLimit();
+            Calendar lower = tpc.getLowerLimit();
             lower.set(lower.get(Calendar.YEAR), lower.get(Calendar.MONTH)    , 1, 0, 0, 0 );
 
 			dpFrom = new DatePicker(c);

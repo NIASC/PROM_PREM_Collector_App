@@ -67,7 +67,7 @@ public class SliderDisplay extends LinearLayout implements FormComponentDisplay
 		super(c);
 		setOrientation(LinearLayout.VERTICAL);
 		this.sc = sc;
-		response = sc.getLowerBound();
+		response = sc.lowerBound();
 
 		String description = "";
 		String optional = Implementations.Messages().info(
@@ -86,8 +86,8 @@ public class SliderDisplay extends LinearLayout implements FormComponentDisplay
 		addView(jta);
 
         SeekBar slider = new SeekBar(c);
-		//slider.setMin(sc.getLowerBound());
-		slider.setMax(sc.getUpperBound());
+		//slider.setMin(sc.lowerBound());
+		slider.setMax(sc.upperBound());
 		slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){

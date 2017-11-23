@@ -34,16 +34,16 @@ public class UserHandle
                 questionnaire = new Questionnaire(ui, this);
                 break;
             case Constants.ALREADY_ONLINE:
-                ui.displayError(msg.error(Messages.ERROR_UH_ALREADY_ONLINE), false);
+                ui.displayError(msg.error(Messages.ERROR.UH_ALREADY_ONLINE), false);
                 break;
             case Constants.SERVER_FULL:
-                ui.displayError(msg.error(Messages.ERROR_UH_SERVER_FULL), false);
+                ui.displayError(msg.error(Messages.ERROR.UH_SERVER_FULL), false);
                 break;
             case Constants.INVALID_DETAILS:
-                ui.displayError(msg.error(Messages.ERROR_UH_INVALID_LOGIN), false);
+                ui.displayError(msg.error(Messages.ERROR.UH_INVALID_LOGIN), false);
                 break;
             default:
-                ui.displayError(msg.error(Messages.ERROR_UNKNOWN_RESPONSE), false);
+                ui.displayError(msg.error(Messages.ERROR.UNKNOWN_RESPONSE), false);
                 break;
 		}
 	}
@@ -78,7 +78,7 @@ public class UserHandle
 	public void updatePassword()
 	{
 		if (user.updatePassword) {
-			ui.displayMessage(msg.info(Messages.INFO_UH_UPDATE_PASSWORD), true);
+			ui.displayMessage(msg.info(Messages.INFO.UH_UPDATE_PASSWORD), true);
 			updatePass.createForm();
 		}
 	}
@@ -104,15 +104,15 @@ public class UserHandle
             case Constants.SUCCESS:
                 return null;
             case Constants.INVALID_DETAILS:
-				return msg.error(Messages.ERROR_UH_PR_INVALID_CURRENT);
+				return msg.error(Messages.ERROR.UH_PR_INVALID_CURRENT);
 			case Constants.MISMATCH_NEW:
-				return msg.error(Messages.ERROR_UH_PR_MISMATCH_NEW);
+				return msg.error(Messages.ERROR.UH_PR_MISMATCH_NEW);
 			case Constants.PASSWORD_SHORT:
-				return msg.error(Messages.ERROR_UH_PR_INVALID_LENGTH);
+				return msg.error(Messages.ERROR.UH_PR_INVALID_LENGTH);
             case Constants.PASSWORD_SIMPLE:
-				return msg.error(Messages.ERROR_UH_PR_PASSWORD_SIMPLE);
+				return msg.error(Messages.ERROR.UH_PR_PASSWORD_SIMPLE);
 			default:
-				return msg.error(Messages.ERROR_UNKNOWN_RESPONSE);
+				return msg.error(Messages.ERROR.UNKNOWN_RESPONSE);
 		}
 	}
 
@@ -162,11 +162,11 @@ public class UserHandle
 		void createForm()
 		{
             List<FormContainer> form = new LinkedList<>();
-			form.add(new FieldContainer(false, true, msg.info(Messages.INFO_CURRENT_PASSWORD), null));
-			form.add(new FieldContainer(false, true, msg.info(Messages.INFO_NEW_PASSWORD), null));
-			form.add(new FieldContainer(false, true, msg.info(Messages.INFO_RE_NEW_PASSWORD), null));
+			form.add(new FieldContainer(false, true, msg.info(Messages.INFO.CURRENT_PASSWORD), null));
+			form.add(new FieldContainer(false, true, msg.info(Messages.INFO.NEW_PASSWORD), null));
+			form.add(new FieldContainer(false, true, msg.info(Messages.INFO.RE_NEW_PASSWORD), null));
 			
-			ui.displayMessage(msg.info(Messages.INFO_NEW_PASS_INFO), false);
+			ui.displayMessage(msg.info(Messages.INFO.NEW_PASS_INFO), false);
 			ui.presentForm(form, this, true);
 		}
 	}

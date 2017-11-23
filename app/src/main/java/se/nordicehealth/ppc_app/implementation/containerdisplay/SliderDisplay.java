@@ -71,7 +71,7 @@ public class SliderDisplay extends LinearLayout implements FormComponentDisplay
 
 		String description = "";
 		String optional = Implementations.Messages().info(
-				Messages.INFO_UI_FORM_OPTIONAL);
+				Messages.INFO.UI_FORM_OPTIONAL);
 		if (sc.getDescription() != null && !sc.getDescription().isEmpty())
 			description = "\n\n"+sc.getDescription();
 

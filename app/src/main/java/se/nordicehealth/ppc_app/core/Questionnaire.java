@@ -86,7 +86,7 @@ public class Questionnaire
             Server db = Implementations.Server();
             Messages msg = Implementations.Messages();
 			if (!db.validatePatientID(uh.getUID(), pnr)) {
-				rfc.message = msg.error(Messages.ERROR_QP_INVALID_PID);
+				rfc.message = msg.error(Messages.ERROR.QP_INVALID_PID);
 				return rfc;
 			}
 
@@ -108,13 +108,13 @@ public class Questionnaire
             List<FormContainer> form = new LinkedList<>();
 			Messages msg = Implementations.Messages();
 			FieldContainer forename = new FieldContainer(false, false,
-					msg.info(Messages.INFO_Q_PATIENT_FORENAME), null);
+					msg.info(Messages.INFO.Q_PATIENT_FORENAME), null);
 			form.add(forename);
 			FieldContainer lastname = new FieldContainer(false, false,
-					msg.info(Messages.INFO_Q_PATIENT_SURNAME), null);
+					msg.info(Messages.INFO.Q_PATIENT_SURNAME), null);
 			form.add(lastname);
 			FieldContainer pnr = new FieldContainer(false, false,
-					msg.info(Messages.INFO_Q_PATIENT_PNR), null);
+					msg.info(Messages.INFO.Q_PATIENT_PNR), null);
 			if (patient != null) {
 				forename.setEntry(patient.getForename());
 				lastname.setEntry(patient.getSurname());

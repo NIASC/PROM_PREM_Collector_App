@@ -13,15 +13,15 @@ class ResourceStrings implements Messages
     }
 
     @Override
-    public String error(String errorName)
+    public String error(ERROR errorName)
     {
-        return emsg.msgError.get(errorName);
+        return error.message.get(errorName);
     }
 
     @Override
-    public String info(String infoName)
+    public String info(INFO infoName)
     {
-        return imsg.msgInfo.get(infoName);
+        return info.message.get(infoName);
     }
 
 	/* Protected */
@@ -43,12 +43,12 @@ class ResourceStrings implements Messages
 
 	/* Private */
 
-    private InfoMessages imsg;
-    private ErrorMessages emsg;
+    private InfoMessages info;
+    private ErrorMessages error;
     private static ResourceStrings self;
 
     private ResourceStrings(Resources r) {
-        imsg = new InfoMessages(r);
-        emsg = new ErrorMessages(r);
+        info = new InfoMessages(r);
+        error = new ErrorMessages(r);
     }
 }

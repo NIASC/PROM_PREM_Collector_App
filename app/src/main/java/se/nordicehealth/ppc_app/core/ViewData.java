@@ -77,9 +77,9 @@ class ViewData
         String errorMessages(Calendar lower, Calendar upper, int entries)
         {
             if (lower == null || upper == null)
-                return msg.error(Messages.ERROR_VD_INVALID_PERIOD);
+                return msg.error(Messages.ERROR.VD_INVALID_PERIOD);
             else if (entries < 5)
-                return msg.error(Messages.ERROR_VD_FEW_ENTRIES);
+                return msg.error(Messages.ERROR.VD_FEW_ENTRIES);
             else
                 return null;
         }
@@ -89,14 +89,14 @@ class ViewData
             List<FormContainer> form = new LinkedList<>();
 			QuestionContainer qc = Questions.getQuestions().getContainer();
 			MultipleOptionContainer questionselect =
-					new MultipleOptionContainer(false, msg.info(Messages.INFO_VD_SELECT_PERIOD), null);
+					new MultipleOptionContainer(false, msg.info(Messages.INFO.VD_SELECT_PERIOD), null);
 
 			for (int i = 0; i < qc.getSize(); ++i)
 				questionselect.addOption(i, qc.getContainer(i).getStatement());
 			form.add(questionselect);
 
 			TimePeriodContainer timeperiod =
-					new TimePeriodContainer(false, msg.info(Messages.INFO_VD_SELECT_QUESTIONS), null);
+					new TimePeriodContainer(false, msg.info(Messages.INFO.VD_SELECT_QUESTIONS), null);
 			db.loadQResultDates(uh.getUID(), timeperiod);
 			form.add(timeperiod);
 

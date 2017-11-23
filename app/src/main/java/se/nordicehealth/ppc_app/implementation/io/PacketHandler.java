@@ -176,11 +176,12 @@ public class PacketHandler implements Server
 	}
 	
 	@Override
-	public boolean loadQuestions(QuestionContainer qc)
+	public QuestionContainer loadQuestions()
 	{
 		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_LOAD_Q);
 
+        QuestionContainer qc = new QuestionContainer();
 		MapData amap = sendMessage(ret);
 		MapData qmap = jsonData.getMapData(amap.get("questions"));
         for (Entry<String, String> e : qmap.iterable()) {
@@ -203,11 +204,11 @@ public class PacketHandler implements Server
                     Integer.parseInt(qtnmap.get("min_val")));
 			qc.addQuestion(q);
 		}
-		return true;
+		return qc;
 	}
 
 	@Override
-	public boolean loadQResultDates(long uid, TimePeriodContainer tpc)
+	public List<Calendar> loadQuestionnaireResultDates(long uid)
 	{
 		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_LOAD_QR_DATE);
@@ -216,6 +217,7 @@ public class PacketHandler implements Server
         details.put("uid", Long.toString(uid));
         ret.put("details", crypto.encrypt(details.toString()));
 
+        List<Calendar> dates = new ArrayList<>();
 		MapData amap = sendMessage(ret);
         ListData dlist = jsonData.getListData(amap.get("dates"));
 		try {
@@ -223,17 +225,17 @@ public class PacketHandler implements Server
             for (String str : dlist.iterable()) {
 				Calendar cal = new GregorianCalendar();
 				cal.setTime(sdf.parse(str));
-				tpc.addDate(cal);
+                dates.add(cal);
 			}
 		} catch (ParseException _e) {
-			return false;
+			return null;
 		}
-		return true;
+		return dates;
 	}
 	
 	@Override
-	public boolean loadQResults(long uid, Calendar begin, Calendar end,
-			List<Integer> questionIDs, StatisticsContainer container)
+	public StatisticsContainer loadQuestionnaireResults(
+			long uid, Calendar begin, Calendar end, List<Integer> questionIDs)
 	{
 		MapData ret = new MapData(null);
 		ret.put("command", Constants.CMD_LOAD_QR);
@@ -251,7 +253,7 @@ public class PacketHandler implements Server
         ret.put("begin", sdf.format(begin.getTime()));
         ret.put("end", sdf.format(end.getTime()));
 
-
+		StatisticsContainer container = new StatisticsContainer();
 		MapData amap = sendMessage(ret);
 		ListData rlist = jsonData.getListData(amap.get("results"));
         for (String str : rlist.iterable()) {
@@ -263,7 +265,7 @@ public class PacketHandler implements Server
                 container.addResult(qdbfmt.getQFormat(q1, jsonData.getMapData(e.getValue())));
             }
         }
-		return true;
+		return container;
 	}
 	
 	@Override

@@ -54,7 +54,7 @@ class ViewData
             if (rfc.message == null) {
                 List<Integer> selQuestions = questionselect.getEntry();
                 StatisticsContainer sc = new StatisticsContainer();
-                db.loadQResults(uh.getUID(), lower, upper, selQuestions, sc);
+                sc = db.loadQuestionnaireResults(uh.getUID(), lower, upper, selQuestions);
                 vdc = new ViewDataContainer(sc.getStatistics(), upper, lower, nEntries);
                 rfc.valid = true;
             }
@@ -97,7 +97,8 @@ class ViewData
 
 			TimePeriodContainer timeperiod =
 					new TimePeriodContainer(false, msg.info(Messages.INFO.VD_SELECT_QUESTIONS), null);
-			db.loadQResultDates(uh.getUID(), timeperiod);
+            for (Calendar cal: db.loadQuestionnaireResultDates(uh.getUID()))
+                timeperiod.addDate(cal);
 			form.add(timeperiod);
 
 			ui.presentForm(form, this, false);

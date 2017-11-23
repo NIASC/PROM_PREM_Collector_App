@@ -6,21 +6,15 @@ public final class Questions
 {
 	public static QuestionContainer getContainer()
 	{
-		if (!loaded)
-			loadQuestionnaire();
+		if (qEntries == null)
+            qEntries = loadQuestionnaire();
 		return (QuestionContainer) qEntries.clone();
 	}
 
 	private static QuestionContainer qEntries;
-    private static boolean loaded;
 
-    static {
-        qEntries = new QuestionContainer();
-    }
-
-    private static synchronized boolean loadQuestionnaire()
+    private static synchronized QuestionContainer loadQuestionnaire()
     {
-        loaded = Implementations.Server().loadQuestions(qEntries);
-        return loaded;
+        return Implementations.Server().loadQuestions();
     }
 }

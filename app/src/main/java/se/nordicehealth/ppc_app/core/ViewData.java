@@ -87,7 +87,7 @@ class ViewData
 		void createForm()
 		{
             List<FormContainer> form = new LinkedList<>();
-			QuestionContainer qc = Questions.getQuestions().getContainer();
+			QuestionContainer qc = Questions.getContainer();
 			MultipleOptionContainer questionselect =
 					new MultipleOptionContainer(false, msg.info(Messages.INFO.VD_SELECT_PERIOD), null);
 

@@ -55,7 +55,7 @@ public class PPCGUI extends Activity implements UserInterface
 
         /*
         if (!ResourceStrings.loadMessages(getResources())
-                || !Questions.getQuestions().loadQuestionnaire()) {
+                || !Questions.Instance().loadQuestionnaire()) {
             displayError(Server.DATABASE_ERROR, false);
         } else {
             setContent(new LoginScreen(this));

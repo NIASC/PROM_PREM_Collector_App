@@ -130,7 +130,7 @@ public class PacketHandler implements Server
         MapData ret = new MapData(null);
         ret.put("command", Constants.CMD_ADD_QANS);
 
-        QuestionContainer qc = Questions.getQuestions().getContainer();
+        QuestionContainer qc = Questions.getContainer();
         if (qc == null || qc.getSize() != answers.size()) {
 			return false;
 		}
@@ -256,7 +256,7 @@ public class PacketHandler implements Server
 		ListData rlist = jsonData.getListData(amap.get("results"));
         for (String str : rlist.iterable()) {
 			MapData ansmap = jsonData.getMapData(str);
-            QuestionContainer qc = Questions.getQuestions().getContainer();
+            QuestionContainer qc = Questions.getContainer();
             for (Entry<String, String> e : ansmap.iterable()) {
                 int qid = Integer.parseInt(e.getKey());
                 Question q1 = qc.getQuestion(qid);

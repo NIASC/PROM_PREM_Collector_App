@@ -27,7 +27,7 @@ public class Questionnaire
 	{
 		this.ui = ui;
 		this.uh = uh;
-		questions = Questions.getQuestions().getContainer();
+		questions = Questions.getContainer();
 		preg = new PatientRegistration();
 		pquest = new PatientQuestionnaire();
 	}

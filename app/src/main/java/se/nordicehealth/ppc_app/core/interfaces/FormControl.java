@@ -4,13 +4,12 @@ import java.util.List;
 
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 
-public interface FormUtils
+public interface FormControl
 {
-	RetFunContainer validateUserInput(List<FormContainer> form);
-
+	ValidationStatus validateUserInput(List<FormContainer> form);
 	void callNext();
 
-	class RetFunContainer
+	class ValidationStatus
 	{
 		public boolean valid;
 		public String message;

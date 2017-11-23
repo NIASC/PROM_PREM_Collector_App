@@ -6,7 +6,7 @@ import java.util.List;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Server;
-import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
+import se.nordicehealth.ppc_app.core.interfaces.FormControl;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.Registration;
@@ -136,11 +136,11 @@ public class UserHandle
 		user = new User(0L, false, false);
 	}
 	
-	private class PasswordUpdate implements FormUtils
+	private class PasswordUpdate implements FormControl
 	{
 		@Override
-		public RetFunContainer validateUserInput(List<FormContainer> form) {
-			RetFunContainer rfc = new RetFunContainer();
+		public ValidationStatus validateUserInput(List<FormContainer> form) {
+			ValidationStatus rfc = new ValidationStatus();
 			List<String> answers = new LinkedList<>();
             for (FormContainer fc : form)
 				answers.add((String) fc.getEntry());

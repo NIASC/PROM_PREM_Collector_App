@@ -3,7 +3,6 @@ package se.nordicehealth.ppc_app.core.interfaces;
 public interface Messages
 {
     String error(ERROR errorName);
-
     String info(INFO infoName);
 
     enum ERROR

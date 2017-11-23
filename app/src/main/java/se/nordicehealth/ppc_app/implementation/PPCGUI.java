@@ -25,10 +25,10 @@ import se.nordicehealth.ppc_app.R;
 import se.nordicehealth.ppc_app.core.UserHandle;
 import se.nordicehealth.ppc_app.core.containers.ViewDataContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
-import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
+import se.nordicehealth.ppc_app.core.interfaces.FormControl;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
-import se.nordicehealth.ppc_app.core.interfaces.FormUtils.RetFunContainer;
+import se.nordicehealth.ppc_app.core.interfaces.FormControl.ValidationStatus;
 import se.nordicehealth.ppc_app.implementation.containerdisplay.ContainerDisplays;
 import se.nordicehealth.ppc_app.implementation.io.PacketHandler;
 import se.nordicehealth.ppc_app.implementation.res.Resource;
@@ -129,8 +129,8 @@ public class PPCGUI extends Activity implements UserInterface
     }
 
     @Override
-    public boolean presentForm(List<FormContainer> form, FormUtils retfun, boolean multiple) {
-        setContent(new GUIForm(this, form, retfun, getContent(), multiple));
+    public boolean presentForm(List<FormContainer> form, FormControl requester, boolean displayMultiple) {
+        setContent(new GUIForm(this, form, requester, getContent(), displayMultiple));
         return true;
     }
 
@@ -277,10 +277,10 @@ public class PPCGUI extends Activity implements UserInterface
 
         final List<FormComponentDisplay> components;
         final List<FormContainer> form;
-        final FormUtils function;
+        final FormControl function;
         final View retpan;
 
-        GUIForm(Context c, final List<FormContainer> form, final FormUtils function,
+        GUIForm(Context c, final List<FormContainer> form, final FormControl function,
                 final View retpan, boolean displayMultiple)
         {
             super(c);
@@ -328,7 +328,7 @@ public class PPCGUI extends Activity implements UserInterface
         {
             int entries = form.size();
             int i = getNextEntry(currentIdx, entries, 1, true);
-            while (form.get(i).entryFilled()
+            while (form.get(i).entryIsFilled()
                     && i != currentIdx)
                 i = getNextEntry(i, entries, 1, true);
             return i;
@@ -374,8 +374,8 @@ public class PPCGUI extends Activity implements UserInterface
                 public void onClick(View view) {
                     components.get(cIdx).fillEntry();
                     int nextComponent = getNextUnfilledEntry(cIdx, components);
-                    if (nextComponent == cIdx && components.get(cIdx).entryFilled()) {
-                        RetFunContainer rfc = function.validateUserInput(form);
+                    if (nextComponent == cIdx && components.get(cIdx).entryIsFilled()) {
+                        ValidationStatus rfc = function.validateUserInput(form);
                         if (rfc.valid) {
                             displayMessage("", false);
                             setContent(retpan);
@@ -453,7 +453,7 @@ public class PPCGUI extends Activity implements UserInterface
                     LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
             title.setSingleLine(false);
             title.setMaxLines(35);
-            title.setText(vdc.getTitle());
+            title.setText(vdc.title());
 
             results = new TextView(c);
             results.setLayoutParams(new FrameLayout.LayoutParams(
@@ -461,7 +461,7 @@ public class PPCGUI extends Activity implements UserInterface
                     LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
             results.setSingleLine(false);
             results.setMaxLines(4096);
-            results.setText(vdc.getResults());
+            results.setText(vdc.representation());
 
             addView(title);
             addView(results);

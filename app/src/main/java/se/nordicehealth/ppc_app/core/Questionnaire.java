@@ -10,7 +10,7 @@ import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Server;
-import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
+import se.nordicehealth.ppc_app.core.interfaces.FormControl;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
@@ -39,11 +39,11 @@ public class Questionnaire
 	private PatientRegistration preg;
 	private PatientQuestionnaire pquest;
 	
-	private class PatientQuestionnaire implements FormUtils
+	private class PatientQuestionnaire implements FormControl
 	{
 		@Override
-		public RetFunContainer validateUserInput(List<FormContainer> form) {
-			RetFunContainer rfc = new RetFunContainer();
+		public ValidationStatus validateUserInput(List<FormContainer> form) {
+			ValidationStatus rfc = new ValidationStatus();
 
 			Server db = Implementations.Server();
 			if (!db.addQuestionnaireAnswers(uh.getUID(), patient, Collections.unmodifiableList(form))) {
@@ -63,19 +63,19 @@ public class Questionnaire
 		void createQuestionnaire()
 		{
             List<FormContainer> form = new LinkedList<>();
-			for (int i = 0; i < questions.getSize(); ++i)
-			    form.add(questions.getContainer(i));
+			for (FormContainer fc : questions.forms())
+			    form.add(fc);
 			
 			ui.presentForm(form, this, false);
 		}
 	}
 	
-	private class PatientRegistration implements FormUtils
+	private class PatientRegistration implements FormControl
 	{
 		@Override
-		public RetFunContainer validateUserInput(List<FormContainer> form)
+		public ValidationStatus validateUserInput(List<FormContainer> form)
 		{
-			RetFunContainer rfc = new RetFunContainer();
+			ValidationStatus rfc = new ValidationStatus();
 			List<String> answers = new ArrayList<>();
             for (FormContainer fc : form)
                 answers.add((String) fc.getEntry());

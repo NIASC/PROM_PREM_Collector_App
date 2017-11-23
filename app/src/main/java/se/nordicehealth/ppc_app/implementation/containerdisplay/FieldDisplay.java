@@ -55,7 +55,7 @@ public class FieldDisplay extends LinearLayout implements FormComponentDisplay
 	}
 
 	@Override
-	public boolean entryFilled()
+	public boolean entryIsFilled()
 	{
 		if (!field.getText().toString().trim().isEmpty())
 			fillEntry();

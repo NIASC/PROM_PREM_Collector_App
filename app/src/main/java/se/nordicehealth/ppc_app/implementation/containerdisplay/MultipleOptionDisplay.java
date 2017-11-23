@@ -64,7 +64,7 @@ public class MultipleOptionDisplay extends LinearLayout implements FormComponent
 	}
 
 	@Override
-	public boolean entryFilled()
+	public boolean entryIsFilled()
 	{
 		return moc.hasEntry();
 	}

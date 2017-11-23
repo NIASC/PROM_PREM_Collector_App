@@ -55,7 +55,7 @@ public class SliderDisplay extends LinearLayout implements FormComponentDisplay
 	}
 
 	@Override
-	public boolean entryFilled()
+	public boolean entryIsFilled()
 	{
 		return sc.hasEntry();
 	}

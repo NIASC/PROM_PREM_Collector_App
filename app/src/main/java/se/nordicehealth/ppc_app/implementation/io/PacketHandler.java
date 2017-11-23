@@ -193,11 +193,8 @@ public class PacketHandler implements Server
 					break;
 				options.add(entry);
 			}
-			Class<? extends FormContainer> c;
-			if ((c = getContainerClass(qtnmap.get("type"))) == null)
-                continue;
 
-            Question q = new Question(Integer.parseInt(qtnmap.get("id")), c,
+            Question q = new Question(Integer.parseInt(qtnmap.get("id")), qtnmap.get("type"),
                     qtnmap.get("question"), qtnmap.get("description"),
                     options, Integer.parseInt(qtnmap.get("optional")) != 0,
                     Integer.parseInt(qtnmap.get("max_val")),
@@ -261,8 +258,7 @@ public class PacketHandler implements Server
             QuestionContainer qc = Questions.getContainer();
             for (Entry<String, String> e : ansmap.iterable()) {
                 int qid = Integer.parseInt(e.getKey());
-                Question q1 = qc.getQuestion(qid);
-                container.addResult(qdbfmt.getQFormat(q1, jsonData.getMapData(e.getValue())));
+                container.addResult(qdbfmt.getQFormat(qc.getQuestion(qid), jsonData.getMapData(e.getValue())));
             }
         }
 		return container;
@@ -343,60 +339,12 @@ public class PacketHandler implements Server
 		jsonData = new PacketData();
         qdbfmt = new QDBFormat();
 	}
-	
-	/**
-	 * Sends a JSONObject to the servlet.
-	 * 
-	 * @param obj The JSONObject to send.
-	 * 
-	 * @return The JSONObject returned from the servlet.
-	 */
+
 	private MapData sendMessage(MapData obj)
 	{
         return jsonData.getMapData(scom.sendMessage(obj.toString()));
 	}
-	
-	/**
-	 * This method converts a container type from the String
-	 * representation in the pktHandler to the appropriate class
-	 * representation in java.
-	 * 
-	 * @param type The type of container as it appears in the pktHandler
-	 * 		(SingleOption, Slider, Field etc.).
-	 * 
-	 * @return The class representation of the supplied {@code type}.
-	 * 		The classes can be acquired using isAssignableFrom.<Br>
-	 * 		Example:<br>
-	 * 		<code>
-	 * 		if (SliderContainer.class.isAssignableFrom(getContainerClass("Slider")))
-	 * 		new SliderContainer( ... );</code>
-	 * 
-	 * @see Class#isAssignableFrom
-	 */
-	private Class<? extends FormContainer> getContainerClass(String type)
-	{
-		if (type.equalsIgnoreCase("SingleOption")) {
-            return SingleOptionContainer.class;
-        } else if (type.equalsIgnoreCase("MultipleOption")) {
-            return MultipleOptionContainer.class;
-        } else if (type.equalsIgnoreCase("Field")) {
-            return FieldContainer.class;
-        } else if (type.equalsIgnoreCase("Slider")) {
-            return SliderContainer.class;
-        } else if (type.equalsIgnoreCase("Area")) {
-            return AreaContainer.class;
-        } else {
-            return null;
-        }
-	}
-	
-	/**
-	 * This class handles converting question answer formats between its
-	 * pktHandler representation and its java representation.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
+
 	private class QDBFormat
 	{
 		/**

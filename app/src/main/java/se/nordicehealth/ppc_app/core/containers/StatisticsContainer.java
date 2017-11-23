@@ -28,15 +28,6 @@ import java.util.TreeMap;
 
 import se.nordicehealth.ppc_app.core.containers.statistics.Statistics;
 
-/**
- * This class contains data for viewing questionnaire statistics.
- * The statistics consist of the question identifiers, options and
- * option count. The option count is the number of occurrences of
- * a particular option.
- * 
- * @author Marcus Malmquist
- *
- */
 public class StatisticsContainer
 {
 	public StatisticsContainer()

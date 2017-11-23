@@ -60,7 +60,7 @@ public class TimePeriodDisplay extends LinearLayout implements FormComponentDisp
 	}
 
 	@Override
-	public boolean entryFilled()
+	public boolean entryIsFilled()
 	{
 		return tpc.hasEntry();
 	}

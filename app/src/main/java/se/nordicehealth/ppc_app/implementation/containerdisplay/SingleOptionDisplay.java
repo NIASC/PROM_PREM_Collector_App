@@ -59,7 +59,7 @@ public class SingleOptionDisplay extends LinearLayout implements FormComponentDi
 	}
 
 	@Override
-	public boolean entryFilled()
+	public boolean entryIsFilled()
 	{
 		return soc.hasEntry();
 	}

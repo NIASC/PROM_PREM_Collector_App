@@ -11,7 +11,7 @@ import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.containers.form.MultipleOptionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Server;
-import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
+import se.nordicehealth.ppc_app.core.interfaces.FormControl;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
@@ -36,11 +36,11 @@ class ViewData
 	private DateSelection dateSel;
 	private ViewDataContainer vdc;
 	
-	private class DateSelection implements FormUtils
+	private class DateSelection implements FormControl
 	{
 		@Override
-		public RetFunContainer validateUserInput(List<FormContainer> form) {
-			RetFunContainer rfc = new RetFunContainer();
+		public ValidationStatus validateUserInput(List<FormContainer> form) {
+			ValidationStatus rfc = new ValidationStatus();
 
 			MultipleOptionContainer questionselect = (MultipleOptionContainer) form.get(0);
 			TimePeriodContainer timeperiod = (TimePeriodContainer) form.get(1);
@@ -53,8 +53,7 @@ class ViewData
             rfc.message = errorMessages(lower, upper, nEntries);
             if (rfc.message == null) {
                 List<Integer> selQuestions = questionselect.getEntry();
-                StatisticsContainer sc = new StatisticsContainer();
-                sc = db.loadQuestionnaireResults(uh.getUID(), lower, upper, selQuestions);
+                StatisticsContainer sc = db.loadQuestionnaireResults(uh.getUID(), lower, upper, selQuestions);
                 vdc = new ViewDataContainer(sc.getStatistics(), upper, lower, nEntries);
                 rfc.valid = true;
             }
@@ -90,9 +89,9 @@ class ViewData
 			QuestionContainer qc = Questions.getContainer();
 			MultipleOptionContainer questionselect =
 					new MultipleOptionContainer(false, msg.info(Messages.INFO.VD_SELECT_PERIOD), null);
-
-			for (int i = 0; i < qc.getSize(); ++i)
-				questionselect.addOption(i, qc.getContainer(i).getStatement());
+            int i = 0;
+            for (FormContainer fc : qc.forms())
+                questionselect.addOption(i, fc.getStatement());
 			form.add(questionselect);
 
 			TimePeriodContainer timeperiod =

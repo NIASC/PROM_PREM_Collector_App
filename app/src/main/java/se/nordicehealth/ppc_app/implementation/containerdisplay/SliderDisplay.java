@@ -33,10 +33,7 @@ public class SliderDisplay extends LinearLayout implements FormComponentDisplay
 		this.sc = sc;
 		response = sc.lowerBound();
 
-		TextView jta = titleArea(c);
-		jta.setText(optionalText() + sc.getStatement() + description() + "\n");
-		addView(jta);
-
+		addView(titleArea(c));
 		addView(makeSlider(c));
 	}
 
@@ -53,6 +50,7 @@ public class SliderDisplay extends LinearLayout implements FormComponentDisplay
 				LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
 		jta.setSingleLine(false);
 		jta.setMaxLines(35);
+        jta.setText(optionalText() + sc.getStatement() + description() + "\n");
 		return jta;
 	}
 

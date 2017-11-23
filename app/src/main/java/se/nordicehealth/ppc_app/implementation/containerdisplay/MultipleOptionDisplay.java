@@ -43,10 +43,7 @@ public class MultipleOptionDisplay extends LinearLayout implements FormComponent
 		responseID = new ArrayList<>();
         options = new TreeMap<>();
 
-		TextView jta = titleArea(c);
-		jta.setText(optionalText() + moc.getStatement() + description() + "\n");
-
-		addView(jta);
+		addView(titleArea(c));
 		addView(buttonPanel(c));
 	}
 
@@ -64,6 +61,7 @@ public class MultipleOptionDisplay extends LinearLayout implements FormComponent
                 LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
         jta.setSingleLine(false);
         jta.setMaxLines(35);
+        jta.setText(optionalText() + moc.getStatement() + description() + "\n");
         return jta;
     }
 

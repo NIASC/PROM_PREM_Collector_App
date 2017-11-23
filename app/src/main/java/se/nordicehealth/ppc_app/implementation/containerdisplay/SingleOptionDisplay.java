@@ -38,10 +38,7 @@ public class SingleOptionDisplay extends LinearLayout implements FormComponentDi
 		this.soc = soc;
 		responseID = null;
 
-		TextView jta = titleArea(c);
-		jta.setText(optionalText() + soc.getStatement() + description() + "\n");
-		addView(jta);
-
+		addView(titleArea(c));
 		addView(buttonPanel(c));
 	}
 
@@ -93,6 +90,7 @@ public class SingleOptionDisplay extends LinearLayout implements FormComponentDi
                 LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
         jta.setSingleLine(false);
         jta.setMaxLines(35);
+        jta.setText(optionalText() + soc.getStatement() + description() + "\n");
         return jta;
     }
 

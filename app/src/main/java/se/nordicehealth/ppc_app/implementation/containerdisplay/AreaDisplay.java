@@ -1,7 +1,6 @@
 package se.nordicehealth.ppc_app.implementation.containerdisplay;
 
 import android.content.Context;
-import android.support.annotation.StringDef;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -35,11 +34,8 @@ public class AreaDisplay extends LinearLayout implements FormComponentDisplay
 		setOrientation(LinearLayout.VERTICAL);
 		this.ac = ac;
 
-        TextView jta = titleArea(c);
-        jta.setText(optionalText() + ac.getStatement() + getDescription() + "\n");
-        addView(jta);
-
         area = textArea(c);
+        addView(titleArea(c));
 		addView(area);
 	}
 
@@ -66,6 +62,7 @@ public class AreaDisplay extends LinearLayout implements FormComponentDisplay
                 LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
         jta.setSingleLine(false);
         jta.setMaxLines(35);
+        jta.setText(optionalText() + ac.getStatement() + getDescription() + "\n");
         return jta;
     }
 

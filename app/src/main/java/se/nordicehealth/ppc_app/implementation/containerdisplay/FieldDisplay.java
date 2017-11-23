@@ -34,9 +34,8 @@ public class FieldDisplay extends LinearLayout implements FormComponentDisplay
 		setOrientation(LinearLayout.HORIZONTAL);
 		this.fc = fc;
 
-		TextView fieldLabel = label(c);
 		field = fieldComponent(c);
-		addView(fieldLabel);
+		addView(label(c));
 		addView(field);
 	}
 

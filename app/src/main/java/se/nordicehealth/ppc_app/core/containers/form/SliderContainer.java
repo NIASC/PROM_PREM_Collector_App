@@ -68,16 +68,7 @@ public class SliderContainer extends FormContainer
 	@Override
 	public boolean hasEntry()
 	{
-		return entrySet && (allowEmpty || value != null);
-	}
-
-	@Override
-	public Object clone()
-	{
-		SliderContainer sc = new SliderContainer(
-				allowEmpty, statement, description, lower, upper);
-		sc.setEntry(value);
-		return sc;
+		return entryIsSet && (allowEmpty || value != null);
 	}
 
 	@Override
@@ -97,7 +88,7 @@ public class SliderContainer extends FormContainer
 	 */
 	public boolean setEntry(int entry)
 	{
-		entrySet = true;
+		entryIsSet = true;
 		if (withinBounds(entry))
 		{
 			value = entry;

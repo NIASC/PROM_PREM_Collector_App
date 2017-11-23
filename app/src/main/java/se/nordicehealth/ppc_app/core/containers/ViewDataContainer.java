@@ -40,15 +40,21 @@ public class ViewDataContainer
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%s:\n", s.question.getStatement()));
 
-        int tot = 0;
-        for (Entry<String, Integer> e : s.answerCount.entrySet()) {
+        int tot = totalEntries(s.answerCount.values());
+        for (Entry<String, Integer> e : s.answerCount.entrySet())
             sb.append(formatLine("├", e.getValue(), tot, e.getKey()));
-            tot += e.getValue();
-        }
 
         sb.append("├─────────────────\n");
         sb.append(formatLine("└", tot, tot, "Total")); sb.append("\n");
         return sb.toString();
+    }
+
+    private int totalEntries(Iterable<Integer> count)
+    {
+        int tot = 0;
+        for (int i : count)
+            tot += i;
+        return tot;
     }
 
     private String formatLine(String edge, int count, int total, String statement)

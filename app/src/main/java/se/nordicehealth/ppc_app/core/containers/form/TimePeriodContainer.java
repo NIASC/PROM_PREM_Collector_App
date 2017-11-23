@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -69,16 +68,6 @@ public class TimePeriodContainer extends FormContainer
 	}
 
 	@Override
-	public Object clone()
-	{
-		TimePeriodContainer tpc = new TimePeriodContainer(
-				allowEmpty, statement, description);
-		tpc.addDate((Calendar) lowerLim.clone());
-		tpc.addDate((Calendar) upperLim.clone());
-		return tpc;
-	}
-
-	@Override
 	public List<Calendar> getEntry()
 	{
 		return Collections.unmodifiableList(Arrays.asList(lowerSel, upperSel));
@@ -98,7 +87,7 @@ public class TimePeriodContainer extends FormContainer
 	public boolean setEntry(Calendar lower,
 			Calendar upper)
 	{
-		entrySet = true;
+		entryIsSet = true;
 		/* check for out of bounds */
 		if (lower.compareTo(lowerLim) < 0)
 			lower = (Calendar) lowerLim.clone();

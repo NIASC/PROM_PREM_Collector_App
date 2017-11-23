@@ -480,8 +480,8 @@ public class PPCGUI extends Activity implements UserInterface
             super(c);
             setOrientation(LinearLayout.VERTICAL);
 
-            title = titleArea(c);
-            results = resultsArea(c);
+            TextView title = titleArea(c);
+            TextView results = resultsArea(c);
 
             title.setText(vdc.title());
             results.setText(vdc.representation());
@@ -489,8 +489,6 @@ public class PPCGUI extends Activity implements UserInterface
             addView(title);
             addView(results);
         }
-
-        TextView title, results;
 
         TextView titleArea(final Context c)
         {

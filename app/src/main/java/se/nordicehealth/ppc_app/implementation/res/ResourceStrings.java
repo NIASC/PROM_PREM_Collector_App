@@ -24,24 +24,12 @@ class ResourceStrings implements Messages
         return info.message.get(infoName);
     }
 
-	/* Protected */
-
-	/* Package */
-
-    /**
-     * Loads messages from the resources.
-     *
-     * @return {@code true} if messages was successfully loaded.
-     * 		{@code false} if an error occurred while loading messages.
-     */
     static boolean loadMessages(Resources r)
     {
         if (self == null)
             self = new ResourceStrings(r);
         return true;
     }
-
-	/* Private */
 
     private InfoMessages info;
     private ErrorMessages error;

@@ -1,23 +1,3 @@
-/*! TimePeriodDisplay.java
- * 
- * Copyright 2017 Marcus Malmquist
- * 
- * This file is part of PROM_PREM_Collector.
- * 
- * PROM_PREM_Collector is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * PROM_PREM_Collector is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with PROM_PREM_Collector.  If not, see
- * <http://www.gnu.org/licenses/>.
- */
 package se.nordicehealth.ppc_app.implementation.containerdisplay;
 
 import android.content.Context;
@@ -33,24 +13,10 @@ import java.util.GregorianCalendar;
 import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
-import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface.FormComponentDisplay;
 
-/**
- * This class is a displayable wrapper for {@code TimePeriodContainer}.<br>
- * It handles placing the {@code TimePeriodContainer} in an object that
- * the implementation of the {@code UserInterface} can display.
- * 
- * @author Marcus Malmquist
- * 
- * @see TimePeriodContainer
- * @see UserInterface
- * 
- */
 public class TimePeriodDisplay extends LinearLayout implements FormComponentDisplay
 {
-	/* public */
-
 	@Override
 	public boolean fillEntry()
 	{
@@ -65,94 +31,101 @@ public class TimePeriodDisplay extends LinearLayout implements FormComponentDisp
 		return tpc.hasEntry();
 	}
 
-	/* protected */
-
 	protected TimePeriodDisplay(Context c, TimePeriodContainer tpc)
 	{
 		super(c);
 		setOrientation(LinearLayout.VERTICAL);
 		this.tpc = tpc;
 
-		String description = "";
-		if (tpc.getDescription() != null && !tpc.getDescription().isEmpty())
-			description = "\n\n"+tpc.getDescription();
+		addView(titleArea(c));
+		addView(datePanel(c));
+	}
 
-		TextView jta = new TextView(c);
-		jta.setLayoutParams(new FrameLayout.LayoutParams(
-				LinearLayoutCompat.LayoutParams.MATCH_PARENT,
-				LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-		jta.setSingleLine(false);
-		jta.setMaxLines(35);
-		jta.setText((tpc.allowsEmpty() ? "(Optional) " : "") + tpc.getStatement()
-				+ description + "\n");
-		addView(jta);
+	private TimePeriodContainer tpc;
+	private DatePicker dpFrom, dpTo;
 
-		try
-		{
-            Calendar upper = tpc.getUpperLimit();
-            upper.set(upper.get(Calendar.YEAR), upper.get(Calendar.MONTH) + 1, 0, 0, 0, 0 );
-            Calendar lower = tpc.getLowerLimit();
-            lower.set(lower.get(Calendar.YEAR), lower.get(Calendar.MONTH)    , 1, 0, 0, 0 );
+    private Messages msg = Implementations.Messages();
 
-			dpFrom = new DatePicker(c);
-            dpFrom.updateDate(lower.get(Calendar.YEAR),
-                    lower.get(Calendar.MONTH),
-                    lower.get(Calendar.DAY_OF_MONTH));
-            dpFrom.setMinDate(lower.getTimeInMillis());
-            dpFrom.setMaxDate(upper.getTimeInMillis());
+	private DatePicker makeCalendar(final Context c, Calendar initial, Calendar lower, Calendar upper)
+	{
+		DatePicker dp = new DatePicker(c);
+		dp.updateDate(initial.get(Calendar.YEAR), initial.get(Calendar.MONTH), initial.get(Calendar.DAY_OF_MONTH));
+		dp.setMinDate(lower.getTimeInMillis());
+		dp.setMaxDate(upper.getTimeInMillis());
+		return dp;
+	}
 
-			dpTo = new DatePicker(c);
-            dpTo.updateDate(upper.get(Calendar.YEAR),
-                    upper.get(Calendar.MONTH),
-                    upper.get(Calendar.DAY_OF_MONTH));
-            dpTo.setMinDate(lower.getTimeInMillis());
-            dpTo.setMaxDate(upper.getTimeInMillis());
-		} catch (Exception npe)
-		{
-			dpFrom = new DatePicker(c);
-			//dpFrom.setMaxDate((new GregorianCalendar()).getTimeInMillis());
-			//dpFrom.setMinDate((new GregorianCalendar()).getTimeInMillis());
+	private Calendar setFirstDayInMonth(Calendar cal)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 1, 0, 0, 0 );
+        return calendar;
+    }
 
-			dpTo = new DatePicker(c);
-			//dpTo.setMaxDate((new GregorianCalendar()).getTimeInMillis());
-			//dpTo.setMinDate((new GregorianCalendar()).getTimeInMillis());
-		}
-		Messages msg = Implementations.Messages();
+    private Calendar setLastDayInMonth(Calendar cal)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, 0, 0, 0, 0 );
+        return calendar;
+    }
 
-		LinearLayout date = new LinearLayout(c);
-		date.setOrientation(LinearLayout.VERTICAL);
+    private LinearLayout datePanel(final Context c)
+    {
+        LinearLayout date = new LinearLayout(c);
+        date.setOrientation(LinearLayout.VERTICAL);
         date.setLayoutParams(new FrameLayout.LayoutParams(
                 LinearLayoutCompat.LayoutParams.MATCH_PARENT,
                 LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
 
-		LinearLayout from = new LinearLayout(c);
-        from.setOrientation(LinearLayout.VERTICAL);
-		TextView fromTF = new TextView(c);
-		fromTF.setLayoutParams(new FrameLayout.LayoutParams(
-				LinearLayoutCompat.LayoutParams.MATCH_PARENT,
-				LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-		fromTF.setText(msg.info(Messages.INFO.VD_DATE_FROM));
-		from.addView(fromTF);
-		from.addView(dpFrom);
+        Calendar upper = setLastDayInMonth(tpc.getUpperLimit());
+        Calendar lower = setFirstDayInMonth(tpc.getLowerLimit());
+        dpFrom = makeCalendar(c, lower, lower, upper);
+        dpTo = makeCalendar(c, upper, lower, upper);
 
+        date.addView(calendarPanel(c, dpFrom, msg.info(Messages.INFO.VD_DATE_FROM)));
+        date.addView(calendarPanel(c, dpTo, msg.info(Messages.INFO.VD_DATE_TO)));
+        return date;
+    }
+
+	private LinearLayout calendarPanel(final Context c, DatePicker dp, String description)
+	{
 		LinearLayout to = new LinearLayout(c);
-        to.setOrientation(LinearLayout.VERTICAL);
-		TextView toTF = new TextView(c);
-		toTF.setLayoutParams(new FrameLayout.LayoutParams(
+		to.setOrientation(LinearLayout.VERTICAL);
+		TextView tv = new TextView(c);
+		tv.setLayoutParams(new FrameLayout.LayoutParams(
 				LinearLayoutCompat.LayoutParams.MATCH_PARENT,
 				LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-		toTF.setText(msg.info(Messages.INFO.VD_DATE_TO));
-		to.addView(toTF);
-		to.addView(dpTo);
-
-		date.addView(from);
-		date.addView(to);
-
-		addView(date);
+		tv.setText(description);
+		to.addView(tv);
+		to.addView(dp);
+		return to;
 	}
 
-	/* private */
+    private TextView titleArea(final Context c)
+    {
+        TextView jta = new TextView(c);
+        jta.setLayoutParams(new FrameLayout.LayoutParams(
+                LinearLayoutCompat.LayoutParams.MATCH_PARENT,
+                LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+        jta.setSingleLine(false);
+        jta.setMaxLines(35);
+        jta.setText(optionalText() + tpc.getStatement() + description() + "\n");
+        return jta;
+    }
 
-	private TimePeriodContainer tpc;
-	private DatePicker dpFrom, dpTo;
+    private String description()
+    {
+        String description = "";
+        if (tpc.getDescription() != null && !tpc.getDescription().isEmpty())
+            description = "\n\n"+tpc.getDescription();
+        return description;
+    }
+
+    private String optionalText()
+    {
+        if (tpc.allowsEmpty())
+            return String.format("(%s) ", msg.info(Messages.INFO.UI_FORM_OPTIONAL));
+        else
+            return "";
+    }
 }

@@ -1,7 +1,5 @@
 package se.nordicehealth.ppc_app.implementation.res;
 
-import android.content.res.Resources;
-
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.implementation.Key;
 

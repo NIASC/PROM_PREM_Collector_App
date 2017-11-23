@@ -9,8 +9,6 @@ import se.nordicehealth.ppc_app.implementation.Key;
 
 class ResourceKeys implements Key
 {
-    /* Public */
-
     @Override
     public BigInteger exp()
     {
@@ -23,10 +21,6 @@ class ResourceKeys implements Key
         return mod;
     }
 
-	/* Protected */
-
-	/* Package */
-
     static ResourceKeys getKeys() throws NullPointerException
     {
         if (self == null)
@@ -38,8 +32,6 @@ class ResourceKeys implements Key
     {
         self = new ResourceKeys(r);
     }
-
-	/* Private */
 
     private static ResourceKeys self;
 	private BigInteger exp, mod;

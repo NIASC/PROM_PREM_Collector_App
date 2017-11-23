@@ -1,23 +1,3 @@
-/*! ServletCommunication.java
- * 
- * Copyright 2017 Marcus Malmquist
- * 
- * This file is part of PROM_PREM_Collector.
- * 
- * PROM_PREM_Collector is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * PROM_PREM_Collector is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with PROM_PREM_Collector.  If not, see
- * <http://www.gnu.org/licenses/>.
- */
 package se.nordicehealth.ppc_app.implementation.io;
 
 import android.util.Log;
@@ -31,41 +11,25 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * This class is an example of an implementation of
- * Database_Interface. This is done using a MySQL database and a
- * MySQL Connector/J to provide a MySQL interface to Java.
- * 
- * This class is designed to be thread safe and a singleton.
- * 
- * @author Marcus Malmquist
- *
- */
 class ServletConnection
 {
-	/* Public */
-
-	/* Protected */
-
-	/* Package */
-
     ServletConnection(URL servletURL)
     {
         this.servletURL = servletURL;
+        msgOut = new Packet();
+        msgIn = new Packet();
     }
 
     String sendMessage(String message)
     {
         Thread t = new Thread(new IOHandler());
-        msgOut = message;
+        msgOut.message = message;
         t.start();
         try { t.join(); } catch (InterruptedException ignored) { }
-        return msgIn;
+        return msgIn.message;
     }
 
-	/* Private */
-
-    private volatile String msgOut, msgIn;
+    private volatile Packet msgOut, msgIn;
     private final URL servletURL;
 
 	private void sendPacket(OutputStream os, String pktOut) throws IOException
@@ -101,7 +65,6 @@ class ServletConnection
     {
         @Override
         public void run() {
-            msgIn = null;
             HttpURLConnection connection;
             try {
                 connection = openConnection(servletURL);
@@ -109,21 +72,29 @@ class ServletConnection
                 Log.e("ECONN", e.getMessage());
                 return;
             }
-            synchronized (this) {
-                Log.i("MSGOUT", msgOut != null ? msgOut : "null");
+            synchronized (msgOut) {
+                Log.i("MSGOUT", msgOut.message != null ? msgOut.message : "null");
                 try (OutputStream os = connection.getOutputStream()) {
-                    sendPacket(os, msgOut);
+                    sendPacket(os, msgOut.message);
                 } catch (IOException pe) {
                     Log.e("EOUT", pe.getMessage());
                     return;
                 }
+            }
+            synchronized (msgIn) {
+                msgIn.message = null;
                 try (InputStream is = connection.getInputStream()) {
-                    msgIn = receivePacket(is);
+                    msgIn.message = receivePacket(is);
                 } catch (IOException pe) {
                     Log.e("EIN", pe.getMessage());
                 }
-                Log.i("MSGIN", msgIn != null ? msgIn : "null");
+                Log.i("MSGIN", msgIn.message != null ? msgIn.message : "null");
             }
         }
+    }
+
+    private class Packet
+    {
+        String message;
     }
 }

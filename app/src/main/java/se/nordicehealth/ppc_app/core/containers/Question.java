@@ -49,14 +49,14 @@ public class Question
      *
      * @return The ID of the question.
      */
-    int getID() { return id; }
+    public int getID() { return id; }
 
     /**
      * Retrieves this question's class.
      *
      * @return This question's class.
      */
-    Class<?> getContainerClass() { return type; }
+    public Class<?> getContainerClass() { return type; }
 
     /**
      * Retrieves the optional flag for the question.
@@ -87,7 +87,7 @@ public class Question
      *
      * @return The option text associated with {@code id}.
      */
-    String getOption(int id)
+    public String getOption(int id)
     {
         String optn = null;
         try {
@@ -103,7 +103,7 @@ public class Question
      *
      * @return A list of the available options in this container.
      */
-    List<String> getOptions()
+    public List<String> getOptions()
     {
         return Collections.unmodifiableList(options);
     }
@@ -113,51 +113,22 @@ public class Question
      *
      * @return The upper/max value for this question
      */
-    int getUpper() { return upper; }
+    public int getUpper() { return upper; }
 		
     /**
      * Retrieves the lower/min value that can be entered as an answer.
      *
      * @return The lower/min value for this question
      */
-    int getLower() { return lower; }
+    public int getLower() { return lower; }
 		
     private int id;
-		
-    /**
-     * Whether or not it is not required to answer this question.
-     */
     private boolean optional;
-		
-    /**
-     * The type of question (SliderContainer, SingleOptionContainer,
-     * FieldContainer etc.)
-     */
     private Class<? extends FormContainer> type;
-		
-    /**
-     * The question/statement of this question.
-     */
     private String question;
-		
-    /**
-     * A more detailed description of the {@link #question}.
-     */
     private String description;
-		
-    /**
-     * The available options for this question.
-     */
     private List<String> options;
-		
-    /**
-     * The upper limit for this entry.
-     */
     private Integer upper;
-		
-    /**
-     * The lower limit for this entry.
-     */
     private Integer lower;
 		
     /**

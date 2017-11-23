@@ -43,6 +43,11 @@ import se.nordicehealth.ppc_app.core.containers.form.MultipleOptionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.SingleOptionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.SliderContainer;
 import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
+import se.nordicehealth.ppc_app.core.containers.statistics.Area;
+import se.nordicehealth.ppc_app.core.containers.statistics.MultipleOption;
+import se.nordicehealth.ppc_app.core.containers.statistics.SingleOption;
+import se.nordicehealth.ppc_app.core.containers.statistics.Slider;
+import se.nordicehealth.ppc_app.core.containers.statistics.Statistics;
 import se.nordicehealth.ppc_app.core.interfaces.Database;
 import se.nordicehealth.ppc_app.implementation.security.Encryption;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
@@ -258,7 +263,7 @@ public class PacketHandler implements Database
             for (Entry<String, String> e : ansmap.iterable()) {
                 int qid = Integer.parseInt(e.getKey());
                 Question q1 = qc.getQuestion(qid);
-                container.addResult(q1, qdbfmt.getQFormat(jsonData.getMapData(e.getValue())));
+                container.addResult(qdbfmt.getQFormat(q1, jsonData.getMapData(e.getValue())));
             }
         }
 		return true;
@@ -443,21 +448,21 @@ public class PacketHandler implements Database
 		 * 
  		 * @return The {@code Object} representation of the answer.
 		 */
-		Object getQFormat(MapData dbEntry)
+		Statistics getQFormat(Question q, MapData dbEntry)
 		{
             String val;
 			if ((val = dbEntry.get("SingleOption")) != null) {
-				return Integer.valueOf(val);
+				return new SingleOption(q, Integer.valueOf(val));
 			} else if ((val = dbEntry.get("Slider")) != null) {
-				return Integer.valueOf(val);
+				return new Slider(q, Integer.valueOf(val));
 			} else if ((val = dbEntry.get("MultipleOption")) != null) {
                 ListData options = jsonData.getListData(val);
                 List<Integer> lint = new ArrayList<>();
                 for (String str : options.iterable())
                     lint.add(Integer.valueOf(str));
-                return lint;
+                return new MultipleOption(q, lint);
 			} else if ((val = dbEntry.get("Area")) != null) {
-				return val;
+				return new Area(q, val);
 			}
 			return null;
 		}

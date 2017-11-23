@@ -460,7 +460,7 @@ public class PPCGUI extends Activity implements UserInterface
                     LinearLayoutCompat.LayoutParams.MATCH_PARENT,
                     LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
             results.setSingleLine(false);
-            results.setMaxLines(35);
+            results.setMaxLines(4096);
             results.setText(vdc.getResults());
 
             addView(title);

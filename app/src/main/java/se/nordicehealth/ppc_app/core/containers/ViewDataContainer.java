@@ -21,18 +21,11 @@
 package se.nordicehealth.ppc_app.core.containers;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import se.nordicehealth.ppc_app.core.containers.StatisticsContainer.Statistics;
-import se.nordicehealth.ppc_app.core.containers.form.AreaContainer;
-import se.nordicehealth.ppc_app.core.containers.form.SingleOptionContainer;
-import se.nordicehealth.ppc_app.core.containers.form.SliderContainer;
 
 /**
  * This class is a container for statistical data that has been processed
@@ -52,8 +45,8 @@ public class ViewDataContainer
 	 * @param nEntries The number of entries that have been used to
 	 * 		create the statistical data.
 	 */
-	public ViewDataContainer(List<Statistics> res, Calendar upper,
-			Calendar lower, int nEntries)
+	public ViewDataContainer(List<StatisticsData> res, Calendar upper,
+                             Calendar lower, int nEntries)
 	{
 		this.res = res;
 		this.upper = upper;
@@ -86,51 +79,21 @@ public class ViewDataContainer
 	public String getResults()
 	{
 		StringBuilder sb = new StringBuilder();
-		for (Statistics s : res) {
-			List<Object> statements = new ArrayList<>();
-			List<Integer> occurences = new ArrayList<>();
+		for (StatisticsData s : res) {
+            Question q = s.question;
+            Map<String, Integer> ac = s.answerCount;
 			int tot = 0;
-			
-			Class<?> c = s.getQuestionClass();
-			Map<Object, Integer> ans = s.getAnswerCounts();
-			Integer count;
-			if (SingleOptionContainer.class.isAssignableFrom(c)) {
-				for (String statement : s.getOptions()) {
-					if ((count = ans.get(statement)) == null)
-						continue;
-					occurences.add(count);
-					statements.add(statement);
-					tot += count;
-				}
-			} else if (SliderContainer.class.isAssignableFrom(c)) {
-				for (int i = s.getLowerBound(); i <= s.getUpperBound(); ++i) {
-					if ((count = ans.get(i)) == null)
-						continue;
-					occurences.add(count);
-					statements.add(i);
-					tot += count;
-				}
-			} else if (AreaContainer.class.isAssignableFrom(c)) {
-				for (Entry<Object, Integer> e : ans.entrySet()) {
-					count = e.getValue();
-					occurences.add(count);
-					statements.add(e.getKey().toString());
-					tot += count;
-				}
-			}
-			sb.append(String.format("%s:\n", s.getStatement()));
-			
-			Iterator<Object> sitr;
-			Iterator<Integer> iitr;
-			for (sitr = statements.iterator(), iitr = occurences.iterator();
-					sitr.hasNext() && iitr.hasNext();) {
-				Integer i = iitr.next();
-				sb.append(String.format(Locale.getDefault(), "|- %4d (%3d%%) - %s\n", i,
-						Math.round(100.0 * i.doubleValue() / tot), sitr.next()));
-			}
-			sb.append("|- ------------ -\n");
-			sb.append(String.format(Locale.getDefault(), "\\- %4d (%3.0f %%) - %s\n\n", tot,
-					100D, "Total"));
+            for (Integer i : ac.values())
+                tot += i;
+			sb.append(String.format("%s:\n", q.getStatement()));
+
+			for (Entry<String, Integer> e : ac.entrySet())
+				sb.append(String.format(Locale.getDefault(), "├─ %03d %% (%04d) - %s\n",
+                        Math.round(100.0 * e.getValue().doubleValue() / tot),
+                        e.getValue(), e.getKey()));
+
+			sb.append("├─────────────────\n");
+			sb.append(String.format(Locale.getDefault(), "└─ %03d %% (%04d) - %s\n\n", 100, tot, "Total"));
 		}
 		return sb.toString();
 	}
@@ -152,5 +115,5 @@ public class ViewDataContainer
 
 	private Calendar upper, lower;
 	private int nEntries;
-	private List<Statistics> res;
+	private List<StatisticsData> res;
 }

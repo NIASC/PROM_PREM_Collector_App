@@ -21,10 +21,12 @@
 package se.nordicehealth.ppc_app.core.containers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import se.nordicehealth.ppc_app.core.containers.statistics.Statistics;
 
 /**
  * This class contains data for viewing questionnaire statistics.
@@ -37,226 +39,78 @@ import java.util.TreeMap;
  */
 public class StatisticsContainer
 {
-	/**
-	 * Creates an empty container for questionnaire statistics.
-	 */
 	public StatisticsContainer()
 	{
-		ah = new AnswerHandle();
-		mstat = new TreeMap<>();
+        answers = new TreeMap<>();
 	}
-	
-	/**
-	 * Append a question with the result to this container.
-	 * 
-	 * @param q The question which contains the question data
-	 * 		as it appears in the database
-	 * @param answer The answer to the question in {@code q}.
-	 */
-	public void addResult(Question q, Object answer)
+
+	public void addResult(Statistics answer)
 	{
-		if (answer == null)
-			return;
-		List<String> lst = q.getOptions();
-		if (lst != null && !lst.isEmpty()) {
-			try {
-				ah.addAnswer(q, q.getOption(Integer.valueOf(answer.toString())));
-			} catch (NumberFormatException e) {
-				return; /* Unsupported answer format */
-			}
-		} else {
-			ah.addAnswer(q, answer); // answers are not IDs
-		}
-		if (!mstat.containsKey(q.getID()))
-			mstat.put(q.getID(), new Statistics(q));
+		if (answer != null)
+            addAnswer(answer.question(), answer);
 	}
-	
-	/**
-	 * Retrieves a list of the statistics.
-	 * 
-	 * @return A list of {@code Statistics} objects.
-	 * 
-	 * @see Statistics
-	 */
-	public List<Statistics> getStatistics()
+
+	public List<StatisticsData> getStatistics()
 	{
-		return Collections.unmodifiableList(new ArrayList<>(mstat.values()));
+        List<StatisticsData> l = new ArrayList<>();
+        for (QA qa : answers.values()) {
+            Map<String, Integer> m = new TreeMap<>();
+            for (Ans a : qa.ac.answerCount.values())
+                m.put(a.statement, a.count);
+            l.add(new StatisticsData(qa.q, m));
+        }
+        return l;
 	}
-	
-	/**
-	 * A container class for statistical data. The statistical
-	 * data contains the question and the number of occurrences.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
-	class Statistics
-	{
-		/**
-		 * Retrieves the options for this object's question.
-		 * 
-		 * @return A list of the options for this object's question.
-		 */
-		List<String> getOptions()
-		{
-			List<String> lst = question.getOptions();
-			if (lst == null || lst.isEmpty())
-				return null;
-			return lst;
-		}
-		
-		/**
-		 * Retrieves the question/statement for this objects' question.
-		 * 
-		 * @return The question/statement for this object's question.
-		 */
-		public String getStatement()
-		{
-			return question.getStatement();
-		}
-		
-		/**
-		 * Retrieves the type of question that this object contains.
-		 * 
-		 * @return The question's class.
-		 */
-		Class<?> getQuestionClass()
-		{
-			return question.getContainerClass();
-		}
-		
-		/**
-		 * The upper bound for this question, if it has an integer
-		 * limit.
-		 * 
-		 * @return The upper bound for this question.
-		 */
-		Integer getUpperBound()
-		{
-			return question.getUpper();
-		}
-		
-		/**
-		 * The lower bound for this question, if it has an integer
-		 * limit.
-		 * 
-		 * @return The upper bound for this question.
-		 */
-		Integer getLowerBound()
-		{
-			return question.getLower();
-		}
-		
-		/**
-		 * 
-		 * @return The Options/values as keys and the number of
-		 * 		occurrences as values.
-		 */
-		Map<Object, Integer> getAnswerCounts()
-		{
-			return Collections.unmodifiableMap(
-					ah.answers.get(question.getID()).answerCount);
-		}
-		
-		private Question question;
-		
-		/**
-		 * Creates a new statistics object for {@code q}.
-		 * @param q The question that this instance should handle
-		 */
-		private Statistics(Question q)
-		{
-			question = q;
-		}
-	}
-	
-	private AnswerHandle ah;
-	private Map<Integer, Statistics> mstat;
-	
-	/**
-	 * This class contains questions and the number of occurrences for the
-	 * different answers.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
-	private class AnswerHandle
-	{
-		
-		Map<Integer, Question> questions;
-		Map<Integer, AnswerCount> answers;
-		
-		/**
-		 * Create an empty handler.
-		 */
-		AnswerHandle()
-		{
-			answers = new TreeMap<>();
-			questions = new TreeMap<>();
-		}
-		
-		/**
-		 * Adds an answer to the supplied question.
-		 * 
-		 * @param q The question to add the answer to.
-		 * @param answer The answer to the question.
-		 */
-		void addAnswer(Question q, Object answer)
-		{
-			if (!questions.containsKey(q.getID()))
-			{
-				answers.put(q.getID(), new AnswerCount());
-				questions.put(q.getID(), q);
-			}
-			answers.get(q.getID()).addAnswer(answer);
-		}
-	}
-	
-	/**
-	 * This class counts the number of occurrences of an answer.
-	 * Only one instance per question should be used in order for
-	 * this class to make any sense since this class does not know
-	 * which question it counts for.
-	 * 
-	 * @author Marcus Malmquist
-	 *
-	 */
+
+    private void addAnswer(Question q, Statistics answer)
+    {
+        if (!answers.containsKey(q.getID()))
+            answers.put(q.getID(), new QA(q, new AnswerCount()));
+        answers.get(q.getID()).ac.addAnswer(answer);
+    }
+
+    private Map<Integer, QA> answers;
+
 	private class AnswerCount
 	{
-		Map<Object, Integer> answerCount;
-		
-		/**
-		 * Creates an empty counter.
-		 */
+		Map<Object, Ans> answerCount;
+
 		AnswerCount()
 		{
 			answerCount = new TreeMap<>();
 		}
-		
-		/**
-		 * Adds {@code answer} to this container. Each answer
-		 * has its own counter which is incremented whenever
-		 * an answer is added.
-		 * 
-		 * @param answer The answer to add to this counter.
-		 */
-		void addAnswer(Object answer)
+
+		void addAnswer(Statistics answer)
 		{
-			if (answer instanceof List) {
-				// All 'List' objects are actually 'List<? extends Object>'
-				@SuppressWarnings("unchecked")
-				List<Object> lobj = (List<Object>) answer;
-				
-				for (Object o : lobj) {
-					if (!answerCount.containsKey(o))
-						answerCount.put(o, 0);
-					answerCount.put(o, answerCount.get(o) + 1);
-				}
-			} else {
-				if (!answerCount.containsKey(answer))
-					answerCount.put(answer, 0);
-				answerCount.put(answer, answerCount.get(answer) + 1);
+			for (Entry<Object, String> e : answer.answers().entrySet()) {
+				if (!answerCount.containsKey(e.getKey()))
+                    answerCount.put(e.getKey(), new Ans(e.getValue()));
+                answerCount.get(e.getKey()).count++;
 			}
 		}
 	}
+
+    private class Ans
+    {
+        String statement;
+        int count;
+
+        Ans(String statement)
+        {
+            this.statement = statement;
+            count = 0;
+        }
+    }
+
+    private class QA
+    {
+        Question q;
+        AnswerCount ac;
+
+        QA(Question q, AnswerCount ac)
+        {
+            this.q = q;
+            this.ac = ac;
+        }
+    }
 }

@@ -20,8 +20,6 @@
  */
 package se.nordicehealth.ppc_app.core.containers;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -90,14 +88,12 @@ public class QuestionContainer
 	 */
 	public Question getQuestion(int index)
 	{
-		if (index >= 0 && index < questions.size())
-		{
+		if (index >= 0 && index < questions.size()) {
 			int i = 0;
-			for (Iterator<Question> itr = questions.values().iterator(); itr.hasNext(); ++i)
-			{
-				Question q = itr.next();
+			for (Question q : questions.values()) {
 				if (i == index)
 					return q;
+                ++i;
 			}
 		}
 		return null;

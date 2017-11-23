@@ -47,20 +47,11 @@ public class PPCGUI extends Activity implements UserInterface
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         Resource.loadResources(getResources());
-        PacketHandler.initialize(new RSA(Resource.key().exp(),
-                Resource.key().mod()));
+        Key key = Resource.key();
+        PacketHandler.initialize(new RSA(key.exp(), key.mod()));
 
         uh = new UserHandle(this);
         initGUI();
-
-        /*
-        if (!ResourceStrings.loadMessages(getResources())
-                || !Questions.Instance().loadQuestionnaire()) {
-            displayError(Server.DATABASE_ERROR, false);
-        } else {
-            setContent(new LoginScreen(this));
-        }
-        */
         setContent(new LoginScreen(this));
     }
 
@@ -111,7 +102,7 @@ public class PPCGUI extends Activity implements UserInterface
         if (panel == null) {
             return;
         }
-        displayMessage("", false); // reset any error messages
+        displayMessage("", false);
         pageContent.removeAllViews();
         pageContent.addView(panel);
         panel.requestFocus();
@@ -119,29 +110,34 @@ public class PPCGUI extends Activity implements UserInterface
     }
 
     @Override
-    public void displayError(String message, boolean popup) {
+    public void displayError(String message, boolean popup)
+    {
         displayEmbeddedMessage(message, 0xffff0000);
     }
 
     @Override
-    public void displayMessage(String message, boolean popup) {
+    public void displayMessage(String message, boolean popup)
+    {
         displayEmbeddedMessage(message, 0xff000000);
     }
 
     @Override
-    public boolean presentForm(List<FormContainer> form, FormControl requester, boolean displayMultiple) {
+    public boolean presentForm(List<FormContainer> form, FormControl requester, boolean displayMultiple)
+    {
         setContent(new GUIForm(this, form, requester, getContent(), displayMultiple));
         return true;
     }
 
     @Override
-    public boolean presentViewData(ViewDataContainer vdc) {
+    public boolean presentViewData(ViewDataContainer vdc)
+    {
         setContent(new ViewDataDisplay(this, vdc));
         return true;
     }
 
     @Override
-    public FormComponentDisplay getContainerDisplay(FormContainer fc) {
+    public FormComponentDisplay getContainerDisplay(FormContainer fc)
+    {
         return ContainerDisplays.getDisplay(this, fc);
     }
 
@@ -162,106 +158,133 @@ public class PPCGUI extends Activity implements UserInterface
         Button login, register;
         EditText usernameTF;
         EditText passwordTF;
+        Messages msg = Resource.messages();
 
-        /**
-         * Creates the login screen.
-         */
         LoginScreen(Context c)
         {
             super(c);
             setOrientation(LinearLayout.VERTICAL);
+            addView(entryFields(c));
+            addView(buttonPanel(c));
+        }
 
-
-			/* entry fields */
-
+        LinearLayout entryFields(final Context c)
+        {
             LinearLayout userPanel = new LinearLayout(c);
             userPanel.setLayoutParams(new FrameLayout.LayoutParams(
                     LinearLayoutCompat.LayoutParams.MATCH_PARENT,
                     LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
             userPanel.setOrientation(LinearLayout.VERTICAL);
 
-            usernameTF = new EditText(c);
-            usernameTF.setHint(String.format("%s",
-                    Resource.messages().info(Messages.INFO.UH_ENTER_USERNAME)));
+            usernameTF = username(c);
+            passwordTF = password(c);
             userPanel.addView(usernameTF);
-
-            passwordTF = new EditText(c);
-            passwordTF.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            passwordTF.setHint(String.format("%s",
-                    Resource.messages().info(Messages.INFO.UH_ENTER_PASSWORD)));
             userPanel.addView(passwordTF);
 
-			/* button panel */
+            return userPanel;
+        }
+
+        LinearLayout buttonPanel(final Context c)
+        {
             LinearLayout buttons = new LinearLayout(c);
             buttons.setOrientation(LinearLayout.HORIZONTAL);
 
-            final Context _c = c;
+            login = loginButton(c);
+            register = registerButton(c);
+            buttons.addView(login);
+            buttons.addView(register);
 
-            login = new Button(c);
-            login.setText(Resource.messages().info(Messages.INFO.LOGIN));
+            return buttons;
+        }
+
+        Button loginButton(final Context c)
+        {
+            Button login = new Button(c);
+            login.setText(msg.info(Messages.INFO.LOGIN));
             login.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    uh.login(usernameTF.getText().toString(),
-                            passwordTF.getText().toString());
+                    uh.login(usernameTF.getText().toString(), passwordTF.getText().toString());
                     if (uh.isLoggedIn()) {
                         usernameTF.setText(null);
                         passwordTF.setText(null);
-                        setContent(new WelcomeScreen(_c));
+                        setContent(new WelcomeScreen(c));
                         uh.updatePassword();
                     }
                 }
             });
+            return login;
+        }
 
-            register = new Button(c);
-            register.setText(Resource.messages().info(Messages.INFO.REGISTER));
+        Button registerButton(final Context c)
+        {
+            Button register = new Button(c);
+            register.setText(msg.info(Messages.INFO.REGISTER));
             register.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        uh.registration();
-                    }
-                });
+                @Override
+                public void onClick(View view) {
+                    uh.registration();
+                }
+            });
+            return register;
+        }
 
-            buttons.addView(login);
-            buttons.addView(register);
+        EditText username(final Context c)
+        {
+            EditText usernameTF = new EditText(c);
+            usernameTF.setHint(String.format("%s", msg.info(Messages.INFO.UH_ENTER_USERNAME)));
+            return usernameTF;
+        }
 
-			/* add components */
-            addView(userPanel);
-            addView(buttons);
+        EditText password(final Context c)
+        {
+            EditText passwordTF = new EditText(c);
+            passwordTF.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            passwordTF.setHint(String.format("%s", msg.info(Messages.INFO.UH_ENTER_PASSWORD)));
+            return passwordTF;
         }
     }
 
     private class WelcomeScreen extends LinearLayout
     {
-
         Button questionnaire, viewData;
+        Messages msg = Resource.messages();
 
         WelcomeScreen(Context c)
         {
             super(c);
             setOrientation(LinearLayout.VERTICAL);
 
+            questionnaire = questionnaireBtn(c);
+            viewData = viewDataBtn(c);
+            addView(questionnaire);
+            addView(viewData);
+        }
 
-            questionnaire = new Button(c);
-            questionnaire.setText(Resource.messages().info(Messages.INFO.START_QUESTIONNAIRE));
+        Button questionnaireBtn(final Context c)
+        {
+            Button questionnaire = new Button(c);
+            questionnaire.setText(msg.info(Messages.INFO.START_QUESTIONNAIRE));
             questionnaire.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     uh.startQuestionnaire();
                 }
             });
+            return questionnaire;
+        }
 
-            viewData = new Button(c);
-            viewData.setText(Resource.messages().info(Messages.INFO.VIEW_STATISTICS));
+        Button viewDataBtn(final Context c)
+        {
+            Button viewData = new Button(c);
+            viewData.setText(msg.info(Messages.INFO.VIEW_STATISTICS));
             viewData.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     uh.viewData();
                 }
             });
-
-            addView(questionnaire);
-            addView(viewData);
+            return viewData;
         }
     }
 
@@ -284,7 +307,6 @@ public class PPCGUI extends Activity implements UserInterface
                 final View retpan, boolean displayMultiple)
         {
             super(c);
-            displayMessage("Setting PPCGUI form as content", false);
 
             this.form = form;
             this.function = function;
@@ -314,7 +336,6 @@ public class PPCGUI extends Activity implements UserInterface
         {
             if (wrap)
                 return (cIndex + steps + nEntries) % nEntries;
-
             if (cIndex + steps >= nEntries)
                 return cIndex;
             else if (cIndex + steps < 0)
@@ -323,13 +344,11 @@ public class PPCGUI extends Activity implements UserInterface
                 return cIndex + steps;
         }
 
-        int getNextUnfilledEntry(int currentIdx,
-                                 List<FormComponentDisplay> form)
+        int getNextUnfilledEntry(int currentIdx, List<FormComponentDisplay> form)
         {
             int entries = form.size();
             int i = getNextEntry(currentIdx, entries, 1, true);
-            while (form.get(i).entryIsFilled()
-                    && i != currentIdx)
+            while (form.get(i).entryIsFilled() && i != currentIdx)
                 i = getNextEntry(i, entries, 1, true);
             return i;
         }
@@ -339,25 +358,20 @@ public class PPCGUI extends Activity implements UserInterface
             fc_next.setEnabled(cIdx != getNextEntry(cIdx, nEntries, 1, false));
             fc_previous.setEnabled(cIdx != getNextEntry(cIdx, nEntries, -1, false));
             if (getNextUnfilledEntry(cIdx, components) == cIdx)
-                fc_continue.setText(msg.info(
-                        Messages.INFO.UI_FORM_FINISH));
+                fc_continue.setText(msg.info(Messages.INFO.UI_FORM_FINISH));
             else
-                fc_continue.setText(msg.info(
-                        Messages.INFO.UI_FORM_CONTINUE));
+                fc_continue.setText(msg.info(Messages.INFO.UI_FORM_CONTINUE));
         }
 
         void setFormContent()
         {
             removeAllViews();
 
-            if (displayMultiple) {
-                for (int i = 0; i < components.size(); ++i) {
-                    FormComponentDisplay fcd = components.get(i);
+            if (displayMultiple)
+                for (FormComponentDisplay fcd : components)
                     addView((View) fcd);
-                }
-            } else {
+            else
                 addView((View) components.get(cIdx));
-            }
             addView(formControl);
 
             invalidate();
@@ -367,7 +381,23 @@ public class PPCGUI extends Activity implements UserInterface
         {
             LinearLayout panel = new LinearLayout(c);
 
-            fc_continue = new Button(c);
+            fc_continue = continueBtn(c);
+            fc_previous = previousBtn(c);
+            fc_next = nextBtn(c);
+            fc_back = backBtn(c);
+
+            panel.addView(fc_continue);
+            if (!displayMultiple) {
+                panel.addView(fc_previous);
+                panel.addView(fc_next);
+            }
+            panel.addView(fc_back);
+            return panel;
+        }
+
+        Button continueBtn(final Context c)
+        {
+            Button fc_continue = new Button(c);
             fc_continue.setText(msg.info(Messages.INFO.UI_FORM_CONTINUE));
             fc_continue.setOnClickListener(new OnClickListener() {
                 @Override
@@ -386,12 +416,15 @@ public class PPCGUI extends Activity implements UserInterface
                         cIdx = nextComponent;
                         setFormContent();
                     }
-
                     updateButtons();
                 }
             });
+            return fc_continue;
+        }
 
-            fc_previous = new Button(c);
+        Button previousBtn(final Context c)
+        {
+            Button fc_previous = new Button(c);
             fc_previous.setText(msg.info(Messages.INFO.UI_FORM_PREVIOUS));
             fc_previous.setOnClickListener(new OnClickListener() {
                 @Override
@@ -405,8 +438,12 @@ public class PPCGUI extends Activity implements UserInterface
             });
             if (cIdx == getNextEntry(cIdx, nEntries, -1, false))
                 fc_previous.setEnabled(false);
+            return fc_previous;
+        }
 
-            fc_next = new Button(c);
+        Button nextBtn(final Context c)
+        {
+            Button fc_next = new Button(c);
             fc_next.setText(msg.info(Messages.INFO.UI_FORM_NEXT));
             fc_next.setOnClickListener(new OnClickListener() {
                 @Override
@@ -418,56 +455,64 @@ public class PPCGUI extends Activity implements UserInterface
                     updateButtons();
                 }
             });
+            return fc_next;
+        }
 
-            fc_back = new Button(c);
+        Button backBtn(final Context c)
+        {
+            Button fc_back = new Button(c);
             fc_back.setText(msg.info(Messages.INFO.UI_FORM_BACK));
             fc_back.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     setContent(retpan);
-
                     updateButtons();
                 }
             });
-
-            panel.addView(fc_continue);
-            if (!displayMultiple) {
-                panel.addView(fc_previous);
-                panel.addView(fc_next);
-            }
-            panel.addView(fc_back);
-            return panel;
+            return fc_back;
         }
     }
 
-    public class ViewDataDisplay extends LinearLayout
+    private class ViewDataDisplay extends LinearLayout
     {
-        public ViewDataDisplay(Context c, ViewDataContainer vdc)
+        ViewDataDisplay(Context c, ViewDataContainer vdc)
         {
             super(c);
             setOrientation(LinearLayout.VERTICAL);
 
-            title = new TextView(c);
-            title.setLayoutParams(new FrameLayout.LayoutParams(
-                    LinearLayoutCompat.LayoutParams.MATCH_PARENT,
-                    LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-            title.setSingleLine(false);
-            title.setMaxLines(35);
-            title.setText(vdc.title());
+            title = titleArea(c);
+            results = resultsArea(c);
 
-            results = new TextView(c);
-            results.setLayoutParams(new FrameLayout.LayoutParams(
-                    LinearLayoutCompat.LayoutParams.MATCH_PARENT,
-                    LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
-            results.setSingleLine(false);
-            results.setMaxLines(4096);
+            title.setText(vdc.title());
             results.setText(vdc.representation());
 
             addView(title);
             addView(results);
         }
 
-        private TextView title, results;
+        TextView title, results;
+
+        TextView titleArea(final Context c)
+        {
+            TextView title = new TextView(c);
+            title.setLayoutParams(new FrameLayout.LayoutParams(
+                    LinearLayoutCompat.LayoutParams.MATCH_PARENT,
+                    LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+            title.setSingleLine(false);
+            title.setMaxLines(35);
+            return title;
+        }
+
+        TextView resultsArea(final Context c)
+        {
+            TextView results = new TextView(c);
+            results.setLayoutParams(new FrameLayout.LayoutParams(
+                    LinearLayoutCompat.LayoutParams.MATCH_PARENT,
+                    LinearLayoutCompat.LayoutParams.WRAP_CONTENT));
+            results.setSingleLine(false);
+            results.setMaxLines(4096);
+            return results;
+        }
     }
 }
 

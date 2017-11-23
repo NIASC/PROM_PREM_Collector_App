@@ -38,14 +38,14 @@ import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
  * @author Marcus Malmquist
  *
  */
-public interface Database
+public interface Server
 {
 	/**
 	 * If the messages was not retrieved from the database this
 	 * message (in English) should be used to notify the caller that
 	 * there was a database error.
 	 */
-	String DATABASE_ERROR = "Database error.";
+	String DATABASE_ERROR = "Server error.";
 
     /**
      * Poke the database to tell it thet the client is still available.
@@ -136,9 +136,9 @@ public interface Database
 	/**
 	 * Sends a registration request to the servlet.
 	 * 
-	 * @param name The name of the person that wishes to register (not the username).
-	 * @param email The email of the person that wishes to register.
-	 * @param clinic The clinic that the person who wishes to register belongs to.
+	 * @param name The name of the person that wishes to registration (not the username).
+	 * @param email The email of the person that wishes to registration.
+	 * @param clinic The clinic that the person who wishes to registration belongs to.
 	 * 
 	 * @return True if the registration was successful.
 	 */

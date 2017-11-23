@@ -26,7 +26,7 @@ import java.util.List;
 
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
-import se.nordicehealth.ppc_app.core.interfaces.Database;
+import se.nordicehealth.ppc_app.core.interfaces.Server;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
@@ -76,7 +76,7 @@ public class EmailRegistration implements Registration, FormUtils
 	}
 
 	@Override
-	public RetFunContainer ValidateUserInput(List<FormContainer> form)
+	public RetFunContainer validateUserInput(List<FormContainer> form)
 	{
 		RetFunContainer rfc = new RetFunContainer();
 		List<String> answers = new ArrayList<>();
@@ -86,7 +86,7 @@ public class EmailRegistration implements Registration, FormUtils
 		String email = answers.get(1);
 		String clinic = answers.get(2);
 		
-		Database db = Implementations.Database();
+		Server db = Implementations.Server();
 		boolean success = db.requestRegistration(name, email, clinic);
 		if (success)
 			ui.displayMessage(Resource.messages().info(

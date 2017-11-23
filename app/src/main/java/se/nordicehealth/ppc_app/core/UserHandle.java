@@ -1,23 +1,3 @@
-/*! UserHandle.java
- * 
- * Copyright 2017 Marcus Malmquist
- * 
- * This file is part of PROM_PREM_Collector.
- * 
- * PROM_PREM_Collector is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * PROM_PREM_Collector is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with PROM_PREM_Collector.  If not, see
- * <http://www.gnu.org/licenses/>.
- */
 package se.nordicehealth.ppc_app.core;
 
 import java.util.LinkedList;
@@ -25,7 +5,7 @@ import java.util.List;
 
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
-import se.nordicehealth.ppc_app.core.interfaces.Database;
+import se.nordicehealth.ppc_app.core.interfaces.Server;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
@@ -33,218 +13,133 @@ import se.nordicehealth.ppc_app.core.interfaces.Registration;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 import se.nordicehealth.ppc_app.common.implementation.Constants;
 
-/**
- * This class handles the user. This mostly means handling the login,
- * logout and redirecting to the registration form as well as
- * redirecting to the different applications that are available to
- * users that have logged in.
- * 
- * @author Marcus Malmquist
- *
- */
 public class UserHandle
 {
-	/* Public */
-	
-	/**
-	 * Initialize variables.
-	 * 
-	 * @param ui The active instance of the {@code UserInterface}.
-	 * 
-	 * @see UserInterface
-	 */
 	public UserHandle(UserInterface ui)
 	{
 		this.ui = ui;
-		db = Implementations.Database();
+        msg = Implementations.Messages();
+		db = Implementations.Server();
 		viewData = new ViewData(ui, this);
-		updatePass = new UpdatePassword();
+		updatePass = new PasswordUpdate();
         resetLoginVars();
 	}
-	
-	/**
-	 * Attempts to match the supplied user details with data in the
-	 * database. If the user successfully logs in it will be flagged
-	 * as logged in (which can be used to verify that the user has
-	 * logged in using the function isLoggedIn). This flag prevents
-	 * methods only available when logged in from being called if
-	 * the user has logged out.
-	 * 
-	 * @param username The username of the user that wants to log in.
-	 * @param password The (unhashed) password of the user that wants
-	 * 		to log in.
-	 */
+
 	public void login(String username, String password)
 	{
-		Database.Session session = db.requestLogin(username, password);
-		switch(session.response)
-		{
-		case Constants.SUCCESS:
-			initLoginVars(new User(session.uid, session.update_password, true));
-            questionnaire = new Questionnaire(ui, this);
-			break;
-		case Constants.ALREADY_ONLINE:
-			ui.displayError(Implementations.Messages().error(
-					Messages.ERROR_UH_ALREADY_ONLINE), false);
-			break;
-		case Constants.SERVER_FULL:
-			ui.displayError(Implementations.Messages().error(
-					Messages.ERROR_UH_SERVER_FULL), false);
-			break;
-		case Constants.INVALID_DETAILS:
-			ui.displayError(Implementations.Messages().error(
-					Messages.ERROR_UH_INVALID_LOGIN), false);
-			break;
-		default:
-			ui.displayError(Implementations.Messages().error(
-					Messages.ERROR_UNKNOWN_RESPONSE), false);
-			break;
+		Server.Session session = db.requestLogin(username, password);
+		switch(session.response) {
+            case Constants.SUCCESS:
+                initLoginVars(new User(session.uid, session.update_password, true));
+                questionnaire = new Questionnaire(ui, this);
+                break;
+            case Constants.ALREADY_ONLINE:
+                ui.displayError(msg.error(Messages.ERROR_UH_ALREADY_ONLINE), false);
+                break;
+            case Constants.SERVER_FULL:
+                ui.displayError(msg.error(Messages.ERROR_UH_SERVER_FULL), false);
+                break;
+            case Constants.INVALID_DETAILS:
+                ui.displayError(msg.error(Messages.ERROR_UH_INVALID_LOGIN), false);
+                break;
+            default:
+                ui.displayError(msg.error(Messages.ERROR_UNKNOWN_RESPONSE), false);
+                break;
 		}
 	}
-	
-	/**
-	 * Presents a registration form that the user must fill in and
-	 * sends the request to an administrator who can add the user if
-	 * it is authorized.
-	 */
-	public void register()
+
+	public void registration()
 	{
 		Registration register = Implementations.Registration(ui);
 		register.registrationProcess();
 	}
-	
-	/**
-	 * Resets any variables that was initialized during login (in
-	 * particular it unflags the user as logged in).
-	 */
+
 	public void logout()
 	{
 		db.requestLogout(user.uid);
 		resetLoginVars();
 	}
-	
-	/**
-	 * Starts the questionnaire.
-	 */
+
 	public void startQuestionnaire()
 	{
 		questionnaire.start();
 	}
-	
-	/**
-	 * Starts the data viewing.
-	 */
+
 	public void viewData()
 	{
 		viewData.start();
 	}
-	
-	/**
-	 * Returns the 'logged in' flag.
-	 * 
-	 * @return {@code true} if the user is logged in. {@code false} if not.
-	 */
+
 	public boolean isLoggedIn()
 	{
 		return user.loggedIn;
 	}
-	
-	/**
-	 * If the user has/wants to update his password then this method
-	 * will call the part of program that displays that form.
-	 * 
-	 * @return {@code true} if the user needed to update its password.
-	 * 		{@code false} if not.
-	 */
-	public boolean updatePassword()
+
+	public void updatePassword()
 	{
-		if (user.update_password)
-		{
-			ui.displayMessage(Implementations.Messages().info(
-					Messages.INFO_UH_UPDATE_PASSWORD), true);
-			updatePass.setPassword();
-			return true;
+		if (user.updatePassword) {
+			ui.displayMessage(msg.info(Messages.INFO_UH_UPDATE_PASSWORD), true);
+			updatePass.createForm();
 		}
-		return false;
 	}
-	
-	/* Protected */
 
     long getUID()
     {
         return user.uid;
     }
-	
-	/* Private */
 
-	private Database db;
+	private Messages msg;
+	private Server db;
 	private UserInterface ui;
 	private Questionnaire questionnaire;
 	private ViewData viewData;
-	private UpdatePassword updatePass;
+	private PasswordUpdate updatePass;
     private volatile User user;
 	private volatile boolean running;
 	private Thread monitor;
 
-	private boolean newPassError(int response)
+	private String newPassError(int response)
 	{
 		switch(response) {
-			case Constants.INVALID_DETAILS:
-				ui.displayError(Implementations.Messages().error(
-						Messages.ERROR_UH_PR_INVALID_CURRENT), false);
-				return true;
+            case Constants.SUCCESS:
+                return null;
+            case Constants.INVALID_DETAILS:
+				return msg.error(Messages.ERROR_UH_PR_INVALID_CURRENT);
 			case Constants.MISMATCH_NEW:
-				ui.displayError(Implementations.Messages().error(
-						Messages.ERROR_UH_PR_MISMATCH_NEW), false);
-				return true;
+				return msg.error(Messages.ERROR_UH_PR_MISMATCH_NEW);
 			case Constants.PASSWORD_SHORT:
-				ui.displayError(Implementations.Messages().error(
-						Messages.ERROR_UH_PR_INVALID_LENGTH), false);
-				return true;
+				return msg.error(Messages.ERROR_UH_PR_INVALID_LENGTH);
             case Constants.PASSWORD_SIMPLE:
-				ui.displayError(Implementations.Messages().error(
-						Messages.ERROR_UH_PR_PASSWORD_SIMPLE), false);
-				return true;
+				return msg.error(Messages.ERROR_UH_PR_PASSWORD_SIMPLE);
 			default:
-				ui.displayError(Implementations.Messages().error(
-						Messages.ERROR_UNKNOWN_RESPONSE), false);
-				return false;
+				return msg.error(Messages.ERROR_UNKNOWN_RESPONSE);
 		}
 	}
-	
-	/**
-	 * Initializes variables that are useful during the time the user
-	 * is logged in.
-	 */
+
 	private void initLoginVars(User user)
 	{
         this.user = user;
 		running = true;
-		monitor = new Thread(new Pinger());
+		monitor = new Thread(new PingServer());
 		monitor.start();
 	}
-	
-	/**
-	 * Resets any variable that was initialized through initLoginVars
-	 */
+
 	private void resetLoginVars()
 	{
 		running = false;
 		if (monitor != null && monitor.isAlive()) {
 			try {
 				monitor.join(0);
-                monitor = null;
-			} catch (InterruptedException ignored) {
-
-			}
+			} catch (InterruptedException ignored) { }
+            monitor = null;
 		}
 		user = new User(0L, false, false);
 	}
 	
-	private class UpdatePassword implements FormUtils
+	private class PasswordUpdate implements FormUtils
 	{
 		@Override
-		public RetFunContainer ValidateUserInput(List<FormContainer> form) {
+		public RetFunContainer validateUserInput(List<FormContainer> form) {
 			RetFunContainer rfc = new RetFunContainer();
 			List<String> answers = new LinkedList<>();
             for (FormContainer fc : form)
@@ -254,44 +149,24 @@ public class UserHandle
 			String new2 = answers.get(2);
 
             int response = db.setPassword(user.uid, current, new1, new2);
-			if (!newPassError(response))
+			if ((rfc.message = newPassError(response)) == null)
                 rfc.valid = true;
 			return rfc;
 		}
 
 		@Override
-		public void callNext()
-		{
-			
-		}
+		public void callNext() { }
 		
-		private UpdatePassword()
-		{
-			
-		}
-		
-		/**
-		 * Query the user for current password and new password if the user
-		 * is logged in. If the old password is correct and the password
-		 * matches the valid passwords criterion.
-		 * This function will query the user until the old and new password
-		 * fulfill the criterion described above.
-		 */
-		private void setPassword()
-		{
-			if (!user.loggedIn)
-				return; // no user to set password for
+		PasswordUpdate() { }
 
+		void createForm()
+		{
             List<FormContainer> form = new LinkedList<>();
-			form.add(new FieldContainer(false, true, Implementations.Messages().info(
-			        Messages.INFO_CURRENT_PASSWORD), null));
-			form.add(new FieldContainer(false, true, Implementations.Messages().info(
-			        Messages.INFO_NEW_PASSWORD), null));
-			form.add(new FieldContainer(false, true, Implementations.Messages().info(
-                    Messages.INFO_RE_NEW_PASSWORD), null));
+			form.add(new FieldContainer(false, true, msg.info(Messages.INFO_CURRENT_PASSWORD), null));
+			form.add(new FieldContainer(false, true, msg.info(Messages.INFO_NEW_PASSWORD), null));
+			form.add(new FieldContainer(false, true, msg.info(Messages.INFO_RE_NEW_PASSWORD), null));
 			
-			ui.displayMessage(Implementations.Messages().info(
-					Messages.INFO_NEW_PASS_INFO), false);
+			ui.displayMessage(msg.info(Messages.INFO_NEW_PASS_INFO), false);
 			ui.presentForm(form, this, true);
 		}
 	}
@@ -299,35 +174,28 @@ public class UserHandle
 	private class User
     {
         long uid;
-        boolean update_password;
-        private boolean loggedIn;
+        boolean updatePassword;
+        boolean loggedIn;
 
         User(long uid, boolean update_password, boolean loggedIn)
         {
             this.uid = uid;
-            this.update_password = update_password;
+            this.updatePassword = update_password;
             this.loggedIn = loggedIn;
         }
     }
 
-    /**
-     * Periodically pokes the server with the goal of telling the server
-     * that the client (i.e. this app) is still running.
-     */
-    private class Pinger implements Runnable
+    private class PingServer implements Runnable
 	{
-        final int sleepsPerCheck = 100; // cycles
-        final int checksPerInterval = 50; // ms
-        // pingInterval = sleepsPerCheck * checksPerInterval
+        final int sleepTimePerCycle = 100;
+        final int cyclesPerInterval = 50;
 
 		@Override
 		public void run() {
-            int checksLeft;
 			while (running) {
-                checksLeft = checksPerInterval;
-                while (running && checksLeft-- > 0) {
+                for (int i = 0; running && i < cyclesPerInterval; i++) {
                     try {
-                        Thread.sleep(sleepsPerCheck);
+                        Thread.sleep(sleepTimePerCycle);
                     } catch (InterruptedException ignored) {
 
                     }

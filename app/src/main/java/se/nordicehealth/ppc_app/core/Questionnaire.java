@@ -1,23 +1,3 @@
-/*! Questionnaire.java
- * 
- * Copyright 2017 Marcus Malmquist
- * 
- * This file is part of PROM_PREM_Collector.
- * 
- * PROM_PREM_Collector is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- * 
- * PROM_PREM_Collector is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with PROM_PREM_Collector.  If not, see
- * <http://www.gnu.org/licenses/>.
- */
 package se.nordicehealth.ppc_app.core;
 
 import java.util.ArrayList;
@@ -29,46 +9,20 @@ import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
-import se.nordicehealth.ppc_app.core.interfaces.Database;
+import se.nordicehealth.ppc_app.core.interfaces.Server;
 import se.nordicehealth.ppc_app.core.interfaces.FormUtils;
 import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 
-/**
- * This class is the central point for the questionnaire part of the
- * program. It handles creating and validating the patient
- * registration as well as the questionnaire.
- * 
- * @author Marcus Malmquist
- *
- */
 public class Questionnaire
 {
-	/* Public */
-	
-	/**
-	 * Starts the questionnaire. The questionnaire is preceded by
-	 * a patient registration form.
-	 */
 	void start()
 	{
-		if (!uh.isLoggedIn())
-			ui.displayError(Implementations.Messages().error(
-					Messages.ERROR_NOT_LOGGED_IN), false);
-		else
-			preg.createPatientRegistration();
+		preg.createPatientRegistration();
 	}
-	
-	/* Protected */
-	
-	/**
-	 * Initialize variables.
-	 * 
-	 * @param ui The active instance of the {@code UserInterface}.
-	 * @param uh The active instance of the {@code UserHandle}.
-	 */
+
 	Questionnaire(UserInterface ui, UserHandle uh)
 	{
 		this.ui = ui;
@@ -77,8 +31,6 @@ public class Questionnaire
 		preg = new PatientRegistration();
 		pquest = new PatientQuestionnaire();
 	}
-	
-	/* Private */
 
 	private UserHandle uh;
 	private UserInterface ui;
@@ -90,12 +42,12 @@ public class Questionnaire
 	private class PatientQuestionnaire implements FormUtils
 	{
 		@Override
-		public RetFunContainer ValidateUserInput(List<FormContainer> form) {
+		public RetFunContainer validateUserInput(List<FormContainer> form) {
 			RetFunContainer rfc = new RetFunContainer();
-			
-			if (!Implementations.Database().addQuestionnaireAnswers(uh.getUID(), patient,
-					Collections.unmodifiableList(form))) {
-				rfc.message = Database.DATABASE_ERROR;
+
+			Server db = Implementations.Server();
+			if (!db.addQuestionnaireAnswers(uh.getUID(), patient, Collections.unmodifiableList(form))) {
+				rfc.message = Server.DATABASE_ERROR;
 				return rfc;
 			}
 			patient = null;
@@ -104,80 +56,54 @@ public class Questionnaire
 		}
 
 		@Override
-		public void callNext()
-		{
-			
-		}
+		public void callNext() { }
 		
-		private PatientQuestionnaire()
+		PatientQuestionnaire() { }
+
+		void createQuestionnaire()
 		{
-			
-		}
-		
-		/**
-		 * Creates the questionnaire form and sends it to the
-		 * {@code UserInterface}. It is required to fill in the patient
-		 * form before the questionnaire is able to start.
-		 */
-		private void createQuestionnaire()
-		{
-			if (patient == null)
-				return;
             List<FormContainer> form = new LinkedList<>();
 			for (int i = 0; i < questions.getSize(); ++i)
 			    form.add(questions.getContainer(i));
 			
 			ui.presentForm(form, this, false);
 		}
-		
 	}
 	
 	private class PatientRegistration implements FormUtils
 	{
-
-		/* Public */
-		
-		/* Protected */
-		
-		/* Private */
-		
 		@Override
-		public RetFunContainer ValidateUserInput(List<FormContainer> form)
+		public RetFunContainer validateUserInput(List<FormContainer> form)
 		{
 			RetFunContainer rfc = new RetFunContainer();
 			List<String> answers = new ArrayList<>();
             for (FormContainer fc : form)
                 answers.add((String) fc.getEntry());
 			String forename = answers.get(0);
-			String lastname = answers.get(1);
+			String surname = answers.get(1);
 			String pnr = answers.get(2);
 
-			if (!Implementations.Database().validatePatientID(uh.getUID(), pnr)) {
-				rfc.message = Implementations.Messages().error(
-						Messages.ERROR_QP_INVALID_PID);
+            Server db = Implementations.Server();
+            Messages msg = Implementations.Messages();
+			if (!db.validatePatientID(uh.getUID(), pnr)) {
+				rfc.message = msg.error(Messages.ERROR_QP_INVALID_PID);
 				return rfc;
 			}
 
-            patient = new Patient(forename, lastname, pnr);
+            patient = new Patient(forename, surname, pnr);
 			rfc.valid = true;
 			return rfc;
 		}
-		
+
+		@Override
 		public void callNext()
 		{
 			pquest.createQuestionnaire();
 		}
 		
-		private PatientRegistration()
-		{
-			
-		}
-		
-		/**
-		 * Displays a patient registration form. This registration form is
-		 * used to link the patient to the questionnaire.
-		 */
-		private void createPatientRegistration()
+		PatientRegistration() { }
+
+		void createPatientRegistration()
 		{
             List<FormContainer> form = new LinkedList<>();
 			Messages msg = Implementations.Messages();

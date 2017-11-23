@@ -23,11 +23,8 @@ package se.nordicehealth.ppc_app.implementation.io;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -48,7 +45,7 @@ import se.nordicehealth.ppc_app.core.containers.statistics.MultipleOption;
 import se.nordicehealth.ppc_app.core.containers.statistics.SingleOption;
 import se.nordicehealth.ppc_app.core.containers.statistics.Slider;
 import se.nordicehealth.ppc_app.core.containers.statistics.Statistics;
-import se.nordicehealth.ppc_app.core.interfaces.Database;
+import se.nordicehealth.ppc_app.core.interfaces.Server;
 import se.nordicehealth.ppc_app.implementation.security.Encryption;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.common.implementation.Constants;
@@ -63,7 +60,7 @@ import se.nordicehealth.ppc_app.common.implementation.Constants;
  * @author Marcus Malmquist
  *
  */
-public class PacketHandler implements Database
+public class PacketHandler implements Server
 {
 	/* Public */
 	

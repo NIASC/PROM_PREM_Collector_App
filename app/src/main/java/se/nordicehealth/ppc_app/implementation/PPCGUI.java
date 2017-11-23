@@ -56,7 +56,7 @@ public class PPCGUI extends Activity implements UserInterface
         /*
         if (!ResourceStrings.loadMessages(getResources())
                 || !Questions.getQuestions().loadQuestionnaire()) {
-            displayError(Database.DATABASE_ERROR, false);
+            displayError(Server.DATABASE_ERROR, false);
         } else {
             setContent(new LoginScreen(this));
         }
@@ -218,7 +218,7 @@ public class PPCGUI extends Activity implements UserInterface
             register.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        uh.register();
+                        uh.registration();
                     }
                 });
 
@@ -375,7 +375,7 @@ public class PPCGUI extends Activity implements UserInterface
                     components.get(cIdx).fillEntry();
                     int nextComponent = getNextUnfilledEntry(cIdx, components);
                     if (nextComponent == cIdx && components.get(cIdx).entryFilled()) {
-                        RetFunContainer rfc = function.ValidateUserInput(form);
+                        RetFunContainer rfc = function.validateUserInput(form);
                         if (rfc.valid) {
                             displayMessage("", false);
                             setContent(retpan);

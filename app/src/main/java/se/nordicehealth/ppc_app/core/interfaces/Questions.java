@@ -51,17 +51,17 @@ public final class Questions
 	}
 	
 	/**
-	 * Attempts to load questions from the {@code Database}.
+	 * Attempts to load questions from the {@code Server}.
 	 * 
 	 * @return {@code true} if questions was successfully loaded.
 	 * 		{@code false} if an error occurred while loading questions.
 	 * 
-	 * @see Database
+	 * @see Server
 	 */
 	public synchronized final boolean loadQuestionnaire()
 	{
 		qEntries = new QuestionContainer();
-		return Implementations.Database().loadQuestions(qEntries);
+		return Implementations.Server().loadQuestions(qEntries);
 	}
 	
 	/**

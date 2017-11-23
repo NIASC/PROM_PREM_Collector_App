@@ -24,13 +24,13 @@ package se.nordicehealth.ppc_app.core.interfaces;
  * This interface contains the methods required by the core part of
  * this program to function. The purpose of this interface is to give
  * the freedom of choosing your own registration process and what
- * it should contain. Since the {@code Database} implementation can
+ * it should contain. Since the {@code Server} implementation can
  * also be chosen freely you are not limited to a pre-defined user
- * structure defined by the {@code Database}.
+ * structure defined by the {@code Server}.
  * 
  * @author Marcus Malmquist
  * 
- * @see Database
+ * @see Server
  *
  */
 public interface Registration

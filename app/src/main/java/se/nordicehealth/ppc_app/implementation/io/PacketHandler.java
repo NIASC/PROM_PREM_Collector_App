@@ -365,14 +365,16 @@ public class PacketHandler implements Server
 				return fmt.toString();
 
 			if (fc instanceof SingleOptionContainer) {
-				SingleOptionContainer soc = (SingleOptionContainer) fc;
-				fmt.put("SingleOption", String.format(Locale.US, "%d", soc.getEntry()));
-			} else if (fc instanceof MultipleOptionContainer) {
-				MultipleOptionContainer moc = (MultipleOptionContainer) fc;
-                ListData options = new ListData(null);
-				for (Integer i : moc.getEntry())
-                    options.add(String.format(Locale.US, "%d", i));
-                fmt.put("MultipleOption", options.toString());
+                if (fc instanceof MultipleOptionContainer) {
+                    MultipleOptionContainer moc = (MultipleOptionContainer) fc;
+                    ListData options = new ListData(null);
+                    for (Integer i : moc.getEntry())
+                        options.add(String.format(Locale.US, "%d", i));
+                    fmt.put("MultipleOption", options.toString());
+                } else {
+                    SingleOptionContainer soc = (SingleOptionContainer) fc;
+                    fmt.put("SingleOption", String.format(Locale.US, "%d", soc.getEntry().get(0)));
+                }
 			} else if (fc instanceof SliderContainer) {
 				SliderContainer sc = (SliderContainer) fc;
                 fmt.put("Slider", String.format(Locale.US, "%d", sc.getEntry()));

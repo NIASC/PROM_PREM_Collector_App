@@ -27,6 +27,9 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import se.nordicehealth.ppc_app.core.containers.form.SingleOptionContainer;
@@ -55,7 +58,7 @@ public class SingleOptionDisplay extends LinearLayout implements FormComponentDi
 	@Override
 	public boolean fillEntry()
 	{
-		return soc.setEntry(responseID);
+		return soc.setEntry(Collections.singletonList(responseID));
 	}
 
 	@Override
@@ -99,14 +102,14 @@ public class SingleOptionDisplay extends LinearLayout implements FormComponentDi
 		RadioGroup group = new RadioGroup(c);
         group.setOrientation(LinearLayout.VERTICAL);
 		Map<Integer, String> opt = soc.getOptions();
-		Integer selected = soc.getSelectedID();
+        List<Integer> selected = soc.getSelectedID();
 		for (Entry<Integer, String> e : opt.entrySet())
 		{
 			String buttonName = Integer.toString(e.getKey());
             MyRadioButton btn = new MyRadioButton(c);
 			btn.setText(e.getValue());
             btn.setLabel(buttonName);
-			if (selected != null && selected.equals(e.getKey()))
+			if (!selected.isEmpty() && selected.get(0).equals(e.getKey()))
 				btn.setSelected(true);
 			group.addView(btn);
 		}

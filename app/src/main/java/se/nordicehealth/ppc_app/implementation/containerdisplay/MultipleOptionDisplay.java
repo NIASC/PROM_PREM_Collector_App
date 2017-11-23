@@ -106,7 +106,7 @@ public class MultipleOptionDisplay extends LinearLayout implements FormComponent
 
 		Map<Integer, String> opt = moc.getOptions();
 
-		List<Integer> selected = moc.getSelectedIDs();
+		List<Integer> selected = moc.getSelectedID();
 
 		options = new TreeMap<>();
 		for (Entry<Integer, String> e : opt.entrySet())

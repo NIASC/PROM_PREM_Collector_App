@@ -1,6 +1,7 @@
 package se.nordicehealth.ppc_app.core.containers.form;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,29 +12,31 @@ public class SingleOptionContainer extends FormContainer
 	{
 		super(allowEmpty, statement, description);
 		options = new ArrayList<>();
-		selected = null;
+        selected = new ArrayList<>();
 	}
 
 	@Override
 	public boolean hasEntry()
 	{
-		return entryIsSet && (allowEmpty || selected != null);
+		return entryIsSet && (allowEmpty || !selected.isEmpty());
 	}
 	
 	@Override
-	public Integer getEntry()
+	public List<Integer> getEntry()
 	{
-		return selected != null ? options.get(selected).identifier : null;
+        return Collections.unmodifiableList(selected);
 	}
 
-	public boolean setEntry(Integer id)
+	public boolean setEntry(List<Integer> selectedIDs)
 	{
-		entryIsSet = true;
-		if (id == null || options.get(id) == null)
-			return false;
+        entryIsSet = true;
+        if (selectedIDs == null)
+            return false;
 
-		selected = id;
-		return true;
+        selected.clear();
+        if (!selectedIDs.isEmpty())
+            selected.add(selectedIDs.get(0));
+        return true;
 	}
 
 	public void addOption(int identifier, String text)
@@ -50,13 +53,13 @@ public class SingleOptionContainer extends FormContainer
 		return sopts;
 	}
 
-	public Integer getSelectedID()
+	public List<Integer> getSelectedID()
 	{
-		return selected;
+		return Collections.unmodifiableList(selected);
 	}
 	
 	private List<Option> options;
-	private Integer selected;
+    List<Integer> selected;
 
 	private final class Option
 	{

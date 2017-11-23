@@ -67,11 +67,11 @@ public abstract class ContainerDisplays
 	 */
 	public static FormComponentDisplay getDisplay(Context c, FormContainer fc)
 	{
-		if (fc instanceof SingleOptionContainer)
+		if (fc instanceof SingleOptionContainer) {
+			if (fc instanceof MultipleOptionContainer)
+				return new MultipleOptionDisplay(c, (MultipleOptionContainer) fc);
 			return new SingleOptionDisplay(c, (SingleOptionContainer) fc);
-		else if (fc instanceof MultipleOptionContainer)
-			return new MultipleOptionDisplay(c, (MultipleOptionContainer) fc);
-		else if (fc instanceof AreaContainer) {
+		} else if (fc instanceof AreaContainer) {
 			if (fc instanceof FieldContainer)
 				return new FieldDisplay(c, (FieldContainer) fc);
 			return new AreaDisplay(c, (AreaContainer) fc);
@@ -79,10 +79,8 @@ public abstract class ContainerDisplays
 			return new SliderDisplay(c, (SliderContainer) fc);
 		else if (fc instanceof TimePeriodContainer)
 			return new TimePeriodDisplay(c, (TimePeriodContainer) fc);
-		else {
-			System.out.println("Unknown Form container");
+		else
 			return null;
-		}
 	}
 	
 	/* Protected */

@@ -27,6 +27,11 @@ import se.nordicehealth.ppc_app.core.interfaces.Server;
 import se.nordicehealth.ppc_app.implementation.security.Encryption;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.common.implementation.Constants;
+import static se.nordicehealth.ppc_app.common.implementation.Constants.Packet.TYPE;
+import static se.nordicehealth.ppc_app.common.implementation.Constants.Packet.DATA;
+import se.nordicehealth.ppc_app.common.implementation.Constants.Packet.Types;
+import se.nordicehealth.ppc_app.common.implementation.Constants.Packet.Data;
+import se.nordicehealth.ppc_app.common.implementation.Constants.QuestionTypes;
 
 public class PacketHandler implements Server
 {
@@ -51,44 +56,58 @@ public class PacketHandler implements Server
 	@Override
 	public boolean ping(long uid)
 	{
-		MapData ret = new MapData(null);
-		ret.put("command", Constants.CMD_PING);
+		MapData out = new MapData(null);
+		out.put(TYPE, Types.PING);
+        MapData dataOut = new MapData(null);
 
 		MapData details = new MapData(null);
-		details.put("uid", Long.toString(uid));
+		details.put(Data.Ping.Details.UID, Long.toString(uid));
+        dataOut.put(Data.Ping.DETAILS, crypto.encrypt(details.toString()));
 
-		ret.put("details", crypto.encrypt(details.toString()));
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
 
-		MapData ans = sendMessage(ret);
-        String resp = ans.get(Constants.INSERT_RESULT);
-        return (resp != null && resp.equals(Constants.INSERT_SUCCESS));
+        Data.Ping.Response insert = Data.Ping.Response.FAIL;
+        try {
+            insert = Constants.getEnum(Data.Ping.Response.values(), inData.get(Data.Ping.RESPONSE));
+        } catch (NumberFormatException ignored) { }
+        return Constants.equal(Data.Ping.Response.SUCCESS, insert);
 	}
 
 	@Override
     public boolean validatePatientID(long uid, String patientID)
     {
-        MapData ret = new MapData(null);
-        ret.put("command", Constants.CMD_VALIDATE_PID);
+        MapData out = new MapData(null);
+        out.put(TYPE, Types.VALIDATE_PID);
+        MapData dataOut = new MapData(null);
 
         MapData details = new MapData(null);
-        details.put("uid", Long.toString(uid));
+        details.put(Data.ValidatePatientID.Details.UID, Long.toString(uid));
 
         MapData pobj = new MapData(null);
-        pobj.put("personal_id", patientID);
+        pobj.put(Data.ValidatePatientID.Patient.PERSONAL_ID, patientID);
 
-        ret.put("details", crypto.encrypt(details.toString()));
-        ret.put("patient", crypto.encrypt(pobj.toString()));
+        dataOut.put(Data.ValidatePatientID.DETAIL, crypto.encrypt(details.toString()));
+        dataOut.put(Data.ValidatePatientID.PATIENT, crypto.encrypt(pobj.toString()));
 
-        MapData ans = sendMessage(ret);
-        String resp = ans.get(Constants.INSERT_RESULT);
-        return (resp != null && resp.equals(Constants.INSERT_SUCCESS));
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
+
+        Data.ValidatePatientID.Response insert = Data.ValidatePatientID.Response.FAIL;
+        try {
+            insert = Constants.getEnum(Data.ValidatePatientID.Response.values(), inData.get(Data.ValidatePatientID.RESPONSE));
+        } catch (NumberFormatException ignored) { }
+        return Constants.equal(Data.ValidatePatientID.Response.SUCCESS, insert);
     }
 
 	@Override
 	public boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers)
 	{
-        MapData ret = new MapData(null);
-        ret.put("command", Constants.CMD_ADD_QANS);
+        MapData out = new MapData(null);
+        out.put(TYPE, Types.ADD_QANS);
+        MapData dataOut = new MapData(null);
 
         QuestionContainer qc = Questions.getContainer();
         if (qc == null || qc.getSize() != answers.size())
@@ -99,64 +118,84 @@ public class PacketHandler implements Server
             questions.add(qdbfmt.getDBFormat(fc));
 
 		MapData pobj = new MapData(null);
-        pobj.put("forename", patient.getForename());
-        pobj.put("surname", patient.getSurname());
-        pobj.put("personal_id", patient.getPersonalNumber());
+        pobj.put(Data.AddQuestionnaireAnswers.Patient.FORENAME, patient.getForename());
+        pobj.put(Data.AddQuestionnaireAnswers.Patient.SURNAME, patient.getSurname());
+        pobj.put(Data.AddQuestionnaireAnswers.Patient.PERSONAL_ID, patient.getPersonalNumber());
 
 		MapData details = new MapData(null);
-        details.put("uid", Long.toString(uid));
+        details.put(Data.AddQuestionnaireAnswers.Details.UID, Long.toString(uid));
 
-        ret.put("details", crypto.encrypt(details.toString()));
-        ret.put("patient", crypto.encrypt(pobj.toString()));
-        ret.put("questions", questions.toString());
+        dataOut.put(Data.AddQuestionnaireAnswers.DETAILS, crypto.encrypt(details.toString()));
+        dataOut.put(Data.AddQuestionnaireAnswers.PATIENT, crypto.encrypt(pobj.toString()));
+        dataOut.put(Data.AddQuestionnaireAnswers.QUESTIONS, questions.toString());
 
-		MapData ans = sendMessage(ret);
-		String insert = ans.get(Constants.INSERT_RESULT);
-		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
+
+        Data.AddQuestionnaireAnswers.Response insert = Data.AddQuestionnaireAnswers.Response.FAIL;
+        try {
+            insert = Constants.getEnum(Data.AddQuestionnaireAnswers.Response.values(), inData.get(Data.AddQuestionnaireAnswers.RESPONSE));
+        } catch (NumberFormatException ignored) { }
+        return Constants.equal(Data.AddQuestionnaireAnswers.Response.SUCCESS, insert);
 	}
 
 	@Override
-	public int setPassword(long uid, String oldPass, String newPass1, String newPass2) throws NumberFormatException
+	public Data.SetPassword.Response setPassword(long uid, String oldPass, String newPass1, String newPass2) throws NumberFormatException
     {
-		MapData ret = new MapData(null);
-		ret.put("command", Constants.CMD_SET_PASSWORD);
+		MapData out = new MapData(null);
+		out.put(TYPE, Types.SET_PASSWORD);
+        MapData dataOut = new MapData(null);
 
 		MapData details = new MapData(null);
-        details.put("uid", Long.toString(uid));
-        details.put("old_password", oldPass);
-        details.put("new_password1", newPass1);
-        details.put("new_password2", newPass2);
-        ret.put("details", crypto.encrypt(details.toString()));
+        details.put(Data.SetPassword.Details.UID, Long.toString(uid));
+        details.put(Data.SetPassword.Details.OLD_PASSWORD, oldPass);
+        details.put(Data.SetPassword.Details.NEW_PASSWORD1, newPass1);
+        details.put(Data.SetPassword.Details.NEW_PASSWORD2, newPass2);
+        dataOut.put(Data.SetPassword.DETAILS, crypto.encrypt(details.toString()));
 
-		MapData amap = sendMessage(ret);
-        String response = amap.get(Constants.SETPASS_REPONSE);
-        return response != null ? Integer.parseInt(response) : Constants.ERROR;
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
+
+        Data.SetPassword.Response insert = Data.SetPassword.Response.ERROR;
+        try {
+            insert = Constants.getEnum(Data.SetPassword.Response.values(), inData.get(Data.SetPassword.RESPONSE));
+        } catch (NumberFormatException ignored) { }
+        return insert;
 	}
 	
 	@Override
 	public QuestionContainer loadQuestions()
 	{
-		MapData ret = new MapData(null);
-		ret.put("command", Constants.CMD_LOAD_Q);
+		MapData out = new MapData(null);
+		out.put(TYPE, Types.LOAD_Q);
+        MapData dataOut = new MapData(null);
+
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
 
         QuestionContainer qc = new QuestionContainer();
-		MapData amap = sendMessage(ret);
-		MapData qmap = jsonData.getMapData(amap.get("questions"));
+		MapData qmap = jsonData.getMapData(inData.get(Data.LoadQuestions.QUESTIONS));
         for (Entry<String, String> e : qmap.iterable()) {
 			MapData qtnmap = jsonData.getMapData(e.getValue());
 			List<String> options = new ArrayList<>();
-			for (int i = 0; ; ++i) {
-                String entry = qtnmap.get(String.format(Locale.US, "option%d", i));
-				if (entry == null)
-					break;
+			for (String entry : jsonData.getListData(qtnmap.get(Data.LoadQuestions.Question.OPTIONS)).iterable()) {
 				options.add(entry);
 			}
 
-            Question q = new Question(Integer.parseInt(qtnmap.get("id")), qtnmap.get("type"),
-                    qtnmap.get("question"), qtnmap.get("description"),
-                    options, Integer.parseInt(qtnmap.get("optional")) != 0,
-                    Integer.parseInt(qtnmap.get("max_val")),
-                    Integer.parseInt(qtnmap.get("min_val")));
+            Data.LoadQuestions.Question.Optional optional = Constants.getEnum(Data.LoadQuestions.Question.Optional.values(),
+                    qtnmap.get(Data.LoadQuestions.Question.OPTIONAL));
+            Question q = new Question(
+                    Integer.parseInt(qtnmap.get(Data.LoadQuestions.Question.ID)),
+                    qtnmap.get(Data.LoadQuestions.Question.TYPE),
+                    qtnmap.get(Data.LoadQuestions.Question.QUESTION),
+                    qtnmap.get(Data.LoadQuestions.Question.DESCRIPTION),
+                    options,
+                    Constants.equal(Data.LoadQuestions.Question.Optional.YES, optional),
+                    Integer.parseInt(qtnmap.get(Data.LoadQuestions.Question.MAX_VAL)),
+                    Integer.parseInt(qtnmap.get(Data.LoadQuestions.Question.MIN_VAL)));
 			qc.addQuestion(q);
 		}
 		return qc;
@@ -165,16 +204,20 @@ public class PacketHandler implements Server
 	@Override
 	public List<Calendar> loadQuestionnaireResultDates(long uid)
 	{
-		MapData ret = new MapData(null);
-		ret.put("command", Constants.CMD_LOAD_QR_DATE);
+		MapData out = new MapData(null);
+		out.put(TYPE, Types.LOAD_QR_DATE);
+        MapData dataOut = new MapData(null);
 
 		MapData details = new MapData(null);
-        details.put("uid", Long.toString(uid));
-        ret.put("details", crypto.encrypt(details.toString()));
+        details.put(Data.LoadQResultDates.Details.UID, Long.toString(uid));
+        dataOut.put(Data.LoadQResultDates.DETAILS, crypto.encrypt(details.toString()));
+
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
 
         List<Calendar> dates = new ArrayList<>();
-		MapData amap = sendMessage(ret);
-        ListData dlist = jsonData.getListData(amap.get("dates"));
+        ListData dlist = jsonData.getListData(inData.get(Data.LoadQResultDates.DATES));
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
             for (String str : dlist.iterable()) {
@@ -192,25 +235,30 @@ public class PacketHandler implements Server
 	public StatisticsContainer loadQuestionnaireResults(
 	        long uid, Calendar begin, Calendar end, List<Integer> questionIDs)
 	{
-		MapData ret = new MapData(null);
-		ret.put("command", Constants.CMD_LOAD_QR);
+		MapData out = new MapData(null);
+		out.put(TYPE, Types.LOAD_QR);
+        MapData dataOut = new MapData(null);
 
 		ListData questions = new ListData(null);
-		for (Integer i : questionIDs)
-			questions.add(String.format(Locale.US, "%d", i));
-        ret.put("questions", questions.toString());
+		for (Integer i : questionIDs) {
+            questions.add(Integer.toString(i));
+        }
+        dataOut.put(Data.LoadQResults.QUESTIONS, questions.toString());
 
 		MapData details = new MapData(null);
-        details.put("uid", Long.toString(uid));
-        ret.put("details", crypto.encrypt(details.toString()));
+        details.put(Data.LoadQResults.Details.UID, Long.toString(uid));
+        dataOut.put(Data.LoadQResults.DETAILS, crypto.encrypt(details.toString()));
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-        ret.put("begin", sdf.format(begin.getTime()));
-        ret.put("end", sdf.format(end.getTime()));
+        dataOut.put(Data.LoadQResults.BEGIN, sdf.format(begin.getTime()));
+        dataOut.put(Data.LoadQResults.END, sdf.format(end.getTime()));
 
-		StatisticsContainer container = new StatisticsContainer();
-		MapData amap = sendMessage(ret);
-		ListData rlist = jsonData.getListData(amap.get("results"));
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
+
+        StatisticsContainer container = new StatisticsContainer();
+		ListData rlist = jsonData.getListData(inData.get(Data.LoadQResults.RESULTS));
         for (String str : rlist.iterable()) {
 			MapData ansmap = jsonData.getMapData(str);
             QuestionContainer qc = Questions.getContainer();
@@ -225,53 +273,75 @@ public class PacketHandler implements Server
 	@Override
 	public boolean requestRegistration(String name, String email, String clinic)
 	{
-		MapData ret = new MapData(null);
-		ret.put("command", Constants.CMD_REQ_REGISTR);
+		MapData out = new MapData(null);
+		out.put(TYPE, Types.REQ_REGISTR);
+        MapData dataOut = new MapData(null);
 
 		MapData details = new MapData(null);
-        details.put("name", name);
-        details.put("email", email);
-        details.put("clinic", clinic);
-        ret.put("details", crypto.encrypt(details.toString()));
+        details.put(Data.RequestRegistration.Details.NAME, name);
+        details.put(Data.RequestRegistration.Details.EMAIL, email);
+        details.put(Data.RequestRegistration.Details.CLINIC, clinic);
+        dataOut.put(Data.RequestRegistration.DETAILS, crypto.encrypt(details.toString()));
 
-		MapData ans = sendMessage(ret);
-		String insert = ans.get(Constants.INSERT_RESULT);
-		return (insert != null && insert.equals(Constants.INSERT_SUCCESS));
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
+
+        Data.RequestRegistration.Response insert = Data.RequestRegistration.Response.FAIL;
+        try {
+            insert = Constants.getEnum(Data.RequestRegistration.Response.values(), inData.get(Data.RequestRegistration.RESPONSE));
+        } catch (NumberFormatException ignored) { }
+        return Constants.equal(Data.RequestRegistration.Response.SUCCESS, insert);
 	}
 
 	@Override
 	public Session requestLogin(String username, String password)
 	{
-		MapData ret = new MapData(null);
-		ret.put("command", Constants.CMD_REQ_LOGIN);
+		MapData out = new MapData(null);
+		out.put(TYPE, Types.REQ_LOGIN);
+        MapData dataOut = new MapData(null);
 
 		MapData details = new MapData(null);
-        details.put("name", username);
-        details.put("password", password);
-        ret.put("details", crypto.encrypt(details.toString()));
+        details.put(Data.RequestLogin.Details.USERNAME, username);
+        details.put(Data.RequestLogin.Details.PASSWORD, password);
+        dataOut.put(Data.RequestLogin.DETAILS, crypto.encrypt(details.toString()));
 
-		MapData ans = sendMessage(ret);
-        String response = ans.get(Constants.LOGIN_REPONSE);
-        String uid = ans.get(Constants.LOGIN_UID);
-        String update_password = ans.get("update_password");
-        return new Session(uid != null ? Long.parseLong(uid) : 0L,
-                response != null ? Integer.parseInt(response) : Constants.ERROR,
-                update_password != null && Integer.parseInt(update_password) > 0);
+        out.put(DATA, dataOut.toString());
+        MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
+
+        Data.RequestLogin.Response response = Data.RequestLogin.Response.ERROR;
+        Data.RequestLogin.UpdatePassword update_password = Data.RequestLogin.UpdatePassword.NO;
+        try {
+            response = Constants.getEnum(Data.RequestLogin.Response.values(), inData.get(Data.RequestLogin.RESPONSE));
+            update_password = Constants.getEnum(Data.RequestLogin.UpdatePassword.values(), inData.get(Data.RequestLogin.UPDATE_PASSWORD));
+        } catch (NumberFormatException ignored) { }
+
+        String uid = inData.get(Data.RequestLogin.UID);
+        return new Session(uid != null ? Long.parseLong(uid) : 0L, response,
+                Constants.equal(Data.RequestLogin.UpdatePassword.YES, update_password));
 	}
 
 	@Override
 	public boolean requestLogout(long uid)
 	{
-		MapData ret = new MapData(null);
-		ret.put("command", Constants.CMD_REQ_LOGOUT);
+		MapData out = new MapData(null);
+		out.put(TYPE, Types.REQ_LOGOUT);
+        MapData dataOut = new MapData(null);
 
 		MapData details = new MapData(null);
-        details.put("uid", Long.toString(uid));
-        ret.put("details", crypto.encrypt(details.toString()));
+        details.put(Data.RequestLogout.Details.UID, Long.toString(uid));
+        dataOut.put(Data.RequestLogout.DETAILS, crypto.encrypt(details.toString()));
 
-		MapData ans = sendMessage(ret);
-		String response = ans.get(Constants.LOGOUT_REPONSE);
-		return response != null && Integer.parseInt(response) == Constants.SUCCESS;
+        out.put(DATA, dataOut.toString());
+		MapData in = sendMessage(out);
+        MapData inData = jsonData.getMapData(in.get(DATA));
+
+        Data.RequestLogout.Response insert = Data.RequestLogout.Response.ERROR;
+        try {
+            insert = Constants.getEnum(Data.RequestLogout.Response.values(), inData.get(Data.RequestLogout.RESPONSE));
+        } catch (NumberFormatException ignored) { }
+        return Constants.equal(Data.RequestLogout.Response.SUCCESS, insert);
 	}
 
 	private static PacketHandler pktHandler;
@@ -308,17 +378,17 @@ public class PacketHandler implements Server
                     ListData options = new ListData(null);
                     for (Integer i : moc.getEntry())
                         options.add(String.format(Locale.US, "%d", i));
-                    fmt.put("MultipleOption", options.toString());
+                    fmt.put(QuestionTypes.MULTIPLE_OPTION, options.toString());
                 } else {
                     SingleOptionContainer soc = (SingleOptionContainer) fc;
-                    fmt.put("SingleOption", String.format(Locale.US, "%d", soc.getEntry().get(0)));
+                    fmt.put(QuestionTypes.SINGLE_OPTION, String.format(Locale.US, "%d", soc.getEntry().get(0)));
                 }
 			} else if (fc instanceof SliderContainer) {
 				SliderContainer sc = (SliderContainer) fc;
-                fmt.put("Slider", String.format(Locale.US, "%d", sc.getEntry()));
+                fmt.put(QuestionTypes.SLIDER, String.format(Locale.US, "%d", sc.getEntry()));
 			} else if (fc instanceof AreaContainer) {
 				AreaContainer ac = (AreaContainer) fc;
-                fmt.put("Area", ac.getEntry());
+                fmt.put(QuestionTypes.AREA, ac.getEntry());
 			}
             return fmt.toString();
 		}
@@ -338,17 +408,17 @@ public class PacketHandler implements Server
 		Statistics getQFormat(Question q, MapData dbEntry)
 		{
             String val;
-			if ((val = dbEntry.get("SingleOption")) != null) {
+			if ((val = dbEntry.get(QuestionTypes.SINGLE_OPTION)) != null) {
 				return new SingleOption(q, Integer.valueOf(val));
-			} else if ((val = dbEntry.get("Slider")) != null) {
+			} else if ((val = dbEntry.get(QuestionTypes.SLIDER)) != null) {
 				return new Slider(q, Integer.valueOf(val));
-			} else if ((val = dbEntry.get("MultipleOption")) != null) {
+			} else if ((val = dbEntry.get(QuestionTypes.MULTIPLE_OPTION)) != null) {
                 ListData options = jsonData.getListData(val);
                 List<Integer> lint = new ArrayList<>();
                 for (String str : options.iterable())
                     lint.add(Integer.valueOf(str));
                 return new MultipleOption(q, lint);
-			} else if ((val = dbEntry.get("Area")) != null) {
+			} else if ((val = dbEntry.get(QuestionTypes.AREA)) != null) {
 				return new Area(q, val);
 			}
 			return null;

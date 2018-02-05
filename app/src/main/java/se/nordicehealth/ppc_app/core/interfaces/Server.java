@@ -3,11 +3,11 @@ package se.nordicehealth.ppc_app.core.interfaces;
 import java.util.Calendar;
 import java.util.List;
 
+import se.nordicehealth.ppc_app.common.implementation.Constants.Packet.Data;
 import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
-import se.nordicehealth.ppc_app.core.containers.form.TimePeriodContainer;
 
 public interface Server
 {
@@ -16,7 +16,7 @@ public interface Server
 	boolean ping(long uid);
     boolean validatePatientID(long uid, String patientID);
 	boolean addQuestionnaireAnswers(long uid, Patient patient, List<FormContainer> answers);
-	int setPassword(long uid, String oldPass, String newPass1, String newPass2);
+    Data.SetPassword.Response setPassword(long uid, String oldPass, String newPass1, String newPass2);
 	QuestionContainer loadQuestions();
 	List<Calendar> loadQuestionnaireResultDates(long uid);
 	StatisticsContainer loadQuestionnaireResults(long uid, Calendar begin, Calendar end, List<Integer> questionIDs);
@@ -27,10 +27,10 @@ public interface Server
 	class Session
 	{
 		public final long uid;
-		public final int response;
+		public final Data.RequestLogin.Response response;
 		public final boolean update_password;
 
-		public Session(long uid, int response, boolean update_password)
+		public Session(long uid, Data.RequestLogin.Response response, boolean update_password)
 		{
 			this.uid = uid;
 			this.response = response;

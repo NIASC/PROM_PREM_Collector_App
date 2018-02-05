@@ -48,33 +48,258 @@ public abstract class Constants {
 		}
 		SERVER_URL = url;
 	}
-	
-	public static final String INSERT_RESULT = "insert_result";
-	public static final String INSERT_SUCCESS = "1";
-	public static final String INSERT_FAIL = "0";
-	
-	public static final int ERROR           = -1;
-	public static final int SUCCESS         = 0x0;
-	public static final int SERVER_FULL     = 0x2;
-	public static final int ALREADY_ONLINE  = 0x4;
-	public static final int INVALID_DETAILS = 0x8;
-    public static final int MISMATCH_NEW    = 0x10;
-    public static final int PASSWORD_SHORT  = 0x20;
-    public static final int PASSWORD_SIMPLE = 0x40;
 
-    public static final String SETPASS_REPONSE = "setpass_response";
-	public static final String LOGIN_REPONSE = "login_response";
-	public static final String LOGOUT_REPONSE = "logout_response";
-	public static final String LOGIN_UID = "login_uid";
+    public enum Packet {
+        __NULL__,
+        TYPE,
+        DATA;
 
-	public static final String CMD_PING         = "ping";
-    public static final String CMD_VALIDATE_PID = "validate_pid";
-	public static final String CMD_ADD_QANS		= "add_questionnaire_answers";
-	public static final String CMD_SET_PASSWORD	= "set_password";
-	public static final String CMD_LOAD_Q		= "load_questions";
-	public static final String CMD_LOAD_QR_DATE	= "load_q_result_dates";
-	public static final String CMD_LOAD_QR		= "load_q_results";
-	public static final String CMD_REQ_REGISTR	= "request_registration";
-	public static final String CMD_REQ_LOGIN	= "request_login";
-	public static final String CMD_REQ_LOGOUT	= "request_logout";
+        public enum Types {
+            __NULL__,
+            PING,
+            VALIDATE_PID,
+            ADD_QANS,
+            SET_PASSWORD,
+            LOAD_Q,
+            LOAD_QR_DATE,
+            LOAD_QR,
+            REQ_REGISTR,
+            REQ_LOGIN,
+            REQ_LOGOUT;
+        }
+
+        public enum Data {
+            __NULL__;
+
+            public enum Ping {
+                __NULL__,
+                RESPONSE,
+                DETAILS;
+
+                public enum Details {
+                    __NULL__,
+                    UID
+                }
+
+                public enum Response {
+                    __NULL__,
+                    FAIL,
+                    SUCCESS
+                }
+            } // Ping
+
+            public enum ValidatePatientID {
+                __NULL__,
+                RESPONSE,
+                PATIENT,
+                DETAIL;
+
+                public enum Details {
+                    __NULL__,
+                    UID
+                }
+
+                public enum Patient {
+                    __NULL__,
+                    PERSONAL_ID
+                }
+
+                public enum Response {
+                    __NULL__,
+                    FAIL,
+                    SUCCESS
+                }
+            } // ValidatePatientID
+
+            public enum AddQuestionnaireAnswers {
+                __NULL__,
+                RESPONSE,
+                DETAILS,
+                PATIENT,
+                QUESTIONS;
+
+                public enum Details {
+                    __NULL__,
+                    UID
+                }
+
+                public enum Patient {
+                    __NULL__,
+                    FORENAME,
+                    SURNAME,
+                    PERSONAL_ID
+                }
+
+                public enum Response {
+                    __NULL__,
+                    FAIL,
+                    SUCCESS
+                }
+            } // AddQuestionnaireAnswers
+
+            public enum SetPassword {
+                __NULL__,
+                RESPONSE,
+                DETAILS;
+
+                public enum Details {
+                    __NULL__,
+                    UID,
+                    OLD_PASSWORD,
+                    NEW_PASSWORD1,
+                    NEW_PASSWORD2
+                }
+
+                public enum Response {
+                    __NULL__,
+                    ERROR,
+                    SUCCESS,
+                    INVALID_DETAILS,
+                    MISMATCH_NEW,
+                    PASSWORD_SHORT,
+                    PASSWORD_SIMPLE
+                }
+            } // SetPassword
+
+            public enum LoadQuestions {
+                __NULL__,
+                QUESTIONS;
+
+                public enum Question {
+                    __NULL__,
+                    OPTIONS,
+                    TYPE,
+                    ID,
+                    QUESTION,
+                    DESCRIPTION,
+                    OPTIONAL,
+                    MAX_VAL,
+                    MIN_VAL;
+
+                    public enum Optional {
+                        __NULL__,
+                        YES,
+                        NO
+                    }
+                }
+            } // LoadQuestions
+
+            public enum LoadQResultDates {
+                __NULL__,
+                DATES,
+                DETAILS;
+
+                public enum Details {
+                    __NULL__,
+                    UID
+                }
+            } // LoadQResultDates
+
+            public enum LoadQResults {
+                __NULL__,
+                RESULTS,
+                QUESTIONS,
+                DETAILS,
+                BEGIN,
+                END;
+
+                public enum Details {
+                    __NULL__,
+                    UID
+                }
+            } // LoadQResults
+
+            public enum RequestRegistration {
+                __NULL__,
+                RESPONSE,
+                DETAILS;
+
+                public enum Details {
+                    __NULL__,
+                    NAME,
+                    EMAIL,
+                    CLINIC
+                }
+
+                public enum Response {
+                    __NULL__,
+                    FAIL,
+                    SUCCESS
+                }
+            } // RequestRegistration
+
+            public enum RequestLogin {
+                __NULL__,
+                RESPONSE,
+                UPDATE_PASSWORD,
+                UID,
+                DETAILS;
+
+                public enum Response {
+                    __NULL__,
+                    ERROR,
+                    FAIL,
+                    SUCCESS,
+                    SERVER_FULL,
+                    ALREADY_ONLINE,
+                    INVALID_DETAILS,
+                    UPDATE_PASSWORD
+                }
+
+                public enum Details {
+                    __NULL__,
+                    USERNAME,
+                    PASSWORD
+                }
+
+                public enum UpdatePassword {
+                    __NULL__,
+                    YES,
+                    NO
+                }
+            } // RequestLogin
+
+            public enum RequestLogout {
+                __NULL__,
+                RESPONSE,
+                DETAILS;
+
+                public enum Response {
+                    __NULL__,
+                    ERROR,
+                    SUCCESS
+                }
+
+                public enum Details {
+                    __NULL__,
+                    UID
+                }
+            } // RequestLogout
+        } // Packets
+    }
+
+    public enum QuestionTypes {
+        __NULL__,
+        SINGLE_OPTION,
+        MULTIPLE_OPTION,
+        SLIDER,
+        AREA
+    }
+
+    public static <T extends Enum<T>> T getEnum(T v[], int ordinal) {
+        for (T t : v) {
+            if (t.ordinal() == ordinal) {
+                return t;
+            }
+        }
+        return v[0];
+    }
+
+    public static <T extends Enum<T>> T getEnum(T v[], String ordinalStr) throws NumberFormatException {
+        return getEnum(v, Integer.parseInt(ordinalStr));
+    }
+
+    public static <T extends Enum<T>> boolean equal(T lhs, T rhs) {
+        return lhs.compareTo(rhs) == 0;
+    }
 }

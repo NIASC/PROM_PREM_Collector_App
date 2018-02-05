@@ -16,20 +16,20 @@ import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
 
-public class Questionnaire
+class Questionnaire
 {
-	void start()
+    Questionnaire(UserInterface ui, UserHandle uh)
+    {
+        this.ui = ui;
+        this.uh = uh;
+        questions = Questions.getContainer();
+        preg = new PatientRegistration();
+        pquest = new PatientQuestionnaire();
+    }
+
+    void start()
 	{
 		preg.createPatientRegistration();
-	}
-
-	Questionnaire(UserInterface ui, UserHandle uh)
-	{
-		this.ui = ui;
-		this.uh = uh;
-		questions = Questions.getContainer();
-		preg = new PatientRegistration();
-		pquest = new PatientQuestionnaire();
 	}
 
 	private UserHandle uh;

@@ -17,14 +17,20 @@ class MapData
         this.jmap = (Map<String, String>) this.jobj;
     }
 
-    void put(String key, String value)
+    void put(Enum<?> key, Enum<?> value)
     {
-        jmap.put(key, value);
+        jmap.put(Integer.toString(key.ordinal()),
+                Integer.toString(value.ordinal()));
     }
 
-    String get(String key)
+    void put(Enum<?> key, String value)
     {
-        return jmap.get(key);
+        jmap.put(Integer.toString(key.ordinal()), value);
+    }
+
+    String get(Enum<?> key)
+    {
+        return jmap.get(Integer.toString(key.ordinal()));
     }
 
     Iterable<Entry<String, String>> iterable()

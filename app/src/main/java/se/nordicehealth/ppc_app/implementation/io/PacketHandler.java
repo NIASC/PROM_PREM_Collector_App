@@ -27,10 +27,10 @@ import se.nordicehealth.ppc_app.core.interfaces.Server;
 import se.nordicehealth.ppc_app.implementation.security.Encryption;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.common.implementation.Constants;
-import static se.nordicehealth.ppc_app.common.implementation.Constants.Packet.TYPE;
-import static se.nordicehealth.ppc_app.common.implementation.Constants.Packet.DATA;
-import se.nordicehealth.ppc_app.common.implementation.Constants.Packet.Types;
-import se.nordicehealth.ppc_app.common.implementation.Constants.Packet.Data;
+import static se.nordicehealth.ppc_app.common.implementation.Packet.TYPE;
+import static se.nordicehealth.ppc_app.common.implementation.Packet.DATA;
+import se.nordicehealth.ppc_app.common.implementation.Packet.Types;
+import se.nordicehealth.ppc_app.common.implementation.Packet.Data;
 import se.nordicehealth.ppc_app.common.implementation.Constants.QuestionTypes;
 
 public class PacketHandler implements Server

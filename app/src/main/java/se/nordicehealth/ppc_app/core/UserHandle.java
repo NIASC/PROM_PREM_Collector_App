@@ -11,7 +11,7 @@ import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.Registration;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
-import se.nordicehealth.ppc_app.common.implementation.Constants.Packet.Data;
+import se.nordicehealth.ppc_app.common.implementation.Packet.Data;
 
 public class UserHandle
 {

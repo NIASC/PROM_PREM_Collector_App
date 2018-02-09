@@ -3,7 +3,7 @@ package se.nordicehealth.ppc_app.core.interfaces;
 import java.util.Calendar;
 import java.util.List;
 
-import se.nordicehealth.ppc_app.common.implementation.Constants.Packet.Data;
+import se.nordicehealth.ppc_app.common.implementation.Packet.Data;
 import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;

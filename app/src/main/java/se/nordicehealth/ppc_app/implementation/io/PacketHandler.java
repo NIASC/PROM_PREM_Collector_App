@@ -24,6 +24,7 @@ import se.nordicehealth.ppc_app.core.containers.statistics.SingleOption;
 import se.nordicehealth.ppc_app.core.containers.statistics.Slider;
 import se.nordicehealth.ppc_app.core.containers.statistics.Statistics;
 import se.nordicehealth.ppc_app.core.interfaces.Server;
+import se.nordicehealth.ppc_app.implementation.res.Resource;
 import se.nordicehealth.ppc_app.implementation.security.Encryption;
 import se.nordicehealth.ppc_app.core.interfaces.Questions;
 import se.nordicehealth.ppc_app.common.implementation.Constants;
@@ -354,7 +355,7 @@ public class PacketHandler implements Server
 	private PacketHandler(Encryption crypto)
 	{
         this.crypto = crypto;
-        scom = new ServletConnection(Constants.SERVER_URL);
+        scom = new ServletConnection(Resource.data().getServerURL());
 		jsonData = new PacketData();
         qdbfmt = new QDBFormat();
 	}

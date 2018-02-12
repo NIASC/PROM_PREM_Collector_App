@@ -1,26 +1,6 @@
 package se.nordicehealth.ppc_app.common.implementation;
 
-import android.util.Log;
-
-import java.io.IOException;
-import java.net.URL;
-
 public abstract class Constants {
-
-	public static final URL SERVER_URL;
-	
-	static
-    {
-		URL url = null;
-		try {
-            //url = new URL("http://188.114.242.3:443/PROM_PREM_Collector/main");
-			url = new URL("http://192.168.1.22:8080/PROM_PREM_Collector/main");
-		}
-		catch (IOException | IllegalArgumentException ignore) {
-			Log.e("ECONN", ignore.getMessage());
-		}
-		SERVER_URL = url;
-	}
 
     public enum QuestionTypes {
         __NULL__,

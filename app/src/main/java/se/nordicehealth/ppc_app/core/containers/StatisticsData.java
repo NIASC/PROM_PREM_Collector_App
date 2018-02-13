@@ -2,14 +2,12 @@ package se.nordicehealth.ppc_app.core.containers;
 
 import java.util.Map;
 
-class StatisticsData
-{
+class StatisticsData  {
     final Question question;
-    final Map<String, Integer> answerCount;
+    final Map<String, Integer> answersAndCount;
 
-    StatisticsData(Question q, Map<String, Integer> ac)
-    {
+    StatisticsData(Question q, Map<String, Integer> ac)  {
         question = q;
-        answerCount = ac;
+        answersAndCount = ac;
     }
 }

@@ -1,22 +1,27 @@
 package se.nordicehealth.ppc_app.core.containers.statistics;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import se.nordicehealth.ppc_app.core.containers.Question;
 
-public abstract class Statistics
-{
-    protected Question q;
-
-    Statistics(Question q) {
-        this.q = q;
+public abstract class Statistics  {
+    public Question question() { return question; }
+    public Set<Map.Entry<Object, String>> answerIdentifierAndText() {
+        return Collections.unmodifiableSet(answerIdentifiersWithText.entrySet());
     }
 
-    public Question question()
-    {
-        return q;
+    Statistics(Question question) {
+        this.question = question;
+        answerIdentifiersWithText = new TreeMap<>();
     }
 
-    public abstract Map<Object, String> answers();
+    void put(Object key, String val) {
+        answerIdentifiersWithText.put(key, val);
+    }
 
+    private Question question;
+    private Map<Object, String> answerIdentifiersWithText;
 }

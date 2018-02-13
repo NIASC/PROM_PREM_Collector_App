@@ -6,20 +6,9 @@ import java.util.TreeMap;
 
 import se.nordicehealth.ppc_app.core.containers.Question;
 
-public class MultipleOption extends Statistics
-{
-	public MultipleOption(Question q, List<Integer> optionIdx)
-    {
-        super(q);
-        this.optionIdx = new TreeMap<>();
-        for (Integer i : optionIdx)
-            this.optionIdx.put(i, q.getOption(i));
+public class MultipleOption extends Statistics {
+	public MultipleOption(Question question, List<Integer> optionIdx) {
+        super(question);
+        for (Integer i : optionIdx) { put(i, question.getOption(i)); }
     }
-
-    public Map<Object, String> answers()
-    {
-        return optionIdx;
-    }
-
-    private Map<Object, String> optionIdx;
 }

@@ -40,8 +40,8 @@ public class ViewDataContainer
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%s:\n", s.question.getStatement()));
 
-        int tot = totalEntries(s.answerCount.values());
-        for (Entry<String, Integer> e : s.answerCount.entrySet())
+        int tot = totalEntries(s.answersAndCount.values());
+        for (Entry<String, Integer> e : s.answersAndCount.entrySet())
             sb.append(formatLine("├", e.getValue(), tot, e.getKey()));
 
         sb.append("├─────────────────\n");

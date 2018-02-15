@@ -63,9 +63,9 @@ class Questionnaire
 		void createQuestionnaire()
 		{
             List<FormContainer> form = new LinkedList<>();
-			for (FormContainer fc : questions.forms())
-			    form.add(fc);
-			
+			for (FormContainer fc : questions.createForms()) {
+				form.add(fc);
+			}
 			ui.presentForm(form, this, false);
 		}
 	}

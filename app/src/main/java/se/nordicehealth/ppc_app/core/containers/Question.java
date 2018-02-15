@@ -41,7 +41,7 @@ public class Question
         this.lower = lower;
     }
 
-    FormContainer getContainer()
+    public FormContainer getContainer()
     {
         if (type == null)
             return null;

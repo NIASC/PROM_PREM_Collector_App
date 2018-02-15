@@ -73,8 +73,7 @@ class ViewData
             db = Implementations.Server();
         }
 
-        String errorMessages(Calendar lower, Calendar upper, int entries)
-        {
+        String errorMessages(Calendar lower, Calendar upper, int entries) {
             if (lower == null || upper == null)
                 return msg.error(Messages.ERROR.VD_INVALID_PERIOD);
             else if (entries < 5)
@@ -90,7 +89,7 @@ class ViewData
 			MultipleOptionContainer questionselect =
 					new MultipleOptionContainer(false, msg.info(Messages.INFO.VD_SELECT_PERIOD), null);
             int i = 0;
-            for (FormContainer fc : qc.forms())
+            for (FormContainer fc : qc.createForms())
                 questionselect.addOption(i, fc.getStatement());
 			form.add(questionselect);
 

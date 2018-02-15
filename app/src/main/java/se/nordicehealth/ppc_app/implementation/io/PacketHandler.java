@@ -7,22 +7,20 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import se.nordicehealth.ppc_app.core.containers.Patient;
 import se.nordicehealth.ppc_app.core.containers.Question;
 import se.nordicehealth.ppc_app.core.containers.QuestionContainer;
 import se.nordicehealth.ppc_app.core.containers.StatisticsContainer;
+import se.nordicehealth.ppc_app.core.containers.StatisticsData;
 import se.nordicehealth.ppc_app.core.containers.form.AreaContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.containers.form.MultipleOptionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.SingleOptionContainer;
 import se.nordicehealth.ppc_app.core.containers.form.SliderContainer;
-import se.nordicehealth.ppc_app.core.containers.statistics.Area;
-import se.nordicehealth.ppc_app.core.containers.statistics.MultipleOption;
-import se.nordicehealth.ppc_app.core.containers.statistics.SingleOption;
-import se.nordicehealth.ppc_app.core.containers.statistics.Slider;
-import se.nordicehealth.ppc_app.core.containers.statistics.Statistics;
 import se.nordicehealth.ppc_app.core.interfaces.Server;
 import se.nordicehealth.ppc_app.implementation.res.Resource;
 import se.nordicehealth.ppc_app.implementation.security.Encryption;
@@ -34,25 +32,12 @@ import se.nordicehealth.ppc_app.common.implementation.Packet.Types;
 import se.nordicehealth.ppc_app.common.implementation.Packet.Data;
 import se.nordicehealth.ppc_app.common.implementation.Constants.QuestionTypes;
 
-public class PacketHandler implements Server
-{
-	public static synchronized PacketHandler getPacketHandler()
-	{
-		if (pktHandler == null)
-		    throw new NullPointerException("PacketHandler have not been initialized.");
-		return pktHandler;
-	}
+public enum PacketHandler implements Server {
+    instance;
 
-	public static void initialize(Encryption crypto)
-    {
-        pktHandler = new PacketHandler(crypto);
+	public static void initialize(Encryption crypto) {
+        instance.crypto = crypto;
     }
-
-	@Override
-	public final Object clone() throws CloneNotSupportedException
-	{
-		throw new CloneNotSupportedException();
-	}
 
 	@Override
 	public boolean ping(long uid)
@@ -259,15 +244,18 @@ public class PacketHandler implements Server
         MapData inData = jsonData.getMapData(in.get(DATA));
 
         StatisticsContainer container = new StatisticsContainer();
-		ListData rlist = jsonData.getListData(inData.get(Data.LoadQResults.RESULTS));
-        for (String str : rlist.iterable()) {
-			MapData ansmap = jsonData.getMapData(str);
-            QuestionContainer qc = Questions.getContainer();
+        MapData rlist = jsonData.getMapData(inData.get(Data.LoadQResults.RESULTS));
+        for (Entry<String, String> str : rlist.iterable()) {
+            Question q = Questions.getContainer().getQuestion(Integer.parseInt(str.getKey()));
+            MapData ansmap = jsonData.getMapData(str.getValue());
+
+            Map<String, Integer> identifierAndCount = new TreeMap<>();
             for (Entry<String, String> e : ansmap.iterable()) {
-                int qid = Integer.parseInt(e.getKey());
-                container.addResult(qdbfmt.getQFormat(qc.getQuestion(qid), jsonData.getMapData(e.getValue())));
+                identifierAndCount.put(e.getKey(), Integer.parseInt(e.getValue()));
             }
+            container.addResult(qdbfmt.getQFormat(q, identifierAndCount));
         }
+
 		return container;
 	}
 	
@@ -345,16 +333,13 @@ public class PacketHandler implements Server
         return Constants.equal(Data.RequestLogout.Response.SUCCESS, insert);
 	}
 
-	private static PacketHandler pktHandler;
 	private Encryption crypto;
 	
 	private PacketData jsonData;
     private ServletConnection scom;
     private QDBFormat qdbfmt;
 
-	private PacketHandler(Encryption crypto)
-	{
-        this.crypto = crypto;
+    PacketHandler() {
         scom = new ServletConnection(Resource.data().getServerURL());
 		jsonData = new PacketData();
         qdbfmt = new QDBFormat();
@@ -393,34 +378,30 @@ public class PacketHandler implements Server
 			}
             return fmt.toString();
 		}
-		
-		/**
-		 * Converts the answer {@code dbEntry} from its pktHandler
-		 * representation to its java representation. The return type
-		 * is {@code Object} to keep the formats general. The returned
-		 * objects are in the format they need to be in order to
-		 * represent the answer in its java format.
-		 * 
-		 * @param dbEntry The pktHandler entry that is to be converted
-		 * 		to a java entry.
-		 * 
- 		 * @return The {@code Object} representation of the answer.
-		 */
-		Statistics getQFormat(Question q, MapData dbEntry)
+
+        StatisticsData getQFormat(Question q, Map<String, Integer> identifierAndCount)
 		{
-            String val;
-			if ((val = dbEntry.get(QuestionTypes.SINGLE_OPTION)) != null) {
-				return new SingleOption(q, Integer.valueOf(val));
-			} else if ((val = dbEntry.get(QuestionTypes.SLIDER)) != null) {
-				return new Slider(q, Integer.valueOf(val));
-			} else if ((val = dbEntry.get(QuestionTypes.MULTIPLE_OPTION)) != null) {
-                ListData options = jsonData.getListData(val);
-                List<Integer> lint = new ArrayList<>();
-                for (String str : options.iterable())
-                    lint.add(Integer.valueOf(str));
-                return new MultipleOption(q, lint);
-			} else if ((val = dbEntry.get(QuestionTypes.AREA)) != null) {
-				return new Area(q, val);
+            FormContainer container = q.getContainer();
+			if (container instanceof SingleOptionContainer) {
+                Map<String, Integer> data = new TreeMap<>();
+                for (Entry<String, Integer> e : identifierAndCount.entrySet()) {
+                    data.put(q.getOption(Integer.parseInt(e.getKey())), e.getValue());
+                }
+				return new StatisticsData(q, data);
+			} else if (container instanceof SliderContainer) {
+                Map<String, Integer> data = new TreeMap<>();
+                for (Entry<String, Integer> e : identifierAndCount.entrySet()) {
+                    data.put(e.getKey(), e.getValue());
+                }
+                return new StatisticsData(q, data);
+            } else if (container instanceof AreaContainer) {
+                Map<String, Integer> data = new TreeMap<>();
+                for (Entry<String, Integer> e : identifierAndCount.entrySet()) {
+                    if (!e.getKey().trim().isEmpty()) {
+                        data.put(e.getKey(), e.getValue());
+                    }
+                }
+                return new StatisticsData(q, data);
 			}
 			return null;
 		}

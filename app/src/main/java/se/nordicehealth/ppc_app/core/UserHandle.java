@@ -48,43 +48,36 @@ public class UserHandle
 		}
 	}
 
-	public void registration()
-	{
+	public void registration() {
 		Registration register = Implementations.Registration(ui);
 		register.registrationProcess();
 	}
 
-	public void logout()
-	{
+	public void logout() {
 		db.requestLogout(user.uid);
 		resetLoginVars();
 	}
 
-	public void startQuestionnaire()
-	{
+	public void startQuestionnaire() {
 		questionnaire.start();
 	}
 
-	public void viewData()
-	{
+	public void viewData() {
 		viewData.start();
 	}
 
-	public boolean isLoggedIn()
-	{
+	public boolean isLoggedIn() {
 		return user.loggedIn;
 	}
 
-	public void updatePassword()
-	{
+	public void updatePassword() {
 		if (user.updatePassword) {
 			ui.displayMessage(msg.info(Messages.INFO.UH_UPDATE_PASSWORD), true);
 			updatePass.createForm();
 		}
 	}
 
-    long getUID()
-    {
+    long getUID() {
         return user.uid;
     }
 
@@ -98,8 +91,7 @@ public class UserHandle
 	private volatile boolean running;
 	private Thread monitor;
 
-	private String newPassError(Data.SetPassword.Response response)
-	{
+	private String newPassError(Data.SetPassword.Response response) {
 		switch(response) {
             case SUCCESS:
                 return null;
@@ -116,16 +108,14 @@ public class UserHandle
 		}
 	}
 
-	private void initLoginVars(User user)
-	{
+	private void initLoginVars(User user) {
         this.user = user;
 		running = true;
 		monitor = new Thread(new PingServer());
 		monitor.start();
 	}
 
-	private void resetLoginVars()
-	{
+	private void resetLoginVars() {
 		running = false;
 		if (monitor != null && monitor.isAlive()) {
 			try {

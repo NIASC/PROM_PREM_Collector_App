@@ -2,9 +2,13 @@ package se.nordicehealth.ppc_app.core.containers;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+
+import se.nordicehealth.ppc_app.common.Util;
 
 public class ViewDataContainer
 {
@@ -40,26 +44,25 @@ public class ViewDataContainer
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%s:\n", s.question.getStatement()));
 
-        int tot = totalEntries(s.answersAndCount.values());
-        for (Entry<String, Integer> e : s.answersAndCount.entrySet())
+        Map<String, Integer> sortedByOccurrence = Util.sortByValue(s.answersAndCount, true);
+        int tot = totalEntries(sortedByOccurrence.values());
+        for (Entry<String, Integer> e : sortedByOccurrence.entrySet()) {
             sb.append(formatLine("├", e.getValue(), tot, e.getKey()));
+        }
 
         sb.append("├─────────────────\n");
         sb.append(formatLine("└", tot, tot, "Total")); sb.append("\n");
         return sb.toString();
     }
 
-    private int totalEntries(Iterable<Integer> count)
-    {
-        int tot = 0;
-        for (int i : count)
-            tot += i;
+    private int totalEntries(Iterable<Integer> count) {
+        int tot = 0; for (int i : count) { tot += i; }
         return tot;
     }
 
-    private String formatLine(String edge, int count, int total, String statement)
-    {
-        return String.format(Locale.getDefault(), "%s─ %03d %% (%04d) - %s\n",
-                edge, Math.round(100D*count/total), count, statement);
+    private String formatLine(String edge, int count, int total, String statement) {
+    	double percent = Math.round(100D*count/total);
+        return String.format(Locale.getDefault(), "%s─ %.0f %% (%d) - %s\n",
+                edge, percent, count, statement);
     }
 }

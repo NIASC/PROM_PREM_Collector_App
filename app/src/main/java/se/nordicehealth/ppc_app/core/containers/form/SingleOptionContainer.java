@@ -16,14 +16,12 @@ public class SingleOptionContainer extends FormContainer
 	}
 
 	@Override
-	public boolean hasEntry()
-	{
-		return entryIsSet && (allowEmpty || !selected.isEmpty());
+	public boolean hasEntry() {
+		return entryIsSet && (allowEmpty || (!selected.isEmpty() && selected.get(0) != null));
 	}
 	
 	@Override
-	public List<Integer> getEntry()
-	{
+	public List<Integer> getEntry() {
         return Collections.unmodifiableList(selected);
 	}
 
@@ -34,9 +32,10 @@ public class SingleOptionContainer extends FormContainer
             return false;
 
         selected.clear();
-        if (!selectedIDs.isEmpty())
-            selected.add(selectedIDs.get(0));
-        return true;
+        if (!selectedIDs.isEmpty()) {
+			selected.add(selectedIDs.get(0));
+		}
+		return true;
 	}
 
 	public void addOption(int identifier, String text)

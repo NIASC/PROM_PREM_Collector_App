@@ -331,9 +331,7 @@ public class PPCGUI extends Activity implements UserInterface
             return contents;
         }
 
-        int getNextEntry(int cIndex, int nEntries, int steps,
-                         boolean wrap)
-        {
+        int getNextEntry(int cIndex, int nEntries, int steps, boolean wrap) {
             if (wrap)
                 return (cIndex + steps + nEntries) % nEntries;
             if (cIndex + steps >= nEntries)
@@ -348,8 +346,9 @@ public class PPCGUI extends Activity implements UserInterface
         {
             int entries = form.size();
             int i = getNextEntry(currentIdx, entries, 1, true);
-            while (form.get(i).entryIsFilled() && i != currentIdx)
+            while (form.get(i).entryIsFilled() && i != currentIdx) {
                 i = getNextEntry(i, entries, 1, true);
+            }
             return i;
         }
 

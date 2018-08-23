@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="servlet_url_test">http://192.168.1.22:8080/PROM_PREM_Collector/main</string>
-    <string name="servlet_url">http://188.114.242.3:443/PROM_PREM_Collector/main</string>
+    <string name="servlet_url">http://192.168.1.2:8080/PROM_PREM_Collector/main</string>
+    <string name="servlet_url_test">http://192.168.1.53:8080/PROM_PREM_Collector/main</string>
+    <string name="servlet_url_live">http://188.114.242.3:8080/PROM_PREM_Collector/main</string>
 </resources>

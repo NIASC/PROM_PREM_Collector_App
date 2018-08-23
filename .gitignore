@@ -1,6 +1,7 @@
 *~
 build
 doc/html
+app/release
 .gradle
 .idea
 local.properties

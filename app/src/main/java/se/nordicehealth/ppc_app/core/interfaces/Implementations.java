@@ -1,8 +1,8 @@
 package se.nordicehealth.ppc_app.core.interfaces;
 
-import se.nordicehealth.ppc_app.implementation.EmailRegistration;
-import se.nordicehealth.ppc_app.implementation.res.Resource;
-import se.nordicehealth.ppc_app.implementation.io.PacketHandler;
+import se.nordicehealth.ppc_app.impl.EmailRegistration;
+import se.nordicehealth.ppc_app.impl.res.Resource;
+import se.nordicehealth.ppc_app.impl.io.PacketHandler;
 
 public abstract class Implementations
 {

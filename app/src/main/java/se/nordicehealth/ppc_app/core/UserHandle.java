@@ -3,6 +3,7 @@ package se.nordicehealth.ppc_app.core;
 import java.util.LinkedList;
 import java.util.List;
 
+import se.nordicehealth.ppc_app.common.impl.Packet;
 import se.nordicehealth.ppc_app.core.containers.form.FieldContainer;
 import se.nordicehealth.ppc_app.core.containers.form.FormContainer;
 import se.nordicehealth.ppc_app.core.interfaces.Server;
@@ -11,7 +12,6 @@ import se.nordicehealth.ppc_app.core.interfaces.Implementations;
 import se.nordicehealth.ppc_app.core.interfaces.Messages;
 import se.nordicehealth.ppc_app.core.interfaces.Registration;
 import se.nordicehealth.ppc_app.core.interfaces.UserInterface;
-import se.nordicehealth.ppc_app.common.implementation.Packet.Data;
 
 public class UserHandle
 {
@@ -29,17 +29,17 @@ public class UserHandle
 	{
 		Server.Session session = db.requestLogin(username, password);
 		switch(session.response) {
-            case SUCCESS:
+            case Packet.SUCCESS:
                 initLoginVars(new User(session.uid, session.update_password, true));
                 questionnaire = new Questionnaire(ui, this);
                 break;
-            case ALREADY_ONLINE:
+            case Packet.ALREADY_ONLINE:
                 ui.displayError(msg.error(Messages.ERROR.UH_ALREADY_ONLINE), false);
                 break;
-            case SERVER_FULL:
+            case Packet.SERVER_FULL:
                 ui.displayError(msg.error(Messages.ERROR.UH_SERVER_FULL), false);
                 break;
-            case INVALID_DETAILS:
+            case Packet.INVALID_DETAILS:
                 ui.displayError(msg.error(Messages.ERROR.UH_INVALID_LOGIN), false);
                 break;
             default:
@@ -91,17 +91,17 @@ public class UserHandle
 	private volatile boolean running;
 	private Thread monitor;
 
-	private String newPassError(Data.SetPassword.Response response) {
+	private String newPassError(String response) {
 		switch(response) {
-            case SUCCESS:
+            case Packet.SUCCESS:
                 return null;
-            case INVALID_DETAILS:
+            case Packet.INVALID_DETAILS:
 				return msg.error(Messages.ERROR.UH_PR_INVALID_CURRENT);
-			case MISMATCH_NEW:
+			case Packet.MISMATCH_NEW:
 				return msg.error(Messages.ERROR.UH_PR_MISMATCH_NEW);
-			case PASSWORD_SHORT:
+			case Packet.PASSWORD_INVALID_LENGTH:
 				return msg.error(Messages.ERROR.UH_PR_INVALID_LENGTH);
-            case PASSWORD_SIMPLE:
+            case Packet.PASSWORD_SIMPLE:
 				return msg.error(Messages.ERROR.UH_PR_PASSWORD_SIMPLE);
 			default:
 				return msg.error(Messages.ERROR.UNKNOWN_RESPONSE);
@@ -138,7 +138,7 @@ public class UserHandle
 			String new1 = answers.get(1);
 			String new2 = answers.get(2);
 
-            Data.SetPassword.Response response = db.setPassword(user.uid, current, new1, new2);
+            String response = db.setPassword(user.uid, current, new1, new2);
 			if ((rfc.message = newPassError(response)) == null)
                 rfc.valid = true;
 			return rfc;
